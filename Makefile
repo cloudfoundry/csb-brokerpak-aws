@@ -39,6 +39,7 @@ run-examples:
 	docker run $(DOCKER_OPTS) \
 	-e SECURITY_USER_NAME \
 	-e SECURITY_USER_PASSWORD \
+	-e USER \
 	$(CSB) client run-examples -j $(PARALLEL_JOB_COUNT)
 
 .PHONY: info
