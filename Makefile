@@ -1,6 +1,6 @@
 
 IAAS=aws
-DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak #--network=host
+DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host
 CSB=cfplatformeng/csb
 
 .PHONY: build
@@ -11,7 +11,7 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf
 
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
-GSB_API_HOSTNAME := $(or $(GSB_API_HOSTNAME), host.docker.internal)
+#GSB_API_HOSTNAME := $(or $(GSB_API_HOSTNAME), host.docker.internal)
 PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 2)
 
 .PHONY: run
@@ -39,8 +39,6 @@ run-examples:
 	docker run $(DOCKER_OPTS) \
 	-e SECURITY_USER_NAME \
 	-e SECURITY_USER_PASSWORD \
-	-e GSB_API_HOSTNAME=$(GSB_API_HOSTNAME) \
-	-e USER \
 	$(CSB) client run-examples -j $(PARALLEL_JOB_COUNT)
 
 .PHONY: info
