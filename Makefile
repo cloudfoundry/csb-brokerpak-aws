@@ -11,6 +11,8 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf
 
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
+GSB_API_HOSTNAME := $(or $(GSB_API_HOSTNAME), host.docker.internal)
+PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 2)
 
 .PHONY: run
 run: build aws_access_key_id aws_secret_access_key
@@ -33,13 +35,13 @@ brokerpak-user-docs.md: *.yml
 	$(CSB) pak docs /brokerpak/$(shell ls *.brokerpak) > $@
 
 .PHONY: run-examples
-run-examples: build
+run-examples: 
 	docker run $(DOCKER_OPTS) \
 	-e SECURITY_USER_NAME \
 	-e SECURITY_USER_PASSWORD \
-	-e "GSB_API_HOSTNAME=host.docker.internal" \
+	-e GSB_API_HOSTNAME=$(GSB_API_HOSTNAME) \
 	-e USER \
-	$(CSB) pak run-examples /brokerpak/$(shell ls *.brokerpak)
+	$(CSB) client run-examples -j $(PARALLEL_JOB_COUNT)
 
 .PHONY: info
 info: build
