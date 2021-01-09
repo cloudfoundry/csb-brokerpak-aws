@@ -84,7 +84,7 @@ if [[ ${CH_UAA_CLIENT_SECRET} ]]; then
 fi
 
 if [[ ${CH_SKIP_SSL_VALIDATION} ]]; then
-  cf set-env "${APP_NAME}" "${CH_SKIP_SSL_VALIDATION}"
+  cf set-env "${APP_NAME}" CH_SKIP_SSL_VALIDATION "${CH_SKIP_SSL_VALIDATION}"
 fi
 
 if [[ ${DB_TLS} ]]; then
