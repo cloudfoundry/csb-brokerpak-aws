@@ -118,7 +118,7 @@ provision:
     default: 0
   - field_name: storage_encrypted
     type: boolean
-    default: false
+    default: true
     details: Enable encrypted storage
   - field_name: parameter_group_name
     type: string
