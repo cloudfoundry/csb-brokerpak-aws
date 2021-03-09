@@ -57,7 +57,7 @@ run-examples: ## run examples in yml files. Runs examples for all services by de
 	-e SECURITY_USER_NAME \
 	-e SECURITY_USER_PASSWORD \
 	-e USER \
-	$(CSB) client run-examples -j $(PARALLEL_JOB_COUNT)
+	$(CSB) client run-examples --service-name=$(service_name) --example-name=$(example_name) -j $(PARALLEL_JOB_COUNT)
 
 ###### info ###################################################################
 
