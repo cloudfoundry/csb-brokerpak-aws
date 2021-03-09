@@ -77,7 +77,8 @@ validate: build ## validate pak syntax
 
 # fetching bits for cf push broker
 cloud-service-broker:
-	wget $(shell curl -sL https://api.github.com/repos/pivotal/cloud-service-broker/releases/latest | jq -r '.assets[] | select(.name == "cloud-service-broker") | .browser_download_url')
+	wget $(shell curl -sL https://api.github.com/repos/cloudfoundry-incubator/cloud-service-broker/releases/latest | jq -r '.assets[] | select(.name == "cloud-service-broker.linux") | .browser_download_url')
+	mv ./cloud-service-broker.linux ./cloud-service-broker
 	chmod +x ./cloud-service-broker
 
 APP_NAME := $(or $(APP_NAME), cloud-service-broker-aws)
