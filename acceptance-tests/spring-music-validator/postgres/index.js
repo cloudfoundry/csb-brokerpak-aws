@@ -73,6 +73,6 @@ module.exports = async function (credentials, runServer) {
         runServer(content)
     }).catch((error) => {
         console.error(error)
-        throw new Error("mysql test failed", error)
+        throw new Error("postgres test failed", error)
     })
 }
