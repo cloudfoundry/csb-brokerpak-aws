@@ -49,6 +49,16 @@ brokerpak-user-docs.md: *.yml
 	docker run $(DOCKER_OPTS) \
 	$(CSB) pak docs /brokerpak/$(shell ls *.brokerpak) > $@
 
+###### examples ###################################################################
+
+.PHONY: examples
+examples: ## display available examples
+        docker run $(DOCKER_OPTS) \
+        -e SECURITY_USER_NAME \
+        -e SECURITY_USER_PASSWORD \
+        -e USER \
+        $(CSB) client examples
+
 ###### run-examples ###################################################################
 
 .PHONY: run-examples
