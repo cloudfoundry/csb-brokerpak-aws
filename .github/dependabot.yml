@@ -21,10 +21,6 @@ updates:
   schedule:
     interval: daily
 - package-ecosystem: terraform
-  directory: "/acceptance-tests/aws/infra-tools/terraform"
-  schedule:
-    interval: daily
-- package-ecosystem: terraform
   directory: "/terraform/s3/provision"
   schedule:
     interval: daily
