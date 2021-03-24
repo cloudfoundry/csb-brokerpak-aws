@@ -1,0 +1,58 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/acceptance-tests/aws/importtestapp"
+  schedule:
+    interval: daily
+- package-ecosystem: maven
+  directory: "/acceptance-tests/aws/springboot-dynamodb"
+  schedule:
+    interval: daily
+- package-ecosystem: npm
+  directory: "/acceptance-tests/spring-music-validator"
+  schedule:
+    interval: daily
+- package-ecosystem: npm
+  directory: "/acceptance-tests/aws/s3-test-app"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/acceptance-tests/aws/infra-tools/terraform"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/acceptance-tests/aws/infra-tools/terraform"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/s3/provision"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/s3/bind"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/redis/cluster/provision"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/dynamodb/provision"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/dynamodb/bind"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/rds/provision"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/rds/bind/postgresql"
+  schedule:
+    interval: daily
+- package-ecosystem: terraform
+  directory: "/terraform/rds/bind/mysql"
+  schedule:
+    interval: daily
