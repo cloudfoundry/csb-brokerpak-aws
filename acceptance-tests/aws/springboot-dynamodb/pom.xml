@@ -16,7 +16,7 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<aws-java-sdk-dynamodb.version>1.11.775</aws-java-sdk-dynamodb.version>
+		<aws-java-sdk-dynamodb.version>1.11.981</aws-java-sdk-dynamodb.version>
 	</properties>
 
 	<dependencies>
