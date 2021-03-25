@@ -34,7 +34,7 @@ run: build aws_access_key_id aws_secret_access_key ## start broker with this bro
 	-e SECURITY_USER_NAME \
 	-e SECURITY_USER_PASSWORD \
 	-e AWS_ACCESS_KEY_ID \
-    -e AWS_SECRET_ACCESS_KEY \
+	-e AWS_SECRET_ACCESS_KEY \
 	-e "DB_TYPE=sqlite3" \
 	-e "DB_PATH=/tmp/csb-db" \
 	-e GSB_PROVISION_DEFAULTS \
@@ -53,11 +53,11 @@ brokerpak-user-docs.md: *.yml
 
 .PHONY: examples
 examples: ## display available examples
-        docker run $(DOCKER_OPTS) \
-        -e SECURITY_USER_NAME \
-        -e SECURITY_USER_PASSWORD \
-        -e USER \
-        $(CSB) client examples
+	docker run $(DOCKER_OPTS) \
+	-e SECURITY_USER_NAME \
+	-e SECURITY_USER_PASSWORD \
+	-e USER \
+	$(CSB) client examples
 
 ###### run-examples ###################################################################
 
