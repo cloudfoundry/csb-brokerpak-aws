@@ -111,7 +111,9 @@ The `cf` CLI has been used to authenticate with a foundation (`cf api` and `cf l
 
 ### Fetch A Broker and AWS Brokerpak
 
-Download a release from https://github.com/pivotal/cloud-service-broker/releases. Find the latest release matching the name pattern `sb-0.1.0-rc.XXX-aws-0.0.1-rc.YY`. This will have a broker and brokerpak that have been tested together. Follow the hyperlink into that release and download `cloud-servic-broker` and `aws-services-0.1.0-rc.YY.brokerpak` into the same directory on your workstation.
+Download a release from https://github.com/pivotal/cloud-service-broker/releases. Find the latest release matching the name pattern `sb-0.1.0-rc.XXX-aws-0.0.1-rc.YY`. This will have a broker. Follow the hyperlink into that release and download `cloud-service-broker`.
+
+Download a release of the brokerpak https://github.com/cloudfoundry-incubator/csb-brokerpak-aws/releases.  Find the latest release and download the `.brokerpak`  file into the same directory on your workstation as the broker.
 
 ### Create a MySQL instance with AWS broker
 The following command will create a basic MySQL database instance named `csb-sql`
