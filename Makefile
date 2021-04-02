@@ -17,7 +17,7 @@ help: ## list Makefile targets
 .PHONY: build
 build: $(IAAS)-services-*.brokerpak ## build brokerpak
 
-$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf
+$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf
 	docker run $(DOCKER_OPTS) $(CSB) pak build
 
 ###### Run ###################################################################
