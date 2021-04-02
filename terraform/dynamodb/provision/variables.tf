@@ -19,7 +19,7 @@ variable instance_name { type = string }
 variable billing_mode { type = string }
 variable hash_key { type = string }
 variable range_key { type = string }
-variable tabel_name { type = string }
+variable table_name { type = string }
 
 variable server_side_encryption_kms_key_arn { type = string }
 variable attributes { type = list(map(string)) }
