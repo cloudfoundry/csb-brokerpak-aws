@@ -34,7 +34,7 @@ if create_service csb-aws-dynamodb ondemand "${SERVICE_NAME}" ${SCRIPT_DIR}/conf
             echo "springboot-dynamodb failed"
             cf logs dynamodb-demo --recent
         fi
-        #cf delete -f javagcpapp-demo 
+        #cf delete -f -r javagcpapp-demo 
     fi
     #delete_service ${SERVICE_NAME}
 fi
@@ -47,7 +47,7 @@ fi
 
 
 
-cf delete -f dynamodb-demo 
+cf delete -f -r dynamodb-demo 
 delete_service ${SERVICE_NAME}
 
 exit ${RESULT}
