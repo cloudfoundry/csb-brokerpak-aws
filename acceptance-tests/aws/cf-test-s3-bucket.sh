@@ -20,7 +20,7 @@ if create_service csb-aws-s3-bucket private ${SERVICE_NAME}; then
             echo "s3-test-app failed"
             cf logs s3-test-app --recent
         fi
-        cf delete -f s3-test-app
+        cf delete -f -r s3-test-app
     fi
     delete_service ${SERVICE_NAME}
 fi

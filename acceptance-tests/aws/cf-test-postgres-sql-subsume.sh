@@ -58,7 +58,7 @@ if create_service csb-aws-postgresql subsume "${SUBSUMED_INSTANCE_NAME}" "${CSB_
             echo "javaawsapp-demo failed"
             cf logs javaawsapp-demo --recent
         fi
-        cf delete -f javaawsapp-demo
+        cf delete -f -r javaawsapp-demo
         cf purge-service-instance "${SUBSUMED_INSTANCE_NAME}" -f
     fi
    
