@@ -24,6 +24,15 @@ resource "postgresql_grant" "all_access" {
   depends_on  = [ postgresql_role.new_user ]
   database    = var.db_name
   role        = postgresql_role.new_user.name
+#   schema      = "public"
+  object_type = "database"
+  privileges  = ["ALL"]
+}
+
+resource "postgresql_grant" "table_access" {
+  depends_on  = [ postgresql_role.new_user ]
+  database    = var.db_name
+  role        = postgresql_role.new_user.name
   schema      = "public"
   object_type = "table"
   privileges  = ["ALL"]
