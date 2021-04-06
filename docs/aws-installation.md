@@ -74,6 +74,16 @@ The AWS account represented by the access key needs the following permission pol
                     "rds:DeleteDBSubnetGroup",
                     "rds:AddTagsToResource",
                     "ec2:RevokeSecurityGroupIngress",
+                    "elasticache:ModifyReplicationGroup",
+                    "elasticache:DeleteCacheSubnetGroup",
+                    "elasticache:DescribeReplicationGroups",
+                    "elasticache:DescribeCacheClusters",
+                    "elasticache:ListTagsForResource",
+                    "elasticache:CreateReplicationGroup",
+                    "elasticache:DescribeCacheSubnetGroups",
+                    "elasticache:CreateCacheSubnetGroup",
+                    "elasticache:DeleteReplicationGroup",
+                    "elasticache:ModifyReplicationGroupShardConfiguration"
                 ],
                 "Effect": "Allow",
                 "Resource": "*"
@@ -81,6 +91,7 @@ The AWS account represented by the access key needs the following permission pol
         ]
     }
 ```
+
 
 ### MySQL Database for Broker State
 The broker keeps service instance and binding information in a MySQL database. 
