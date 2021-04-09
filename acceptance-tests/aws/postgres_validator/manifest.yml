@@ -1,0 +1,5 @@
+---
+applications:
+- name: postgres-validator
+  command: node index.js
+  random-route: true  
