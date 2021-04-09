@@ -51,7 +51,7 @@ for s in ${INSTANCES[@]}; do
 done
 
 if [ ${RESULT} -eq 0 ]; then
-  ${SCRIPT_DIR}/cf-test-s3-bucket.sh
+  ${SCRIPT_DIR}/cf-test-s3-bucket.sh && ${SCRIPT_DIR}/cf-test-postgres.sh
   RESULT=$?
 fi
 
