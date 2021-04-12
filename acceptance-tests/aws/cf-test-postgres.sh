@@ -2,6 +2,7 @@
 
 set -o pipefail
 set -o nounset
+set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
