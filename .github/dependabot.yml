@@ -20,7 +20,7 @@ updates:
     time: "06:00"
 - package-ecosystem: npm
   directory: "/acceptance-tests/aws/s3-test-app"
-  schedule:  schedule:
+  schedule:
     interval: "weekly"
     day: "monday"
     time: "06:00"
