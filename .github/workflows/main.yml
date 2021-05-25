@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
+      - name: View context attributes
+        uses: actions/github-script@v4
+        with:
+          script: console.log(context)
       - name: Merge
         uses: actions/github-script@v4
         with:
@@ -17,6 +21,6 @@ jobs:
           script: |
             github.pulls.merge({
               owner: context.repo.owner,
-              name: context.repo,
+              repo: context.repo,
               pull_number: context.issue.number
             })
