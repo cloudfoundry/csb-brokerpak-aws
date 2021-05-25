@@ -5,6 +5,13 @@ on:
     branches: [ main ]
 
 jobs:
+  print:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github.event) }}
+        run: echo "$GITHUB_CONTEXT"
   automerge:
     name: Merge Dependabot Pull Pequest
     runs-on: ubuntu-latest
@@ -17,5 +24,5 @@ jobs:
             github.pulls.merge({
               owner: github.repository_owner,
               repo: github.repository,
-              pull_number: github.event.issue.number
+              pull_number: context.payload.pull_request.number
             })
