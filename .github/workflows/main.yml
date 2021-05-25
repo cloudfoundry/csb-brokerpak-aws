@@ -10,6 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
+      - name: Dump GitHub context issue
+        env:
+          ISSUE: ${{ toJSON(context.issue) }}
+        run: echo "$ISSUE"
+      - name: Dump GitHub context issue
+        env:
+          ISSUE: ${{ toJSON(context.issue.number) }}
+        run: echo "$ISSUE"
       - name: Dump GitHub event
         env:
           GITHUB_EVENT: ${{ toJSON(github.event) }}
