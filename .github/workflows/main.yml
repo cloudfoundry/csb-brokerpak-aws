@@ -10,29 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
-      - name: Dump GitHub context issue
-        env:
-          ISSUE: ${{ toJSON(context.issue) }}
-        run: echo "$ISSUE"
-      - name: Dump GitHub context issue
-        env:
-          ISSUE: ${{ toJSON(context.issue.number) }}
-        run: echo "$ISSUE"
-      - name: Dump GitHub event
-        env:
-          GITHUB_EVENT: ${{ toJSON(github.event) }}
-        run: echo "$GITHUB_EVENT"
-      - name: Dump GitHub context
-        env:
-          PR_NUMBER: ${{ toJSON(github.event.number) }}
-        run: echo "$PR_NUMBER"
       - name: Merge
         uses: actions/github-script@v4
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             github.pulls.merge({
-              owner: github.repository_owner,
-              repo: github.repository,
-              pull_number: github.event.number
+              owner: context.repo.owner,
+              name: context.repo,
+              pull_number: context.issue.number
             })
