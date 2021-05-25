@@ -1,8 +1,8 @@
 name: Automerge Dependabot
 
 on:
-  pull_request:
-    branches: [ main ]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
 jobs:
   automerge:
