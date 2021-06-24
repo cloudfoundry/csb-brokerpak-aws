@@ -10,7 +10,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 RESULT=1
 
 #allServices=("csb-aws-mysql" "csb-aws-redis" "csb-aws-postgresql")
-allServices=("csb-aws-redis")
+allServices=("csb-aws-redis" "csb-aws-postgresql")
 INSTANCES=()
 
 for s in ${allServices[@]}; do
@@ -18,8 +18,7 @@ for s in ${allServices[@]}; do
   INSTANCES+=("${s}-$$")
 done
 
-#NO_TLS_SERVICES=("csb-aws-mysql" "csb-aws-postgresql")
-NO_TLS_SERVICES=()
+NO_TLS_SERVICES=("csb-aws-mysql" "csb-aws-postgresql")
 
 for s in ${NO_TLS_SERVICES[@]}; do
     create_service "${s}" small "${s}-no-tls-$$" "{\"use_tls\":false}" &
@@ -53,8 +52,7 @@ for s in ${INSTANCES[@]}; do
 done
 
 if [ ${RESULT} -eq 0 ]; then
-  ${SCRIPT_DIR}/cf-test-s3-bucket.sh
-#  ${SCRIPT_DIR}/cf-test-s3-bucket.sh && ${SCRIPT_DIR}/cf-test-postgres.sh
+  ${SCRIPT_DIR}/cf-test-s3-bucket.sh && ${SCRIPT_DIR}/cf-test-postgres.sh
   RESULT=$?
 fi
 
