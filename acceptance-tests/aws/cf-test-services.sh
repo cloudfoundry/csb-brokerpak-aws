@@ -9,8 +9,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 RESULT=1
 
-#allServices=("csb-aws-mysql" "csb-aws-redis" "csb-aws-postgresql")
-allServices=("csb-aws-redis" "csb-aws-postgresql")
+allServices=("csb-aws-mysql" "csb-aws-redis" "csb-aws-postgresql")
 INSTANCES=()
 
 for s in ${allServices[@]}; do
