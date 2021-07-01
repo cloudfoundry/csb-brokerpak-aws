@@ -17,7 +17,7 @@ var serviceInstanceName string
 
 var _ = BeforeSuite(func() {
 	serviceInstanceName = helpers.RandomName("redis")
-	helpers.CreateService("csb-aws-redis", "mini", serviceInstanceName)
+	helpers.CreateService("csb-aws-redis", "small", serviceInstanceName)
 })
 
 var _ = AfterSuite(func() {
