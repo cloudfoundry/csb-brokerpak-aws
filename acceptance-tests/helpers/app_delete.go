@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-func DeleteApps(names []string) {
-	for i := 0; i < len(names); i++ {
-		session := StartCF("delete", "-f", names[i])
+func AppDelete(names ...string) {
+	for _, name := range names {
+		session := StartCF("delete", "-f", name)
 		Eventually(session, time.Minute).Should(Exit(0))
 	}
 }
