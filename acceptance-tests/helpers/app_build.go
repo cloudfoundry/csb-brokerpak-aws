@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega/gexec"
 )
 
-func BuildApp(source string) string {
+func AppBuild(source string) string {
 	dir, err := os.MkdirTemp("", "")
 	Expect(err).NotTo(HaveOccurred())
 

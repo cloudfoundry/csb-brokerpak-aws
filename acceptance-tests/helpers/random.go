@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/onsi/gomega"
-
 	"github.com/Pallinder/go-randomdata"
+	. "github.com/onsi/gomega"
 )
 
 func RandomName(prefixes ...string) string {

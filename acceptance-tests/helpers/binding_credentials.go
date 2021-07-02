@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-
 	"code.cloudfoundry.org/jsonry"
+	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
