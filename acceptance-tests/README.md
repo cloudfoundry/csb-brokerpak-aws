@@ -9,9 +9,6 @@ The main pattern is:
 4. `cf delete-service` the tested instance 
 
 ## Pipeline tests
-
-The build pipeline has acceptance jobs for each IaaS (GCP, Azure and AWS.) 
-
 ### Positive Tests
 Positive tests follow the basic pattern above - create a service, bind a test, validate the test app is successful.
 
@@ -21,9 +18,7 @@ Negative test verify that bad configuration options result in service creation f
 
 | Positive Tests | Negative Tests |
 |----------------|----------------|
-| [aws/cf-test-services.sh](./aws/cf-test-services.sh) | [azure/cf-test-negative-responses.sh](./azure/cf-test-negative-responses.sh) |
-| [azure/cf-test-services.sh](./azure/cf-test-services.sh) | [azure/cf-test-negative-responses.sh](./azure/cf-test-negative-responses.sh) |
-| [gcp/cf-test-services.sh](./gcp/cf-test-services.sh) | [gcp/cf-test-negative-responses.sh](./gcp/cf-test-negative-responses.sh) |
+| [aws/cf-test-services.sh](./aws/cf-test-services.sh) | [aws/cf-test-negative-responses.sh](./aws/cf-test-negative-responses.sh) |
 
 ## Spring Music
 
@@ -44,3 +39,11 @@ The use of the spring-music-validator app verifies all the binding credential va
 For those services that SpringMusic doesn't support, some validation app that can be `cf push`'ed has been created. See [AWS](./aws) and [Azure](./azure)
 
 When new services are added, test apps should be created and the corresponding IaaS `cf-test-services.sh` should be updated so the test gets run as part of the pipeline.
+
+
+## Running ginkgo acceptance tests locally
+
+1. Claim an environment by running `claim aws`
+1. Target the env by running `target-csb <env-name>`
+1. Deploy the broker with AWS brokerpak by running `make push-broker`
+1. From `acceptance-tests` folder run `go run github.com/onsi/ginkgo/ginkgo -r -v`
