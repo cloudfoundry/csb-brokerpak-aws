@@ -42,12 +42,12 @@ var _ = Describe("Redis", func() {
 		creds := helpers.GetBindingCredential(appOne, "csb-aws-redis", bindingName)
 		Expect(creds).To(HaveKey("credhub-ref"))
 
-		By("setting a key using the first app")
+		By("setting a key-value using the first app")
 		key := helpers.RandomString()
 		value := helpers.RandomString()
 		helpers.HTTPPost(fmt.Sprintf("http://%s.%s/%s", appOne, helpers.DefaultSharedDomain(), key), value)
 
-		By("getting the key using the second app")
+		By("getting the value using the second app")
 		got := helpers.HTTPGet(fmt.Sprintf("http://%s.%s/%s", appTwo, helpers.DefaultSharedDomain(), key))
 		Expect(got).To(Equal(value))
 	})

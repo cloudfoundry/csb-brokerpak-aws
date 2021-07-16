@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -30,4 +31,23 @@ func HTTPPost(url, data string) {
 	response, err := http.Post(url, "text/html", strings.NewReader(data))
 	Expect(err).NotTo(HaveOccurred())
 	Expect(response).To(HaveHTTPStatus(http.StatusCreated))
+}
+
+func HTTPPostFile(url string, fileContent []byte) {
+	fmt.Fprintf(GinkgoWriter, "HTTP POST: %s\n", url)
+	fmt.Fprintf(GinkgoWriter, "Sending data: %s\n", string(fileContent))
+
+	response, err := http.Post(url, "multipart/form-data", bytes.NewReader(fileContent))
+	Expect(err).NotTo(HaveOccurred())
+	Expect(response).To(HaveHTTPStatus(http.StatusCreated))
+}
+
+func HTTPDelete(url string) {
+	fmt.Fprintf(GinkgoWriter, "HTTP DELETE: %s\n", url)
+	request, err := http.NewRequest(http.MethodDelete, url, nil)
+	Expect(err).NotTo(HaveOccurred())
+
+	response, err := http.DefaultClient.Do(request)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(response).To(HaveHTTPStatus(http.StatusGone))
 }
