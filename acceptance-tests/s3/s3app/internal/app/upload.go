@@ -1,17 +1,17 @@
 package app
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"log"
 	"net/http"
 	"s3app/internal/credentials"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/gorilla/mux"
 )
 
-func handleUpload(session *session.Session, cred *credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
+func handleUpload(session *session.Session, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling upload.")
 
@@ -24,7 +24,7 @@ func handleUpload(session *session.Session, cred *credentials.S3Service) func(w 
 
 		uploader := s3manager.NewUploader(session)
 		_, err := uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(cred.BucketName),
+			Bucket: aws.String(creds.BucketName),
 			Key:    aws.String(filename),
 			Body:   r.Body,
 		})
@@ -35,6 +35,6 @@ func handleUpload(session *session.Session, cred *credentials.S3Service) func(w 
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		log.Printf("File %q is uploaded to bucket %q.", filename, cred.BucketName)
+		log.Printf("File %q is uploaded to bucket %q.", filename, creds.BucketName)
 	}
 }

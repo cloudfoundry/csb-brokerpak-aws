@@ -1,19 +1,20 @@
 package app
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"s3app/internal/credentials"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/gorilla/mux"
 )
 
-func handleDownload(session *session.Session, cred *credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
+func handleDownload(session *session.Session, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling download.")
 
@@ -27,7 +28,7 @@ func handleDownload(session *session.Session, cred *credentials.S3Service) func(
 		file, err := os.Create(filename)
 		downloader := s3manager.NewDownloader(session)
 		_, err = downloader.Download(file, &s3.GetObjectInput{
-			Bucket: aws.String(cred.BucketName),
+			Bucket: aws.String(creds.BucketName),
 			Key:    aws.String(filename),
 		})
 		if err != nil {
