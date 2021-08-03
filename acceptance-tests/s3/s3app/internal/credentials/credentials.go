@@ -1,49 +1,45 @@
 package credentials
 
 import (
-	"code.cloudfoundry.org/jsonry"
 	"fmt"
 
-	"os"
+	"github.com/cloudfoundry-community/go-cfenv"
+	"github.com/mitchellh/mapstructure"
 )
 
 type S3Service struct {
-	AccessKeyId     string `jsonry:"credentials.access_key_id"`
-	AccessKeySecret string `jsonry:"credentials.secret_access_key"`
-	Region  string    `jsonry:"credentials.region"`
-	BucketDomainName  string    `jsonry:"credentials.bucket_domain_name"`
-	BucketName  string    `jsonry:"credentials.bucket_name"`
-	Arn  string    `jsonry:"credentials.arn"`
+	AccessKeyId      string `mapstructure:"access_key_id"`
+	AccessKeySecret  string `mapstructure:"secret_access_key"`
+	Region           string `mapstructure:"region"`
+	BucketDomainName string `mapstructure:"bucket_domain_name"`
+	BucketName       string `mapstructure:"bucket_name"`
+	Arn              string `mapstructure:"arn"`
 }
 
-func Read() (*S3Service, error) {
-	const variable = "VCAP_SERVICES"
-
-	var services struct {
-		S3Services []S3Service `jsonry:"csb-aws-s3-bucket"`
+func Read() (S3Service, error) {
+	app, err := cfenv.Current()
+	if err != nil {
+		return S3Service{}, fmt.Errorf("error reading app env: %w", err)
+	}
+	svs, err := app.Services.WithTag("s3")
+	if err != nil {
+		return S3Service{}, fmt.Errorf("error reading S3 service details")
 	}
 
-	if err := jsonry.Unmarshal([]byte(os.Getenv(variable)), &services); err != nil {
-		return nil, fmt.Errorf("failed to parse %q: %w", variable, err)
+	var s S3Service
+
+	if err := mapstructure.Decode(svs[0].Credentials, &s); err != nil {
+		return S3Service{}, fmt.Errorf("failed to decode credentials: %w", err)
 	}
 
-	switch len(services.S3Services) {
-	case 1: // ok
-	case 0:
-		return nil, fmt.Errorf("unable to find `csb-aws-s3-bucket` in %q", variable)
-	default:
-		return nil, fmt.Errorf("more than one entry for `csb-aws-s3-bucket` in %q", variable)
+	if s.AccessKeyId == "" ||
+		s.AccessKeySecret == "" ||
+		s.Region == "" ||
+		s.BucketName == "" ||
+		s.BucketDomainName == "" ||
+		s.Arn == "" {
+		return S3Service{}, fmt.Errorf("parsed credentials are not valid")
 	}
 
-	r := services.S3Services[0]
-	if r.AccessKeyId == "" ||
-		r.AccessKeySecret == "" ||
-		r.Region == "" ||
-		r.BucketName == "" ||
-		r.BucketDomainName == "" ||
-		r.Arn == "" {
-		return nil, fmt.Errorf("parsed credentials are not valid: %s", os.Getenv(variable))
-	}
-
-	return &services.S3Services[0], nil
+	return s, nil
 }

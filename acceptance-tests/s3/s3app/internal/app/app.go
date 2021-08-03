@@ -1,24 +1,23 @@
 package app
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	awscredentials "github.com/aws/aws-sdk-go/aws/credentials"
-
-	"github.com/aws/aws-sdk-go/aws/session"
 	"log"
 	"net/http"
 	"s3app/internal/credentials"
 
+	"github.com/aws/aws-sdk-go/aws"
+	awscredentials "github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/gorilla/mux"
 )
 
-func App(creds *credentials.S3Service) *mux.Router {
+func App(creds credentials.S3Service) *mux.Router {
 	config := aws.NewConfig().
 		WithCredentials(
 			awscredentials.NewStaticCredentials(
-			creds.AccessKeyId,
-			creds.AccessKeySecret,
-			"")).
+				creds.AccessKeyId,
+				creds.AccessKeySecret,
+				"")).
 		WithRegion(creds.Region)
 
 	session, err := session.NewSession(config)

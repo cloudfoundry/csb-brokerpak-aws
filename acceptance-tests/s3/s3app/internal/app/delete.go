@@ -1,16 +1,17 @@
 package app
 
 import (
+	"log"
+	"net/http"
+	"s3app/internal/credentials"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
-	"s3app/internal/credentials"
 )
 
-func handleDelete(session *session.Session, cred *credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
+func handleDelete(session *session.Session, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling delete.")
 
@@ -23,7 +24,7 @@ func handleDelete(session *session.Session, cred *credentials.S3Service) func(w 
 
 		svc := s3.New(session)
 		input := &s3.DeleteObjectsInput{
-			Bucket: aws.String(cred.BucketName),
+			Bucket: aws.String(creds.BucketName),
 			Delete: &s3.Delete{
 				Objects: []*s3.ObjectIdentifier{
 					{
