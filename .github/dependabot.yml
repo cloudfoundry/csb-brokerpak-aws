@@ -4,77 +4,77 @@ updates:
   directory: "/acceptance-tests/aws/importtestapp"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: maven
   directory: "/acceptance-tests/aws/springboot-dynamodb"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: npm
   directory: "/acceptance-tests/spring-music-validator"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: npm
   directory: "/acceptance-tests/aws/s3-test-app"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/acceptance-tests/aws/infra-tools/terraform"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/s3/provision"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/s3/bind"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/redis/cluster/provision"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/dynamodb/provision"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/dynamodb/bind"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/rds/provision"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/rds/bind/postgresql"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/rds/bind/mysql"
   schedule:
     interval: "weekly"
-    day: "monday"
+    day: "saturday"
     time: "06:00"
