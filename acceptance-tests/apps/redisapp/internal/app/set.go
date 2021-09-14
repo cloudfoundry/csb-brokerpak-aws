@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -30,7 +31,7 @@ func handleSet(client *redis.Client) func(w http.ResponseWriter, r *http.Request
 		value := string(rawValue)
 		if err := client.Set(r.Context(), key, value, 0).Err(); err != nil {
 			log.Printf("Error setting key %q to value %q: %s", key, value, err)
-			http.Error(w, "Failed to set value.", http.StatusFailedDependency)
+			http.Error(w, fmt.Sprintf("Failed to set value: %s", err), http.StatusFailedDependency)
 			return
 		}
 
