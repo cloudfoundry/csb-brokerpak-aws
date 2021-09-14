@@ -26,10 +26,10 @@ func App(creds credentials.S3Service) *mux.Router {
 	}
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", aliveness).Methods("HEAD", "GET")
-	r.HandleFunc("/{file_name}", handleUpload(session, creds)).Methods("POST")
-	r.HandleFunc("/{file_name}", handleDownload(session, creds)).Methods("GET")
-	r.HandleFunc("/{file_name}", handleDelete(session, creds)).Methods("DELETE")
+	r.HandleFunc("/", aliveness).Methods(http.MethodHead, http.MethodGet)
+	r.HandleFunc("/{file_name}", handleUpload(session, creds)).Methods(http.MethodPut)
+	r.HandleFunc("/{file_name}", handleDownload(session, creds)).Methods(http.MethodGet)
+	r.HandleFunc("/{file_name}", handleDelete(session, creds)).Methods(http.MethodDelete)
 
 	return r
 }

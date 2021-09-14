@@ -1,54 +1,40 @@
 package redis_test
 
 import (
+	"acceptancetests/apps"
 	"acceptancetests/helpers"
-	"fmt"
-	"os"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Redis", func() {
-	var serviceInstanceName string
-
-	BeforeEach(func() {
-		serviceInstanceName = helpers.RandomName("redis")
-		helpers.CreateService("csb-aws-redis", "small", serviceInstanceName)
-	})
-
-	AfterEach(func() {
-		helpers.DeleteService(serviceInstanceName)
-	})
-
 	It("can be accessed by an app", func() {
-		By("building the app")
-		appDir := helpers.AppBuild("./redisapp")
-		defer os.RemoveAll(appDir)
+		By("creating a service instance")
+		serviceInstance := helpers.CreateService("csb-aws-redis", "small")
+		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := helpers.AppPushUnstarted("redis", appDir)
-		appTwo := helpers.AppPushUnstarted("redis", appDir)
+		appOne := helpers.AppPushUnstarted(apps.Redis)
+		appTwo := helpers.AppPushUnstarted(apps.Redis)
 		defer helpers.AppDelete(appOne, appTwo)
 
 		By("binding the apps to the Redis service instance")
-		bindingName := helpers.Bind(appOne, serviceInstanceName)
-		helpers.Bind(appTwo, serviceInstanceName)
+		binding := serviceInstance.Bind(appOne)
+		serviceInstance.Bind(appTwo)
 
 		By("starting the apps")
 		helpers.AppStart(appOne, appTwo)
 
 		By("checking that the app environment has a credhub reference for credentials")
-		creds := helpers.GetBindingCredential(appOne, "csb-aws-redis", bindingName)
-		Expect(creds).To(HaveKey("credhub-ref"))
+		Expect(binding.Credential()).To(HaveKey("credhub-ref"))
 
 		By("setting a key-value using the first app")
-		key := helpers.RandomString()
-		value := helpers.RandomString()
-		helpers.HTTPPost(fmt.Sprintf("http://%s.%s/%s", appOne, helpers.DefaultSharedDomain(), key), value)
+		key := helpers.RandomHex()
+		value := helpers.RandomHex()
+		appOne.PUT(value, key)
 
 		By("getting the value using the second app")
-		got := helpers.HTTPGet(fmt.Sprintf("http://%s.%s/%s", appTwo, helpers.DefaultSharedDomain(), key))
+		got := appTwo.GET(key)
 		Expect(got).To(Equal(value))
 	})
 })
