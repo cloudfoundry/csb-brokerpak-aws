@@ -2,13 +2,6 @@
 IAAS=aws
 DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host
 CSB=cfplatformeng/csb
-USE_GO_CONTAINERS := $(or $(USE_GO_CONTAINERS), 1)
-
-ifeq ($(USE_GO_CONTAINERS), 0)
-BUILDER=./cloud-service-broker
-else
-BUILDER=docker run $(DOCKER_OPTS) $(CSB)
-endif
 
 ###### Help ###################################################################
 
@@ -25,7 +18,7 @@ help: ## list Makefile targets
 build: $(IAAS)-services-*.brokerpak ## build brokerpak
 
 $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf
-	$(BUILDER) pak build
+	docker run $(DOCKER_OPTS) $(CSB) pak build
 
 ###### Run ###################################################################
 
