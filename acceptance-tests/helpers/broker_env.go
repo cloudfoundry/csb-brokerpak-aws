@@ -12,7 +12,7 @@ type EnvVar struct {
 }
 
 func SetBrokerEnv(envVars ...EnvVar) {
-	const broker = "cloud-service-broker"
+	const broker = "cloud-service-broker-aws"
 
 	for _, envVar := range envVars {
 		switch v := envVar.Value.(type) {
