@@ -1,0 +1,36 @@
+# Copyright 2021 Pivotal Software, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+dependencies:
+- name: terraform
+  version: 0.12.30
+  source: https://github.com/hashicorp/terraform/archive/v0.12.30.zip
+  source_sha256: d93afe75708f706f416a7968f65af8302ac9c492a21aa958ffb2202bd9390e4d
+- name: terraform-provider-aws
+  version: 3.35.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v3.35.0.zip
+  souce_sha256: 63286d75926a503d15039e435ed165a1f0cbddf5097eeafcabe60024a3d6e226
+- name: terraform-provider-random
+  version: 2.2.1
+  source: https://github.com/hashicorp/terraform-provider-random/archive/refs/tags/v2.2.1.zip
+  source_sha256: de665715107f480e0c8ba94249cc4499dd5c442ace9e0315f3e3732ea61c5bee
+- name: terraform-provider-mysql
+  version: 1.9.0
+  source: https://github.com/hashicorp/terraform-provider-mysql/archive/refs/tags/v1.9.0.zip
+  source_sha256: 8cd135baba86b5568f7685152201b3f73300aa1fe455c6873da05bff1418b707
+- name: terraform-provider-postgresql
+  version: 1.7.1
+  source: https://github.com/terraform-providers/terraform-provider-postgresql/archive/v1.7.1.zip
+  source_sha256: 0ceb5c1fa8322b5d4e2c62b8993703248e4d01bb7ec7249b3cd86741c3ff7ebf
+
