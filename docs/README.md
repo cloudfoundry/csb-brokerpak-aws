@@ -3,7 +3,6 @@
 General Service notes and documentation:
 - [MySQL](./mysql-plans-and-config.md)
 - [Redis](./redis-plans-and-config.md)
-- [Mongo](./mongo-plans-and-config.md)
 - [PostgreSQL](./postgresql-plans-and-config.md)
 
 AWS Services notes and documentation:
