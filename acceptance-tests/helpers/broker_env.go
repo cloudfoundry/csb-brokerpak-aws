@@ -11,7 +11,24 @@ type EnvVar struct {
 	Value interface{}
 }
 
-func SetBrokerEnv(envVars ...EnvVar) {
+func SetBrokerEnv(brokerName string, envVars ...EnvVar) {
+	for _, envVar := range envVars {
+		switch v := envVar.Value.(type) {
+		case string:
+			if v == "" {
+				CF("unset-env", brokerName, envVar.Name)
+			} else {
+				CF("set-env", brokerName, envVar.Name, v)
+			}
+		default:
+			data, err := json.Marshal(v)
+			Expect(err).NotTo(HaveOccurred())
+			CF("set-env", brokerName, envVar.Name, string(data))
+		}
+	}
+}
+
+func SetBrokerEnvAndRestart(envVars ...EnvVar) {
 	const broker = "cloud-service-broker-aws"
 
 	for _, envVar := range envVars {

@@ -13,6 +13,31 @@ type ServiceInstance struct {
 	name     string
 }
 
+func CreateServiceInBroker(offering, plan, broker string, parameters ...interface{}) ServiceInstance {
+	name := RandomName(offering, plan)
+	createCommandTimeout := 5 * time.Minute // MASB is slow to start creation
+	args := []string{"create-service", offering, plan, name, "-b", broker}
+	if cfVersion() == cfVersionV8 {
+		args = append(args, "--wait")
+		createCommandTimeout = time.Hour
+	}
+	args = append(args, serviceParameters(parameters)...)
+
+	session := StartCF(args...)
+	Eventually(session, createCommandTimeout).Should(Exit(0))
+
+	Eventually(func() string {
+		out, _ := CF("service", name)
+		Expect(out).NotTo(MatchRegexp(`status:\s+create failed`))
+		return out
+	}, time.Hour, 30*time.Second).Should(MatchRegexp(`status:\s+create succeeded`))
+
+	return ServiceInstance{
+		name:     name,
+		offering: offering,
+	}
+}
+
 func CreateService(offering, plan string, parameters ...interface{}) ServiceInstance {
 	name := RandomName(offering, plan)
 	createCommandTimeout := 5 * time.Minute // MASB is slow to start creation
@@ -85,6 +110,11 @@ func (s ServiceInstance) Bind(app AppInstance, parameters ...interface{}) Bindin
 		bindingName:     name,
 		appInstance:     app,
 	}
+}
+
+func (s ServiceInstance) Unbind(app AppInstance) {
+	args := []string{"unbind-service", app.name, s.name}
+	CF(args...)
 }
 
 func (s ServiceInstance) CreateKey() ServiceKey {
