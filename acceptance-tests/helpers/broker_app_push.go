@@ -31,7 +31,7 @@ func PushAndStartBroker(brokerName, brokerDir string) ServiceBroker {
 	waitForAppPush(session, brokerName)
 
 	brokerURL := getBrokerAppURL(brokerApp)
-	session = StartCF("create-service-broker", brokerName, brokerUsername, brokerPassword, "https://"+brokerURL)
+	session = StartCF("create-service-broker", brokerName, brokerUsername, brokerPassword, "https://"+brokerURL, "--space-scoped")
 	waitForBrokerOperation(session, brokerName)
 
 	return ServiceBroker{
