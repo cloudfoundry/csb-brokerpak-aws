@@ -16,7 +16,7 @@ var _ = Describe("UpgradeTest", func() {
 			defer serviceBroker.Delete()
 
 			By("creating a service")
-			serviceInstance := helpers.CreateServiceInBroker("csb-azure-redis", "small", brokerName)
+			serviceInstance := helpers.CreateServiceInBroker("csb-aws-redis", "small", brokerName)
 			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
