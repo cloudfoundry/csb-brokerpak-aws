@@ -3,6 +3,8 @@ package upgrade_test
 import (
 	"acceptancetests/apps"
 	"acceptancetests/helpers"
+	"fmt"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -16,54 +18,42 @@ var _ = Describe("UpgradeTest", func() {
 			defer serviceBroker.Delete()
 
 			By("creating a service")
-			serviceInstance := helpers.CreateServiceInBroker("csb-aws-redis", "small", brokerName)
+			serviceInstance := helpers.CreateServiceInBroker("csb-aws-s3-bucket", "private", brokerName)
 			defer serviceInstance.Delete()
 
-			By("pushing the unstarted app twice")
-			appOne := helpers.AppPushUnstarted(apps.Redis)
-			appTwo := helpers.AppPushUnstarted(apps.Redis)
-			defer helpers.AppDelete(appOne, appTwo)
+			By("pushing the unstarted app")
+			testApp := helpers.AppPushUnstarted(apps.S3)
+			defer helpers.AppDelete(testApp)
 
-			By("binding to the apps")
-			serviceInstance.Bind(appOne)
-			serviceInstance.Bind(appTwo)
-			helpers.AppStart(appOne, appTwo)
+			By("binding the app to the s3 service instance")
+			serviceInstance.Bind(testApp)
 
-			By("setting a key-value using the first app")
-			key := helpers.RandomHex()
-			value := helpers.RandomHex()
-			appOne.PUT(value, key)
+			By("starting the app")
+			helpers.AppStart(testApp)
 
-			By("getting the value using the second app")
-			got := appTwo.GET(key)
-			Expect(got).To(Equal(value))
+			By("uploading a file using the first app")
+			filename := helpers.RandomHex()
+			fileContent := fmt.Sprintf("This is a dummy file that will be uploaded the S3 at %s.", time.Now().String())
+			testApp.PUT(fileContent, filename)
+			defer testApp.DELETE(filename)
 
 			By("pushing the development version of the broker")
 			serviceBroker.Update(developmentBuildDir)
 
+			By("downloading the file")
+			got := testApp.GET(filename)
+			Expect(got).To(Equal(fileContent))
+
 			By("deleting bindings created before the upgrade")
-			serviceInstance.Unbind(appOne)
-			serviceInstance.Unbind(appTwo)
+			serviceInstance.Unbind(testApp)
 
-			By("creating new bindings and testing they still work")
-			serviceInstance.Bind(appOne)
-			serviceInstance.Bind(appTwo)
-			helpers.AppRestage(appOne, appTwo)
-			key = helpers.RandomHex()
-			value = helpers.RandomHex()
-			appOne.PUT(value, key)
-			got = appTwo.GET(key)
-			Expect(got).To(Equal(value))
+			By("binding the app to the instance again")
+			serviceInstance.Bind(testApp)
+			helpers.AppRestage(testApp)
 
-			By("updating the instance plan")
-			serviceInstance.UpdateService("-p", "medium")
-
-			By("checking it still works")
-			key = helpers.RandomHex()
-			value = helpers.RandomHex()
-			appOne.PUT(value, key)
-			got = appTwo.GET(key)
-			Expect(got).To(Equal(value))
+			By("downloading the file")
+			got = testApp.GET(filename)
+			Expect(got).To(Equal(fileContent))
 		})
 	})
 })

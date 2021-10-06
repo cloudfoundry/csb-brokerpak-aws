@@ -72,3 +72,15 @@ func waitForAppPush(session *Session, name string) AppInstance {
 
 	return AppInstance{name: name}
 }
+
+func waitForAppDelete(session *Session, name string) AppInstance {
+	Eventually(session, 5*time.Minute).Should(Exit())
+
+	if session.ExitCode() != 0 {
+		fmt.Fprintf(GinkgoWriter, "FAILED to delete app. Getting logs...")
+		CF("logs", name, "--recent")
+		Fail("App failed to delete")
+	}
+
+	return AppInstance{name: name}
+}
