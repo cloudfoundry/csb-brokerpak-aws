@@ -8,7 +8,6 @@ import (
 
 	"code.cloudfoundry.org/jsonry"
 
-	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
 )
@@ -17,11 +16,12 @@ const brokerUsername = "brokeruser"
 const brokerPassword = "brokeruserpassword"
 
 type ServiceBroker struct {
-	name string
+	name          string
+	mySqlInstance ServiceInstance
 }
 
 func PushAndStartBroker(brokerName, brokerDir string) ServiceBroker {
-	brokerApp := pushServiceBroker(brokerName, brokerDir)
+	brokerApp := pushNoStartServiceBroker(brokerName, brokerDir)
 	setEnvVars(brokerName)
 
 	mySqlInstance := CreateService("p.mysql", "db-small")
@@ -35,7 +35,8 @@ func PushAndStartBroker(brokerName, brokerDir string) ServiceBroker {
 	waitForBrokerOperation(session, brokerName)
 
 	return ServiceBroker{
-		name: brokerName,
+		name:          brokerName,
+		mySqlInstance: mySqlInstance,
 	}
 }
 
@@ -52,19 +53,19 @@ func (b ServiceBroker) Delete() {
 	waitForBrokerOperation(session, b.name)
 
 	session = StartCF("delete", b.name, "-f")
-	waitForBrokerOperation(session, b.name)
+	waitForAppDelete(session, b.name)
+
+	b.mySqlInstance.Delete()
 }
 
 func setEnvVars(brokerName string) {
 	envVars := requiredEnvVar(
 		"AWS_ACCESS_KEY_ID",
 		"AWS_SECRET_ACCESS_KEY",
-		"AWS_PAS_VPC_ID",
 	)
 
 	envVars = append(envVars, optionalEnvVar(
 		"GSB_BROKERPAK_BUILTIN_PATH",
-		"GSB_PROVISION_DEFAULTS",
 		"CH_CRED_HUB_URL",
 		"CH_UAA_URL",
 		"CH_UAA_CLIENT_NAME",
@@ -76,6 +77,7 @@ func setEnvVars(brokerName string) {
 		EnvVar{Name: "SECURITY_USER_NAME", Value: brokerUsername},
 		EnvVar{Name: "SECURITY_USER_PASSWORD", Value: brokerPassword},
 		EnvVar{Name: "DB_TLS", Value: "skip-verify"},
+		EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
 		EnvVar{Name: "ENCRYPTION_ENABLED", Value: true},
 		EnvVar{Name: "ENCRYPTION_PASSWORDS", Value: `[{"password": {"secret":"superSecretP@SSw0Rd1234!"},"label":"first-encryption","primary":true}]`},
 	)
@@ -117,17 +119,17 @@ func getBrokerAppURL(brokerApp AppInstance) string {
 	return receiver.BrokerURL[0]
 }
 
-func pushServiceBroker(brokerName, brokerDir string) AppInstance {
+func pushNoStartServiceBroker(brokerName, brokerDir string) AppInstance {
 	session := StartCF("push", brokerName, "--no-start", "-p", brokerDir, "-f", fmt.Sprintf("%s/cf-manifest.yml", brokerDir), "--var", fmt.Sprintf("app=%s", brokerName))
+	return waitForAppPush(session, brokerName)
+}
+
+func pushServiceBroker(brokerName, brokerDir string) AppInstance {
+	session := StartCF("push", brokerName, "-p", brokerDir, "-f", fmt.Sprintf("%s/cf-manifest.yml", brokerDir), "--var", fmt.Sprintf("app=%s", brokerName))
 	return waitForAppPush(session, brokerName)
 }
 
 func waitForBrokerOperation(session *Session, name string) {
 	Eventually(session, 5*time.Minute).Should(Exit())
-
-	if session.ExitCode() != 0 {
-		fmt.Fprintf(GinkgoWriter, "FAILED broekr operation. Getting logs...")
-		CF("logs", name, "--recent")
-		Fail("Broker failed operation")
-	}
+	Expect(session.ExitCode()).To(BeZero())
 }

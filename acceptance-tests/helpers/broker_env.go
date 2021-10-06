@@ -31,20 +31,7 @@ func SetBrokerEnv(brokerName string, envVars ...EnvVar) {
 func SetBrokerEnvAndRestart(envVars ...EnvVar) {
 	const broker = "cloud-service-broker-aws"
 
-	for _, envVar := range envVars {
-		switch v := envVar.Value.(type) {
-		case string:
-			if v == "" {
-				CF("unset-env", broker, envVar.Name)
-			} else {
-				CF("set-env", broker, envVar.Name, v)
-			}
-		default:
-			data, err := json.Marshal(v)
-			Expect(err).NotTo(HaveOccurred())
-			CF("set-env", broker, envVar.Name, string(data))
-		}
-	}
-
-	CF("restart", broker)
+	SetBrokerEnv(broker, envVars...)
+	session := StartCF("restart", broker)
+	waitForAppPush(session, broker)
 }

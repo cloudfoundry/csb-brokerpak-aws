@@ -114,6 +114,15 @@ push-broker: cloud-service-broker build aws_access_key_id aws_secret_access_key 
 push-local-broker: local-cloud-service-broker build aws_access_key_id aws_secret_access_key aws_pas_vpc_id ## push the broker with this brokerpak
 	MANIFEST=cf-manifest.yml APP_NAME=$(APP_NAME) DB_TLS=$(DB_TLS) GSB_PROVISION_DEFAULTS='$(GSB_PROVISION_DEFAULTS)' ./scripts/push-broker.sh
 
+.PHONY: collect-released
+collect-released:
+	mkdir -p ../aws-released
+	wget $(shell curl -sL https://api.github.com/repos/cloudfoundry-incubator/cloud-service-broker/releases/latest | jq -r '.assets[] | select(.name == "cloud-service-broker.linux") | .browser_download_url') -P ../aws-released
+	mv ./../aws-released/cloud-service-broker.linux ./../aws-released/cloud-service-broker
+	chmod +x ./../aws-released/cloud-service-broker
+	wget $(shell curl -sL https://api.github.com/repos/cloudfoundry-incubator/csb-brokerpak-aws/releases/latest | jq -r '.assets[0].browser_download_url') -P ../aws-released
+	cp cf-manifest.yml ../aws-released
+
 .PHONY: aws_access_key_id
 aws_access_key_id:
 ifndef AWS_ACCESS_KEY_ID
@@ -139,3 +148,4 @@ clean: ## delete build files
 	- rm $(IAAS)-services-*.brokerpak
 	- rm ./cloud-service-broker
 	- rm ./brokerpak-user-docs.md
+	- rm -rf ../aws-released
