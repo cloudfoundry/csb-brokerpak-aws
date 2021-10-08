@@ -13,11 +13,11 @@ terraform_binaries:
   version: 0.12.30
   source: https://github.com/hashicorp/terraform/archive/v0.12.30.zip  
 - name: terraform-provider-aws
-  version: 3.35.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v3.35.0.zip
+  version: 3.62.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v3.62.0.zip
 - name: terraform-provider-random
-  version: 2.2.1
-  source: https://releases.hashicorp.com/terraform-provider-random/2.2.1/terraform-provider-random_2.2.1_linux_amd64.zip
+  version: 3.1.0
+  source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.1.0.zip
 - name: terraform-provider-mysql
   version: 1.9.0
   source: https://releases.hashicorp.com/terraform-provider-mysql/1.9.0/terraform-provider-mysql_1.9.0_linux_amd64.zip 
