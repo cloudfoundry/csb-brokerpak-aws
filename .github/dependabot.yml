@@ -1,31 +1,31 @@
 version: 2
 updates:
-- package-ecosystem: maven
-  directory: "/acceptance-tests/aws/importtestapp"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests"
   schedule:
     interval: "weekly"
     day: "saturday"
     time: "06:00"
-- package-ecosystem: maven
-  directory: "/acceptance-tests/aws/springboot-dynamodb"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
     interval: "weekly"
     day: "saturday"
     time: "06:00"
-- package-ecosystem: npm
-  directory: "/acceptance-tests/spring-music-validator"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/s3app"
   schedule:
     interval: "weekly"
     day: "saturday"
     time: "06:00"
-- package-ecosystem: npm
-  directory: "/acceptance-tests/aws/s3-test-app"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
     interval: "weekly"
     day: "saturday"
     time: "06:00"
-- package-ecosystem: terraform
-  directory: "/acceptance-tests/aws/infra-tools/terraform"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/redisapp"
   schedule:
     interval: "weekly"
     day: "saturday"
@@ -74,6 +74,12 @@ updates:
     time: "06:00"
 - package-ecosystem: terraform
   directory: "/terraform/rds/bind/mysql"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: "github-actions"
+  directory: "/"
   schedule:
     interval: "weekly"
     day: "saturday"
