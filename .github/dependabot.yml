@@ -30,50 +30,8 @@ updates:
     interval: "weekly"
     day: "saturday"
     time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/s3/provision"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/s3/bind"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/redis/cluster/provision"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/dynamodb/provision"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/dynamodb/bind"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/rds/provision"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/rds/bind/postgresql"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: terraform
-  directory: "/terraform/rds/bind/mysql"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/dynamodbapp"
   schedule:
     interval: "weekly"
     day: "saturday"
