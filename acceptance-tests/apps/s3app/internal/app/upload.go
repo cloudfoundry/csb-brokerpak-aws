@@ -5,13 +5,12 @@ import (
 	"net/http"
 	"s3app/internal/credentials"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gorilla/mux"
 )
 
-func handleUpload(session *session.Session, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
+func handleUpload(client *s3.Client, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling upload.")
 
@@ -22,15 +21,14 @@ func handleUpload(session *session.Session, creds credentials.S3Service) func(w 
 			return
 		}
 
-		uploader := s3manager.NewUploader(session)
-		_, err := uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(creds.BucketName),
-			Key:    aws.String(filename),
-			Body:   r.Body,
+		_, err := client.PutObject(r.Context(), &s3.PutObjectInput{
+			Bucket:        aws.String(creds.BucketName),
+			Key:           aws.String(filename),
+			Body:          r.Body,
+			ContentLength: r.ContentLength,
 		})
 		if err != nil {
-			log.Printf("Error uploading file %q: %s", filename, err)
-			http.Error(w, "Failed to upload file.", http.StatusFailedDependency)
+			fail(w, http.StatusFailedDependency, "Error uploading file part %q: %s", filename, err)
 			return
 		}
 
