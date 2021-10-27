@@ -9,6 +9,7 @@ const (
 	PostgeSQL AppCode = "postgresqlapp"
 	Redis     AppCode = "redisapp"
 	S3        AppCode = "s3app"
+	DynamoDB  AppCode = "dynamodbapp"
 )
 
 func (a AppCode) Dir() string {

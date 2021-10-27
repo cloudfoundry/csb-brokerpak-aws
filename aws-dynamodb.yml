@@ -76,7 +76,7 @@ provision:
   - field_name: range_key
     type: string
     details: The attribute to use as the range (sort) key. Must also be defined as an attribute
-    drequired: true
+    required: true
   - field_name: ttl_attribute_name
     type: string
     details: The name of the table attribute to store the TTL timestamp in
