@@ -4,17 +4,14 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"s3app/internal/credentials"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gorilla/mux"
 )
 
-func handleDownload(session *session.Session, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
+func handleDownload(client *s3.Client, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling download.")
 
@@ -25,22 +22,18 @@ func handleDownload(session *session.Session, creds credentials.S3Service) func(
 			return
 		}
 
-		file, err := os.Create(filename)
-		downloader := s3manager.NewDownloader(session)
-		_, err = downloader.Download(file, &s3.GetObjectInput{
+		obj, err := client.GetObject(r.Context(), &s3.GetObjectInput{
 			Bucket: aws.String(creds.BucketName),
 			Key:    aws.String(filename),
 		})
 		if err != nil {
-			log.Printf("Error dowloading file %q: %s", filename, err)
-			http.Error(w, "Failed to download file.", http.StatusFailedDependency)
+			fail(w, http.StatusFailedDependency, "Error downloading file %q: %s", filename, err)
 			return
 		}
 
-		fileContents, err := ioutil.ReadAll(file)
+		fileContents, err := ioutil.ReadAll(obj.Body)
 		if err != nil {
-			log.Printf("Error reading file %q: %s", filename, err)
-			http.Error(w, "Failed to read file.", http.StatusFailedDependency)
+			fail(w, http.StatusFailedDependency, "Error reading file %q: %s", filename, err)
 			return
 		}
 
