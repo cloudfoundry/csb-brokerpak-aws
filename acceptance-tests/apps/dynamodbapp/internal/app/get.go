@@ -22,7 +22,8 @@ func handleGet(client *dynamodb.Client, creds credentials.DynamoDBService) func(
 		}
 
 		out, err := client.Scan(r.Context(), &dynamodb.ScanInput{
-			TableName: aws.String(creds.TableName),
+			TableName:      aws.String(creds.TableName),
+			ConsistentRead: aws.Bool(true),
 		})
 		if err != nil {
 			fail(w, http.StatusNotFound, "failed to scan table %q: %s", creds.TableName, err)
