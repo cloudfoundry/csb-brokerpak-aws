@@ -47,7 +47,6 @@ func handleGet(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 		var value string
 		if err := rows.Scan(&value); err != nil {
 			fail(w, http.StatusNotFound, "Error retrieving value: %s", err)
-			http.Error(w, "Failed to retrieve value.", http.StatusNotFound)
 			return
 		}
 

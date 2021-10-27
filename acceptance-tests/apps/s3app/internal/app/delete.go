@@ -5,39 +5,27 @@ import (
 	"net/http"
 	"s3app/internal/credentials"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gorilla/mux"
 )
 
-func handleDelete(session *session.Session, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
+func handleDelete(client *s3.Client, creds credentials.S3Service) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling delete.")
 
 		filename, ok := mux.Vars(r)["file_name"]
 		if !ok {
-			log.Println("File name missing.")
-			http.Error(w, "File name missing.", http.StatusBadRequest)
+			fail(w, http.StatusBadRequest, "File name missing")
 			return
 		}
 
-		svc := s3.New(session)
-		input := &s3.DeleteObjectsInput{
+		input := s3.DeleteObjectInput{
 			Bucket: aws.String(creds.BucketName),
-			Delete: &s3.Delete{
-				Objects: []*s3.ObjectIdentifier{
-					{
-						Key: aws.String(filename),
-					},
-				},
-				Quiet: aws.Bool(true),
-			},
+			Key:    aws.String(filename),
 		}
-		_, err := svc.DeleteObjects(input)
-		if err != nil {
-			log.Printf("Error deleting file %q: %s", filename, err)
-			http.Error(w, "Failed to delete file.", http.StatusFailedDependency)
+		if _, err := client.DeleteObject(r.Context(), &input); err != nil {
+			fail(w, http.StatusFailedDependency, "Error deleting file %q: %s", filename, err)
 			return
 		}
 
