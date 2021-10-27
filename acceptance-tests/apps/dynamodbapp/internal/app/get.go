@@ -5,11 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
-
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/gorilla/mux"
 )
 
@@ -42,6 +40,7 @@ func handleGet(client *dynamodb.Client, creds credentials.DynamoDBService) func(
 
 		if value == "" {
 			fail(w, http.StatusNotFound, "failed to find item with key %q", key)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)
