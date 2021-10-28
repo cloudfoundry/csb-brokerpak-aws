@@ -59,7 +59,7 @@ func config() interface{} {
 		},
 		"hash_key":   "id",
 		"range_key":  "value",
-		"table_name": "csb-dynamodb-test",
+		"table_name": helpers.RandomName("csb", "dynamodb"),
 		"global_secondary_indexes": []map[string]interface{}{
 			{
 				"name":               "KeyIndex",
