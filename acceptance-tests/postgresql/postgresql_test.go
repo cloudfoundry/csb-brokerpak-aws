@@ -1,8 +1,10 @@
 package postgresql_test
 
 import (
-	"acceptancetests/apps"
-	"acceptancetests/helpers"
+	"acceptancetests/helpers/apps"
+	"acceptancetests/helpers/matchers"
+	"acceptancetests/helpers/random"
+	"acceptancetests/helpers/services"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,31 +13,31 @@ import (
 var _ = Describe("PostgreSQL", func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := helpers.CreateService("csb-aws-postgresql", "small")
+		serviceInstance := services.CreateInstance("csb-aws-postgresql", "small")
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
-		appOne := helpers.AppPushUnstarted(apps.PostgeSQL)
-		appTwo := helpers.AppPushUnstarted(apps.PostgeSQL)
-		defer helpers.AppDelete(appOne, appTwo)
+		appOne := apps.Push(apps.WithApp(apps.PostgeSQL))
+		appTwo := apps.Push(apps.WithApp(apps.PostgeSQL))
+		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the service instance")
 		binding := serviceInstance.Bind(appOne)
 		serviceInstance.Bind(appTwo)
 
 		By("starting the apps")
-		helpers.AppStart(appOne, appTwo)
+		apps.Start(appOne, appTwo)
 
 		By("checking that the app environment has a credhub reference for credentials")
-		Expect(binding.Credential()).To(helpers.HaveCredHubRef)
+		Expect(binding.Credential()).To(matchers.HaveCredHubRef)
 
 		By("creating a schema using the first app")
-		schema := helpers.RandomShortName()
+		schema := random.Name(random.WithMaxLength(8))
 		appOne.PUT("", schema)
 
 		By("setting a key-value using the first app")
-		key := helpers.RandomHex()
-		value := helpers.RandomHex()
+		key := random.Hexadecimal()
+		value := random.Hexadecimal()
 		appOne.PUT(value, "%s/%s", schema, key)
 
 		By("getting the value using the second app")
