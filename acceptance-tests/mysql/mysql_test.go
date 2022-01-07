@@ -1,8 +1,10 @@
 package mysql_test
 
 import (
-	"acceptancetests/apps"
-	"acceptancetests/helpers"
+	"acceptancetests/helpers/apps"
+	"acceptancetests/helpers/matchers"
+	"acceptancetests/helpers/random"
+	"acceptancetests/helpers/services"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,27 +13,27 @@ import (
 var _ = Describe("MySQL", func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := helpers.CreateService("csb-aws-mysql", "small")
+		serviceInstance := services.CreateInstance("csb-aws-mysql", "small")
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := helpers.AppPushUnstarted(apps.MySQL)
-		appTwo := helpers.AppPushUnstarted(apps.MySQL)
-		defer helpers.AppDelete(appOne, appTwo)
+		appOne := apps.Push(apps.WithApp(apps.MySQL))
+		appTwo := apps.Push(apps.WithApp(apps.MySQL))
+		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the service instance")
 		binding := serviceInstance.Bind(appOne)
 		serviceInstance.Bind(appTwo)
 
 		By("starting the apps")
-		helpers.AppStart(appOne, appTwo)
+		apps.Start(appOne, appTwo)
 
 		By("checking that the app environment has a credhub reference for credentials")
-		Expect(binding.Credential()).To(helpers.HaveCredHubRef)
+		Expect(binding.Credential()).To(matchers.HaveCredHubRef)
 
 		By("setting a key-value using the first app")
-		key := helpers.RandomHex()
-		value := helpers.RandomHex()
+		key := random.Hexadecimal()
+		value := random.Hexadecimal()
 		appOne.PUT(value, key)
 
 		By("getting the value using the second app")
