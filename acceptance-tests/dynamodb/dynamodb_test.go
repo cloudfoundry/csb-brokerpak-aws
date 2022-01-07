@@ -1,38 +1,42 @@
 package dynamodb_test
 
 import (
-	"acceptancetests/apps"
-	"acceptancetests/helpers"
-
-	. "github.com/onsi/gomega"
+	"acceptancetests/helpers/apps"
+	"acceptancetests/helpers/random"
+	"acceptancetests/helpers/services"
 
 	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("DynamoDB", func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := helpers.CreateService("csb-aws-dynamodb", "ondemand", config())
+		serviceInstance := services.CreateInstance(
+			"csb-aws-dynamodb",
+			"ondemand",
+			services.WithParameters(config()),
+		)
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := helpers.AppPushUnstarted(apps.DynamoDB)
-		appTwo := helpers.AppPushUnstarted(apps.DynamoDB)
-		defer helpers.AppDelete(appOne, appTwo)
+		appOne := apps.Push(apps.WithApp(apps.DynamoDB))
+		appTwo := apps.Push(apps.WithApp(apps.DynamoDB))
+		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the DynamoDB service instance")
 		binding := serviceInstance.Bind(appOne)
 		serviceInstance.Bind(appTwo)
 
 		By("starting the apps")
-		helpers.AppStart(appOne, appTwo)
+		apps.Start(appOne, appTwo)
 
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(HaveKey("credhub-ref"))
 
 		By("setting a key-value using the first app")
-		key := helpers.RandomHex()
-		value := helpers.RandomHex()
+		key := random.Hexadecimal()
+		value := random.Hexadecimal()
 		appOne.PUT(value, key)
 
 		By("getting the value using the second app")
@@ -59,7 +63,7 @@ func config() interface{} {
 		},
 		"hash_key":   "id",
 		"range_key":  "value",
-		"table_name": helpers.RandomName("csb", "dynamodb"),
+		"table_name": random.Name(random.WithPrefix("csb", "dynamodb")),
 		"global_secondary_indexes": []map[string]interface{}{
 			{
 				"name":               "KeyIndex",

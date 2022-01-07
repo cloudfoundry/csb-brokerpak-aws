@@ -1,8 +1,9 @@
 package s3_test
 
 import (
-	"acceptancetests/apps"
-	"acceptancetests/helpers"
+	"acceptancetests/helpers/apps"
+	"acceptancetests/helpers/random"
+	"acceptancetests/helpers/services"
 	"fmt"
 	"time"
 
@@ -13,26 +14,26 @@ import (
 var _ = Describe("S3", func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := helpers.CreateService("csb-aws-s3-bucket", "private")
+		serviceInstance := services.CreateInstance("csb-aws-s3-bucket", "private")
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := helpers.AppPushUnstarted(apps.S3)
-		appTwo := helpers.AppPushUnstarted(apps.S3)
-		defer helpers.AppDelete(appOne, appTwo)
+		appOne := apps.Push(apps.WithApp(apps.S3))
+		appTwo := apps.Push(apps.WithApp(apps.S3))
+		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the s3 service instance")
 		binding := serviceInstance.Bind(appOne)
 		serviceInstance.Bind(appTwo)
 
 		By("starting the apps")
-		helpers.AppStart(appOne, appTwo)
+		apps.Start(appOne, appTwo)
 
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(HaveKey("credhub-ref"))
 
 		By("uploading a file using the first app")
-		filename := helpers.RandomHex()
+		filename := random.Hexadecimal()
 		fileContent := fmt.Sprintf("This is a dummy file that will be uploaded the S3 at %s.", time.Now().String())
 		appOne.PUT(fileContent, filename)
 

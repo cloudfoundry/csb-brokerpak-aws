@@ -1,8 +1,11 @@
 package withoutcredhub_test
 
 import (
-	"acceptancetests/apps"
-	"acceptancetests/helpers"
+	"acceptancetests/helpers/apps"
+	"acceptancetests/helpers/brokers"
+	"acceptancetests/helpers/matchers"
+	"acceptancetests/helpers/random"
+	"acceptancetests/helpers/services"
 	"fmt"
 	"time"
 
@@ -12,25 +15,36 @@ import (
 
 var _ = Describe("Without CredHub", func() {
 	It("can be accessed by an app", func() {
+		env := apps.EnvVar{Name: "CH_CRED_HUB_URL", Value: ""}
+		broker := brokers.Create(
+			brokers.WithPrefix("csb-storage"),
+			brokers.WithEnv(env),
+		)
+		defer broker.Delete()
+
 		By("creating a service instance")
-		serviceInstance := helpers.CreateService("csb-aws-s3-bucket", "private")
+		serviceInstance := services.CreateInstance(
+			"csb-aws-s3-bucket",
+			"private",
+			services.WithBroker(broker),
+		)
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
-		app := helpers.AppPushUnstarted(apps.S3)
-		defer helpers.AppDelete(app)
+		app := apps.Push(apps.WithApp(apps.S3))
+		defer apps.Delete(app)
 
 		By("binding the app to the storage service instance")
 		binding := serviceInstance.Bind(app)
 
 		By("starting the app")
-		helpers.AppStart(app)
+		apps.Start(app)
 
 		By("checking that the app environment does not a credhub reference for credentials")
-		Expect(binding.Credential()).NotTo(helpers.HaveCredHubRef)
+		Expect(binding.Credential()).NotTo(matchers.HaveCredHubRef)
 
 		By("uploading a file")
-		filename := helpers.RandomHex()
+		filename := random.Hexadecimal()
 		fileContent := fmt.Sprintf("This is a dummy file that will be uploaded the S3 at %s.", time.Now().String())
 		app.PUT(fileContent, filename)
 

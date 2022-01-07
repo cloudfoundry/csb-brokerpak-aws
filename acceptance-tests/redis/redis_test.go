@@ -1,8 +1,10 @@
 package redis_test
 
 import (
-	"acceptancetests/apps"
-	"acceptancetests/helpers"
+	"acceptancetests/helpers/apps"
+	"acceptancetests/helpers/random"
+	"acceptancetests/helpers/services"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -10,27 +12,27 @@ import (
 var _ = Describe("Redis", func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := helpers.CreateService("csb-aws-redis", "small")
+		serviceInstance := services.CreateInstance("csb-aws-redis", "small")
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := helpers.AppPushUnstarted(apps.Redis)
-		appTwo := helpers.AppPushUnstarted(apps.Redis)
-		defer helpers.AppDelete(appOne, appTwo)
+		appOne := apps.Push(apps.WithApp(apps.Redis))
+		appTwo := apps.Push(apps.WithApp(apps.Redis))
+		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the Redis service instance")
 		binding := serviceInstance.Bind(appOne)
 		serviceInstance.Bind(appTwo)
 
 		By("starting the apps")
-		helpers.AppStart(appOne, appTwo)
+		apps.Start(appOne, appTwo)
 
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(HaveKey("credhub-ref"))
 
 		By("setting a key-value using the first app")
-		key := helpers.RandomHex()
-		value := helpers.RandomHex()
+		key := random.Hexadecimal()
+		value := random.Hexadecimal()
 		appOne.PUT(value, key)
 
 		By("getting the value using the second app")

@@ -1,7 +1,6 @@
 package upgrade_test
 
 import (
-	"acceptancetests/helpers"
 	"flag"
 	"testing"
 
@@ -9,14 +8,14 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var developmentBuildDir string
-var releasedBuildDir string
-var brokerName string
+var (
+	developmentBuildDir string
+	releasedBuildDir    string
+)
 
 func init() {
 	flag.StringVar(&releasedBuildDir, "releasedBuildDir", "../../../aws-released", "location of released version of built broker and brokerpak")
 	flag.StringVar(&developmentBuildDir, "developmentBuildDir", "../../", "location of development version of built broker and brokerpak")
-	brokerName = helpers.RandomName("csb")
 }
 
 func TestUpgrade(t *testing.T) {
