@@ -34,7 +34,7 @@ plans:
 - name: medium
   id: df41095a-43e8-4be4-b4d6-ae2d8a35068d
   description: 'Redis 6.0 with at least 4GB cache and 1 node.'
-  display_name: "Medium HA"
+  display_name: "Medium"
   properties:
     cache_size: 4
     redis_version: "6.0"
@@ -42,7 +42,7 @@ plans:
 - name: large
   id: da4dc49c-a64f-4d2a-8490-5e456cbb0577
   description: 'Redis 6.0 with at least 16 GB cache and 1 node.'
-  display_name: "Large HA"
+  display_name: "Large"
   properties:
     cache_size: 16
     redis_version: "6.0"
