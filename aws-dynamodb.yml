@@ -226,10 +226,8 @@ bind:
       type: string
       details: AWS region for the bucket              
 examples:
-# - name: ondemand
-#   description: Create a small mysql instance
-#   plan_id: 52b109ee-1318-11eb-851b-dbe6aa707e6b
-#   # provision_params: {  "attributes": [ { name = 'id' type = 'N' },{ name = 'title' type = 'S' },{ name = 'age' type = 'N'} ] }
-#   # provision_params:  {  "attributes": {"pcf-instance-id':'ex1065500383-sridharvennela'} }
-#   #provision_params:  { "attributes": {'pcf-instance-id':'ex1065500383-sridharvennela','pcf-organization-guid':'','pcf-space-guid':''} }
-#   bind_params: {}
+- name: ondemand
+  description: Create a dynamodb instance
+  plan_id: 52b109ee-1318-11eb-851b-dbe6aa707e6b
+  provision_params: { "table_name": "example_table", "hash_key": "id", "range_key": "title", "attributes": [ { "name": "id", "type": "N" },{ "name": "title", "type": "S" },{ "name": "age", "type": "N"} ], "global_secondary_indexes": [{"name": "TitleIndex", "hash_key": "title", "range_key": "age", "projection_type": "ALL"}]}
+  bind_params: {}
