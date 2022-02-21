@@ -1,7 +1,7 @@
 package apps
 
 import (
-	"acceptancetests/helpers/cf"
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"fmt"
 
 	. "github.com/onsi/ginkgo"
