@@ -1,8 +1,8 @@
 package brokers
 
 import (
-	"acceptancetests/helpers/apps"
-	"acceptancetests/helpers/cf"
+	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 )
 
 func (b *Broker) UpdateSourceDir(dir string) {
