@@ -20,22 +20,16 @@ To provision services, the brokerpak currently requires AWS access key id and se
 
 A Makefile supports the full local development lifecycle for the brokerpak.
 
-Make targets will run with the *cfplatformeng/csb* docker image. Make sure your local image is up to date or run
+Make targets will run with the *cfplatformeng/csb* docker image. Alternatively, a custom image can be specified by setting the `CSB` environment variable
 
-`docker pull cfplatformeng/csb` to update it
-
-Alternatively, a custom image can be specified by setting the `CSB` environment variable
-
-Available targets include (but are not limited to):
-
-- `make` list make targets
-- `make build` build the brokerpak
-- `make run` runs the brokerpak locally
-- `make docs` will generate markdown documentation from brokerpak
-- `make run-examples` will run example provision, bind, unbind, deprovision against broker started with `make run`
+Available make targets can be listed by running `make`.
 
 There is a make target to push the broker and brokerpak into a CloudFoundry foundation. It will be necessary to manually configure a few items for the broker to work.
 
 - `make push-broker` will `cf push` the broker into CloudFoundry. Requires the `cf` cli to be installed.
 
 The broker gets pushed into CloudFoundry as *cloud-service-broker-aws*  It will be necessary to bind a MySQL database to the broker to provide broker state storage. See [AWS Installation](./docs/aws-installation.md) docs for more info.
+
+## Broker
+The version of Cloud Service Broker to use with this brokerpak is encoded in the `go.mod` file.
+The make targets will use this version by default.
