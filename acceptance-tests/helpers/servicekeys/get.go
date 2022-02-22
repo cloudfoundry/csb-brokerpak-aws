@@ -1,7 +1,7 @@
 package servicekeys
 
 import (
-	"acceptancetests/helpers/cf"
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"encoding/json"
 	"reflect"
 	"strings"

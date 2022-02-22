@@ -1,9 +1,9 @@
 package redis_test
 
 import (
-	"acceptancetests/helpers/apps"
-	"acceptancetests/helpers/random"
-	"acceptancetests/helpers/services"
+	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/random"
+	"csbbrokerpakaws/acceptance-tests/helpers/services"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

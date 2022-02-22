@@ -1,7 +1,7 @@
 package bindings
 
 import (
-	"acceptancetests/helpers/cf"
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 )
 
 func (b *Binding) Unbind() {

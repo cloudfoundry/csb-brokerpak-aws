@@ -1,25 +1,31 @@
-
-IAAS=aws
-DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host
-CSB := $(or $(CSB), cfplatformeng/csb)
-USE_GO_CONTAINERS := $(or $(USE_GO_CONTAINERS), 1)
-
-ifeq ($(USE_GO_CONTAINERS), 0)
-BUILDER=./cloud-service-broker
-else
-BUILDER=docker run $(DOCKER_OPTS) $(CSB)
-endif
-
 ###### Help ###################################################################
-
 .DEFAULT_GOAL = help
 
 .PHONY: help
-
 help: ## list Makefile targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-###### Build ###################################################################
+###### Setup ##################################################################
+IAAS=aws
+CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
+CSB := $(or $(CSB), cfplatformeng/csb:$(CSB_VERSION))
+GO_OK := $(shell which go 1>/dev/null 2>/dev/null; echo $$?)
+DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
+ifeq ($(GO_OK), 0)
+GO=go
+BUILDER=go run github.com/cloudfoundry/cloud-service-broker
+LDFLAGS="-X github.com/cloudfoundry/cloud-service-broker/utils.Version=$(CSB_VERSION)"
+GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker"
+else ifeq ($(DOCKER_OK), 0)
+DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host
+GO=docker run $(DOCKER_OPTS) golang:$(GOVERSION) go
+BUILDER=docker run $(DOCKER_OPTS) $(CSB)
+GET_CSB="wget -O cloud-service-broker https://github.com/cloudfoundry/cloud-service-broker/releases/download/v$(CSB_VERSION)/cloud-service-broker.linux && chmod +x cloud-service-broker"
+else
+$(error either Go or Docker must be installed)
+endif
+
+###### Targets ################################################################
 
 .PHONY: build
 build: $(IAAS)-services-*.brokerpak ## build brokerpak
@@ -31,7 +37,6 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf
 
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
-#GSB_API_HOSTNAME := $(or $(GSB_API_HOSTNAME), host.docker.internal)
 PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 2)
 
 .PHONY: run
@@ -93,14 +98,8 @@ validate: build ## validate pak syntax
 ###### push-broker ###################################################################
 
 # fetching bits for cf push broker
-cloud-service-broker:
-	wget $(shell curl -sL https://api.github.com/repos/cloudfoundry-incubator/cloud-service-broker/releases/latest | jq -r '.assets[] | select(.name == "cloud-service-broker.linux") | .browser_download_url')
-	mv ./cloud-service-broker.linux ./cloud-service-broker
-	chmod +x ./cloud-service-broker
-
-local-cloud-service-broker:
-	cp ../cloud-service-broker/build/cloud-service-broker.linux ./cloud-service-broker
-	chmod +x cloud-service-broker
+cloud-service-broker: go.mod ## build or fetch CSB binary
+	$(shell "$(GET_CSB)")
 
 APP_NAME := $(or $(APP_NAME), cloud-service-broker-aws)
 DB_TLS := $(or $(DB_TLS), skip-verify)
@@ -113,15 +112,6 @@ push-broker: cloud-service-broker build aws_access_key_id aws_secret_access_key 
 .PHONY: push-local-broker
 push-local-broker: local-cloud-service-broker build aws_access_key_id aws_secret_access_key aws_pas_vpc_id ## push the broker with this brokerpak
 	MANIFEST=cf-manifest.yml APP_NAME=$(APP_NAME) DB_TLS=$(DB_TLS) GSB_PROVISION_DEFAULTS='$(GSB_PROVISION_DEFAULTS)' ./scripts/push-broker.sh
-
-.PHONY: collect-released
-collect-released:
-	mkdir -p ../aws-released
-	wget $(shell curl -sL https://api.github.com/repos/cloudfoundry-incubator/cloud-service-broker/releases/latest | jq -r '.assets[] | select(.name == "cloud-service-broker.linux") | .browser_download_url') -P ../aws-released
-	mv ./../aws-released/cloud-service-broker.linux ./../aws-released/cloud-service-broker
-	chmod +x ./../aws-released/cloud-service-broker
-	wget $(shell curl -sL https://api.github.com/repos/cloudfoundry-incubator/csb-brokerpak-aws/releases/latest | jq -r '.assets[0].browser_download_url') -P ../aws-released
-	cp cf-manifest.yml ../aws-released
 
 .PHONY: aws_access_key_id
 aws_access_key_id:
@@ -145,7 +135,15 @@ endif
 
 .PHONY: clean
 clean: ## delete build files
-	- rm $(IAAS)-services-*.brokerpak
-	- rm ./cloud-service-broker
-	- rm ./brokerpak-user-docs.md
+	- rm -f $(IAAS)-services-*.brokerpak
+	- rm -f ./cloud-service-broker
+	- rm -f ./brokerpak-user-docs.md
 	- rm -rf ../aws-released
+
+.PHONY: latest-csb
+latest-csb: ## point to the very latest CSB on GitHub
+	$(GO) get -d github.com/cloudfoundry/cloud-service-broker@main
+
+.PHONY: local-csb
+local-csb: ## point to a local CSB repo
+	echo "replace \"github.com/cloudfoundry/cloud-service-broker\" => \"$$PWD/../cloud-service-broker\"" >>go.mod
