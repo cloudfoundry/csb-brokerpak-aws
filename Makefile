@@ -143,7 +143,9 @@ clean: ## delete build files
 .PHONY: latest-csb
 latest-csb: ## point to the very latest CSB on GitHub
 	$(GO) get -d github.com/cloudfoundry/cloud-service-broker@main
+	$(GO) mod tidy
 
 .PHONY: local-csb
 local-csb: ## point to a local CSB repo
 	echo "replace \"github.com/cloudfoundry/cloud-service-broker\" => \"$$PWD/../cloud-service-broker\"" >>go.mod
+	$(GO) mod tidy
