@@ -13,7 +13,7 @@ GO_OK := $(shell which go 1>/dev/null 2>/dev/null; echo $$?)
 DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
 ifeq ($(GO_OK), 0)
 GO=go
-BUILDER=go run github.com/cloudfoundry/cloud-service-broker
+BUILDER=go run -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker
 LDFLAGS="-X github.com/cloudfoundry/cloud-service-broker/utils.Version=$(CSB_VERSION)"
 GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker"
 else ifeq ($(DOCKER_OK), 0)
