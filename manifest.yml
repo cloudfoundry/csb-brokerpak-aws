@@ -22,8 +22,9 @@ terraform_binaries:
   version: 1.9.0
   source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
 - name: terraform-provider-postgresql
-  version: 1.7.1
-  source: https://github.com/terraform-providers/terraform-provider-postgresql/archive/v1.7.1.zip
+  version: 1.15.0
+  source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.15.0.zip
+  url_template: https://registry.terraform.io/v1/providers/cyrilgdn/postgresql/${version}/download/${os}/${arch}
 env_config_mapping:
   AWS_ACCESS_KEY_ID: aws.access_key_id
   AWS_SECRET_ACCESS_KEY: aws.secret_access_key
