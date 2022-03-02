@@ -1,15 +1,15 @@
-package dynamodb_test
+package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DynamoDB", func() {
+var _ = Describe("DynamoDB", Label("dynamodb"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(

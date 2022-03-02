@@ -1,4 +1,4 @@
-package withoutcredhub_test
+package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Without CredHub", func() {
+var _ = Describe("Without CredHub", Label("withoutcredhub"), func() {
 	It("can be accessed by an app", func() {
 		env := apps.EnvVar{Name: "CH_CRED_HUB_URL", Value: ""}
 		broker := brokers.Create(

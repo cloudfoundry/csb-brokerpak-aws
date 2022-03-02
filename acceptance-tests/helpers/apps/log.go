@@ -4,7 +4,7 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 )
 
 func checkSuccess(code int, name string) {

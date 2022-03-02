@@ -1,4 +1,4 @@
-package s3_test
+package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("S3", func() {
+var _ = Describe("S3", Label("s3"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance("csb-aws-s3-bucket", "private")
