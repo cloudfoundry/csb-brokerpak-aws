@@ -28,5 +28,5 @@ func (a AppCode) Dir() string {
 }
 
 func WithApp(app AppCode) Option {
-	return WithDir(app.Dir())
+	return WithPreBuild(app.Dir())
 }
