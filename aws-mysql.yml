@@ -25,7 +25,7 @@ plan_updateable: true
 plans:
 - name: small
   id: 2268ce43-7fd7-48dc-be2f-8611e11fb12e
-  description: 'MySQL v5.7, minumum 2 cores, minumum 4GB ram, 5GB storage'
+  description: 'MySQL v5.7, minimum 2 cores, minimum 4GB ram, 5GB storage'
   display_name: "small"
   properties:
     cores: 2
@@ -34,7 +34,7 @@ plans:
     subsume: false
 - name: medium
   id: f2ae0bb7-6921-43b7-bae7-6d1fe1c5d1c6
-  description: 'MySQL v5.7, minumum 4 cores, minumum 8GB ram, 10GB storage'
+  description: 'MySQL v5.7, minimum 4 cores, minimum 8GB ram, 10GB storage'
   display_name: "medium"
   properties:
     cores: 4
@@ -43,7 +43,7 @@ plans:
     subsume: false
 - name: large
   id: a5fea013-e87f-488f-969d-1cf038881b57
-  description: 'MySQL v5.7, minumum 8 cores, minumum 16GB ram, 20GB storage'
+  description: 'MySQL v5.7, minimum 8 cores, minimum 16GB ram, 20GB storage'
   display_name: "large"
   properties:
     cores: 8
@@ -76,7 +76,7 @@ provision:
     default: 5
     constraints:
       maximum: 4096
-      minumum: 5
+      minimum: 5
   - field_name: subsume
     type: boolean
     details: Indicates an existing PostgreSQL instnace should be subsumed      
