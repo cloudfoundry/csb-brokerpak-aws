@@ -8,59 +8,19 @@ help: ## list Makefile targets
 ###### Setup ##################################################################
 IAAS=aws
 CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
-CSB_RELEASE_VERSION := CSB_VERSION # this doesnt work well if we did make latest-csb.
-
-CSB_DOCKER_IMAGE := $(or $(CSB), cfplatformeng/csb:$(CSB_VERSION))
-GO_OK := $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; echo $$?))
+CSB := $(or $(CSB), cfplatformeng/csb:$(CSB_VERSION))
+GO_OK := $(shell which go 1>/dev/null 2>/dev/null; echo $$?)
 DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
-
-####### broker environment variables
-PAK_CACHE=.pak-cache
-SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
-SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
-PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 2)
-GSB_PROVISION_DEFAULTS := $(or $(GSB_PROVISION_DEFAULTS), {"aws_vpc_id": "$(AWS_PAS_VPC_ID)"})
-
-ifeq ($(GO_OK), 0)  # use local go binary
+ifeq ($(GO_OK), 0)
 GO=go
-BROKER_GO_OPTS=PORT=8080 \
-				DB_TYPE=sqlite3 \
-				DB_PATH=/tmp/csb-db \
-				SECURITY_USER_NAME=$(SECURITY_USER_NAME) \
-				SECURITY_USER_PASSWORD=$(SECURITY_USER_PASSWORD) \
-				AWS_ACCESS_KEY_ID='$(AWS_ACCESS_KEY_ID)' \
-				AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
- 				PAK_BUILD_CACHE_PATH=$(PAK_CACHE) \
- 				GSB_PROVISION_DEFAULTS='$(GSB_PROVISION_DEFAULTS)'
-
-PAK_PATH=$(PWD)
-RUN_CSB=$(BROKER_GO_OPTS) go run github.com/cloudfoundry/cloud-service-broker
 BUILDER=go run -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker
 LDFLAGS="-X github.com/cloudfoundry/cloud-service-broker/utils.Version=$(CSB_VERSION)"
 GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker"
 else ifeq ($(DOCKER_OK), 0)
-BROKER_DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host  \
-    -p 8080:8080 \
-		-e SECURITY_USER_NAME \
-		-e SECURITY_USER_PASSWORD \
-		-e AWS_ACCESS_KEY_ID \
-		-e AWS_SECRET_ACCESS_KEY \
-		-e "DB_TYPE=sqlite3" \
-		-e "DB_PATH=/tmp/csb-db" \
-		-e PAK_BUILD_CACHE_PATH=$(PAK_CACHE) \
-		-e GSB_PROVISION_DEFAULTS
-
-RUN_CSB=docker run $(BROKER_DOCKER_OPTS) $(CSB_DOCKER_IMAGE)
-
-#### running go inside a container, this is for integration tests and push-broker
-# path inside the container
-PAK_PATH=/brokerpak
-
-GO_DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host
-GO=docker run $(GO_DOCKER_OPTS) golang:latest go
-
-# this doesnt work well if we did make latest-csb. We should build it instead, with go inside a container.
-GET_CSB="wget -O cloud-service-broker https://github.com/cloudfoundry/cloud-service-broker/releases/download/v$(CSB_RELEASE_VERSION)/cloud-service-broker.linux && chmod +x cloud-service-broker"
+DOCKER_OPTS=--rm -v $(PWD):/brokerpak -w /brokerpak --network=host
+GO=docker run $(DOCKER_OPTS) golang:latest go
+BUILDER=docker run $(DOCKER_OPTS) $(CSB)
+GET_CSB="wget -O cloud-service-broker https://github.com/cloudfoundry/cloud-service-broker/releases/download/v$(CSB_VERSION)/cloud-service-broker.linux && chmod +x cloud-service-broker"
 else
 $(error either Go or Docker must be installed)
 endif
@@ -71,15 +31,26 @@ endif
 build: $(IAAS)-services-*.brokerpak ## build brokerpak
 
 $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf
-	$(RUN_CSB) pak build
-
-.pak-cache:
-	mkdir -p $(PAK_CACHE)
+	$(BUILDER) pak build
 
 ###### Run ###################################################################
+
+SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
+SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
+PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 2)
+
 .PHONY: run
 run: build aws_access_key_id aws_secret_access_key ## start broker with this brokerpak
-	$(RUN_CSB) serve
+	docker run $(DOCKER_OPTS) \
+	-p 8080:8080 \
+	-e SECURITY_USER_NAME \
+	-e SECURITY_USER_PASSWORD \
+	-e AWS_ACCESS_KEY_ID \
+	-e AWS_SECRET_ACCESS_KEY \
+	-e "DB_TYPE=sqlite3" \
+	-e "DB_PATH=/tmp/csb-db" \
+	-e GSB_PROVISION_DEFAULTS \
+	$(CSB) serve
 
 ###### docs ###################################################################
 
@@ -87,32 +58,42 @@ run: build aws_access_key_id aws_secret_access_key ## start broker with this bro
 docs: build brokerpak-user-docs.md ## build docs
 
 brokerpak-user-docs.md: *.yml
-	$(RUN_CSB) pak docs $(PAK_PATH)/$(shell ls *.brokerpak) > $@
+	docker run $(DOCKER_OPTS) \
+	$(CSB) pak docs /brokerpak/$(shell ls *.brokerpak) > $@
 
 ###### examples ###################################################################
 
 .PHONY: examples
 examples: ## display available examples
-	 $(RUN_CSB) client examples
+	docker run $(DOCKER_OPTS) \
+	-e SECURITY_USER_NAME \
+	-e SECURITY_USER_PASSWORD \
+	-e USER \
+	$(CSB) client examples
 
 ###### run-examples ###################################################################
-PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 10000)
 
 .PHONY: run-examples
 run-examples: ## run examples in yml files. Runs examples for all services by default. Set service_name and example_name to run all examples for a specific service or an specific example.
-	$(RUN_CSB) client run-examples --service-name="$(service_name)" --example-name="$(example_name)" -j $(PARALLEL_JOB_COUNT)
+	docker run $(DOCKER_OPTS) \
+	-e SECURITY_USER_NAME \
+	-e SECURITY_USER_PASSWORD \
+	-e USER \
+	$(CSB) client run-examples --service-name=$(service_name) --example-name=$(example_name) -j $(PARALLEL_JOB_COUNT)
 
 ###### info ###################################################################
 
 .PHONY: info ## show brokerpak info
 info: build
-	$(RUN_CSB) pak info $(PAK_PATH)/$(shell ls *.brokerpak)
+	docker run $(DOCKER_OPTS) \
+	$(CSB) pak info /brokerpak/$(shell ls *.brokerpak)
 
 ###### validate ###################################################################
 
 .PHONY: validate
 validate: build ## validate pak syntax
-	$(RUN_CSB) pak validate $(PAK_PATH)/$(shell ls *.brokerpak)
+	docker run $(DOCKER_OPTS) \
+	$(CSB) pak validate /brokerpak/$(shell ls *.brokerpak)
 
 ###### push-broker ###################################################################
 
@@ -122,6 +103,7 @@ cloud-service-broker: go.mod ## build or fetch CSB binary
 
 APP_NAME := $(or $(APP_NAME), cloud-service-broker-aws)
 DB_TLS := $(or $(DB_TLS), skip-verify)
+GSB_PROVISION_DEFAULTS := $(or $(GSB_PROVISION_DEFAULTS), {"aws_vpc_id": "$(AWS_PAS_VPC_ID)"})
 
 .PHONY: push-broker
 push-broker: cloud-service-broker build aws_access_key_id aws_secret_access_key aws_pas_vpc_id ## push the broker with this brokerpak
@@ -157,7 +139,6 @@ clean: ## delete build files
 	- rm -f ./cloud-service-broker
 	- rm -f ./brokerpak-user-docs.md
 	- rm -rf ../aws-released
-	- rm -rf $(PAK_CACHE)
 
 .PHONY: latest-csb
 latest-csb: ## point to the very latest CSB on GitHub
