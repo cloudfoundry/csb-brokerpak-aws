@@ -1,0 +1,44 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/postgresqlapp"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/s3app"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/mysqlapp"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/redisapp"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/dynamodbapp"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"

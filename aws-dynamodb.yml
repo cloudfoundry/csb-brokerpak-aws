@@ -56,7 +56,7 @@ provision:
     type: string
     details: The attribute to use as the hash (partition) key. Must also be defined as an attribute
     required: true
-  - field_name: tabel_name
+  - field_name: table_name
     type: string
     details: Name of the DynamoDB table
     required: true    
@@ -76,7 +76,7 @@ provision:
   - field_name: range_key
     type: string
     details: The attribute to use as the range (sort) key. Must also be defined as an attribute
-    drequired: true
+    required: true
   - field_name: ttl_attribute_name
     type: string
     details: The name of the table attribute to store the TTL timestamp in
@@ -226,10 +226,8 @@ bind:
       type: string
       details: AWS region for the bucket              
 examples:
-# - name: ondemand
-#   description: Create a small mysql instance
-#   plan_id: 52b109ee-1318-11eb-851b-dbe6aa707e6b
-#   # provision_params: {  "attributes": [ { name = 'id' type = 'N' },{ name = 'title' type = 'S' },{ name = 'age' type = 'N'} ] }
-#   # provision_params:  {  "attributes": {"pcf-instance-id':'ex1065500383-sridharvennela'} }
-#   #provision_params:  { "attributes": {'pcf-instance-id':'ex1065500383-sridharvennela','pcf-organization-guid':'','pcf-space-guid':''} }
-#   bind_params: {}
+- name: ondemand
+  description: Create a dynamodb instance
+  plan_id: 52b109ee-1318-11eb-851b-dbe6aa707e6b
+  provision_params: { "table_name": "example_table", "hash_key": "id", "range_key": "title", "attributes": [ { "name": "id", "type": "N" },{ "name": "title", "type": "S" },{ "name": "age", "type": "N"} ], "global_secondary_indexes": [{"name": "TitleIndex", "hash_key": "title", "range_key": "age", "projection_type": "ALL"}]}
+  bind_params: {}
