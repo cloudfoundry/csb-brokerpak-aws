@@ -38,7 +38,7 @@ var _ = Describe("Error Messages", Label("errormessages"), func() {
 			}, 10*time.Minute, 10*time.Second).Should(MatchRegexp(`status:\s+create failed`))
 
 			stdout, _ := cf.Run("service", name)
-			Expect(stdout).To(MatchRegexp(`message:\s+Error: Error creating DB Instance: InvalidParameterValue: Invalid DB Instance class: bogus`))
+			Expect(stdout).To(MatchRegexp(`message:\s+provision failed: Error: Error creating DB Instance: InvalidParameterValue: Invalid DB Instance class: bogus`))
 		})
 	})
 })
