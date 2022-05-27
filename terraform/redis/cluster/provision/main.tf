@@ -56,4 +56,8 @@ resource "aws_elasticache_replication_group" "redis" {
   subnet_group_name             = local.subnet_group
   transit_encryption_enabled    = true
   auth_token                    = random_password.auth_token.result
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

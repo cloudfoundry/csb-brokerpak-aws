@@ -82,5 +82,7 @@ resource "aws_dynamodb_table" "this" {
 
 tags = var.labels
 
-
+  lifecycle {
+    prevent_destroy = true
+  }
 }
