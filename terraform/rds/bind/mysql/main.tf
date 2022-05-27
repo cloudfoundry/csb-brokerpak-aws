@@ -15,13 +15,13 @@
 resource "mysql_user" "newuser" {
   user               = random_string.username.result
   plaintext_password = random_password.password.result
-  host = "%"
-  tls_option = var.use_tls ? "SSL" : "NONE"
+  host               = "%"
+  tls_option         = var.use_tls ? "SSL" : "NONE"
 }
 
 resource "mysql_grant" "newuser" {
   user       = mysql_user.newuser.user
   database   = var.db_name
-  host = mysql_user.newuser.host
+  host       = mysql_user.newuser.host
   privileges = ["ALL"]
 }

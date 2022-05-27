@@ -28,7 +28,7 @@ resource "aws_dynamodb_table" "this" {
     attribute_name = var.ttl_attribute_name
   }
 
- #attribute = var.attributes
+  #attribute = var.attributes
 
   dynamic "attribute" {
     for_each = var.attributes
@@ -67,20 +67,20 @@ resource "aws_dynamodb_table" "this" {
 
 
 
-#   dynamic "replica" {
-#     for_each = var.replica_regions
+  #   dynamic "replica" {
+  #     for_each = var.replica_regions
 
-#     content {
-#       region_name = replica.value
-#     }
-#   }
+  #     content {
+  #       region_name = replica.value
+  #     }
+  #   }
 
   server_side_encryption {
     enabled     = var.server_side_encryption_enabled
     kms_key_arn = var.server_side_encryption_kms_key_arn
   }
 
-tags = var.labels
+  tags = var.labels
 
   lifecycle {
     prevent_destroy = true
