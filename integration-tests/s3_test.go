@@ -189,7 +189,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		)
 	})
 
-	Describe("bind a service ", func() {
+	FDescribe("bind a service ", func() {
 		It("return the bind values from terraform output", func() {
 			err := mockTerraform.ReturnTFState([]testframework.TFStateValue{
 				{
@@ -227,12 +227,12 @@ var _ = Describe("S3", Label("s3"), func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(bindResult).To(
-				SatisfyAll(
-					HaveKeyWithValue("access_key_id", "subsequent.access.key.id.test"),
-					HaveKeyWithValue("secret_access_key", "initial.secret.access.key.test"),
-					HaveKeyWithValue("region", "ap-northeast-3"),
-					HaveKeyWithValue("arn", "arn:aws:s3:::examplebucket/developers/design_info.doc"),
-				),
+				Equal(map[string]any{
+					"access_key_id":     "subsequent.access.key.id.test",
+					"secret_access_key": "initial.secret.access.key.test",
+					"region":            "ap-northeast-3",
+					"arn":               "arn:aws:s3:::examplebucket/developers/design_info.doc",
+				}),
 			)
 		})
 	})
