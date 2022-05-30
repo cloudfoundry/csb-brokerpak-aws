@@ -189,7 +189,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		)
 	})
 
-	FDescribe("bind a service ", func() {
+	Describe("bind a service ", func() {
 		It("return the bind values from terraform output", func() {
 			err := mockTerraform.ReturnTFState([]testframework.TFStateValue{
 				{
