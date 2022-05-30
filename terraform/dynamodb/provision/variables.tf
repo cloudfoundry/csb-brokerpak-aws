@@ -12,25 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable labels { type = map }
-variable aws_vpc_id { type = string }
-variable instance_name { type = string }
+variable "labels" { type = map(any) }
+variable "aws_vpc_id" { type = string }
+variable "instance_name" { type = string }
 
-variable billing_mode { type = string }
-variable hash_key { type = string }
-variable range_key { type = string }
-variable table_name { type = string }
+variable "billing_mode" { type = string }
+variable "hash_key" { type = string }
+variable "range_key" { type = string }
+variable "table_name" { type = string }
 
-variable server_side_encryption_kms_key_arn { type = string }
-variable attributes { type = list(map(string)) }
-variable local_secondary_indexes { type = any }
-variable global_secondary_indexes { type = any }
+variable "server_side_encryption_kms_key_arn" { type = string }
+variable "attributes" { type = list(map(string)) }
+variable "local_secondary_indexes" { type = any }
+variable "global_secondary_indexes" { type = any }
 
-variable ttl_attribute_name { type = string }
-variable ttl_enabled { type = bool }
-variable stream_enabled { type = bool }
-variable stream_view_type { type = string }
-variable server_side_encryption_enabled { type = bool }
+variable "ttl_attribute_name" { type = string }
+variable "ttl_enabled" { type = bool }
+variable "stream_enabled" { type = bool }
+variable "stream_view_type" { type = string }
+variable "server_side_encryption_enabled" { type = bool }
 
-variable write_capacity { type = number }
-variable read_capacity { type = number }
+variable "write_capacity" { type = number }
+variable "read_capacity" { type = number }

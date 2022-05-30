@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable aws_access_key_id { type = string }
-variable aws_secret_access_key { type = string }
-variable region { type = string }
+variable "aws_access_key_id" { type = string }
+variable "aws_secret_access_key" { type = string }
+variable "region" { type = string }
 
 provider "aws" {
-  version = "~> 3.0"
-  region  = var.region
+  version    = "~> 3.0"
+  region     = var.region
   access_key = var.aws_access_key_id
   secret_key = var.aws_secret_access_key
 }

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable bucket_name { type = string }
-variable acl { type = string }
-variable labels { type = map }
-variable enable_versioning { type = bool }
+variable "bucket_name" { type = string }
+variable "acl" { type = string }
+variable "labels" { type = map(any) }
+variable "enable_versioning" { type = bool }

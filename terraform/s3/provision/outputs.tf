@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output arn { value = aws_s3_bucket.b.arn}
-output bucket_domain_name { value = aws_s3_bucket.b.bucket_domain_name }
-output region { value = aws_s3_bucket.b.region }
-output bucket_name { value = aws_s3_bucket.b.bucket }
+output "arn" { value = aws_s3_bucket.b.arn }
+output "bucket_domain_name" { value = aws_s3_bucket.b.bucket_domain_name }
+output "region" { value = aws_s3_bucket.b.region }
+output "bucket_name" { value = aws_s3_bucket.b.bucket }

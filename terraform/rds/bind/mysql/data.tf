@@ -13,15 +13,15 @@
 # limitations under the License.
 
 resource "random_string" "username" {
-  length = 16
+  length  = 16
   special = false
-  number = false
+  number  = false
 }
 
 resource "random_password" "password" {
-  length = 64
+  length           = 64
   override_special = "~_-."
-  min_upper = 2
-  min_lower = 2
-  min_special = 2
+  min_upper        = 2
+  min_lower        = 2
+  min_special      = 2
 }
