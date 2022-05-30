@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output access_key_id { value = aws_iam_access_key.access_key.id}
-output secret_access_key { value = aws_iam_access_key.access_key.secret }
-output dynamodb_table_arn { value = var.dynamodb_table_arn }
-output dynamodb_table_id { value = var.dynamodb_table_arn }
-output region { value = var.region }
+output "access_key_id" { value = aws_iam_access_key.access_key.id }
+output "secret_access_key" { value = aws_iam_access_key.access_key.secret }
+output "dynamodb_table_arn" { value = var.dynamodb_table_arn }
+output "dynamodb_table_id" { value = var.dynamodb_table_arn }
+output "region" { value = var.region }
