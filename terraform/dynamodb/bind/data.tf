@@ -13,13 +13,13 @@
 # limitations under the License.
 
 data "aws_iam_policy_document" "user_policy" {
-    statement {
-        sid = "dynamoAccess"
-        actions = [
-    		"dynamodb:*",
-        ]
-        resources = [
-            var.dynamodb_table_arn
-        ]
-    }
+  statement {
+    sid = "dynamoAccess"
+    actions = [
+      "dynamodb:*",
+    ]
+    resources = [
+      var.dynamodb_table_arn
+    ]
+  }
 }

@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable cache_size { type = number }
-variable redis_version { type = string }
-variable instance_name { type = string }
-variable labels { type = map }
-variable aws_vpc_id { type = string }
-variable node_type { type = string }
-variable node_count { type = number }
-variable elasticache_subnet_group { type = string }
-variable elasticache_vpc_security_group_ids { type = string }
+variable "cache_size" { type = number }
+variable "redis_version" { type = string }
+variable "instance_name" { type = string }
+variable "labels" { type = map(any) }
+variable "aws_vpc_id" { type = string }
+variable "node_type" { type = string }
+variable "node_count" { type = number }
+variable "elasticache_subnet_group" { type = string }
+variable "elasticache_vpc_security_group_ids" { type = string }
