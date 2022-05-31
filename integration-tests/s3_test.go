@@ -21,10 +21,6 @@ var customS3Plan = map[string]any{
 	"metadata": map[string]any{
 		"displayName": "custom S3 service",
 	},
-	"labels": map[string]any{
-		"label1": "label1",
-		"label2": "label2",
-	},
 }
 
 var _ = Describe("S3", Label("s3"), func() {
