@@ -93,18 +93,13 @@ var _ = Describe("S3", Label("s3"), func() {
 			Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: acl")))
 		})
 
-		DescribeTable("property constraints",
-			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), params)
+		Describe("property constraints", func() {
+			It("should validate invalid characters in the region parameter", func() {
+				_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), map[string]any{"region": "-Asia-northeast1"})
 
-				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
-			},
-			Entry(
-				"region invalid characters",
-				map[string]any{"region": "-Asia-northeast1"},
-				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
-			),
-		)
+				Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
+			})
+		})
 	})
 
 	Describe("updating instance", func() {
@@ -139,19 +134,16 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
 		)
 
-		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
-			func(params map[string]any) {
-				err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), params)
+		It("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data", func() {
+			err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), map[string]any{"enable_versioning": false})
 
-				Expect(err).To(MatchError(
-					ContainSubstring(
-						"attempt to update parameter that may result in service instance re-creation and data loss",
-					),
-				))
-				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
-			},
-			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
-		)
+			Expect(err).To(MatchError(
+				ContainSubstring(
+					"attempt to update parameter that may result in service instance re-creation and data loss",
+				),
+			))
+			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
+		})
 
 		DescribeTable("should not allow updating properties that are specified in the plan",
 			func(key string, value any) {
@@ -216,6 +208,7 @@ var _ = Describe("S3", Label("s3"), func() {
 
 			err = mockTerraform.ReturnTFState([]testframework.TFStateValue{
 				{Name: "access_key_id", Type: "string", Value: "subsequent.access.key.id.test"},
+				{Name: "secret_access_key", Type: "string", Value: "subsequent.secret.access.key.test"},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -225,7 +218,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			Expect(bindResult).To(
 				Equal(map[string]any{
 					"access_key_id":     "subsequent.access.key.id.test",
-					"secret_access_key": "initial.secret.access.key.test",
+					"secret_access_key": "subsequent.secret.access.key.test",
 					"region":            "ap-northeast-3",
 					"arn":               "arn:aws:s3:::examplebucket/developers/design_info.doc",
 				}),
