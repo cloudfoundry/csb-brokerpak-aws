@@ -107,18 +107,6 @@ var _ = Describe("S3", Label("s3"), func() {
 
 		BeforeEach(func() {
 			instanceID, _ = broker.Provision(s3ServiceName, customS3Plan["name"].(string), nil)
-
-			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
-				SatisfyAll(
-					HaveKeyWithValue("bucket_name", "csb-"+instanceID),
-					HaveKeyWithValue("enable_versioning", false),
-					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
-					HaveKeyWithValue("region", "us-west-2"),
-					HaveKeyWithValue("acl", "private"),
-					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
-					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
-				),
-			)
 			_ = mockTerraform.Reset()
 		})
 
