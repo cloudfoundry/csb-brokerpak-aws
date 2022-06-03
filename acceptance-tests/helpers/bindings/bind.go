@@ -1,3 +1,4 @@
+// Package bindings manages service bindings
 package bindings
 
 import (

@@ -25,6 +25,9 @@ var customS3Plan = map[string]any{
 
 var _ = Describe("S3", Label("s3"), func() {
 	const s3ServiceName = "csb-aws-s3-bucket"
+	BeforeEach(func() {
+		Expect(mockTerraform.InitState()).NotTo(HaveOccurred())
+	})
 
 	AfterEach(func() {
 		Expect(mockTerraform.Reset()).NotTo(HaveOccurred())
@@ -51,8 +54,9 @@ var _ = Describe("S3", Label("s3"), func() {
 
 	Describe("provisioning", func() {
 		It("should provision private plan", func() {
-			instanceID, _ := broker.Provision(s3ServiceName, "private", nil)
+			instanceID, err := broker.Provision(s3ServiceName, "private", nil)
 
+			Expect(err).NotTo(HaveOccurred())
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("bucket_name", "csb-"+instanceID),
@@ -67,7 +71,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		})
 
 		It("should allow setting properties do not defined in the plan", func() {
-			instanceID, _ := broker.Provision(s3ServiceName, "private", map[string]any{
+			instanceID, err := broker.Provision(s3ServiceName, "private", map[string]any{
 				"bucket_name":           "fake-bucket-name",
 				"enable_versioning":     true,
 				"region":                "eu-west-1",
@@ -75,6 +79,7 @@ var _ = Describe("S3", Label("s3"), func() {
 				"aws_secret_access_key": "fake-aws-secret-access-key",
 			})
 
+			Expect(err).NotTo(HaveOccurred())
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("bucket_name", "fake-bucket-name"),
@@ -106,8 +111,10 @@ var _ = Describe("S3", Label("s3"), func() {
 		var instanceID string
 
 		BeforeEach(func() {
-			instanceID, _ = broker.Provision(s3ServiceName, customS3Plan["name"].(string), nil)
-			_ = mockTerraform.Reset()
+			var err error
+			instanceID, err = broker.Provision(s3ServiceName, customS3Plan["name"].(string), nil)
+
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should allow updating properties not flagged as `prohibit_update` and not specified in the plan",
@@ -130,7 +137,8 @@ var _ = Describe("S3", Label("s3"), func() {
 					"attempt to update parameter that may result in service instance re-creation and data loss",
 				),
 			))
-			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
+			const initialProvisionInvocation = 1
+			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 		})
 
 		DescribeTable("should not allow updating properties that are specified in the plan",

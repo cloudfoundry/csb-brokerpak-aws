@@ -1,11 +1,13 @@
+// Package services manages service instances
 package services
 
 import (
+	"encoding/json"
+	"time"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
-	"encoding/json"
-	"time"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
