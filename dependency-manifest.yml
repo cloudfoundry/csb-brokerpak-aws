@@ -20,7 +20,7 @@ dependencies:
     - name: terraform-provider-aws
       version: 4.17.1
       source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.17.1.zip
-      source_sha256: fe76b66c2dd1f4df0d63db5515fe2ab1e4996281d7fc7f43cf3e025340df3ba0
+      source_sha256: 05b2d4ca9c53afe70fee207fec8a965a463eb95cfff01982a6a3a112fcc9812b
     - name: terraform-provider-mysql
       version: 1.9.0
       source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
