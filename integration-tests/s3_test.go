@@ -141,20 +141,15 @@ var _ = Describe("S3", Label("s3"), func() {
 			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 		})
 
-		DescribeTable("should not allow updating properties that are specified in the plan",
-			func(key string, value any) {
-				err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), map[string]any{key: value})
+		It("should not allow updating properties that are specified in the plan", func() {
+			err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), map[string]any{"acl": "public-read"})
 
-				Expect(err).To(
-					MatchError(
-						ContainSubstring(
-							fmt.Sprintf("plan defined properties cannot be changed: %s", key),
-						),
-					),
-				)
-			},
-			Entry("update acl", "acl", "public-read"),
-		)
+			Expect(err).To(
+				MatchError(
+					ContainSubstring("plan defined properties cannot be changed: acl"),
+				),
+			)
+		})
 
 		DescribeTable("should not allow updating additional properties",
 			func(key string, value any) {
