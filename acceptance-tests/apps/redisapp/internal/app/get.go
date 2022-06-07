@@ -1,10 +1,11 @@
 package app
 
 import (
-	"github.com/go-redis/redis/v8"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/gorilla/mux"
 )
 
 func handleGet(client *redis.Client) func(w http.ResponseWriter, r *http.Request) {
