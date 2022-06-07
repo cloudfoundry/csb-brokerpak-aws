@@ -26,11 +26,11 @@ var customS3Plan = map[string]any{
 var _ = Describe("S3", Label("s3"), func() {
 	const s3ServiceName = "csb-aws-s3-bucket"
 	BeforeEach(func() {
-		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).NotTo(HaveOccurred())
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
 
 	AfterEach(func() {
-		Expect(mockTerraform.Reset()).NotTo(HaveOccurred())
+		Expect(mockTerraform.Reset()).To(Succeed())
 	})
 
 	It("should publish AWS S3 in the catalog", func() {
