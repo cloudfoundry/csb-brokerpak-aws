@@ -175,7 +175,7 @@ var _ = Describe("S3", Label("s3"), func() {
 
 	Describe("bind a service ", func() {
 		It("return the bind values from terraform output", func() {
-			err := mockTerraform.ReturnTFState([]testframework.TFStateValue{
+			err := mockTerraform.SetTFState([]testframework.TFStateValue{
 				{
 					Name:  "access_key_id",
 					Type:  "string",
@@ -202,7 +202,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			instanceID, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = mockTerraform.ReturnTFState([]testframework.TFStateValue{
+			err = mockTerraform.SetTFState([]testframework.TFStateValue{
 				{Name: "access_key_id", Type: "string", Value: "subsequent.access.key.id.test"},
 				{Name: "secret_access_key", Type: "string", Value: "subsequent.secret.access.key.test"},
 			})
