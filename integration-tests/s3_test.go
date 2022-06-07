@@ -26,7 +26,7 @@ var customS3Plan = map[string]any{
 var _ = Describe("S3", Label("s3"), func() {
 	const s3ServiceName = "csb-aws-s3-bucket"
 	BeforeEach(func() {
-		Expect(mockTerraform.InitState()).NotTo(HaveOccurred())
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
