@@ -19,7 +19,7 @@ type ServiceInstance struct {
 
 type config struct {
 	name              string
-	serviceBrokerName string
+	serviceBrokerName func() string
 	parameters        string
 }
 
@@ -33,7 +33,7 @@ func CreateInstance(offering, plan string, opts ...Option) *ServiceInstance {
 		plan,
 		cfg.name,
 		"-b",
-		cfg.serviceBrokerName,
+		cfg.serviceBrokerName(),
 	}
 
 	if cfg.parameters != "" {
@@ -72,13 +72,13 @@ func createInstanceWithPoll(name string, args []string) {
 
 func WithDefaultBroker() Option {
 	return func(c *config) {
-		c.serviceBrokerName = brokers.DefaultBrokerName()
+		c.serviceBrokerName = brokers.DefaultBrokerName
 	}
 }
 
 func WithBroker(broker *brokers.Broker) Option {
 	return func(c *config) {
-		c.serviceBrokerName = broker.Name
+		c.serviceBrokerName = func() string { return broker.Name }
 	}
 }
 
