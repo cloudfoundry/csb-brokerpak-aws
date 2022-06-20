@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("DynamoDB", Label("DynamoDB"), func() {
+var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 	const serviceName = "csb-aws-dynamodb"
 	attributes := map[string]any{
 		"table_name": "games",

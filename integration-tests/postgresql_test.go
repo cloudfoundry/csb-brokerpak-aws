@@ -6,8 +6,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("MySQL", Label("MySQL"), func() {
-	const serviceName = "csb-aws-mysql"
+var _ = Describe("Postgresql", Label("Postgresql"), func() {
+	const serviceName = "csb-aws-postgresql"
 
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
