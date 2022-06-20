@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Redis", Label("Redis"), func() {
+var _ = Describe("Redis", Label("Redis"), func() {
 	const serviceName = "csb-aws-redis"
 
 	BeforeEach(func() {
