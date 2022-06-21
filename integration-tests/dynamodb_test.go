@@ -8,26 +8,27 @@ import (
 
 var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 	const serviceName = "csb-aws-dynamodb"
-	attributes := map[string]any{
-		"table_name": "games",
-		"hash_key":   "UserId",
-		"range_key":  "GameTitle",
-		"attributes": []any{},
-		"global_secondary_indexes": []map[string]any{
-			{
-				"name":               "GameTitleIndex",
-				"hash_key":           "GameTitle",
-				"range_key":          "TopScore",
-				"write_capacity":     10,
-				"read_capacity":      10,
-				"projection_type":    "INCLUDE",
-				"non_key_attributes": []string{"UserId"},
-			},
-		},
-	}
+	var attributes map[string]any
 
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
+		attributes = map[string]any{
+			"table_name": "games",
+			"hash_key":   "UserId",
+			"range_key":  "GameTitle",
+			"attributes": []any{},
+			"global_secondary_indexes": []map[string]any{
+				{
+					"name":               "GameTitleIndex",
+					"hash_key":           "GameTitle",
+					"range_key":          "TopScore",
+					"write_capacity":     10,
+					"read_capacity":      10,
+					"projection_type":    "INCLUDE",
+					"non_key_attributes": []string{"UserId"},
+				},
+			},
+		}
 	})
 
 	AfterEach(func() {
@@ -36,9 +37,8 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 
 	Describe("provisioning", func() {
 		It("should check region constraints", func() {
-			att := copyMap(attributes)
-			att["region"] = "-Asia-northeast1"
-			_, err := broker.Provision(serviceName, "ondemand", att)
+			attributes["region"] = "-Asia-northeast1"
+			_, err := broker.Provision(serviceName, "ondemand", attributes)
 
 			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
 		})
@@ -61,11 +61,3 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 		})
 	})
 })
-
-func copyMap(m map[string]any) map[string]any {
-	aux := make(map[string]any)
-	for k, v := range m {
-		aux[k] = v
-	}
-	return aux
-}
