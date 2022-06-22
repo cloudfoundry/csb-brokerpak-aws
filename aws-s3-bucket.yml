@@ -69,6 +69,7 @@ provision:
           - us-west-2
           - eu-west-1
         pattern: ^[a-z][a-z0-9-]+$
+      prohibit_update: true
     - field_name: aws_access_key_id
       type: string
       details: AWS access key
