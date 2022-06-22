@@ -2,6 +2,7 @@
 
 - region property as a text field instead of an enumerated enabling selection of any region available in the Cloud Provider
 - S3: region updates for existing buckets are now blocked by the broker resulting in faster feedback and improved error message.
+- Beta tag: all service offerings tagged as beta and will not be displayed by default in the marketplace. Set the environment variable `GSB_COMPATIBILITY_ENABLE_BETA_SERVICES` to true to enable them. 
 
 ### Fix:
 - minimum constraints on MySQL and PostreSQL storage_gb are now enforced
