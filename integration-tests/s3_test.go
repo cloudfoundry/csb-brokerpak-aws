@@ -123,23 +123,27 @@ var _ = Describe("S3", Label("s3"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry("update region", map[string]any{"region": "ap-northeast-3"}),
 			Entry("update bucket_name", map[string]any{"bucket_name": "other-bucket_name"}),
 			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
 		)
 
-		It("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data", func() {
-			err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), map[string]any{"enable_versioning": false})
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
+			func(params map[string]any) {
+				err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), params)
 
-			Expect(err).To(MatchError(
-				ContainSubstring(
-					"attempt to update parameter that may result in service instance re-creation and data loss",
-				),
-			))
-			const initialProvisionInvocation = 1
-			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
-		})
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
+
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
+			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
+		)
 
 		It("should not allow updating properties that are specified in the plan", func() {
 			err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), map[string]any{"acl": "public-read"})
