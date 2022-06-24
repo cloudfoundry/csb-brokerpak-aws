@@ -55,6 +55,7 @@ provision:
       details: Name of bucket
       default: csb-${request.instance_id}
       plan_updateable: true
+      prohibit_update: true
     - field_name: enable_versioning
       type: boolean
       details: Enable bucket versioning

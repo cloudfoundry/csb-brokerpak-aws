@@ -131,7 +131,6 @@ var _ = Describe("S3", Label("s3"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry("update bucket_name", map[string]any{"bucket_name": "other-bucket_name"}),
 			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
 		)
@@ -151,6 +150,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			},
 			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
+			Entry("update bucket name", map[string]any{"bucket_name": "some-nicer-name"}),
 		)
 
 		It("should not allow updating properties that are specified in the plan", func() {
