@@ -40,7 +40,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			HaveEach(
 				MatchFields(IgnoreExtras, Fields{
 					"Description": HavePrefix("Beta -"),
-					"Metadata": PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
+					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
 				}),
 			),
 		)

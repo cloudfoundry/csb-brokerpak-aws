@@ -36,14 +36,13 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("small-ha")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("medium-ha")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("large-ha")}),
-
 			),
 		)
 		Expect(service.Plans).To(
 			HaveEach(
 				MatchFields(IgnoreExtras, Fields{
 					"Description": HavePrefix("Beta -"),
-					"Metadata": PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
+					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
 				}),
 			),
 		)

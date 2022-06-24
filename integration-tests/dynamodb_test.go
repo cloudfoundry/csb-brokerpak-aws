@@ -58,7 +58,7 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 			HaveEach(
 				MatchFields(IgnoreExtras, Fields{
 					"Description": HavePrefix("Beta -"),
-					"Metadata": PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
+					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
 				}),
 			),
 		)

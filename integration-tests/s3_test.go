@@ -54,7 +54,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			HaveEach(
 				MatchFields(IgnoreExtras, Fields{
 					"Description": HavePrefix("Beta -"),
-					"Metadata": PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
+					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
 				}),
 			),
 		)
