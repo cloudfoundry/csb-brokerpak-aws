@@ -18,9 +18,9 @@ dependencies:
       source: https://github.com/hashicorp/terraform/archive/v0.12.30.zip
       source_sha256: d93afe75708f706f416a7968f65af8302ac9c492a21aa958ffb2202bd9390e4d
     - name: terraform-provider-aws
-      version: 4.19.0
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.19.0.zip
-      source_sha256: b22cb3004faca9edbcbcfa179c39297dcd6a9cf1cdfdebf38d6f4a1d113fa791
+      version: 4.20.1
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.20.1.zip
+      source_sha256: bddca029fecec8b27c29397bfb5030804c59a6558de420167197694902d5ca48
     - name: terraform-provider-mysql
       version: 1.9.0
       source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
