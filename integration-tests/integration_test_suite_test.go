@@ -37,6 +37,7 @@ var _ = BeforeSuite(func() {
 		"AWS_ACCESS_KEY_ID=" + awsAccessKeyID,
 		"AWS_SECRET_ACCESS_KEY=" + awsSecretAccessKey,
 		"CSB_LISTENER_HOST=localhost",
+		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES=true",
 	})).To(Succeed())
 })
 

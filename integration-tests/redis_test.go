@@ -4,6 +4,7 @@ import (
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("Redis", Label("Redis"), func() {
@@ -15,6 +16,36 @@ var _ = Describe("Redis", Label("Redis"), func() {
 
 	AfterEach(func() {
 		Expect(mockTerraform.Reset()).To(Succeed())
+	})
+
+	It("should publish AWS redis in the catalog", func() {
+		catalog, err := broker.Catalog()
+		Expect(err).NotTo(HaveOccurred())
+
+		service := testframework.FindService(catalog, serviceName)
+		Expect(service.ID).NotTo(BeNil())
+		Expect(service.Name).NotTo(BeNil())
+		Expect(service.Tags).To(ConsistOf("aws", "redis", "beta"))
+		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).NotTo(BeNil())
+		Expect(service.Plans).To(
+			ConsistOf(
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("small")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("medium")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("large")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("small-ha")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("medium-ha")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("large-ha")}),
+			),
+		)
+		Expect(service.Plans).To(
+			HaveEach(
+				MatchFields(IgnoreExtras, Fields{
+					"Description": HavePrefix("Beta -"),
+					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
+				}),
+			),
+		)
 	})
 
 	Describe("provisioning", func() {
