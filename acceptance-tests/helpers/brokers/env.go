@@ -20,7 +20,7 @@ func (b Broker) env() []apps.EnvVar {
 		"CH_UAA_CLIENT_NAME":                     false,
 		"CH_UAA_CLIENT_SECRET":                   false,
 		"CH_SKIP_SSL_VALIDATION":                 false,
-		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES": true,
+		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES": false,
 	} {
 		val, ok := os.LookupEnv(name)
 		switch {
