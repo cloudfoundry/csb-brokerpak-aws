@@ -15,24 +15,24 @@
 version: 1
 name: csb-aws-s3-bucket
 id: ffe28d48-c235-4e07-9c51-ddff5699e48c
-description: AWS S3 Bucket
-display_name: AWS S3 Bucket
+description: Beta - AWS S3 Bucket
+display_name: AWS S3 Bucket (Beta)
 image_url: https://www.pikpng.com/pngl/m/73-731373_aws-s3-logo-png-transparent-amazon-s3-logo.png
 documentation_url: https://aws.amazon.com/s3/
 support_url: https://aws.amazon.com/s3/
-tags: [aws, s3, preview]
+tags: [aws, s3, beta]
 plan_updateable: true
 plans:
 - name: private
   id: 8938b4c0-d67f-4c34-9f68-a66deef99b4e
-  description: 'Private S3 bucket'
-  display_name: 'Private'
+  description: 'Beta - Private S3 bucket'
+  display_name: 'Private (Beta)'
   properties:
     acl: private
 - name: public-read
   id: 04317eaa-11ac-4c5f-b77f-eb005fe977fe
-  description: 'Public-read S3 bucket'
-  display_name: 'Public Read'
+  description: 'Beta - Public-read S3 bucket'
+  display_name: 'Public Read (Beta)'
   properties:
     acl: public-read
 provision:

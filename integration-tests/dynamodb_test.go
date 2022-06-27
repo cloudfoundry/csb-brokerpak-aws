@@ -4,6 +4,7 @@ import (
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
 )
 
 var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
@@ -33,6 +34,34 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 
 	AfterEach(func() {
 		Expect(mockTerraform.Reset()).To(Succeed())
+	})
+
+	It("should publish AWS dynamodb in the catalog", func() {
+		catalog, err := broker.Catalog()
+		Expect(err).NotTo(HaveOccurred())
+
+		service := testframework.FindService(catalog, serviceName)
+		Expect(service.ID).NotTo(BeNil())
+		Expect(service.Name).NotTo(BeNil())
+		Expect(service.Tags).To(ConsistOf("aws", "dynamodb", "beta"))
+		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).To(HaveSuffix("(Beta)"))
+		Expect(service.Metadata.LongDescription).To(HavePrefix("Beta -"))
+		Expect(service.Plans).To(
+			ConsistOf(
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("ondemand")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("provisioned")}),
+			),
+		)
+		Expect(service.Plans).To(
+			HaveEach(
+				MatchFields(IgnoreExtras, Fields{
+					"Description": HavePrefix("Beta -"),
+					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
+				}),
+			),
+		)
 	})
 
 	Describe("provisioning", func() {
