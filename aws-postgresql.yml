@@ -52,7 +52,7 @@ plans:
     subsume: false
 - name: subsume
   id: 886cb524-1d4f-11eb-b35f-8ba96a9085d7
-  description: 'Beta - Subsume control of an existing Postgre Database'
+  description: 'Beta - Subsume control of an existing PostgreSQL Database'
   display_name: "Subsume (Beta)"
   properties:
     subsume: true
