@@ -13,8 +13,8 @@ terraform_binaries:
   version: 0.12.30
   source: https://github.com/hashicorp/terraform/archive/v0.12.30.zip  
 - name: terraform-provider-aws
-  version: 4.20.1
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.20.1.zip
+  version: 4.21.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.21.0.zip
 - name: terraform-provider-random
   version: 3.3.2
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.3.2.zip
