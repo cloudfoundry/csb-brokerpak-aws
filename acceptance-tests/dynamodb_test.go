@@ -45,9 +45,9 @@ var _ = Describe("DynamoDB", Label("dynamodb"), func() {
 	})
 })
 
-func config() interface{} {
-	return map[string]interface{}{
-		"attributes": []map[string]interface{}{
+func config() any {
+	return map[string]any{
+		"attributes": []map[string]any{
 			{
 				"name": "id",
 				"type": "S",
@@ -64,7 +64,7 @@ func config() interface{} {
 		"hash_key":   "id",
 		"range_key":  "value",
 		"table_name": random.Name(random.WithPrefix("csb", "dynamodb")),
-		"global_secondary_indexes": []map[string]interface{}{
+		"global_secondary_indexes": []map[string]any{
 			{
 				"name":               "KeyIndex",
 				"hash_key":           "key",

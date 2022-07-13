@@ -82,7 +82,7 @@ func WithBroker(broker *brokers.Broker) Option {
 	}
 }
 
-func WithParameters(parameters interface{}) Option {
+func WithParameters(parameters any) Option {
 	return func(c *config) {
 		switch p := parameters.(type) {
 		case string:
