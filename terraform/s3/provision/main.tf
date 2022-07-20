@@ -26,3 +26,11 @@ resource "aws_s3_bucket" "b" {
     prevent_destroy = true
   }
 }
+
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.b.id
+
+  rule {
+    object_ownership = var.boc_object_ownership
+  }
+}
