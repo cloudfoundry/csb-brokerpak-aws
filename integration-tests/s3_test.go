@@ -76,13 +76,18 @@ var _ = Describe("S3", Label("s3"), func() {
 			instanceID, err := broker.Provision(s3ServiceName, "private", nil)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+			vars, err := mockTerraform.FirstTerraformInvocationVars()
+			Expect(vars, err).To(
 				SatisfyAll(
 					HaveKeyWithValue("bucket_name", "csb-"+instanceID),
 					HaveKeyWithValue("enable_versioning", false),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("acl", "private"),
+					HaveKeyWithValue("pab_block_public_acls", false),
+					HaveKeyWithValue("pab_block_public_policy", false),
+					HaveKeyWithValue("pab_ignore_public_acls", false),
+					HaveKeyWithValue("pab_restrict_public_buckets", false),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
 				),
@@ -95,6 +100,7 @@ var _ = Describe("S3", Label("s3"), func() {
 				"enable_versioning":     true,
 				"region":                "eu-west-1",
 				"acl":                   "public-read",
+				"pab_block_public_acls": true,
 				"aws_access_key_id":     "fake-aws-access-key-id",
 				"aws_secret_access_key": "fake-aws-secret-access-key",
 			})
@@ -107,6 +113,10 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "eu-west-1"),
 					HaveKeyWithValue("acl", "public-read"),
+					HaveKeyWithValue("pab_block_public_acls", true),
+					HaveKeyWithValue("pab_block_public_policy", false),
+					HaveKeyWithValue("pab_ignore_public_acls", false),
+					HaveKeyWithValue("pab_restrict_public_buckets", false),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 				),
@@ -147,6 +157,11 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
 			Entry("update acl", map[string]any{"acl": "public-read"}),
+			Entry("update acl", map[string]any{"acl": "public-read"}),
+			Entry("update pab_block_public_acls", map[string]any{"pab_block_public_acls": true}),
+			Entry("update pab_block_public_policy", map[string]any{"pab_block_public_policy": true}),
+			Entry("update pab_ignore_public_acls", map[string]any{"pab_ignore_public_acls": true}),
+			Entry("update pab_restrict_public_buckets", map[string]any{"pab_restrict_public_buckets": true}),
 		)
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
