@@ -36,10 +36,17 @@ plans:
   properties:
     acl: public-read
 provision:
-  plan_inputs:
+  user_inputs:
+    - field_name: bucket_name
+      type: string
+      details: Name of bucket
+      default: csb-${request.instance_id}
+      plan_updateable: true
+      prohibit_update: true
     - field_name: acl
       type: string
       details: S3 bucket ACL (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl)
+      default: private
       enum:
         private: private
         public-read: public-read
@@ -49,13 +56,6 @@ provision:
         bucket-owner-read: bucket-owner-read
         bucket-owner-full-control: bucket-owner-full-control
         log-delivery-write: log-delivery-write
-  user_inputs:
-    - field_name: bucket_name
-      type: string
-      details: Name of bucket
-      default: csb-${request.instance_id}
-      plan_updateable: true
-      prohibit_update: true
     - field_name: enable_versioning
       type: boolean
       details: Enable bucket versioning
