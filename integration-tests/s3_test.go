@@ -11,15 +11,25 @@ import (
 
 var customS3Plans = []map[string]any{
 	customS3Plan,
+	customS3PlanWithACL,
 }
 
 var customS3Plan = map[string]any{
 	"name":        "custom-plan",
 	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc3",
 	"description": "Beta - custom S3 plan defined by customer",
-	"acl":         "private",
 	"metadata": map[string]any{
 		"displayName": "custom S3 service (Beta)",
+	},
+}
+
+var customS3PlanWithACL = map[string]any{
+	"name":        "custom-plan-with-acl",
+	"acl":         "private",
+	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc4",
+	"description": "Beta - custom S3 plan defined by customer specifying acl",
+	"metadata": map[string]any{
+		"displayName": "custom S3 service with acl (Beta)",
 	},
 }
 
@@ -48,6 +58,7 @@ var _ = Describe("S3", Label("s3"), func() {
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("private")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("public-read")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan-with-acl")}),
 			),
 		)
 		Expect(service.Plans).To(
@@ -78,11 +89,12 @@ var _ = Describe("S3", Label("s3"), func() {
 			)
 		})
 
-		It("should allow setting properties do not defined in the plan", func() {
-			instanceID, err := broker.Provision(s3ServiceName, "private", map[string]any{
+		It("should allow setting properties not defined in the plan", func() {
+			instanceID, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), map[string]any{
 				"bucket_name":           "fake-bucket-name",
 				"enable_versioning":     true,
 				"region":                "eu-west-1",
+				"acl":                   "public-read",
 				"aws_access_key_id":     "fake-aws-access-key-id",
 				"aws_secret_access_key": "fake-aws-secret-access-key",
 			})
@@ -94,6 +106,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("enable_versioning", true),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "eu-west-1"),
+					HaveKeyWithValue("acl", "public-read"),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 				),
@@ -120,7 +133,7 @@ var _ = Describe("S3", Label("s3"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(s3ServiceName, customS3Plan["name"].(string), nil)
+			instanceID, err = broker.Provision(s3ServiceName, customS3Plan["name"].(string), map[string]any{"acl": "private"})
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -133,6 +146,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			},
 			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
+			Entry("update acl", map[string]any{"acl": "public-read"}),
 		)
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
@@ -154,7 +168,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		)
 
 		It("should not allow updating properties that are specified in the plan", func() {
-			err := broker.Update(instanceID, s3ServiceName, customS3Plan["name"].(string), map[string]any{"acl": "public-read"})
+			err := broker.Update(instanceID, s3ServiceName, customS3PlanWithACL["name"].(string), map[string]any{"acl": "public-read"})
 
 			Expect(err).To(
 				MatchError(
