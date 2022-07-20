@@ -127,6 +127,17 @@ var _ = Describe("S3", Label("s3"), func() {
 
 				Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
 			})
+			DescribeTable("should ensure enum values are validated",
+				func(params map[string]any, property string) {
+					_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), params)
+
+					Expect(err).To(MatchError(ContainSubstring(fmt.Sprintf("%[1]s: %[1]s must be one of the following", property))))
+				},
+
+				Entry("update boc_object_ownership", map[string]any{"boc_object_ownership": "invalidValue"}, "boc_object_ownership"),
+				Entry("update acl", map[string]any{"acl": "invalidValue"}, "acl"),
+			)
+
 		})
 	})
 
