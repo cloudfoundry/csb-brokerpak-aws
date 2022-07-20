@@ -25,7 +25,7 @@ var customS3Plan = map[string]any{
 
 var customS3PlanWithACL = map[string]any{
 	"name":        "custom-plan-with-acl",
-	"acl": "private",
+	"acl":         "private",
 	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc4",
 	"description": "Beta - custom S3 plan defined by customer specifying acl",
 	"metadata": map[string]any{
@@ -94,7 +94,7 @@ var _ = Describe("S3", Label("s3"), func() {
 				"bucket_name":           "fake-bucket-name",
 				"enable_versioning":     true,
 				"region":                "eu-west-1",
-				"acl":                "public-read",
+				"acl":                   "public-read",
 				"aws_access_key_id":     "fake-aws-access-key-id",
 				"aws_secret_access_key": "fake-aws-secret-access-key",
 			})
