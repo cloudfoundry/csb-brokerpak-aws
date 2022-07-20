@@ -76,8 +76,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			instanceID, err := broker.Provision(s3ServiceName, "private", nil)
 
 			Expect(err).NotTo(HaveOccurred())
-			vars, err := mockTerraform.FirstTerraformInvocationVars()
-			Expect(vars, err).To(
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("bucket_name", "csb-"+instanceID),
 					HaveKeyWithValue("enable_versioning", false),
