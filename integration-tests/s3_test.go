@@ -83,6 +83,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("acl", "private"),
+					HaveKeyWithValue("boc_object_ownership", "BucketOwnerEnforced"),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
 				),
