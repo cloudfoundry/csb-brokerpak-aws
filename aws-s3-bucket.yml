@@ -71,6 +71,14 @@ provision:
           - eu-west-1
         pattern: ^[a-z][a-z0-9-]+$
       prohibit_update: true
+    - field_name: boc_object_ownership
+      type: string
+      details: S3 Bucket Ownership Controls (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html)
+      enum:
+        BucketOwnerPreferred: BucketOwnerPreferred
+        ObjectWriter: ObjectWriter
+        BucketOwnerEnforced: BucketOwnerEnforced
+      default: BucketOwnerEnforced
     - field_name: aws_access_key_id
       type: string
       details: AWS access key
