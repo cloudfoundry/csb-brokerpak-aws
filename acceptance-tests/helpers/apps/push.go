@@ -39,10 +39,6 @@ func (a *App) Push(opts ...Option) {
 		cmd = append(cmd, "-f", a.manifest)
 	}
 
-	for k, v := range a.variables {
-		cmd = append(cmd, "--var", fmt.Sprintf("%s=%s", k, v))
-	}
-
 	if a.dir.path() == "" {
 		Fail("App directory must be specified")
 	}
@@ -89,15 +85,6 @@ func WithDir(dir string) Option {
 func WithManifest(manifest string) Option {
 	return func(a *App) {
 		a.manifest = manifest
-	}
-}
-
-func WithVariable(key, value string) Option {
-	return func(a *App) {
-		if a.variables == nil {
-			a.variables = make(map[string]string)
-		}
-		a.variables[key] = value
 	}
 }
 
