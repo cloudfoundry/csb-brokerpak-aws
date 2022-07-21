@@ -17,3 +17,9 @@ variable "acl" { type = string }
 variable "labels" { type = map(any) }
 variable "enable_versioning" { type = bool }
 variable "boc_object_ownership" { type = string }
+
+# Resource aws_s3_bucket_public_access_block
+variable "pab_block_public_acls" { type = bool }
+variable "pab_block_public_policy" { type = bool }
+variable "pab_ignore_public_acls" { type = bool }
+variable "pab_restrict_public_buckets" { type = bool }
