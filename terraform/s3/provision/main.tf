@@ -34,3 +34,12 @@ resource "aws_s3_bucket_ownership_controls" "example" {
     object_ownership = var.boc_object_ownership
   }
 }
+
+resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
+  bucket = aws_s3_bucket.b.id
+
+  block_public_acls       = var.pab_block_public_acls
+  block_public_policy     = var.pab_block_public_policy
+  ignore_public_acls      = var.pab_ignore_public_acls
+  restrict_public_buckets = var.pab_restrict_public_buckets
+}

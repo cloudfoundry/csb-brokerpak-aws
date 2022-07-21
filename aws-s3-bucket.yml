@@ -87,6 +87,22 @@ provision:
       type: string
       details: AWS secret key
       default: ${config("aws.secret_access_key")}
+    - field_name: pab_block_public_acls
+      type: boolean
+      details: Whether Amazon S3 should block public ACLs for the bucket (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html).
+      default: false
+    - field_name: pab_block_public_policy
+      type: boolean
+      details: Whether Amazon S3 should block public bucket policies for the bucket.
+      default: false
+    - field_name: pab_ignore_public_acls
+      type: boolean
+      details: Whether Amazon S3 should ignore public ACLs for the bucket.
+      default: false
+    - field_name: pab_restrict_public_buckets
+      type: boolean
+      details: Whether Amazon S3 should restrict public bucket policies for the bucket.
+      default: false
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
