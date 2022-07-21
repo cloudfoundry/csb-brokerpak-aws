@@ -23,3 +23,9 @@ variable "pab_block_public_acls" { type = bool }
 variable "pab_block_public_policy" { type = bool }
 variable "pab_ignore_public_acls" { type = bool }
 variable "pab_restrict_public_buckets" { type = bool }
+
+# Resource aws_s3_bucket_server_side_encryption_configuration
+variable "sse_default_kms_master_key_id" { type = string }
+variable "sse_default_algorithm" { type = string }
+variable "sse_bucket_key_enabled" { type = string }
+
