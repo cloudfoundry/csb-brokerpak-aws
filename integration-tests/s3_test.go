@@ -83,6 +83,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("acl", "private"),
+					HaveKeyWithValue("boc_object_ownership", "BucketOwnerEnforced"),
 					HaveKeyWithValue("pab_block_public_acls", false),
 					HaveKeyWithValue("pab_block_public_policy", false),
 					HaveKeyWithValue("pab_ignore_public_acls", false),
@@ -99,6 +100,7 @@ var _ = Describe("S3", Label("s3"), func() {
 				"enable_versioning":     true,
 				"region":                "eu-west-1",
 				"acl":                   "public-read",
+				"boc_object_ownership":  "BucketOwnerPreferred",
 				"pab_block_public_acls": true,
 				"aws_access_key_id":     "fake-aws-access-key-id",
 				"aws_secret_access_key": "fake-aws-secret-access-key",
@@ -112,6 +114,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "eu-west-1"),
 					HaveKeyWithValue("acl", "public-read"),
+					HaveKeyWithValue("boc_object_ownership", "BucketOwnerPreferred"),
 					HaveKeyWithValue("pab_block_public_acls", true),
 					HaveKeyWithValue("pab_block_public_policy", false),
 					HaveKeyWithValue("pab_ignore_public_acls", false),
@@ -134,6 +137,17 @@ var _ = Describe("S3", Label("s3"), func() {
 
 				Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
 			})
+			DescribeTable("should ensure enum values are validated",
+				func(params map[string]any, property string) {
+					_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), params)
+
+					Expect(err).To(MatchError(ContainSubstring(fmt.Sprintf("%[1]s: %[1]s must be one of the following", property))))
+				},
+
+				Entry("update boc_object_ownership", map[string]any{"boc_object_ownership": "invalidValue"}, "boc_object_ownership"),
+				Entry("update acl", map[string]any{"acl": "invalidValue"}, "acl"),
+			)
+
 		})
 	})
 
@@ -156,7 +170,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
 			Entry("update acl", map[string]any{"acl": "public-read"}),
-			Entry("update acl", map[string]any{"acl": "public-read"}),
+			Entry("update boc_object_ownership", map[string]any{"boc_object_ownership": "BucketOwnerPreferred"}),
 			Entry("update pab_block_public_acls", map[string]any{"pab_block_public_acls": true}),
 			Entry("update pab_block_public_policy", map[string]any{"pab_block_public_policy": true}),
 			Entry("update pab_ignore_public_acls", map[string]any{"pab_ignore_public_acls": true}),

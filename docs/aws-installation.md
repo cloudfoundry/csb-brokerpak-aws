@@ -28,6 +28,7 @@ The AWS account represented by the access key needs the following permission pol
                     "s3:PutBucketLogging",
                     "s3:PutBucketPolicy",
                     "s3:PutBucketTagging",
+                    "s3:PutBucketOwnershipControls",
                     "s3:GetObject",
                     "s3:ListBucket",
                     "s3:GetBucketPolicyStatus",

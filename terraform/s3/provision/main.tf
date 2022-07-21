@@ -27,6 +27,14 @@ resource "aws_s3_bucket" "b" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "example" {
+  bucket = aws_s3_bucket.b.id
+
+  rule {
+    object_ownership = var.boc_object_ownership
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
   bucket = aws_s3_bucket.b.id
 
