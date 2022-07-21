@@ -17,10 +17,11 @@ func Create(opts ...Option) *Broker {
 	brokerApp := apps.Push(
 		apps.WithName(broker.Name),
 		apps.WithDir(broker.dir),
-		apps.WithManifest(fmt.Sprintf("%s/cf-manifest.yml", broker.dir)),
-		apps.WithVariable("app", broker.Name),
+		apps.WithManifest(newManifest(
+			withName(broker.Name),
+			withEnv(broker.env()...),
+		)),
 	)
-	brokerApp.SetEnv(broker.env()...)
 
 	schemaName := strings.ReplaceAll(broker.Name, "-", "_")
 	cf.Run("bind-service", broker.Name, "csb-sql", "-c", fmt.Sprintf(`{"schema":"%s"}`, schemaName))

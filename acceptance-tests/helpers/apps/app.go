@@ -8,6 +8,5 @@ type App struct {
 	buildpack string
 	memory    string
 	manifest  string
-	variables map[string]string
 	dir       dir
 }
