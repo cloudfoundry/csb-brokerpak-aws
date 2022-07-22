@@ -270,11 +270,11 @@ provision:
     overwrite: true
     type: string
   template_refs:
-    outputs: terraform/rds/provision/outputs.tf
-    provider: terraform/rds/provision/provider.tf
-    variables: terraform/rds/provision/variables.tf
-    main: terraform/rds/provision/main.tf
-    data: terraform/rds/provision/data.tf
+    outputs: terraform/mysql/provision/outputs.tf
+    provider: terraform/mysql/provision/provider.tf
+    variables: terraform/mysql/provision/variables.tf
+    main: terraform/mysql/provision/main.tf
+    data: terraform/mysql/provision/data.tf
   outputs:
   - field_name: name
     type: string
@@ -323,11 +323,11 @@ bind:
       default: ${instance.details["use_tls"]}
       overwrite: true        
   template_refs:
-    outputs: terraform/rds/bind/mysql/outputs.tf
-    provider: terraform/rds/bind/mysql/provider.tf
-    variables: terraform/rds/bind/mysql/variables.tf
-    main: terraform/rds/bind/mysql/main.tf
-    data: terraform/rds/bind/mysql/data.tf
+    outputs: terraform/mysql/bind/outputs.tf
+    provider: terraform/mysql/bind/provider.tf
+    variables: terraform/mysql/bind/variables.tf
+    main: terraform/mysql/bind/main.tf
+    data: terraform/mysql/bind/data.tf
   outputs:
     - field_name: username
       type: string
