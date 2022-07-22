@@ -55,7 +55,7 @@ resource "aws_db_instance" "db_instance" {
   engine_version              = var.engine_version
   instance_class              = local.instance_class
   identifier                  = var.instance_name
-  name                        = var.db_name
+  db_name                     = var.db_name
   username                    = random_string.username.result
   password                    = random_password.password.result
   parameter_group_name        = local.parameter_group_name
