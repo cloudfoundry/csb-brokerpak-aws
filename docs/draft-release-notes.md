@@ -8,6 +8,7 @@
 - S3: Blocking public access to Amazon S3 storage. This feature provides settings for buckets to help manage public access to Amazon S3 resources. S3 Block Public Access settings override policies and permissions so that it is possible to limit public access to these resources.
 - S3: Server Side encryption can now be enabled and configured. This feature provides settings for configuring encryption of data in an S3 bucket.
 - Beta tag: all service offerings tagged as beta and will not be displayed by default in the marketplace. Set the environment variable `GSB_COMPATIBILITY_ENABLE_BETA_SERVICES` to true to enable them. 
+- PostgreSQL: when creating a binding, the PostgreSQL connection will be secured via the "verify-ca" PosgreSQL configuration. This will require the AWS certificate bundle to be installed.
 
 ### Fix:
 - minimum constraints on MySQL and PostreSQL storage_gb are now enforced
