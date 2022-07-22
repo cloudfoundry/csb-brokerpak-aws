@@ -293,11 +293,11 @@ provision:
     overwrite: true
     type: string
   template_refs:
-    outputs: ./terraform/rds/provision/outputs.tf
-    provider: ./terraform/rds/provision/provider.tf
-    variables: ./terraform/rds/provision/variables.tf
-    main: ./terraform/rds/provision/main.tf
-    data: ./terraform/rds/provision/data.tf
+    outputs: ./terraform/postgresql/provision/outputs.tf
+    provider: ./terraform/postgresql/provision/provider.tf
+    variables: ./terraform/postgresql/provision/variables.tf
+    main: ./terraform/postgresql/provision/main.tf
+    data: ./terraform/postgresql/provision/data.tf
   outputs:
   - field_name: name
     type: string
@@ -346,11 +346,11 @@ bind:
     default: ${instance.details["use_tls"]}
     overwrite: true    
   template_refs:
-    outputs: ./terraform/rds/bind/postgresql/outputs.tf
-    provider: ./terraform/rds/bind/postgresql/provider.tf
-    variables: ./terraform/rds/bind/postgresql/variables.tf
-    main: ./terraform/rds/bind/postgresql/main.tf
-    data: ./terraform/rds/bind/postgresql/data.tf
+    outputs: ./terraform/postgresql/bind/outputs.tf
+    provider: ./terraform/postgresql/bind/provider.tf
+    variables: ./terraform/postgresql/bind/variables.tf
+    main: ./terraform/postgresql/bind/main.tf
+    data: ./terraform/postgresql/bind/data.tf
   outputs:
   - field_name: username
     type: string
