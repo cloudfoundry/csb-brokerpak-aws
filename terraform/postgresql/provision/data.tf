@@ -38,8 +38,6 @@ locals {
 
   subnet_group = length(var.rds_subnet_group) > 0 ? var.rds_subnet_group : aws_db_subnet_group.rds-private-subnet[0].name
 
-  parameter_group_name = length(var.parameter_group_name) == 0 ? format("default.%s%s", var.engine, var.engine_version) : var.parameter_group_name
-
   max_allocated_storage = (var.storage_autoscale && var.storage_autoscale_limit_gb > var.storage_gb) ? var.storage_autoscale_limit_gb : null
 
   rds_vpc_security_group_ids = length(var.rds_vpc_security_group_ids) == 0 ? [aws_security_group.rds-sg[0].id] : split(",", var.rds_vpc_security_group_ids)
