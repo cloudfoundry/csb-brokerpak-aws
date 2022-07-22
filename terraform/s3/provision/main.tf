@@ -45,7 +45,7 @@ resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encryption_configuration" {
-  count = (var.sse_default_algorithm != null || var.sse_bucket_key_enabled != false) ? 1 : 0
+  count  = (var.sse_default_algorithm != null || var.sse_bucket_key_enabled != false) ? 1 : 0
   bucket = aws_s3_bucket.b.bucket
 
   rule {
