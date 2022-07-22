@@ -88,6 +88,9 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("pab_block_public_policy", false),
 					HaveKeyWithValue("pab_ignore_public_acls", false),
 					HaveKeyWithValue("pab_restrict_public_buckets", false),
+					HaveKeyWithValue("sse_default_kms_master_key_id", BeNil()),
+					HaveKeyWithValue("sse_default_algorithm", BeNil()),
+					HaveKeyWithValue("sse_bucket_key_enabled", false),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
 				),
@@ -96,14 +99,17 @@ var _ = Describe("S3", Label("s3"), func() {
 
 		It("should allow setting properties not defined in the plan", func() {
 			instanceID, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), map[string]any{
-				"bucket_name":           "fake-bucket-name",
-				"enable_versioning":     true,
-				"region":                "eu-west-1",
-				"acl":                   "public-read",
-				"boc_object_ownership":  "BucketOwnerPreferred",
-				"pab_block_public_acls": true,
-				"aws_access_key_id":     "fake-aws-access-key-id",
-				"aws_secret_access_key": "fake-aws-secret-access-key",
+				"bucket_name":                   "fake-bucket-name",
+				"enable_versioning":             true,
+				"region":                        "eu-west-1",
+				"acl":                           "public-read",
+				"boc_object_ownership":          "BucketOwnerPreferred",
+				"pab_block_public_acls":         true,
+				"sse_default_kms_master_key_id": "key-arn",
+				"sse_bucket_key_enabled":        true,
+				"sse_default_algorithm":         "aws:kms",
+				"aws_access_key_id":             "fake-aws-access-key-id",
+				"aws_secret_access_key":         "fake-aws-secret-access-key",
 			})
 
 			Expect(err).NotTo(HaveOccurred())
@@ -119,6 +125,9 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("pab_block_public_policy", false),
 					HaveKeyWithValue("pab_ignore_public_acls", false),
 					HaveKeyWithValue("pab_restrict_public_buckets", false),
+					HaveKeyWithValue("sse_default_kms_master_key_id", "key-arn"),
+					HaveKeyWithValue("sse_default_algorithm", "aws:kms"),
+					HaveKeyWithValue("sse_bucket_key_enabled", true),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 				),
@@ -175,6 +184,9 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update pab_block_public_policy", map[string]any{"pab_block_public_policy": true}),
 			Entry("update pab_ignore_public_acls", map[string]any{"pab_ignore_public_acls": true}),
 			Entry("update pab_restrict_public_buckets", map[string]any{"pab_restrict_public_buckets": true}),
+			Entry("update sse apply_server_side_encryption_by_default block", map[string]any{"sse_default_kms_master_key_id": "key-arn", "sse_default_algorithm": "aws:kms", "sse_bucket_key_enabled": true}),
+			Entry("update sse_default_algorithm", map[string]any{"sse_default_algorithm": "AES256"}),
+			Entry("update sse_bucket_key_enabled", map[string]any{"sse_bucket_key_enabled": true}),
 		)
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
