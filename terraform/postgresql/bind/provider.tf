@@ -19,5 +19,5 @@ provider "postgresql" {
   password  = var.admin_password
   superuser = false
   database  = var.db_name
-  sslmode   = "verify-ca"
+  sslmode   = var.use_tls ? "verify-full" : "prefer"
 }
