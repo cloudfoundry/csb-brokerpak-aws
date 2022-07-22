@@ -107,7 +107,11 @@ provision:
   - field_name: use_tls
     type: boolean
     details: Use TLS for connection
-    default: true      
+    default: true
+  - field_name: provider_verify_certificate
+    type: boolean
+    details: Whether PostgreSQL Terraform provider should validate the server certificate. The AWS certificate bundle must be installed.
+    default: true
   - field_name: storage_autoscale
     type: boolean
     default: false
@@ -317,6 +321,9 @@ provision:
   - field_name: use_tls
     type: boolean
     details: Using TLS for connection
+  - field_name: provider_verify_certificate
+    type: boolean
+    details: Whether PostgreSQL Terraform provider should validate the server certificate. The AWS certificate bundle must be installed.
 bind:
   plan_inputs: []
   user_inputs: []
@@ -345,6 +352,10 @@ bind:
     type: boolean
     default: ${instance.details["use_tls"]}
     overwrite: true    
+  - name: provider_verify_certificate
+    type: boolean
+    default: ${instance.details["provider_verify_certificate"]}
+    overwrite: true
   template_refs:
     outputs: ./terraform/postgresql/bind/outputs.tf
     provider: ./terraform/postgresql/bind/provider.tf
@@ -368,35 +379,35 @@ examples:
 - name: small
   description: Create a small PostgreSQL instance
   plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
 - name: medium
   description: Create a medium PostgreSQL instance
   plan_id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
 - name: large
   description: Create a large PostgreSQL instance
   plan_id: 48baef10-a14c-4ae1-aab5-25f26eba941a
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
 - name: medium-multiaz
   description: Create a medium multiaz PostgreSQL instance
   plan_id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
-  provision_params: { "publicly_accessible": true, "multi_az": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true, "multi_az": true, "provider_verify_certificate": false }
   bind_params: {}
 - name: small-encrypted
   description: Create a small PostgreSQL instance with encrypted storage
   plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  provision_params: { "storage_encrypted": true, "publicly_accessible": true, "use_tls": false }
+  provision_params: { "storage_encrypted": true, "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
 - name: small-disable-upgrades
   description: Create a small PostgreSQL instance with disabled upgrades
   plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true, "use_tls": false }
+  provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
 - name: small-with-maintenance-window
   description: Create a small PostgreSQL instance with encrypted storage
   plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "use_tls": false }
+  provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
