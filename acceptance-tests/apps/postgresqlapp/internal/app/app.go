@@ -36,7 +36,7 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 }
 
 func connect(uri string) *sql.DB {
-	db, err := sql.Open("pgx", uri)
+	db, err := sql.Open("pgx", fmt.Sprintf("%s?sslmode=verify-full", uri))
 	if err != nil {
 		log.Fatalf("failed to connect to database: %s", err)
 	}
