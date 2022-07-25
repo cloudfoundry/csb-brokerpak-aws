@@ -116,6 +116,7 @@ provision:
         - us-central1
         - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
   - field_name: aws_access_key_id
     type: string
     details: AWS access key
