@@ -69,5 +69,16 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 			Expect(err).NotTo(HaveOccurred())
 		})
+
+		DescribeTable(
+			"some allowed update",
+			func(key string, value any) {
+				err := broker.Update(instanceID, serviceName, "small", map[string]any{key: value})
+
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry(nil, "require_ssl", false),
+			Entry(nil, "provider_verify_certificate", false),
+		)
 	})
 })
