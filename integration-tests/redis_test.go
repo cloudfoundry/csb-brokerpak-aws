@@ -56,7 +56,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		})
 	})
 
-	FDescribe("updating instance", func() {
+	Describe("updating instance", func() {
 		var instanceID string
 
 		BeforeEach(func() {
