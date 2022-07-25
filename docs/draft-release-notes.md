@@ -15,3 +15,4 @@
 ### Fix:
 - minimum constraints on MySQL and PostreSQL storage_gb are now enforced
 - adds lifecycle.prevent_destroy to all data services to provide extra layer of protection against data loss
+- Modification of the region generates the same service without eliminating the existing one in the newly established region. Blocking updating operation of such property to avoid the generation of infrastructure unintentionally.

@@ -90,7 +90,7 @@ provision:
   user_inputs:
   - field_name: instance_name
     type: string
-    details: Name for your mysql instance
+    details: Name for your instance
     default: csb${request.instance_id}
     constraints:
       maxLength: 40
@@ -106,6 +106,7 @@ provision:
         - us-central1
         - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
   - field_name: node_count
     type: integer
     details: Number of nodes (primary and replicas) in cluster
