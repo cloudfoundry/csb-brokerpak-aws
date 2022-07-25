@@ -104,9 +104,9 @@ provision:
     type: boolean
     details: Indicates an existing PostgreSQL instnace should be subsumed
   user_inputs:
-  - field_name: use_tls
+  - field_name: require_ssl
     type: boolean
-    details: Use TLS for connection
+    details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
     default: true
   - field_name: provider_verify_certificate
     type: boolean
@@ -318,9 +318,9 @@ provision:
   - field_name: password
     type: string
     details: The password to authenticate to the database instance.
-  - field_name: use_tls
+  - field_name: require_ssl
     type: boolean
-    details: Using TLS for connection
+    details: Require that connections use SSL
   - field_name: provider_verify_certificate
     type: boolean
     details: Whether PostgreSQL Terraform provider should validate the server certificate. The AWS certificate bundle must be installed.
@@ -348,10 +348,10 @@ bind:
     type: string
     default: ${instance.details["password"]}
     overwrite: true
-  - name: use_tls
+  - name: require_ssl
     type: boolean
-    default: ${instance.details["use_tls"]}
-    overwrite: true    
+    default: ${instance.details["require_ssl"]}
+    overwrite: true
   - name: provider_verify_certificate
     type: boolean
     default: ${instance.details["provider_verify_certificate"]}

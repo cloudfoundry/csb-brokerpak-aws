@@ -58,7 +58,7 @@ resource "aws_db_instance" "db_instance" {
   db_name                     = var.db_name
   username                    = random_string.username.result
   password                    = random_password.password.result
-  parameter_group_name        = local.parameter_group_name
+  parameter_group_name        = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
   tags                        = var.labels
   vpc_security_group_ids      = local.rds_vpc_security_group_ids
   db_subnet_group_name        = local.subnet_group
@@ -73,5 +73,16 @@ resource "aws_db_instance" "db_instance" {
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+resource "aws_db_parameter_group" "db_parameter_group" {
+  count = length(var.parameter_group_name) == 0 ? 1 : 0
+
+  family = format("%s%s", var.engine, var.engine_version)
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = var.require_ssl ? 1 : 0
   }
 }
