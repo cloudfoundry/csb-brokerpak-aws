@@ -129,6 +129,7 @@ provision:
         - us-central1
         - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
   - field_name: multi_az
     type: boolean
     details: Make instance multi AZ if true (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)
