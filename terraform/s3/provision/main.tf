@@ -13,18 +13,25 @@
 # limitations under the License.
 
 resource "aws_s3_bucket" "b" {
-  bucket              = var.bucket_name
-  acl                 = var.acl
+  bucket = var.bucket_name
   object_lock_enabled = var.ol_enabled
-
-  versioning {
-    enabled = var.enable_versioning
-  }
 
   tags = var.labels
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket = aws_s3_bucket.b.id
+  acl = var.acl
+}
+
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket = aws_s3_bucket.b.id
+  versioning_configuration {
+    status = var.enable_versioning ? "Enabled" : "Disabled"
   }
 }
 

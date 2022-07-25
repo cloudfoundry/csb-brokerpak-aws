@@ -12,22 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "username" { value = postgresql_role.new_user.name }
-output "password" { value = postgresql_role.new_user.password }
-output "uri" {
-  value = format("postgresql://%s:%s@%s:%d/%s",
-    postgresql_role.new_user.name,
-    postgresql_role.new_user.password,
-    var.hostname,
-    var.port,
-  var.db_name)
-}
-output "jdbcUrl" {
-  value = format("jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
-    var.hostname,
-    var.port,
-    var.db_name,
-    postgresql_role.new_user.name,
-    postgresql_role.new_user.password,
-  var.use_tls)
-}
+variable "db_name" { type = string }
+variable "hostname" { type = string }
+variable "port" { type = number }
+variable "admin_username" { type = string }
+variable "admin_password" { type = string }
+variable "require_ssl" { type = bool }
+variable "provider_verify_certificate" { type = bool }

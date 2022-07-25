@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "db_name" { type = string }
-variable "hostname" { type = string }
-variable "port" { type = number }
-variable "admin_username" { type = string }
-variable "admin_password" { type = string }
-variable "use_tls" { type = bool }
+provider "postgresql" {
+  host      = var.hostname
+  port      = var.port
+  username  = var.admin_username
+  password  = var.admin_password
+  superuser = false
+  database  = var.db_name
+  sslmode   = var.provider_verify_certificate ? "verify-full" : "require"
+}
