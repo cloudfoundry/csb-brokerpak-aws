@@ -115,6 +115,37 @@ provision:
       type: boolean
       details: Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html).
       default: false
+    - field_name: ol_enabled
+      type: boolean
+      details: Whether or not to store objects using a write-once-read-many (WORM) model using Amazon S3 Object Lock. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html).
+      default: false
+      prohibit_update: true
+    - field_name: ol_configuration_default_retention_mode
+      type: string
+      details: |
+        The default retention mode for objects placed in the bucket.
+        The property `ol_configuration_default_retention_days` or `ol_configuration_default_retention_years` is required if this property is set.
+        To enable Object Lock for a new bucket, see the `ol_enabled`.
+      default: null
+      enum:
+        COMPLIANCE: COMPLIANCE
+        GOVERNANCE: GOVERNANCE
+    - field_name: ol_configuration_default_retention_days
+      type: number
+      details: | 
+        The default fixed amount of days of retention for objects placed in the bucket.
+        Optional property, but required if `ol_configuration_default_retention_years` is not specified.
+        `ol_configuration_default_retention_mode` is required if this property is set.
+        To enable Object Lock for a new bucket, see `ol_enabled`.
+      default: null
+    - field_name: ol_configuration_default_retention_years
+      type: number
+      details: |
+        The default fixed amount of years of retention for objects placed in the bucket.
+        Optional property, but required if `ol_configuration_default_retention_days` is not specified.
+        `ol_configuration_default_retention_mode` is required if this property is set.
+        To enable Object Lock for a new bucket, see `ol_enabled`.
+      default: null
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
