@@ -83,6 +83,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("acl", "private"),
+					HaveKeyWithValue("ol_enabled", false),
 					HaveKeyWithValue("boc_object_ownership", "ObjectWriter"),
 					HaveKeyWithValue("pab_block_public_acls", false),
 					HaveKeyWithValue("pab_block_public_policy", false),
@@ -99,17 +100,20 @@ var _ = Describe("S3", Label("s3"), func() {
 
 		It("should allow setting properties not defined in the plan", func() {
 			instanceID, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), map[string]any{
-				"bucket_name":                   "fake-bucket-name",
-				"enable_versioning":             true,
-				"region":                        "eu-west-1",
-				"acl":                           "public-read",
-				"boc_object_ownership":          "BucketOwnerPreferred",
-				"pab_block_public_acls":         true,
-				"sse_default_kms_master_key_id": "key-arn",
-				"sse_bucket_key_enabled":        true,
-				"sse_default_algorithm":         "aws:kms",
-				"aws_access_key_id":             "fake-aws-access-key-id",
-				"aws_secret_access_key":         "fake-aws-secret-access-key",
+				"bucket_name":       "fake-bucket-name",
+				"enable_versioning": true,
+				"region":            "eu-west-1",
+				"acl":               "public-read",
+				"ol_enabled":        true,
+				"ol_configuration_default_retention_mode": "COMPLIANCE",
+				"ol_configuration_default_retention_days": 1,
+				"boc_object_ownership":                    "BucketOwnerPreferred",
+				"pab_block_public_acls":                   true,
+				"sse_default_kms_master_key_id":           "key-arn",
+				"sse_bucket_key_enabled":                  true,
+				"sse_default_algorithm":                   "aws:kms",
+				"aws_access_key_id":                       "fake-aws-access-key-id",
+				"aws_secret_access_key":                   "fake-aws-secret-access-key",
 			})
 
 			Expect(err).NotTo(HaveOccurred())
@@ -120,6 +124,9 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "eu-west-1"),
 					HaveKeyWithValue("acl", "public-read"),
+					HaveKeyWithValue("ol_enabled", true),
+					HaveKeyWithValue("ol_configuration_default_retention_mode", "COMPLIANCE"),
+					HaveKeyWithValue("ol_configuration_default_retention_days", float64(1)),
 					HaveKeyWithValue("boc_object_ownership", "BucketOwnerPreferred"),
 					HaveKeyWithValue("pab_block_public_acls", true),
 					HaveKeyWithValue("pab_block_public_policy", false),
@@ -140,24 +147,33 @@ var _ = Describe("S3", Label("s3"), func() {
 			Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: acl")))
 		})
 
-		Describe("property constraints", func() {
-			It("should validate invalid characters in the region parameter", func() {
-				_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), map[string]any{"region": "-Asia-northeast1"})
+		DescribeTable("property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), params)
 
-				Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
-			})
-			DescribeTable("should ensure enum values are validated",
-				func(params map[string]any, property string) {
-					_, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), params)
-
-					Expect(err).To(MatchError(ContainSubstring(fmt.Sprintf("%[1]s: %[1]s must be one of the following", property))))
-				},
-
-				Entry("update boc_object_ownership", map[string]any{"boc_object_ownership": "invalidValue"}, "boc_object_ownership"),
-				Entry("update acl", map[string]any{"acl": "invalidValue"}, "acl"),
-			)
-
-		})
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"invalid boc_object_ownership",
+				map[string]any{"boc_object_ownership": "invalidValue"},
+				"boc_object_ownership: boc_object_ownership must be one of the following",
+			),
+			Entry(
+				"invalid acl",
+				map[string]any{"acl": "invalidValue"},
+				"acl: acl must be one of the following",
+			),
+			Entry(
+				"invalid ol_configuration_default_retention_mode",
+				map[string]any{"ol_configuration_default_retention_mode": "invalidValue"},
+				`ol_configuration_default_retention_mode: ol_configuration_default_retention_mode must be one of the following`,
+			),
+		)
 	})
 
 	Describe("updating instance", func() {
@@ -187,6 +203,8 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update sse apply_server_side_encryption_by_default block", map[string]any{"sse_default_kms_master_key_id": "key-arn", "sse_default_algorithm": "aws:kms", "sse_bucket_key_enabled": true}),
 			Entry("update sse_default_algorithm", map[string]any{"sse_default_algorithm": "AES256"}),
 			Entry("update sse_bucket_key_enabled", map[string]any{"sse_bucket_key_enabled": true}),
+			Entry("update ol_configuration_default_retention_mode", map[string]any{"ol_configuration_default_retention_mode": "COMPLIANCE"}),
+			Entry("update ol_configuration_default_retention_days", map[string]any{"ol_configuration_default_retention_days": 1}),
 		)
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
@@ -205,6 +223,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update bucket name", map[string]any{"bucket_name": "some-nicer-name"}),
+			Entry("update object lock enabled property", map[string]any{"ol_enabled": true}),
 		)
 
 		It("should not allow updating properties that are specified in the plan", func() {
