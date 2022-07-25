@@ -18,3 +18,4 @@ variable "port" { type = number }
 variable "admin_username" { type = string }
 variable "admin_password" { type = string }
 variable "use_tls" { type = bool }
+variable "provider_verify_certificate" { type = bool }
