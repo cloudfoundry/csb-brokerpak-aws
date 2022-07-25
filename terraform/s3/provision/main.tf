@@ -13,8 +13,9 @@
 # limitations under the License.
 
 resource "aws_s3_bucket" "b" {
-  bucket = var.bucket_name
-  acl    = var.acl
+  bucket              = var.bucket_name
+  acl                 = var.acl
+  object_lock_enabled = var.ol_enabled
 
   versioning {
     enabled = var.enable_versioning
@@ -45,7 +46,7 @@ resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encryption_configuration" {
-  count = (var.sse_default_algorithm != null || var.sse_bucket_key_enabled != false) ? 1 : 0
+  count  = (var.sse_default_algorithm != null || var.sse_bucket_key_enabled != false) ? 1 : 0
   bucket = aws_s3_bucket.b.bucket
 
   rule {
@@ -58,5 +59,19 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encry
     }
 
     bucket_key_enabled = var.sse_bucket_key_enabled
+  }
+}
+
+resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configuration" {
+  count               = (var.ol_configuration_default_retention_mode != null || var.ol_configuration_default_retention_days != null || var.ol_configuration_default_retention_years != null ) ? 1 : 0
+  bucket              = aws_s3_bucket.b.id
+  object_lock_enabled = "Enabled"
+
+  rule {
+    default_retention {
+      mode  = var.ol_configuration_default_retention_mode
+      days  = var.ol_configuration_default_retention_days
+      years = var.ol_configuration_default_retention_years
+    }
   }
 }
