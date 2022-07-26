@@ -84,7 +84,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("acl", "private"),
 					HaveKeyWithValue("ol_enabled", false),
-					HaveKeyWithValue("boc_object_ownership", "ObjectWriter"),
+					HaveKeyWithValue("boc_object_ownership", "BucketOwnerEnforced"),
 					HaveKeyWithValue("pab_block_public_acls", false),
 					HaveKeyWithValue("pab_block_public_policy", false),
 					HaveKeyWithValue("pab_ignore_public_acls", false),

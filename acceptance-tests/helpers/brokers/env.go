@@ -38,6 +38,7 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "ENCRYPTION_ENABLED", Value: true},
 		apps.EnvVar{Name: "ENCRYPTION_PASSWORDS", Value: b.secrets},
 		apps.EnvVar{Name: "BROKERPAK_UPDATES_ENABLED", Value: true},
+		apps.EnvVar{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
 		apps.EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
 	)
 

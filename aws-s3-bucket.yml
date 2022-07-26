@@ -78,7 +78,7 @@ provision:
         BucketOwnerPreferred: BucketOwnerPreferred
         ObjectWriter: ObjectWriter
         BucketOwnerEnforced: BucketOwnerEnforced
-      default: ObjectWriter
+      default: BucketOwnerEnforced
     - field_name: aws_access_key_id
       type: string
       details: AWS access key

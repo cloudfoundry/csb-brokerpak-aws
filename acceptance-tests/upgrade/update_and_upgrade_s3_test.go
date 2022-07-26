@@ -51,7 +51,7 @@ var _ = Describe("UpgradeS3Test", Label("upgrade"), func() {
 			serviceBroker.UpdateSourceDir(developmentBuildDir)
 
 			By("re-applying the terraform for service instance")
-			serviceInstance.Update("-p", "public-read")
+			serviceInstance.Update("-c", `{"boc_object_ownership":"ObjectWriter"}`)
 
 			By("checking that previously written data is accessible")
 			got = appTwo.GET(blobNameOne)
