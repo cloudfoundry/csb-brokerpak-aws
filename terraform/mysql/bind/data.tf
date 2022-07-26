@@ -12,9 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable db_name { type = string }
-variable hostname { type = string }
-variable port { type = number }
-variable admin_username { type = string }
-variable admin_password { type = string }
-variable use_tls { type = bool }
+resource "random_string" "username" {
+  length  = 16
+  special = false
+  number  = false
+}
+
+resource "random_password" "password" {
+  length           = 64
+  override_special = "~_-."
+  min_upper        = 2
+  min_lower        = 2
+  min_special      = 2
+}

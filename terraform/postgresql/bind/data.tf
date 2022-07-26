@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable aws_access_key_id { type = string }
-variable aws_secret_access_key { type = string }
-variable region { type = string }
+resource "random_string" "username" {
+  length  = 16
+  special = false
+  number  = false
+}
 
-provider "aws" {
-  version = "~> 3.0"
-  region  = var.region
-  access_key = var.aws_access_key_id
-  secret_key = var.aws_secret_access_key
+resource "random_password" "password" {
+  length           = 64
+  override_special = "~_-."
+  min_upper        = 2
+  min_lower        = 2
+  min_special      = 2
 }

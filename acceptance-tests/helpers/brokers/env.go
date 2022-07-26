@@ -12,14 +12,15 @@ func (b Broker) env() []apps.EnvVar {
 	var result []apps.EnvVar
 
 	for name, required := range map[string]bool{
-		"AWS_ACCESS_KEY_ID":          true,
-		"AWS_SECRET_ACCESS_KEY":      true,
-		"GSB_BROKERPAK_BUILTIN_PATH": false,
-		"CH_CRED_HUB_URL":            false,
-		"CH_UAA_URL":                 false,
-		"CH_UAA_CLIENT_NAME":         false,
-		"CH_UAA_CLIENT_SECRET":       false,
-		"CH_SKIP_SSL_VALIDATION":     false,
+		"AWS_ACCESS_KEY_ID":                      true,
+		"AWS_SECRET_ACCESS_KEY":                  true,
+		"GSB_BROKERPAK_BUILTIN_PATH":             false,
+		"CH_CRED_HUB_URL":                        false,
+		"CH_UAA_URL":                             false,
+		"CH_UAA_CLIENT_NAME":                     false,
+		"CH_UAA_CLIENT_SECRET":                   false,
+		"CH_SKIP_SSL_VALIDATION":                 false,
+		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES": false,
 	} {
 		val, ok := os.LookupEnv(name)
 		switch {
@@ -36,6 +37,7 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "DB_TLS", Value: "skip-verify"},
 		apps.EnvVar{Name: "ENCRYPTION_ENABLED", Value: true},
 		apps.EnvVar{Name: "ENCRYPTION_PASSWORDS", Value: b.secrets},
+		apps.EnvVar{Name: "BROKERPAK_UPDATES_ENABLED", Value: true},
 		apps.EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
 	)
 

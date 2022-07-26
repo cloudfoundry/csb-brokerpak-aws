@@ -15,56 +15,56 @@
 version: 1
 name: csb-aws-redis
 id: e9c11b1b-0caa-45c9-b9b2-592939c9a5a6
-description: Amazon ElastiCache for Redis - multinode with automatic failover
-display_name: Amazon ElastiCache for Redis
+description: Beta - Amazon ElastiCache for Redis - multinode with automatic failover
+display_name: Amazon ElastiCache for Redis (Beta)
 image_url: https://www.edrawsoft.com/symbols/awsdatabase/elasticacheredis.png
 documentation_url: https://aws.amazon.com/elasticache/redis/resources/?nc=sn&loc=5
 support_url: https://aws.amazon.com/redis/
-tags: [aws, redis, preview]
+tags: [aws, redis, beta]
 plan_updateable: true
 plans:
 - name: small
   id: ad963fcd-19f7-4b79-8e6d-645756e84f7a
-  description: 'Redis 6.0 with 1GB cache and 1 node.'
-  display_name: "Small"
+  description: 'Beta - Redis 6.0 with 1GB cache and 1 node.'
+  display_name: "Small (Beta)"
   properties:
     cache_size: 1   
     redis_version: "6.0"  
     node_count: 1
 - name: medium
   id: df41095a-43e8-4be4-b4d6-ae2d8a35068d
-  description: 'Redis 6.0 with at least 4GB cache and 1 node.'
-  display_name: "Medium"
+  description: 'Beta - Redis 6.0 with at least 4GB cache and 1 node.'
+  display_name: "Medium (Beta)"
   properties:
     cache_size: 4
     redis_version: "6.0"
     node_count: 1
 - name: large
   id: da4dc49c-a64f-4d2a-8490-5e456cbb0577
-  description: 'Redis 6.0 with at least 16 GB cache and 1 node.'
-  display_name: "Large"
+  description: 'Beta - Redis 6.0 with at least 16 GB cache and 1 node.'
+  display_name: "Large (Beta)"
   properties:
     cache_size: 16
     redis_version: "6.0"
     node_count: 1
 - name: small-ha
   id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
-  description: 'Redis 6.0 with 1GB cache and 2 nodes.'
-  display_name: "Small HA"
+  description: 'Beta - Redis 6.0 with 1GB cache and 2 nodes.'
+  display_name: "Small HA (Beta)"
   properties:
     cache_size: 1   
     redis_version: "6.0"
 - name: medium-ha
   id: a4235008-80f4-4053-924b-defcce17cb63
-  description: 'Redis 6.0 with at least 4GB cache and 2 nodes.'
-  display_name: "Medium HA"
+  description: 'Beta - Redis 6.0 with at least 4GB cache and 2 nodes.'
+  display_name: "Medium HA (Beta)"
   properties:
     cache_size: 4
     redis_version: "6.0"
 - name: large-ha
   id: f26cda6f-d4b4-473a-966c-32d238f723ef
-  description: 'Redis 6.0 with at least 16 GB cache and 2 nodes.'
-  display_name: "Large HA"
+  description: 'Beta - Redis 6.0 with at least 16 GB cache and 2 nodes.'
+  display_name: "Large HA (Beta)"
   properties:
     cache_size: 16
     redis_version: "6.0"
@@ -90,7 +90,7 @@ provision:
   user_inputs:
   - field_name: instance_name
     type: string
-    details: Name for your mysql instance
+    details: Name for your instance
     default: csb${request.instance_id}
     constraints:
       maxLength: 40
@@ -99,30 +99,14 @@ provision:
     prohibit_update: true  
   - field_name: region
     type: string
-    details: The region of the mysql instance.
+    details: The region of AWS.
     default: us-west-2
-    enum: 
-      us-east-2 : us-east-2
-      us-east-1 : us-east-1
-      us-west-1 : us-west-1
-      us-west-2 : us-west-2
-      ap-east-1 : ap-east-1
-      ap-south-1 : ap-south-1
-      ap-northeast-3 : ap-northeast-3
-      ap-northeast-2 : ap-northeast-2
-      ap-southeast-1 : ap-southeast-1
-      ap-southeast-2 : ap-southeast-2
-      ap-northeast-1 : ap-northeast-1
-      ca-central-1 : ca-central-1
-      cn-north-1 : cn-north-1
-      cn-northwest-1 : cn-northwest-1
-      eu-central-1 : eu-central-1
-      eu-west-1 : eu-west-1
-      eu-west-2 : eu-west-2
-      eu-west-3 : eu-west-3
-      eu-north-1 : eu-north-1
-      me-south-1 : me-south-1
-      sa-east-1 : sa-east-1
+    constraints:
+      examples:
+        - us-central1
+        - asia-northeast1
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
   - field_name: node_count
     type: integer
     details: Number of nodes (primary and replicas) in cluster

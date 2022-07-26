@@ -1,3 +1,4 @@
+// Package apps manages the test app lifecycle
 package apps
 
 type App struct {
@@ -7,6 +8,5 @@ type App struct {
 	buildpack string
 	memory    string
 	manifest  string
-	variables map[string]string
 	dir       dir
 }

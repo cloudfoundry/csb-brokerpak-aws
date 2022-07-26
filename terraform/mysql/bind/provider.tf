@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable db_name { type = string }
-variable hostname { type = string }
-variable port { type = number }
-variable admin_username { type = string }
-variable admin_password { type = string }
-variable use_tls { type = bool }
+provider "mysql" {
+  endpoint = format("%s:%d", var.hostname, var.port)
+  username = var.admin_username
+  password = var.admin_password
+  tls      = var.use_tls ? true : false
+}

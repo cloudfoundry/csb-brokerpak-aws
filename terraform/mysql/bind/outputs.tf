@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output username { value = random_string.username.result }
-output password { value = random_password.password.result }
-output uri {
+output "username" { value = random_string.username.result }
+output "password" { value = random_password.password.result }
+output "uri" {
   value = format("mysql://%s:%s@%s:%d/%s",
-                  random_string.username.result,
-                  random_password.password.result,
-                  var.hostname,
-                  var.port,
-                  var.db_name)
+    random_string.username.result,
+    random_password.password.result,
+    var.hostname,
+    var.port,
+  var.db_name)
 }
-output jdbcUrl {
+output "jdbcUrl" {
   value = format("jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
-                  var.hostname,
-                  var.port,
-                  var.db_name,
-                  random_string.username.result,
-                  random_password.password.result,
-                  var.use_tls)
+    var.hostname,
+    var.port,
+    var.db_name,
+    random_string.username.result,
+    random_password.password.result,
+  var.use_tls)
 }

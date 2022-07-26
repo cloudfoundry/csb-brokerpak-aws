@@ -1,11 +1,13 @@
+// Package services manages service instances
 package services
 
 import (
+	"encoding/json"
+	"time"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
-	"encoding/json"
-	"time"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
@@ -17,7 +19,7 @@ type ServiceInstance struct {
 
 type config struct {
 	name              string
-	serviceBrokerName string
+	serviceBrokerName func() string
 	parameters        string
 }
 
@@ -31,7 +33,7 @@ func CreateInstance(offering, plan string, opts ...Option) *ServiceInstance {
 		plan,
 		cfg.name,
 		"-b",
-		cfg.serviceBrokerName,
+		cfg.serviceBrokerName(),
 	}
 
 	if cfg.parameters != "" {
@@ -70,17 +72,17 @@ func createInstanceWithPoll(name string, args []string) {
 
 func WithDefaultBroker() Option {
 	return func(c *config) {
-		c.serviceBrokerName = brokers.DefaultBrokerName()
+		c.serviceBrokerName = brokers.DefaultBrokerName
 	}
 }
 
 func WithBroker(broker *brokers.Broker) Option {
 	return func(c *config) {
-		c.serviceBrokerName = broker.Name
+		c.serviceBrokerName = func() string { return broker.Name }
 	}
 }
 
-func WithParameters(parameters interface{}) Option {
+func WithParameters(parameters any) Option {
 	return func(c *config) {
 		switch p := parameters.(type) {
 		case string:

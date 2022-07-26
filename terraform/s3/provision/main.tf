@@ -14,11 +14,71 @@
 
 resource "aws_s3_bucket" "b" {
   bucket = var.bucket_name
-  acl    = var.acl
-
-  versioning {
-    enabled = var.enable_versioning
-  }
+  object_lock_enabled = var.ol_enabled
 
   tags = var.labels
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket = aws_s3_bucket.b.id
+  acl = var.acl
+}
+
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket = aws_s3_bucket.b.id
+  versioning_configuration {
+    status = var.enable_versioning ? "Enabled" : "Disabled"
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket_ownership_controls" {
+  bucket = aws_s3_bucket.b.id
+
+  rule {
+    object_ownership = var.boc_object_ownership
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
+  bucket = aws_s3_bucket.b.id
+
+  block_public_acls       = var.pab_block_public_acls
+  block_public_policy     = var.pab_block_public_policy
+  ignore_public_acls      = var.pab_ignore_public_acls
+  restrict_public_buckets = var.pab_restrict_public_buckets
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encryption_configuration" {
+  count  = (var.sse_default_algorithm != null || var.sse_bucket_key_enabled != false) ? 1 : 0
+  bucket = aws_s3_bucket.b.bucket
+
+  rule {
+    dynamic "apply_server_side_encryption_by_default" {
+      for_each = var.sse_default_algorithm[*]
+      content {
+        kms_master_key_id = var.sse_default_kms_master_key_id
+        sse_algorithm     = var.sse_default_algorithm
+      }
+    }
+
+    bucket_key_enabled = var.sse_bucket_key_enabled
+  }
+}
+
+resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configuration" {
+  count               = (var.ol_configuration_default_retention_mode != null || var.ol_configuration_default_retention_days != null || var.ol_configuration_default_retention_years != null ) ? 1 : 0
+  bucket              = aws_s3_bucket.b.id
+  object_lock_enabled = "Enabled"
+
+  rule {
+    default_retention {
+      mode  = var.ol_configuration_default_retention_mode
+      days  = var.ol_configuration_default_retention_days
+      years = var.ol_configuration_default_retention_years
+    }
+  }
 }

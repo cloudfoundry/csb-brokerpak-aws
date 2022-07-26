@@ -15,24 +15,24 @@
 version: 1
 name: csb-aws-dynamodb
 id: bf1db66a-1316-11eb-b959-e73b704ea230
-description: Amazon DynamoDB
-display_name: Amazon DynamoDB
+description: Beta - Amazon DynamoDB
+display_name: Amazon DynamoDB (Beta)
 image_url: https://www.pnglogos.com/images/other/aws-dynamodb.svg
 documentation_url: https://aws.amazon.com/dynamodb/
 support_url: https://aws.amazon.com/dynamodb/
-tags: [aws, dynamodb, preview]
+tags: [aws, dynamodb, beta]
 plan_updateable: true
 plans:
 - name: ondemand
   id: 52b109ee-1318-11eb-851b-dbe6aa707e6b
-  description: 'With on-demand capacity mode, DynamoDB charges you for the data reads and writes your application performs on your tables.'
-  display_name: "ondemand"
+  description: 'Beta - With on-demand capacity mode, DynamoDB charges you for the data reads and writes your application performs on your tables.'
+  display_name: "ondemand (Beta)"
   properties:
     billing_mode: "PAY_PER_REQUEST"
 - name: provisioned
   id: 591808b4-1318-11eb-b932-cbf259c3124c
-  description: 'With provisioned capacity mode, you specify the number of reads and writes per second that you expect your application to require.'
-  display_name: "provisioned"
+  description: 'Beta - With provisioned capacity mode, you specify the number of reads and writes per second that you expect your application to require.'
+  display_name: "provisioned (Beta)"
   properties:
      billing_mode: "PROVISIONED"
 provision:
@@ -109,30 +109,14 @@ provision:
     details: The number of read units for this table. If the billing_mode is PROVISIONED, this field should be greater than 0      
   - field_name: region
     type: string
-    details: The region of the mysql instance.
+    details: The region of AWS.
     default: us-west-2
-    enum: 
-      us-east-2 : us-east-2
-      us-east-1 : us-east-1
-      us-west-1 : us-west-1
-      us-west-2 : us-west-2
-      ap-east-1 : ap-east-1
-      ap-south-1 : ap-south-1
-      ap-northeast-3 : ap-northeast-3
-      ap-northeast-2 : ap-northeast-2
-      ap-southeast-1 : ap-southeast-1
-      ap-southeast-2 : ap-southeast-2
-      ap-northeast-1 : ap-northeast-1
-      ca-central-1 : ca-central-1
-      cn-north-1 : cn-north-1
-      cn-northwest-1 : cn-northwest-1
-      eu-central-1 : eu-central-1
-      eu-west-1 : eu-west-1
-      eu-west-2 : eu-west-2
-      eu-west-3 : eu-west-3
-      eu-north-1 : eu-north-1
-      me-south-1 : me-south-1
-      sa-east-1 : sa-east-1
+    constraints:
+      examples:
+        - us-central1
+        - asia-northeast1
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
   - field_name: aws_access_key_id
     type: string
     details: AWS access key

@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-provider "mysql" {
-  endpoint = format("%s:%d", var.hostname, var.port)
-  username = var.admin_username
-  password = var.admin_password
-  tls = var.use_tls ? true : false
+variable "aws_access_key_id" { type = string }
+variable "aws_secret_access_key" { type = string }
+variable "region" { type = string }
+
+provider "aws" {
+  version    = "~> 4.0"
+  region     = var.region
+  access_key = var.aws_access_key_id
+  secret_key = var.aws_secret_access_key
 }

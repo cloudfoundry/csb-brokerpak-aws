@@ -12,5 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable arn { type = string }
-variable user_name { type = string }
+variable "arn" { type = string }
+variable "user_name" { type = string }

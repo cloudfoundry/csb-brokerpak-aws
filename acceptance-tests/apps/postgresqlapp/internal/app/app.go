@@ -36,7 +36,7 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 }
 
 func connect(uri string) *sql.DB {
-	db, err := sql.Open("pgx", uri)
+	db, err := sql.Open("pgx", fmt.Sprintf("%s?sslmode=verify-full", uri))
 	if err != nil {
 		log.Fatalf("failed to connect to database: %s", err)
 	}
@@ -61,7 +61,7 @@ func schemaName(r *http.Request) (string, error) {
 	}
 }
 
-func fail(w http.ResponseWriter, code int, format string, a ...interface{}) {
+func fail(w http.ResponseWriter, code int, format string, a ...any) {
 	msg := fmt.Sprintf(format, a...)
 	log.Println(msg)
 	http.Error(w, msg, code)

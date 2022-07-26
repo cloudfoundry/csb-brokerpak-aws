@@ -15,31 +15,38 @@
 version: 1
 name: csb-aws-s3-bucket
 id: ffe28d48-c235-4e07-9c51-ddff5699e48c
-description: AWS S3 Bucket
-display_name: AWS S3 Bucket
+description: Beta - AWS S3 Bucket
+display_name: AWS S3 Bucket (Beta)
 image_url: https://www.pikpng.com/pngl/m/73-731373_aws-s3-logo-png-transparent-amazon-s3-logo.png
 documentation_url: https://aws.amazon.com/s3/
 support_url: https://aws.amazon.com/s3/
-tags: [aws, s3, preview]
+tags: [aws, s3, beta]
 plan_updateable: true
 plans:
 - name: private
   id: 8938b4c0-d67f-4c34-9f68-a66deef99b4e
-  description: 'Private S3 bucket'
-  display_name: 'Private'
+  description: 'Beta - Private S3 bucket'
+  display_name: 'Private (Beta)'
   properties:
     acl: private
 - name: public-read
   id: 04317eaa-11ac-4c5f-b77f-eb005fe977fe
-  description: 'Public-read S3 bucket'
-  display_name: 'Public Read'
+  description: 'Beta - Public-read S3 bucket'
+  display_name: 'Public Read (Beta)'
   properties:
     acl: public-read
 provision:
-  plan_inputs:
+  user_inputs:
+    - field_name: bucket_name
+      type: string
+      details: Name of bucket
+      default: csb-${request.instance_id}
+      plan_updateable: true
+      prohibit_update: true
     - field_name: acl
       type: string
-      details: S3 bucket ACL (see https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html#canned-acl)
+      details: S3 bucket ACL (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl)
+      default: private
       enum:
         private: private
         public-read: public-read
@@ -49,12 +56,6 @@ provision:
         bucket-owner-read: bucket-owner-read
         bucket-owner-full-control: bucket-owner-full-control
         log-delivery-write: log-delivery-write
-  user_inputs:
-    - field_name: bucket_name
-      type: string
-      details: Name of bucket
-      default: csb-${request.instance_id}
-      plan_updateable: true
     - field_name: enable_versioning
       type: boolean
       details: Enable bucket versioning
@@ -62,30 +63,22 @@ provision:
       prohibit_update: true
     - field_name: region
       type: string
-      details: The region of the S3 bucket instance.
+      details: The region of AWS.
       default: us-west-2
-      enum: 
-        us-east-2 : us-east-2
-        us-east-1 : us-east-1
-        us-west-1 : us-west-1
-        us-west-2 : us-west-2
-        ap-east-1 : ap-east-1
-        ap-south-1 : ap-south-1
-        ap-northeast-3 : ap-northeast-3
-        ap-northeast-2 : ap-northeast-2
-        ap-southeast-1 : ap-southeast-1
-        ap-southeast-2 : ap-southeast-2
-        ap-northeast-1 : ap-northeast-1
-        ca-central-1 : ca-central-1
-        cn-north-1 : cn-north-1
-        cn-northwest-1 : cn-northwest-1
-        eu-central-1 : eu-central-1
-        eu-west-1 : eu-west-1
-        eu-west-2 : eu-west-2
-        eu-west-3 : eu-west-3
-        eu-north-1 : eu-north-1
-        me-south-1 : me-south-1
-        sa-east-1 : sa-east-1
+      constraints:
+        examples:
+          - us-west-2
+          - eu-west-1
+        pattern: ^[a-z][a-z0-9-]+$
+      prohibit_update: true
+    - field_name: boc_object_ownership
+      type: string
+      details: S3 Bucket Ownership Controls (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html)
+      enum:
+        BucketOwnerPreferred: BucketOwnerPreferred
+        ObjectWriter: ObjectWriter
+        BucketOwnerEnforced: BucketOwnerEnforced
+      default: ObjectWriter
     - field_name: aws_access_key_id
       type: string
       details: AWS access key
@@ -94,6 +87,65 @@ provision:
       type: string
       details: AWS secret key
       default: ${config("aws.secret_access_key")}
+    - field_name: pab_block_public_acls
+      type: boolean
+      details: Whether Amazon S3 should block public ACLs for the bucket (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html).
+      default: false
+    - field_name: pab_block_public_policy
+      type: boolean
+      details: Whether Amazon S3 should block public bucket policies for the bucket.
+      default: false
+    - field_name: pab_ignore_public_acls
+      type: boolean
+      details: Whether Amazon S3 should ignore public ACLs for the bucket.
+      default: false
+    - field_name: pab_restrict_public_buckets
+      type: boolean
+      details: Whether Amazon S3 should restrict public bucket policies for the bucket.
+      default: false
+    - field_name: sse_default_kms_master_key_id
+      type: string
+      details: The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
+      default: null
+    - field_name: sse_default_algorithm
+      type: string
+      details: The server-side encryption algorithm to use. Valid values are `AES256` and `aws:kms`. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)
+      default: null
+    - field_name: sse_bucket_key_enabled
+      type: boolean
+      details: Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html).
+      default: false
+    - field_name: ol_enabled
+      type: boolean
+      details: Whether or not to store objects using a write-once-read-many (WORM) model using Amazon S3 Object Lock. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html).
+      default: false
+      prohibit_update: true
+    - field_name: ol_configuration_default_retention_mode
+      type: string
+      details: |
+        The default retention mode for objects placed in the bucket.
+        The property `ol_configuration_default_retention_days` or `ol_configuration_default_retention_years` is required if this property is set.
+        To enable Object Lock for a new bucket, see the `ol_enabled`.
+      default: null
+      enum:
+        COMPLIANCE: COMPLIANCE
+        GOVERNANCE: GOVERNANCE
+    - field_name: ol_configuration_default_retention_days
+      type: number
+      details: | 
+        The default fixed amount of days of retention for objects placed in the bucket.
+        Optional property, but required if `ol_configuration_default_retention_years` is not specified.
+        `ol_configuration_default_retention_mode` is required if this property is set.
+        To enable Object Lock for a new bucket, see `ol_enabled`.
+      default: null
+    - field_name: ol_configuration_default_retention_years
+      type: number
+      details: |
+        The default fixed amount of years of retention for objects placed in the bucket.
+        Optional property, but required if `ol_configuration_default_retention_days` is not specified.
+        `ol_configuration_default_retention_mode` is required if this property is set.
+        To enable Object Lock for a new bucket, see `ol_enabled`.
+      default: null
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

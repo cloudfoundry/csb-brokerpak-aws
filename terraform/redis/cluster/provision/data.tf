@@ -14,19 +14,19 @@
 
 data "aws_vpc" "vpc" {
   default = length(var.aws_vpc_id) == 0
-  id = length(var.aws_vpc_id) == 0 ? null : var.aws_vpc_id
+  id      = length(var.aws_vpc_id) == 0 ? null : var.aws_vpc_id
 }
 
 locals {
   instance_types = {
     // https://aws.amazon.com/elasticache/pricing
-    1 = "cache.t2.small"
-    2 = "cache.t3.medium"
-    4 = "cache.m5.large"
-    8 = "cache.m5.xlarge"
-    16 = "cache.r4.xlarge"
-    32 = "cache.r4.2xlarge"
-    64 = "cache.r4.4xlarge"
+    1   = "cache.t2.small"
+    2   = "cache.t3.medium"
+    4   = "cache.m5.large"
+    8   = "cache.m5.xlarge"
+    16  = "cache.r4.xlarge"
+    32  = "cache.r4.2xlarge"
+    64  = "cache.r4.4xlarge"
     128 = "cache.r4.8xlarge"
     256 = "cache.r5.12xlarge"
   }
@@ -39,11 +39,11 @@ locals {
   }
 
   node_type = length(var.node_type) == 0 ? local.instance_types[var.cache_size] : var.node_type
-  port = 6379
+  port      = 6379
 
   subnet_group = length(var.elasticache_subnet_group) > 0 ? var.elasticache_subnet_group : aws_elasticache_subnet_group.subnet_group[0].name
 
-   elasticache_vpc_security_group_ids = length(var.elasticache_vpc_security_group_ids) == 0 ? [aws_security_group.sg[0].id] : split(",", var.elasticache_vpc_security_group_ids)
+  elasticache_vpc_security_group_ids = length(var.elasticache_vpc_security_group_ids) == 0 ? [aws_security_group.sg[0].id] : split(",", var.elasticache_vpc_security_group_ids)
 }
 
 data "aws_subnet_ids" "all" {

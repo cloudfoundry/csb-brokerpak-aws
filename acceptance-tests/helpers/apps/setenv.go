@@ -9,7 +9,18 @@ import (
 
 type EnvVar struct {
 	Name  string
-	Value interface{}
+	Value any
+}
+
+func (e EnvVar) ValueString() string {
+	switch v := e.Value.(type) {
+	case string:
+		return v
+	default:
+		data, err := json.Marshal(v)
+		Expect(err).NotTo(HaveOccurred())
+		return string(data)
+	}
 }
 
 func (a *App) SetEnv(env ...EnvVar) {
@@ -18,17 +29,11 @@ func (a *App) SetEnv(env ...EnvVar) {
 
 func SetEnv(name string, env ...EnvVar) {
 	for _, envVar := range env {
-		switch v := envVar.Value.(type) {
-		case string:
-			if v == "" {
-				cf.Run("unset-env", name, envVar.Name)
-			} else {
-				cf.Run("set-env", name, envVar.Name, v)
-			}
-		default:
-			data, err := json.Marshal(v)
-			Expect(err).NotTo(HaveOccurred())
-			cf.Run("set-env", name, envVar.Name, string(data))
+		v := envVar.ValueString()
+		if v == "" {
+			cf.Run("unset-env", name, envVar.Name)
+		} else {
+			cf.Run("set-env", name, envVar.Name, v)
 		}
 	}
 }

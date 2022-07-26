@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable dynamodb_table_arn { type = string }
-variable dynamodb_table_id { type = string }
-variable user_name { type = string }
+variable "dynamodb_table_arn" { type = string }
+variable "dynamodb_table_id" { type = string }
+variable "user_name" { type = string }

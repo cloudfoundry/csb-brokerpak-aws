@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "mysql_user" "newuser" {
-  user               = random_string.username.result
-  plaintext_password = random_password.password.result
-  host = "%"
-  tls_option = var.use_tls ? "SSL" : "NONE"
-}
+variable "aws_access_key_id" { type = string }
+variable "aws_secret_access_key" { type = string }
+variable "region" { type = string }
 
-resource "mysql_grant" "newuser" {
-  user       = mysql_user.newuser.user
-  database   = var.db_name
-  host = mysql_user.newuser.host
-  privileges = ["ALL"]
+provider "aws" {
+  version    = "~> 4.0"
+  region     = var.region
+  access_key = var.aws_access_key_id
+  secret_key = var.aws_secret_access_key
 }
