@@ -13,7 +13,7 @@
 # limitations under the License.
 
 resource "aws_s3_bucket" "b" {
-  bucket = var.bucket_name
+  bucket              = var.bucket_name
   object_lock_enabled = var.ol_enabled
 
   tags = var.labels
@@ -25,7 +25,7 @@ resource "aws_s3_bucket" "b" {
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
   bucket = aws_s3_bucket.b.id
-  acl = var.acl
+  acl    = var.acl
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
@@ -70,7 +70,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encry
 }
 
 resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configuration" {
-  count               = (var.ol_configuration_default_retention_mode != null || var.ol_configuration_default_retention_days != null || var.ol_configuration_default_retention_years != null ) ? 1 : 0
+  count               = (var.ol_configuration_default_retention_mode != null || var.ol_configuration_default_retention_days != null || var.ol_configuration_default_retention_years != null) ? 1 : 0
   bucket              = aws_s3_bucket.b.id
   object_lock_enabled = "Enabled"
 

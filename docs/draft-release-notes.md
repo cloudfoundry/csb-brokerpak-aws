@@ -14,6 +14,7 @@
 - PostgreSQL: server rejects non-SSL connections by default. Renamed "use_tls" to "require_ssl". The "require_ssl" property is true by default, and will make the server require SSL connections. When false, the server will accept SSL and non-SSL connections.
 - PostgreSQL: The default Postgres version is now 13.4. All Postgres versions available on AWS RDS are now available to select when creating a new plan.
 - PostgreSQL: binding users are now deleted when a binding is deleted. This applies only to newly created bindings.
+- PostgreSQL: a new "deletion_protection" property allows a server to be protected from accidental deletion.
 
 ### Fix:
 - minimum constraints on MySQL and PostreSQL storage_gb are now enforced
