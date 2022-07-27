@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "username" { value = postgresql_role.new_user.name }
-output "password" { value = postgresql_role.new_user.password }
+output "username" { value = csbpg_binding_user.binding_user.username }
+output "password" { value = csbpg_binding_user.binding_user.password }
 output "uri" {
   value = format(
     "postgresql://%s:%s@%s:%d/%s",
-    postgresql_role.new_user.name,
-    postgresql_role.new_user.password,
+    csbpg_binding_user.binding_user.username,
+    csbpg_binding_user.binding_user.password,
     var.hostname,
     var.port,
     var.db_name,
@@ -30,8 +30,8 @@ output "jdbcUrl" {
     var.hostname,
     var.port,
     var.db_name,
-    postgresql_role.new_user.name,
-    postgresql_role.new_user.password,
+    csbpg_binding_user.binding_user.username,
+    csbpg_binding_user.binding_user.password,
     var.require_ssl,
   )
 }
