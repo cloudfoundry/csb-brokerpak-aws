@@ -53,12 +53,12 @@ resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encryption_configuration" {
-  count  = (var.sse_default_algorithm != null || var.sse_bucket_key_enabled != false) ? 1 : 0
+  count  = (var.sse_default_algorithm != "" || var.sse_bucket_key_enabled != false) ? 1 : 0
   bucket = aws_s3_bucket.b.bucket
 
   rule {
     dynamic "apply_server_side_encryption_by_default" {
-      for_each = var.sse_default_algorithm[*]
+      for_each = length(var.sse_default_algorithm) > 0 ?  var.sse_default_algorithm[*] : []
       content {
         kms_master_key_id = var.sse_default_kms_master_key_id
         sse_algorithm     = var.sse_default_algorithm
