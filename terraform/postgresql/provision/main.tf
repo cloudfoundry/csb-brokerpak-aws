@@ -86,4 +86,9 @@ resource "aws_db_parameter_group" "db_parameter_group" {
     name  = "rds.force_ssl"
     value = var.require_ssl ? 1 : 0
   }
+
+  parameter {
+    name  = "password_encryption"
+    value = "scram-sha-256"
+  }
 }
