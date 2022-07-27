@@ -22,19 +22,6 @@ documentation_url: https://aws.amazon.com/s3/
 support_url: https://aws.amazon.com/s3/
 tags: [aws, s3, beta]
 plan_updateable: true
-plans:
-- name: private
-  id: 8938b4c0-d67f-4c34-9f68-a66deef99b4e
-  description: 'Beta - Private S3 bucket'
-  display_name: 'Private (Beta)'
-  properties:
-    acl: private
-- name: public-read
-  id: 04317eaa-11ac-4c5f-b77f-eb005fe977fe
-  description: 'Beta - Public-read S3 bucket'
-  display_name: 'Public Read (Beta)'
-  properties:
-    acl: public-read
 provision:
   user_inputs:
     - field_name: bucket_name
@@ -213,13 +200,8 @@ bind:
     type: string
     details: AWS secret access key
 examples:
-- name: s3-bucket-private
-  description: Private S3 Bucket
-  plan_id: 8938b4c0-d67f-4c34-9f68-a66deef99b4e
-  provision_params: {}
-  bind_params: {}
-- name: s3-bucket-public-read
-  description: Public Read S3 Bucket
-  plan_id: 04317eaa-11ac-4c5f-b77f-eb005fe977fe
+- name: s3-default
+  description: Default S3 Bucket
+  plan_id: f64891b4-5021-4742-9871-dfe1a9051302
   provision_params: {}
   bind_params: {}
