@@ -26,10 +26,10 @@ resource "aws_db_subnet_group" "rds-private-subnet" {
 
 resource "aws_security_group_rule" "rds_inbound_access" {
   count             = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
-  from_port         = local.ports[var.engine]
+  from_port         = local.port
   protocol          = "tcp"
   security_group_id = aws_security_group.rds-sg[0].id
-  to_port           = local.ports[var.engine]
+  to_port           = local.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
@@ -70,6 +70,7 @@ resource "aws_db_instance" "db_instance" {
   apply_immediately           = true
   max_allocated_storage       = local.max_allocated_storage
   storage_encrypted           = var.storage_encrypted
+  deletion_protection         = var.deletion_protection
 
   lifecycle {
     prevent_destroy = true
