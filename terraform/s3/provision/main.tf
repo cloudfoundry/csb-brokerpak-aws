@@ -13,7 +13,7 @@
 # limitations under the License.
 
 resource "aws_s3_bucket" "b" {
-  bucket = var.bucket_name
+  bucket              = var.bucket_name
   object_lock_enabled = var.ol_enabled
 
   tags = var.labels
@@ -25,13 +25,13 @@ resource "aws_s3_bucket" "b" {
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
   bucket = aws_s3_bucket.b.id
-  acl = var.acl
+  acl    = var.acl
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
   bucket = aws_s3_bucket.b.id
   versioning_configuration {
-    status = var.enable_versioning ? "Enabled" : "Disabled"
+    status = local.is_versioning_enabled ? "Enabled" : "Disabled"
   }
 }
 
@@ -69,8 +69,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encry
   }
 }
 
+# aws_s3_bucket_object_lock_configuration.object_lock_enabled only admits the "Enabled" value. To be able to disable
+# the resource, we have to remove it.
 resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configuration" {
-  count               = (var.ol_configuration_default_retention_mode != null || var.ol_configuration_default_retention_days != null || var.ol_configuration_default_retention_years != null ) ? 1 : 0
+  count               = local.ol_configuration_is_enabled ? 1 : 0
   bucket              = aws_s3_bucket.b.id
   object_lock_enabled = "Enabled"
 

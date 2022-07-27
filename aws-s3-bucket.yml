@@ -60,7 +60,6 @@ provision:
       type: boolean
       details: Enable bucket versioning
       default: false
-      prohibit_update: true
     - field_name: region
       type: string
       details: The region of AWS.
@@ -120,16 +119,22 @@ provision:
       details: Whether or not to store objects using a write-once-read-many (WORM) model using Amazon S3 Object Lock. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html).
       default: false
       prohibit_update: true
+    - field_name: ol_configuration_default_retention_enabled
+      type: boolean
+      details: |
+        Whether this bucket has an Object Lock `configuration` enabled
+        To enable Object Lock for a new bucket, see `ol_enabled`
+      default: null
     - field_name: ol_configuration_default_retention_mode
       type: string
       details: |
         The default retention mode for objects placed in the bucket.
+        S3 Object Lock provides several retention modes. These retention modes apply different levels of protection to the objects.
+        To read about retention mode see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html#object-lock-retention-modes.
+        To read about admitted retention modes see the valid values in the `Mode` section https://docs.aws.amazon.com/AmazonS3/latest/API/API_DefaultRetention.html. 
         The property `ol_configuration_default_retention_days` or `ol_configuration_default_retention_years` is required if this property is set.
         To enable Object Lock for a new bucket, see the `ol_enabled`.
       default: null
-      enum:
-        COMPLIANCE: COMPLIANCE
-        GOVERNANCE: GOVERNANCE
     - field_name: ol_configuration_default_retention_days
       type: number
       details: | 
@@ -156,6 +161,7 @@ provision:
     outputs: terraform/s3/provision/outputs.tf
     provider: terraform/s3/provision/provider.tf
     variables: terraform/s3/provision/variables.tf
+    data: terraform/s3/provision/data.tf
   outputs:
   - field_name: arn
     type: string

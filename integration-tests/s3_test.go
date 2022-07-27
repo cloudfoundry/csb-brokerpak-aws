@@ -84,6 +84,10 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("acl", "private"),
 					HaveKeyWithValue("ol_enabled", false),
+					HaveKeyWithValue("ol_configuration_default_retention_enabled", BeNil()),
+					HaveKeyWithValue("ol_configuration_default_retention_mode", BeNil()),
+					HaveKeyWithValue("ol_configuration_default_retention_days", BeNil()),
+					HaveKeyWithValue("ol_configuration_default_retention_years", BeNil()),
 					HaveKeyWithValue("boc_object_ownership", "BucketOwnerEnforced"),
 					HaveKeyWithValue("pab_block_public_acls", false),
 					HaveKeyWithValue("pab_block_public_policy", false),
@@ -168,11 +172,6 @@ var _ = Describe("S3", Label("s3"), func() {
 				map[string]any{"acl": "invalidValue"},
 				"acl: acl must be one of the following",
 			),
-			Entry(
-				"invalid ol_configuration_default_retention_mode",
-				map[string]any{"ol_configuration_default_retention_mode": "invalidValue"},
-				`ol_configuration_default_retention_mode: ol_configuration_default_retention_mode must be one of the following`,
-			),
 		)
 	})
 
@@ -203,8 +202,10 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update sse apply_server_side_encryption_by_default block", map[string]any{"sse_default_kms_master_key_id": "key-arn", "sse_default_algorithm": "aws:kms", "sse_bucket_key_enabled": true}),
 			Entry("update sse_default_algorithm", map[string]any{"sse_default_algorithm": "AES256"}),
 			Entry("update sse_bucket_key_enabled", map[string]any{"sse_bucket_key_enabled": true}),
+			Entry("update ol_configuration_default_retention_enabled", map[string]any{"ol_configuration_default_retention_enabled": false}),
 			Entry("update ol_configuration_default_retention_mode", map[string]any{"ol_configuration_default_retention_mode": "COMPLIANCE"}),
 			Entry("update ol_configuration_default_retention_days", map[string]any{"ol_configuration_default_retention_days": 1}),
+			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
 		)
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
@@ -220,7 +221,6 @@ var _ = Describe("S3", Label("s3"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
-			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update bucket name", map[string]any{"bucket_name": "some-nicer-name"}),
 			Entry("update object lock enabled property", map[string]any{"ol_enabled": true}),
