@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"fmt"
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -51,6 +52,77 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			_, err := broker.Provision(serviceName, "small", map[string]any{"region": "-Asia-northeast1"})
 
 			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
+		})
+
+		It("should provision a plan", func() {
+			instanceID, err := broker.Provision(serviceName, "small", nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("cores", float64(2)),
+					HaveKeyWithValue("engine_version", "13.4"),
+					HaveKeyWithValue("storage_gb", float64(5)),
+					HaveKeyWithValue("subsume", false),
+					HaveKeyWithValue("require_ssl", true),
+					HaveKeyWithValue("provider_verify_certificate", true),
+					HaveKeyWithValue("storage_autoscale", false),
+					HaveKeyWithValue("storage_autoscale_limit_gb", float64(0)),
+					HaveKeyWithValue("parameter_group_name", ""),
+					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-postgresql-%s", instanceID)),
+					HaveKeyWithValue("db_name", "vsbdb"),
+					HaveKeyWithValue("publicly_accessible", false),
+					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("multi_az", false),
+					HaveKeyWithValue("allow_major_version_upgrade", true),
+					HaveKeyWithValue("auto_minor_version_upgrade", true),
+					HaveKeyWithValue("maintenance_window", "Sun:00:00-Sun:00:00"),
+					HaveKeyWithValue("deletion_protection", false),
+				),
+			)
+		})
+
+		It("should allow properties to be set on provision", func() {
+			_, err := broker.Provision(serviceName, "small", map[string]any{
+				"require_ssl":                 false,
+				"provider_verify_certificate": false,
+				"storage_autoscale":           true,
+				"storage_autoscale_limit_gb":  float64(10),
+				"parameter_group_name":        "flopsy",
+				"instance_name":               "csb-postgresql-mopsy",
+				"db_name":                     "cottontail",
+				"publicly_accessible":         true,
+				"region":                      "africa-north-4",
+				"multi_az":                    true,
+				"allow_major_version_upgrade": false,
+				"auto_minor_version_upgrade":  false,
+				"maintenance_day":             "Mon",
+				"maintenance_start_hour":      "03",
+				"maintenance_start_min":       "45",
+				"maintenance_end_hour":        "10",
+				"maintenance_end_min":         "15",
+				"deletion_protection":         true,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("require_ssl", false),
+					HaveKeyWithValue("provider_verify_certificate", false),
+					HaveKeyWithValue("storage_autoscale", true),
+					HaveKeyWithValue("storage_autoscale_limit_gb", float64(10)),
+					HaveKeyWithValue("parameter_group_name", "flopsy"),
+					HaveKeyWithValue("instance_name", "csb-postgresql-mopsy"),
+					HaveKeyWithValue("db_name", "cottontail"),
+					HaveKeyWithValue("publicly_accessible", true),
+					HaveKeyWithValue("region", "africa-north-4"),
+					HaveKeyWithValue("multi_az", true),
+					HaveKeyWithValue("allow_major_version_upgrade", false),
+					HaveKeyWithValue("auto_minor_version_upgrade", false),
+					HaveKeyWithValue("maintenance_window", "Mon:03:45-Mon:10:15"),
+					HaveKeyWithValue("deletion_protection", true),
+				),
+			)
 		})
 	})
 
