@@ -1,11 +1,12 @@
 package services
 
 import (
-	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"time"
 
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gexec"
+
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 )
 
 func (s *ServiceInstance) Delete() {
