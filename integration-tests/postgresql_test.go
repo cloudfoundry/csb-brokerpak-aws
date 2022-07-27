@@ -78,7 +78,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		})
 
 		DescribeTable(
-			"some allowed update",
+			"some allowed updates",
 			func(key string, value any) {
 				err := broker.Update(instanceID, serviceName, "small", map[string]any{key: value})
 
@@ -86,6 +86,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			},
 			Entry(nil, "require_ssl", false),
 			Entry(nil, "provider_verify_certificate", false),
+			Entry(nil, "deletion_protection", true),
 		)
 	})
 })

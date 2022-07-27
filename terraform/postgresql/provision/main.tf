@@ -70,6 +70,7 @@ resource "aws_db_instance" "db_instance" {
   apply_immediately           = true
   max_allocated_storage       = local.max_allocated_storage
   storage_encrypted           = var.storage_encrypted
+  deletion_protection         = var.deletion_protection
 
   lifecycle {
     prevent_destroy = true
