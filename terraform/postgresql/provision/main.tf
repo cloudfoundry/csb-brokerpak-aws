@@ -48,16 +48,17 @@ resource "random_password" "password" {
 }
 
 resource "aws_db_instance" "db_instance" {
-  allocated_storage           = var.storage_gb
-  storage_type                = "gp2"
-  skip_final_snapshot         = true
-  engine                      = var.engine
-  engine_version              = var.engine_version
+  engine                      = local.engine
+  engine_version              = local.engine_version
   instance_class              = local.instance_class
   identifier                  = var.instance_name
   db_name                     = var.db_name
   username                    = random_string.username.result
   password                    = random_password.password.result
+  storage_type                = "gp2"
+  allocated_storage           = var.storage_gb
+  max_allocated_storage       = local.max_allocated_storage
+  storage_encrypted           = var.storage_encrypted
   parameter_group_name        = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
   tags                        = var.labels
   vpc_security_group_ids      = local.rds_vpc_security_group_ids
@@ -67,10 +68,9 @@ resource "aws_db_instance" "db_instance" {
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
   maintenance_window          = var.maintenance_window == "Sun:00:00-Sun:00:00" ? null : var.maintenance_window
-  apply_immediately           = true
-  max_allocated_storage       = local.max_allocated_storage
-  storage_encrypted           = var.storage_encrypted
   deletion_protection         = var.deletion_protection
+  skip_final_snapshot         = true
+  apply_immediately           = true
 
   lifecycle {
     prevent_destroy = true
@@ -80,7 +80,8 @@ resource "aws_db_instance" "db_instance" {
 resource "aws_db_parameter_group" "db_parameter_group" {
   count = length(var.parameter_group_name) == 0 ? 1 : 0
 
-  family = format("%s%s", var.engine, var.engine_version)
+  name = format("rds-pg-%s", var.instance_name)
+  family = format("%s%s", local.engine, var.postgres_version_major)
 
   parameter {
     name  = "rds.force_ssl"

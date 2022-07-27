@@ -29,6 +29,9 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
+  engine = "postgres"
+  engine_version = length(var.postgres_version_minor) == 0 ? var.postgres_version_major : format("%s.%s", var.postgres_version_major, var.postgres_version_minor)
+
   port = 5432
 
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
