@@ -129,12 +129,12 @@ provision:
       type: string
       details: |
         The default retention mode for objects placed in the bucket.
+        S3 Object Lock provides several retention modes. These retention modes apply different levels of protection to the objects.
+        To read about retention mode see https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-overview.html#object-lock-retention-modes.
+        To read about admitted retention modes see the valid values in the `Mode` section https://docs.aws.amazon.com/AmazonS3/latest/API/API_DefaultRetention.html. 
         The property `ol_configuration_default_retention_days` or `ol_configuration_default_retention_years` is required if this property is set.
         To enable Object Lock for a new bucket, see the `ol_enabled`.
       default: null
-      enum:
-        COMPLIANCE: COMPLIANCE
-        GOVERNANCE: GOVERNANCE
     - field_name: ol_configuration_default_retention_days
       type: number
       details: | 

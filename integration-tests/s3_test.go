@@ -172,11 +172,6 @@ var _ = Describe("S3", Label("s3"), func() {
 				map[string]any{"acl": "invalidValue"},
 				"acl: acl must be one of the following",
 			),
-			Entry(
-				"invalid ol_configuration_default_retention_mode",
-				map[string]any{"ol_configuration_default_retention_mode": "invalidValue"},
-				`ol_configuration_default_retention_mode: ol_configuration_default_retention_mode must be one of the following`,
-			),
 		)
 	})
 
