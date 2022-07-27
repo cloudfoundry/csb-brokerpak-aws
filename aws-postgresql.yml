@@ -90,16 +90,11 @@ provision:
     type: boolean
     details: Indicates an existing PostgreSQL instnace should be subsumed
   user_inputs:
-  - field_name: postgres_version_major
+  - field_name: postgres_version
     required: true
     type: string
-    details: The major version for the PostgreSQL instance. Can be any supported major version.
-    default: "13"
-  - field_name: postgres_version_minor
-    required: false
-    type: string
-    details: The minor version for the PostgreSQL instance. Can be any supported minor version for the "postgres_version_major".
-    default: "4"
+    details: The version for the PostgreSQL instance. Can be any supported major version or major and minor e.g. 13 or 13.4.
+    default: "13.4"
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.

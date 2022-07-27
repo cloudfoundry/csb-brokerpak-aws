@@ -14,7 +14,7 @@
 - PostgreSQL: when creating a binding, by default the PostgreSQL connection will be secured via the "verify-full" PosgreSQL configuration. This will require the AWS certificate bundle to be installed, or it can be disabled by setting "use_tls=false"
 - PostgreSQL: a new "provider_verify_certificate" property allows for the PostgreSQL Terraform provider to skip the verification of the server certificate.
 - PostgreSQL: server rejects non-SSL connections by default. Renamed "use_tls" to "require_ssl". The "require_ssl" property is true by default, and will make the server require SSL connections. When false, the server will accept SSL and non-SSL connections.
-- PostgreSQL: The default Postgres version is now 13.4. All Postgres versions available on AWS RDS are now available to select when creating a new plan.
+- PostgreSQL: The default Postgres version is now 13.4. All Postgres versions available on AWS RDS are now available to select using the "postgres_version" property.
 - PostgreSQL: binding users are now deleted when a binding is deleted. This applies only to newly created bindings.
 - PostgreSQL: a new "deletion_protection" property allows a server to be protected from accidental deletion.
 

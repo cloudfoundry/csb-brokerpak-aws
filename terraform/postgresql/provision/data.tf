@@ -30,7 +30,7 @@ locals {
   }
 
   engine = "postgres"
-  engine_version = length(var.postgres_version_minor) == 0 ? var.postgres_version_major : format("%s.%s", var.postgres_version_major, var.postgres_version_minor)
+  major_version = split(".", var.postgres_version)[0]
 
   port = 5432
 
