@@ -31,6 +31,7 @@ variable "sse_default_algorithm" { type = string }
 variable "sse_bucket_key_enabled" { type = string }
 
 # Resource aws_s3_bucket_object_lock_configuration
+variable "ol_configuration_default_retention_enabled" { type = bool }
 variable "ol_configuration_default_retention_mode" { type = string }
 variable "ol_configuration_default_retention_days" { type = number }
 variable "ol_configuration_default_retention_years" { type = number }
