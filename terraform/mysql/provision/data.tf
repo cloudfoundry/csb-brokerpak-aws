@@ -29,10 +29,7 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
-  ports = {
-    "mysql"    = 3306
-    "postgres" = 5432
-  }
+  port = 3306
 
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
 

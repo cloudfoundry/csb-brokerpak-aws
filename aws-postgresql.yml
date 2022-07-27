@@ -308,9 +308,6 @@ provision:
   - field_name: hostname
     type: string
     details: Hostname or IP address of the exposed PostgreSQL endpoint used by clients to connect to the service.
-  - field_name: port
-    type: integer
-    details: The port number of the exposed PostgreSQL instance.
   - field_name: username
     type: string
     details: The username to authenticate to the database instance.
@@ -334,10 +331,6 @@ bind:
   - name: hostname
     type: string
     default: ${instance.details["hostname"]}
-    overwrite: true
-  - name: port
-    type: integer
-    default: ${instance.details["port"]}
     overwrite: true
   - name: admin_username
     type: string
@@ -373,6 +366,9 @@ bind:
   - field_name: jdbcUrl
     type: string
     details: The jdbc url to connect to the database instance and database.
+  - field_name: port
+    type: integer
+    details: The port number of the exposed postgres instance.
 examples:
 - name: small
   description: Create a small PostgreSQL instance
