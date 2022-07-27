@@ -75,6 +75,12 @@ if [[ ${DB_TLS} ]]; then
   echo "    DB_TLS: ${DB_TLS}" >>$cfmf
 fi
 
+if [[ -z "$GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS" ]]; then
+  GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS='[{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"}]'
+fi
+echo "    GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS" | jq @json)" >>$cfmf
+
+
 cf push --no-start -f "${cfmf}" --var app=${APP_NAME}
 
 if [[ -z ${MSYQL_INSTANCE} ]]; then
