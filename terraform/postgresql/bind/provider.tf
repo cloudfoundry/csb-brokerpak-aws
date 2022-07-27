@@ -14,7 +14,7 @@
 
 provider "csbpg" {
   host            = var.hostname
-  port            = local.port,
+  port            = local.port
   username        = var.admin_username
   password        = var.admin_password
   data_owner_role = "dataowner"
