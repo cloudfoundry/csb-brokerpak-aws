@@ -335,6 +335,9 @@ bind:
     - field_name: jdbcUrl
       type: string
       details: The jdbc url to connect to the database instance and database.
+    - field_name: port
+      type: integer
+      details: The port number of the exposed mysql instance.
 examples:
 - name: small
   description: Create a small MySQL instance

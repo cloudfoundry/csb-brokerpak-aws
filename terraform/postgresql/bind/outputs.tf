@@ -24,6 +24,7 @@ output "uri" {
     var.db_name,
   )
 }
+output "port" { value = local.port }
 output "jdbcUrl" {
   value = format(
     "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
