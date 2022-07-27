@@ -13,7 +13,7 @@
 # limitations under the License.
 
 provider "mysql" {
-  endpoint = format("%s:%d", var.hostname, var.port)
+  endpoint = format("%s:%d", var.hostname, local.port)
   username = var.admin_username
   password = var.admin_password
   tls      = var.use_tls ? true : false

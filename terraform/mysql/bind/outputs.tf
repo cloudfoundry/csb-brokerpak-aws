@@ -19,13 +19,13 @@ output "uri" {
     random_string.username.result,
     random_password.password.result,
     var.hostname,
-    var.port,
+    local.port,
   var.db_name)
 }
 output "jdbcUrl" {
   value = format("jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
     var.hostname,
-    var.port,
+    local.port,
     var.db_name,
     random_string.username.result,
     random_password.password.result,

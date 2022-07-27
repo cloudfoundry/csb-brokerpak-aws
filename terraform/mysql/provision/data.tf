@@ -29,11 +29,6 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
-  ports = {
-    "mysql"    = 3306
-    "postgres" = 5432
-  }
-
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
 
   subnet_group = length(var.rds_subnet_group) > 0 ? var.rds_subnet_group : aws_db_subnet_group.rds-private-subnet[0].name

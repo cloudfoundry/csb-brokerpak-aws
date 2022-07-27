@@ -20,7 +20,7 @@ output "uri" {
     csbpg_binding_user.binding_user.username,
     csbpg_binding_user.binding_user.password,
     var.hostname,
-    var.port,
+    local.port,
     var.db_name,
   )
 }
@@ -28,7 +28,7 @@ output "jdbcUrl" {
   value = format(
     "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
     var.hostname,
-    var.port,
+    local.port,
     var.db_name,
     csbpg_binding_user.binding_user.username,
     csbpg_binding_user.binding_user.password,
