@@ -78,7 +78,7 @@ provision:
         BucketOwnerPreferred: BucketOwnerPreferred
         ObjectWriter: ObjectWriter
         BucketOwnerEnforced: BucketOwnerEnforced
-      default: ObjectWriter
+      default: BucketOwnerEnforced
     - field_name: aws_access_key_id
       type: string
       details: AWS access key
@@ -106,11 +106,11 @@ provision:
     - field_name: sse_default_kms_master_key_id
       type: string
       details: The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
-      default: null
+      default: ""
     - field_name: sse_default_algorithm
       type: string
       details: The server-side encryption algorithm to use. Valid values are `AES256` and `aws:kms`. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)
-      default: null
+      default: ""
     - field_name: sse_bucket_key_enabled
       type: boolean
       details: Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html).
