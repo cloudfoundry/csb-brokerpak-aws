@@ -8,11 +8,11 @@ import (
 type AppCode string
 
 const (
-	MySQL     AppCode = "mysqlapp"
-	PostgeSQL AppCode = "postgresqlapp"
-	Redis     AppCode = "redisapp"
-	S3        AppCode = "s3app"
-	DynamoDB  AppCode = "dynamodbapp"
+	MySQL      AppCode = "mysqlapp"
+	PostgreSQL AppCode = "postgresqlapp"
+	Redis      AppCode = "redisapp"
+	S3         AppCode = "s3app"
+	DynamoDB   AppCode = "dynamodbapp"
 )
 
 func (a AppCode) Dir() string {

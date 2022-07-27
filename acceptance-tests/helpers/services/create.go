@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"time"
 
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gexec"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
-
-	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gexec"
 )
 
 type ServiceInstance struct {
 	Name string
+	guid string
 }
 
 type config struct {
