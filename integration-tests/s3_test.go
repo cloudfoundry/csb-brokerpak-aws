@@ -55,8 +55,6 @@ var _ = Describe("S3", Label("s3"), func() {
 		Expect(service.Metadata.DisplayName).NotTo(BeNil())
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("private")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("public-read")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan-with-acl")}),
 			),
@@ -72,8 +70,8 @@ var _ = Describe("S3", Label("s3"), func() {
 	})
 
 	Describe("provisioning", func() {
-		It("should provision private plan", func() {
-			instanceID, err := broker.Provision(s3ServiceName, "private", nil)
+		It("should provision a plan", func() {
+			instanceID, err := broker.Provision(s3ServiceName, customS3Plan["name"].(string), nil)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -146,7 +144,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		})
 
 		It("should not allow changing of plan defined properties", func() {
-			_, err := broker.Provision(s3ServiceName, "private", map[string]any{"acl": "public-read"})
+			_, err := broker.Provision(s3ServiceName, customS3PlanWithACL["name"].(string), map[string]any{"acl": "public-read"})
 
 			Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: acl")))
 		})
