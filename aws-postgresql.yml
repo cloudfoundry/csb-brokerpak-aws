@@ -274,6 +274,10 @@ provision:
       "15": 15 minutes
       "30": 30 minutes
       "45": 45 minutes
+  - field_name: deletion_protection
+    type: boolean
+    details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
+    default: false
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
