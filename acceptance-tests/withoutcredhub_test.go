@@ -25,7 +25,7 @@ var _ = Describe("Without CredHub", Label("withoutcredhub"), func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
 			"csb-aws-s3-bucket",
-			"private",
+			"default",
 			services.WithBroker(broker),
 		)
 		defer serviceInstance.Delete()
