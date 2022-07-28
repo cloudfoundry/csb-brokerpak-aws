@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"postgresqlapp/internal/app"
 	"postgresqlapp/internal/credentials"
 )
@@ -21,7 +22,7 @@ func main() {
 	port := port()
 	log.Printf("Listening on port: %s", port)
 	http.Handle("/", app.App(creds))
-	http.ListenAndServe(port, nil)
+	_ = http.ListenAndServe(port, nil)
 }
 
 func port() string {

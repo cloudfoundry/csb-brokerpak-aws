@@ -66,9 +66,6 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			By("updating the instance plan")
 			serviceInstance.Update("-p", "medium")
 
-			By("restarting apps to reconnect to the new database")
-			apps.Restart(appOne, appTwo)
-
 			By("checking previously written data still accessible")
 			got = appTwo.GET("%s/%s", schema, keyOne)
 			Expect(got).To(Equal(valueOne))
