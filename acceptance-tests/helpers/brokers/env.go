@@ -41,7 +41,7 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "BROKERPAK_UPDATES_ENABLED", Value: true},
 		apps.EnvVar{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
 		apps.EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
-		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS", Value: `[{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default", "acl": "public-read-write"}]`},
+		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS", Value: `[{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"}]`},
 	)
 
 	return append(result, b.envExtras...)
