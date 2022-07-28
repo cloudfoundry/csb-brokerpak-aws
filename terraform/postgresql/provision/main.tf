@@ -41,7 +41,7 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
-  length  = 32
+  length  = 64
   special = false
   // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html#RDS_Limits.Constraints
   override_special = "~_-."
@@ -50,7 +50,7 @@ resource "random_password" "password" {
 resource "aws_db_instance" "db_instance" {
   engine                      = local.engine
   engine_version              = var.postgres_version
-  instance_class              = local.instance_class
+  instance_class              = var.instance_class
   identifier                  = var.instance_name
   db_name                     = var.db_name
   username                    = random_string.username.result

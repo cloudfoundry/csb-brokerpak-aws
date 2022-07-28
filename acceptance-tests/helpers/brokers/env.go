@@ -1,9 +1,10 @@
 package brokers
 
 import (
-	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"fmt"
 	"os"
+
+	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 
 	"github.com/onsi/ginkgo/v2"
 )
