@@ -50,7 +50,7 @@ resource "random_password" "password" {
 resource "aws_db_instance" "db_instance" {
   engine                      = local.engine
   engine_version              = var.postgres_version
-  instance_class              = local.instance_class
+  instance_class              = var.instance_class
   identifier                  = var.instance_name
   db_name                     = var.db_name
   username                    = random_string.username.result
