@@ -91,12 +91,14 @@ provision:
       default: false
     - field_name: sse_default_kms_master_key_id
       type: string
+      nullable: true
       details: The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
-      default: ""
+      default: null
     - field_name: sse_default_algorithm
       type: string
+      nullable: true
       details: The server-side encryption algorithm to use. Valid values are `AES256` and `aws:kms`. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html)
-      default: ""
+      default: null
     - field_name: sse_bucket_key_enabled
       type: boolean
       details: Whether or not to use Amazon S3 Bucket Keys for SSE-KMS. (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-key.html).
