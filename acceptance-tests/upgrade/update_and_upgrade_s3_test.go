@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("UpgradeS3Test", Label("upgrade"), func() {
+var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 	Context("When upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
