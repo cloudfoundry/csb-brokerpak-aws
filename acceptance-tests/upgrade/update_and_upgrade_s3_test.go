@@ -17,6 +17,7 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-upgrade"),
 				brokers.WithSourceDir(releasedBuildDir),
+				brokers.WithReleaseEnv(),
 			)
 			defer serviceBroker.Delete()
 
@@ -48,10 +49,10 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			Expect(got).To(Equal(blobDataOne))
 
 			By("pushing the development version of the broker")
-			serviceBroker.UpdateSourceDir(developmentBuildDir)
+			serviceBroker.UpdateBroker(developmentBuildDir)
 
 			By("re-applying the terraform for service instance")
-			serviceInstance.Update("-c", `{"boc_object_ownership":"ObjectWriter"}`)
+			serviceInstance.Update("-c", `{"pab_block_public_policy": true}`)
 
 			By("checking that previously written data is accessible")
 			got = appTwo.GET(blobNameOne)

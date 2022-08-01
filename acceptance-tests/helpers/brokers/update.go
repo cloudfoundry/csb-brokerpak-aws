@@ -5,12 +5,15 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 )
 
-func (b *Broker) UpdateSourceDir(dir string) {
+func (b *Broker) UpdateBroker(dir string) {
 	b.app.Push(
 		apps.WithName(b.Name),
 		apps.WithDir(dir),
-		apps.WithStartedState(),
 	)
+
+	WithEnv(b.latestEnv()...)(b)
+	b.app.SetEnv(b.env()...)
+	b.app.Restart()
 
 	cf.Run("update-service-broker", b.Name, b.username, b.password, b.app.URL)
 }
