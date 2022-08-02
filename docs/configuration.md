@@ -121,10 +121,10 @@ service:
       {
         "name":"small",
         "id":"85b27a04-8695-11ea-818a-274131861b81",
-        "description":"additional plan with 4 cores, version 13.4 and 10 gb",
+        "description":"additional plan with 4 cores, version 11 and 10 gb",
         "display_name":"small",
-        "instance_class":"db.m6g.large",
-        "postgres_version": 13.4,
+        "cores":"4",
+        "postgres_version": 11,
         "storage_gb":10
       }
     ]'

@@ -18,8 +18,6 @@
 - PostgreSQL: binding users are now deleted when a binding is deleted. This applies only to newly created bindings.
 - PostgreSQL: a new "deletion_protection" property allows a server to be protected from accidental deletion.
 - PostgreSQL: passwords are stored using "scram". This is enabled only when not defining a custom parameter_group_name. The PostgreSQL admin password is now 64 bytes.
-- PostgreSQL: Only "instance_classes" are now exposed when provisioning or updating an instance. The previous “cores” abstraction is removed, in favor of using the underlying AWS instance class property.
-
 
 ### Fix:
 - minimum constraints on MySQL and PostreSQL storage_gb are now enforced
