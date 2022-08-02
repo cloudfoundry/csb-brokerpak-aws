@@ -62,7 +62,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("cores", float64(2)),
-					HaveKeyWithValue("postgres_version", "13.4"),
+					HaveKeyWithValue("engine_version", "11"),
 					HaveKeyWithValue("storage_gb", float64(5)),
 					HaveKeyWithValue("subsume", false),
 					HaveKeyWithValue("require_ssl", true),
