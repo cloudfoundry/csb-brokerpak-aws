@@ -30,7 +30,7 @@ plans:
   properties:
     cores: 2
     storage_gb: 5
-    postgres_version: 13.4
+    postgres_version: 11
     subsume: false
 - name: medium
   id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
@@ -39,7 +39,7 @@ plans:
   properties:
     cores: 4
     storage_gb: 10
-    postgres_version: 13.4
+    postgres_version: 11
     subsume: false
 - name: large
   id: 48baef10-a14c-4ae1-aab5-25f26eba941a
@@ -48,7 +48,7 @@ plans:
   properties:
     cores: 8
     storage_gb: 20
-    postgres_version: 13.4
+    postgres_version: 11
     subsume: false
 - name: subsume
   id: 886cb524-1d4f-11eb-b35f-8ba96a9085d7
