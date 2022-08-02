@@ -6,7 +6,10 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/onsi/gomega"
 )
 
 type Option func(broker *Broker)
@@ -55,6 +58,7 @@ func WithPrefix(prefix string) Option {
 }
 
 func WithSourceDir(dir string) Option {
+	gomega.Expect(filepath.Join(dir, "cloud-service-broker")).To(gomega.BeAnExistingFile())
 	return func(b *Broker) {
 		b.dir = dir
 	}
