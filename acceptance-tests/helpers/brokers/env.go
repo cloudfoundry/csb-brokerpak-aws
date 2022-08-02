@@ -53,5 +53,6 @@ func (b Broker) latestEnv() []apps.EnvVar {
 	return []apps.EnvVar{
 		{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
 		{Name: "GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS", Value: `[{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"},{"name":"private","id":"8938b4c0-d67f-4c34-9f68-a66deef99b4e","description":"Private S3 bucket","display_name":"Private","acl":"private","boc_object_ownership":"ObjectWriter"}]`},
+		{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
 	}
 }
