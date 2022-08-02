@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "cores" { type = number }
 variable "instance_name" { type = string }
 variable "db_name" { type = string }
 variable "labels" { type = map(any) }
