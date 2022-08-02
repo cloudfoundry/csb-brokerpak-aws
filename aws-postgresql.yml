@@ -96,7 +96,7 @@ provision:
       minimum: 5
   - field_name: subsume
     type: boolean
-    details: Indicates an existing PostgreSQL instnace should be subsumed
+    details: Indicates an existing PostgreSQL instance should be subsumed
   user_inputs:
   - field_name: require_ssl
     type: boolean
@@ -190,7 +190,7 @@ provision:
     type: string
     details: The preferred maintenance day
     default: Sun
-    enum:
+    enum: &weekday_enum
       Sun: Sunday
       Mon: Monday
       Tue: Tuesday
@@ -202,7 +202,7 @@ provision:
     type: string
     details: The preferred maintenance start hour
     default: "00"
-    enum:
+    enum: &hour_enum
       "00": 12 am
       "01": 1 am
       "02": 2 am
@@ -231,7 +231,7 @@ provision:
     type: string
     details: The preferred maintenance start minute
     default: "00"
-    enum:
+    enum: &minute_enum
       "00": Top of the hour
       "15": 15 minutes
       "30": 30 minutes
@@ -240,44 +240,53 @@ provision:
     type: string
     details: The preferred maintenance end hour
     default: "00"
-    enum:
-      "00": 12 am
-      "01": 1 am
-      "02": 2 am
-      "03": 3 am
-      "04": 4 am
-      "05": 5 am
-      "06": 6 am
-      "07": 7 am
-      "08": 8 am
-      "09": 9 am
-      "10": 10 am
-      "11": 11 am
-      "12": 12 pm
-      "13": 1 pm
-      "14": 2 pm
-      "15": 3 pm
-      "16": 4 pm
-      "17": 5 pm
-      "18": 6 pm
-      "19": 7 pm
-      "20": 8 pm
-      "21": 9 pm
-      "22": 10 pm
-      "23": 11 pm
+    enum: *hour_enum
   - field_name: maintenance_end_min
     type: string
     details: The preferred maintenance end minute
     default: "00"
-    enum:
-      "00": Top of the hour
-      "15": 15 minutes
-      "30": 30 minutes
-      "45": 45 minutes
+    enum: *minute_enum
   - field_name: deletion_protection
     type: boolean
     details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
     default: false
+  - field_name: backup_day
+    type: string
+    details: The preferred automated backup day
+    default: Sun
+    enum: *weekday_enum
+  - field_name: backup_retention_period
+    type: number
+    details: The number of days (1-35) for which automatic backups are kept
+    default: 7
+  - field_name: backup_start_hour
+    type: string
+    details: The preferred automated backup window start hour
+    default: "00"
+    enum: *hour_enum
+  - field_name: backup_start_min
+    type: string
+    default: "00"
+    details: The preferred automated backup window start minute
+    enum: *minute_enum
+  - field_name: backup_end_hour
+    type: string
+    default: "00"
+    details: The preferred automated backup window end hour
+    enum: *hour_enum
+  - field_name: backup_end_min
+    type: string
+    default: "00"
+    details: The preferred automated backup window end minute
+    enum: *minute_enum
+  - field_name: delete_automated_backups
+    type: boolean
+    details: Specifies whether to remove automated backups immediately after the DB instance is deleted
+    default: true
+  - field_name: copy_tags_to_snapshot
+    type: boolean
+    details: Copy all Instance tags to snapshots
+    default: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -295,6 +304,8 @@ provision:
     default: ${maintenance_day}:${maintenance_start_hour}:${maintenance_start_min}-${maintenance_day}:${maintenance_end_hour}:${maintenance_end_min}
     overwrite: true
     type: string
+  - name: backup_window
+    default: ${backup_day}:${backup_start_hour}:${backup_start_min}-${backup_day}:${backup_end_hour}:${backup_end_min}
   template_refs:
     outputs: ./terraform/postgresql/provision/outputs.tf
     provider: ./terraform/postgresql/provision/provider.tf
