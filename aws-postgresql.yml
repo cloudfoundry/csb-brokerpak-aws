@@ -353,6 +353,7 @@ bind:
     provider: ./terraform/postgresql/bind/provider.tf
     variables: ./terraform/postgresql/bind/variables.tf
     main: ./terraform/postgresql/bind/main.tf
+    data: ./terraform/postgresql/bind/data.tf
   outputs:
   - field_name: username
     type: string
