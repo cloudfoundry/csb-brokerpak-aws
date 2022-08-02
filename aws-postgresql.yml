@@ -30,6 +30,7 @@ plans:
   properties:
     cores: 2
     storage_gb: 5
+    postgres_version: 13.4
     subsume: false
 - name: medium
   id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
@@ -38,6 +39,7 @@ plans:
   properties:
     cores: 4
     storage_gb: 10
+    postgres_version: 13.4
     subsume: false
 - name: large
   id: 48baef10-a14c-4ae1-aab5-25f26eba941a
@@ -46,6 +48,7 @@ plans:
   properties:
     cores: 8
     storage_gb: 20
+    postgres_version: 13.4
     subsume: false
 - name: subsume
   id: 886cb524-1d4f-11eb-b35f-8ba96a9085d7
@@ -78,6 +81,11 @@ provision:
       maximum: 64
       minimum: 1
       multipleOf: 2
+  - field_name: postgres_version
+    required: true
+    type: string
+    details: The version for the PostgreSQL instance. Can be any supported major or major and minor version.
+    default: 13.4
   - field_name: storage_gb
     required: true
     type: number
@@ -90,11 +98,6 @@ provision:
     type: boolean
     details: Indicates an existing PostgreSQL instnace should be subsumed
   user_inputs:
-  - field_name: postgres_version
-    required: true
-    type: string
-    details: The version for the PostgreSQL instance. Can be any supported major version or major and minor e.g. 13 or 13.4.
-    default: "13.4"
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
@@ -280,6 +283,14 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
+  - name: engine
+    default: postgres
+    overwrite: true
+    type: string
+  - name: engine_version
+    default: ${postgres_version}
+    overwrite: true
+    type: string
   - name: maintenance_window
     default: ${maintenance_day}:${maintenance_start_hour}:${maintenance_start_min}-${maintenance_day}:${maintenance_end_hour}:${maintenance_end_min}
     overwrite: true
