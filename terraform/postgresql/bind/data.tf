@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-provider "postgresql" {
-  host      = var.hostname
-  port      = local.port
-  username  = var.admin_username
-  password  = var.admin_password
-  superuser = false
-  database  = var.db_name
-  sslmode   = var.provider_verify_certificate ? "verify-full" : "require"
+resource "random_string" "username" {
+  length  = 16
+  special = false
+  number  = false
+}
+
+resource "random_password" "password" {
+  length           = 64
+  override_special = "~_-."
+  min_upper        = 2
+  min_lower        = 2
+  min_special      = 2
 }
