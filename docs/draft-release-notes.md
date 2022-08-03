@@ -14,6 +14,7 @@
 - PostgreSQL: when creating a binding, by default the PostgreSQL connection will be secured via the "verify-full" PosgreSQL configuration. This will require the AWS certificate bundle to be installed, or it can be disabled by setting "use_tls=false"
 - PostgreSQL: a new "provider_verify_certificate" property allows for the PostgreSQL Terraform provider to skip the verification of the server certificate.
 - PostgreSQL: server rejects non-SSL connections by default. Renamed "use_tls" to "require_ssl". The "require_ssl" property is true by defalt, and will make the server require SSL connections. When false, the server will accept SSL and non-SSL connections.
+- PostgreSQL: Enhanced Monitoring. Amazon RDS provides metrics in real time for the operating system (OS) of the DB instance. Enhanced Monitoring enables all the system metrics and process information for the RDS DB instances on the console.
 - Terraform upgrade (from 0.12.30 to 0.12.31) has been added
 
 ### Fix:
