@@ -80,15 +80,11 @@ resource "aws_db_instance" "db_instance" {
 resource "aws_db_parameter_group" "db_parameter_group" {
   count = length(var.parameter_group_name) == 0 ? 1 : 0
 
+  name   = format("rds-pg-%s", var.instance_name)
   family = format("%s%s", var.engine, var.engine_version)
 
   parameter {
     name  = "rds.force_ssl"
     value = var.require_ssl ? 1 : 0
-  }
-
-  parameter {
-    name  = "password_encryption"
-    value = "scram-sha-256"
   }
 }

@@ -65,7 +65,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("engine_version", "11"),
 					HaveKeyWithValue("storage_gb", float64(5)),
 					HaveKeyWithValue("subsume", false),
-					HaveKeyWithValue("require_ssl", true),
+					HaveKeyWithValue("require_ssl", false),
 					HaveKeyWithValue("provider_verify_certificate", true),
 					HaveKeyWithValue("storage_autoscale", false),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(0)),
@@ -85,7 +85,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "small", map[string]any{
-				"require_ssl":                 false,
+				"require_ssl":                 true,
 				"provider_verify_certificate": false,
 				"storage_autoscale":           true,
 				"storage_autoscale_limit_gb":  float64(10),
@@ -108,7 +108,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("require_ssl", false),
+					HaveKeyWithValue("require_ssl", true),
 					HaveKeyWithValue("provider_verify_certificate", false),
 					HaveKeyWithValue("storage_autoscale", true),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(10)),
@@ -157,7 +157,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry(nil, "require_ssl", false),
+			Entry(nil, "require_ssl", true),
 			Entry(nil, "provider_verify_certificate", false),
 			Entry(nil, "deletion_protection", true),
 		)
