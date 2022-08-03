@@ -107,6 +107,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"maintenance_end_hour":        "10",
 				"maintenance_end_min":         "15",
 				"deletion_protection":         true,
+				"backup_retention_period":     float64(2),
+				"backup_window":               "01:02-03:04",
+				"copy_tags_to_snapshot":       false,
+				"delete_automated_backups":    false,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -126,6 +130,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_window", "Mon:03:45-Mon:10:15"),
 					HaveKeyWithValue("deletion_protection", true),
+					HaveKeyWithValue("backup_retention_period", float64(2)),
+					HaveKeyWithValue("backup_window", "01:02-03:04"),
+					HaveKeyWithValue("copy_tags_to_snapshot", false),
+					HaveKeyWithValue("delete_automated_backups", false),
 				),
 			)
 		})
