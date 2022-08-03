@@ -5,7 +5,7 @@ go 1.19
 require (
 	code.cloudfoundry.org/jsonry v1.1.3
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/cloudfoundry/cloud-service-broker v0.11.1-0.20220802124931-0e62799b04d6
+	github.com/cloudfoundry/cloud-service-broker v0.11.0
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.20.0
 	golang.org/x/tools v0.1.11-0.20220513221640-090b14e8501f

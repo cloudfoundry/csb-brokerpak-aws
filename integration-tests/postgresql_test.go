@@ -80,7 +80,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("maintenance_window", "Sun:00:00-Sun:00:00"),
 					HaveKeyWithValue("deletion_protection", false),
 					HaveKeyWithValue("backup_retention_period", float64(7)),
-					HaveKeyWithValue("backup_window", "Sun:00:00-Sun:00:00"),
+					HaveKeyWithValue("backup_window", "00:00-00:00"),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
 				),
