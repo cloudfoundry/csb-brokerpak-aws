@@ -38,5 +38,5 @@ variable "provider_verify_certificate" { type = bool }
 variable "deletion_protection" { type = bool }
 variable "backup_retention_period" { type = string }
 variable "backup_window" { type = string }
-variable "copy_tags_to_snapshot" { type = string }
-variable "delete_automated_backups" { type = string }
+variable "copy_tags_to_snapshot" { type = bool }
+variable "delete_automated_backups" { type = bool }

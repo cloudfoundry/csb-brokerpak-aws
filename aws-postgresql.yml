@@ -264,7 +264,7 @@ provision:
     default: true
   - field_name: copy_tags_to_snapshot
     type: boolean
-    details: Copy all Instance tags to snapshots
+    details: Copy all instance tags to snapshots
     default: true
   computed_inputs:
   - name: labels
