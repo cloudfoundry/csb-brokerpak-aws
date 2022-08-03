@@ -27,10 +27,10 @@ terraform_binaries:
 - name: terraform-provider-mysql
   version: 1.9.0
   source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
-- name: terraform-provider-csbpg
-  version: 1.0.0
-  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.0.0.zip
-  url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
+- name: terraform-provider-postgresql
+  version: 1.16.0
+  source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.16.0.zip
+  url_template: https://github.com/cyrilgdn/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 env_config_mapping:
   AWS_ACCESS_KEY_ID: aws.access_key_id
   AWS_SECRET_ACCESS_KEY: aws.secret_access_key
