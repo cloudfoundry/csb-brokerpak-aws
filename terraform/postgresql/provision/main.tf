@@ -41,8 +41,8 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
-  length  = 32
-  special = false
+  length           = 32
+  special          = false
   // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html#RDS_Limits.Constraints
   override_special = "~_-."
 }
@@ -71,6 +71,8 @@ resource "aws_db_instance" "db_instance" {
   max_allocated_storage       = local.max_allocated_storage
   storage_encrypted           = var.storage_encrypted
   deletion_protection         = var.deletion_protection
+  monitoring_interval         = var.monitoring_interval
+  monitoring_role_arn         = var.monitoring_role_arn
 
   lifecycle {
     prevent_destroy = true

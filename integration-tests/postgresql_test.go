@@ -79,6 +79,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("auto_minor_version_upgrade", true),
 					HaveKeyWithValue("maintenance_window", "Sun:00:00-Sun:00:00"),
 					HaveKeyWithValue("deletion_protection", false),
+					HaveKeyWithValue("monitoring_interval", float64(0)),
+					HaveKeyWithValue("monitoring_role_arn", ""),
 				),
 			)
 		})
@@ -103,6 +105,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"maintenance_end_hour":        "10",
 				"maintenance_end_min":         "15",
 				"deletion_protection":         true,
+				"monitoring_interval":         30,
+				"monitoring_role_arn":         "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -122,6 +126,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_window", "Mon:03:45-Mon:10:15"),
 					HaveKeyWithValue("deletion_protection", true),
+					HaveKeyWithValue("monitoring_interval", float64(30)),
+					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
 				),
 			)
 		})
@@ -160,6 +166,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "require_ssl", false),
 			Entry(nil, "provider_verify_certificate", false),
 			Entry(nil, "deletion_protection", true),
+			Entry(nil, "monitoring_interval", 0),
+			Entry(nil, "monitoring_role_arn", ""),
 		)
 	})
 })

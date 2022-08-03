@@ -36,3 +36,5 @@ variable "maintenance_window" { type = string }
 variable "require_ssl" { type = bool }
 variable "provider_verify_certificate" { type = bool }
 variable "deletion_protection" { type = bool }
+variable "monitoring_interval" { type = number }
+variable "monitoring_role_arn" { type = string }
