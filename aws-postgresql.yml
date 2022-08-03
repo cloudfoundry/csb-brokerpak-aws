@@ -96,7 +96,7 @@ provision:
       minimum: 5
   - field_name: subsume
     type: boolean
-    details: Indicates an existing PostgreSQL instnace should be subsumed
+    details: Indicates an existing PostgreSQL instance should be subsumed
   user_inputs:
   - field_name: require_ssl
     type: boolean
@@ -202,7 +202,7 @@ provision:
     type: string
     details: The preferred maintenance start hour
     default: "00"
-    enum:
+    enum: &hour_enum
       "00": 12 am
       "01": 1 am
       "02": 2 am
@@ -231,7 +231,7 @@ provision:
     type: string
     details: The preferred maintenance start minute
     default: "00"
-    enum:
+    enum: &minute_enum
       "00": Top of the hour
       "15": 15 minutes
       "30": 30 minutes
@@ -240,44 +240,32 @@ provision:
     type: string
     details: The preferred maintenance end hour
     default: "00"
-    enum:
-      "00": 12 am
-      "01": 1 am
-      "02": 2 am
-      "03": 3 am
-      "04": 4 am
-      "05": 5 am
-      "06": 6 am
-      "07": 7 am
-      "08": 8 am
-      "09": 9 am
-      "10": 10 am
-      "11": 11 am
-      "12": 12 pm
-      "13": 1 pm
-      "14": 2 pm
-      "15": 3 pm
-      "16": 4 pm
-      "17": 5 pm
-      "18": 6 pm
-      "19": 7 pm
-      "20": 8 pm
-      "21": 9 pm
-      "22": 10 pm
-      "23": 11 pm
+    enum: *hour_enum
   - field_name: maintenance_end_min
     type: string
     details: The preferred maintenance end minute
     default: "00"
-    enum:
-      "00": Top of the hour
-      "15": 15 minutes
-      "30": 30 minutes
-      "45": 45 minutes
+    enum: *minute_enum
   - field_name: deletion_protection
     type: boolean
     details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
     default: false
+  - field_name: backup_retention_period
+    type: number
+    details: The number of days (1-35) for which automatic backups are kept. Set the value to 0 to disable automated backups. An outage occurs if you change the backup retention period from 0 to a nonzero value or vice versa. This applies to both Single-AZ and Multi-AZ DB instances.
+    default: 7
+  - field_name: backup_window
+    type: string
+    details: 'The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16". Must not overlap with the maintenance window. If not set, uses the default for the region (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html#USER_WorkingWithAutomatedBackups.BackupWindow)'
+    default: "00:00-00:00"
+  - field_name: delete_automated_backups
+    type: boolean
+    details: Specifies whether to remove automated backups immediately after the DB instance is deleted
+    default: true
+  - field_name: copy_tags_to_snapshot
+    type: boolean
+    details: Copy all instance tags to snapshots
+    default: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
