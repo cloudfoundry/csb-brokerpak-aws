@@ -51,7 +51,14 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			By("pushing the development version of the broker")
 			serviceBroker.UpdateBroker(developmentBuildDir)
 
-			By("re-applying the terraform for service instance")
+			By("upgrading the service instance")
+			serviceInstance.Upgrade()
+
+			By("checking that previously written data is accessible")
+			got = appTwo.GET(blobNameOne)
+			Expect(got).To(Equal(blobDataOne))
+
+			By("updating the service instance")
 			serviceInstance.Update("-c", `{"pab_block_public_policy": true}`)
 
 			By("checking that previously written data is accessible")
