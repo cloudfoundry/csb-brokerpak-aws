@@ -72,7 +72,7 @@ resource "aws_db_instance" "db_instance" {
   storage_encrypted           = var.storage_encrypted
   deletion_protection         = var.deletion_protection
   backup_retention_period     = var.backup_retention_period
-  backup_window               = var.backup_window == "Sun:00:00-Sun:00:00" ? null : var.backup_window
+  backup_window               = var.backup_window == "00:00-00:00" ? null : var.backup_window
   copy_tags_to_snapshot       = var.copy_tags_to_snapshot
   delete_automated_backups    = var.delete_automated_backups
 
