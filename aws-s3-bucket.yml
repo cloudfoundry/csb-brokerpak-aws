@@ -33,7 +33,7 @@ provision:
     - field_name: acl
       type: string
       details: S3 bucket ACL (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl)
-      default: private
+      default: null
       enum:
         private: private
         public-read: public-read
