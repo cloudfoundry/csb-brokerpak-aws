@@ -180,6 +180,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "deletion_protection", true),
 			Entry(nil, "monitoring_interval", 0),
 			Entry(nil, "monitoring_role_arn", ""),
+			Entry(nil, "backup_retention_period", float64(2)),
+			Entry(nil, "backup_window", "01:02-03:04"),
+			Entry(nil, "copy_tags_to_snapshot", false),
+			Entry(nil, "delete_automated_backups", false),
 		)
 	})
 })
