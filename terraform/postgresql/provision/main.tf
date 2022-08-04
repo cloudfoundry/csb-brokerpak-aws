@@ -71,6 +71,10 @@ resource "aws_db_instance" "db_instance" {
   max_allocated_storage       = local.max_allocated_storage
   storage_encrypted           = var.storage_encrypted
   deletion_protection         = var.deletion_protection
+  backup_retention_period     = var.backup_retention_period
+  backup_window               = var.backup_window == "00:00-00:00" ? null : var.backup_window
+  copy_tags_to_snapshot       = var.copy_tags_to_snapshot
+  delete_automated_backups    = var.delete_automated_backups
   monitoring_interval         = var.monitoring_interval
   monitoring_role_arn         = var.monitoring_role_arn
 
@@ -82,15 +86,11 @@ resource "aws_db_instance" "db_instance" {
 resource "aws_db_parameter_group" "db_parameter_group" {
   count = length(var.parameter_group_name) == 0 ? 1 : 0
 
+  name   = format("rds-pg-%s", var.instance_name)
   family = format("%s%s", var.engine, var.engine_version)
 
   parameter {
     name  = "rds.force_ssl"
     value = var.require_ssl ? 1 : 0
-  }
-
-  parameter {
-    name  = "password_encryption"
-    value = "scram-sha-256"
   }
 }

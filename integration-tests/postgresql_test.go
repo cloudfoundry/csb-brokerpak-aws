@@ -65,7 +65,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("engine_version", "11"),
 					HaveKeyWithValue("storage_gb", float64(5)),
 					HaveKeyWithValue("subsume", false),
-					HaveKeyWithValue("require_ssl", true),
+					HaveKeyWithValue("require_ssl", false),
 					HaveKeyWithValue("provider_verify_certificate", true),
 					HaveKeyWithValue("storage_autoscale", false),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(0)),
@@ -79,6 +79,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("auto_minor_version_upgrade", true),
 					HaveKeyWithValue("maintenance_window", "Sun:00:00-Sun:00:00"),
 					HaveKeyWithValue("deletion_protection", false),
+					HaveKeyWithValue("backup_retention_period", float64(7)),
+					HaveKeyWithValue("backup_window", "00:00-00:00"),
+					HaveKeyWithValue("copy_tags_to_snapshot", true),
+					HaveKeyWithValue("delete_automated_backups", true),
 					HaveKeyWithValue("monitoring_interval", float64(0)),
 					HaveKeyWithValue("monitoring_role_arn", ""),
 				),
@@ -87,7 +91,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "small", map[string]any{
-				"require_ssl":                 false,
+				"require_ssl":                 true,
 				"provider_verify_certificate": false,
 				"storage_autoscale":           true,
 				"storage_autoscale_limit_gb":  float64(10),
@@ -105,6 +109,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"maintenance_end_hour":        "10",
 				"maintenance_end_min":         "15",
 				"deletion_protection":         true,
+				"backup_retention_period":     float64(2),
+				"backup_window":               "01:02-03:04",
+				"copy_tags_to_snapshot":       false,
+				"delete_automated_backups":    false,
 				"monitoring_interval":         30,
 				"monitoring_role_arn":         "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
 			})
@@ -112,7 +120,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("require_ssl", false),
+					HaveKeyWithValue("require_ssl", true),
 					HaveKeyWithValue("provider_verify_certificate", false),
 					HaveKeyWithValue("storage_autoscale", true),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(10)),
@@ -126,6 +134,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_window", "Mon:03:45-Mon:10:15"),
 					HaveKeyWithValue("deletion_protection", true),
+					HaveKeyWithValue("backup_retention_period", float64(2)),
+					HaveKeyWithValue("backup_window", "01:02-03:04"),
+					HaveKeyWithValue("copy_tags_to_snapshot", false),
+					HaveKeyWithValue("delete_automated_backups", false),
 					HaveKeyWithValue("monitoring_interval", float64(30)),
 					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
 				),
@@ -163,7 +175,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry(nil, "require_ssl", false),
+			Entry(nil, "require_ssl", true),
 			Entry(nil, "provider_verify_certificate", false),
 			Entry(nil, "deletion_protection", true),
 			Entry(nil, "monitoring_interval", 0),
