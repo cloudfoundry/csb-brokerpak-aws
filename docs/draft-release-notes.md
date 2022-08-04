@@ -13,7 +13,7 @@
 - Beta tag: all service offerings tagged as beta and will not be displayed by default in the marketplace. Set the environment variable `GSB_COMPATIBILITY_ENABLE_BETA_SERVICES` to true to enable them. 
 - PostgreSQL: when creating a binding, by default the PostgreSQL connection will be secured via the "verify-full" PosgreSQL configuration. This will require the AWS certificate bundle to be installed, or it can be disabled by setting "use_tls=false"
 - PostgreSQL: a new "provider_verify_certificate" property allows for the PostgreSQL Terraform provider to skip the verification of the server certificate.
-- PostgreSQL: server rejects non-SSL connections by default. Renamed "use_tls" to "require_ssl". The "require_ssl" property is true by defalt, and will make the server require SSL connections. When false, the server will accept SSL and non-SSL connections.
+- PostgreSQL: server can reject non-SSL connections by default. Renamed "use_tls" to "require_ssl". Wheh the "require_ssl" property is true, it will make the server require SSL connections. When false (default), the server will accept SSL and non-SSL connections.
 - Terraform upgrade (from 0.12.30 to 0.12.31) has been added
 - PostgreSQL: Only "instance_class" are now exposed when provisioning or updating an instance. The previous “cores” abstraction is removed, in favor of using the underlying AWS instance class property.
 - PostgreSQL: Automated backups can now be scheduled through "backup_window". By default, the automated backups are disabled.

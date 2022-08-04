@@ -101,7 +101,7 @@ provision:
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
-    default: true
+    default: false
   - field_name: provider_verify_certificate
     type: boolean
     details: Whether PostgreSQL Terraform provider should validate the server certificate. The AWS certificate bundle must be installed.
@@ -121,7 +121,10 @@ provision:
   - field_name: parameter_group_name
     type: string
     default: ""
-    details: DB parameter group name - default 'default.postgres.<postgresql version>'
+    details: |
+      DB parameter group name. If not set, a parameter group is created for the instance.
+      Updates to this property may not occur until the next maintenance period.
+      This property should not be introduced during an instance update as it will fail.
   - field_name: instance_name
     type: string
     details: Name for your PostgreSQL instance
