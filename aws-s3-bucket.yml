@@ -110,12 +110,15 @@ provision:
       prohibit_update: true
     - field_name: ol_configuration_default_retention_enabled
       type: boolean
+      nullable: true
+      default: null
       details: |
         Whether this bucket has an Object Lock `configuration` enabled
         To enable Object Lock for a new bucket, see `ol_enabled`
-      default: null
     - field_name: ol_configuration_default_retention_mode
       type: string
+      nullable: true
+      default: null
       details: |
         The default retention mode for objects placed in the bucket.
         S3 Object Lock provides several retention modes. These retention modes apply different levels of protection to the objects.
@@ -123,23 +126,24 @@ provision:
         To read about admitted retention modes see the valid values in the `Mode` section https://docs.aws.amazon.com/AmazonS3/latest/API/API_DefaultRetention.html. 
         The property `ol_configuration_default_retention_days` or `ol_configuration_default_retention_years` is required if this property is set.
         To enable Object Lock for a new bucket, see the `ol_enabled`.
-      default: null
     - field_name: ol_configuration_default_retention_days
       type: number
+      nullable: true
+      default: null
       details: | 
-        The default fixed amount of days of retention for objects placed in the bucket.
+        The default fixed number of days of retention for objects placed in the bucket.
         Optional property, but required if `ol_configuration_default_retention_years` is not specified.
         `ol_configuration_default_retention_mode` is required if this property is set.
         To enable Object Lock for a new bucket, see `ol_enabled`.
-      default: null
     - field_name: ol_configuration_default_retention_years
       type: number
+      nullable: true
+      default: null
       details: |
-        The default fixed amount of years of retention for objects placed in the bucket.
+        The default fixed number of years of retention for objects placed in the bucket.
         Optional property, but required if `ol_configuration_default_retention_days` is not specified.
         `ol_configuration_default_retention_mode` is required if this property is set.
         To enable Object Lock for a new bucket, see `ol_enabled`.
-      default: null
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
