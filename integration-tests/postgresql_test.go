@@ -83,6 +83,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("backup_window", "00:00-00:00"),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
+					HaveKeyWithValue("monitoring_interval", float64(0)),
+					HaveKeyWithValue("monitoring_role_arn", ""),
 				),
 			)
 		})
@@ -111,6 +113,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"backup_window":               "01:02-03:04",
 				"copy_tags_to_snapshot":       false,
 				"delete_automated_backups":    false,
+				"monitoring_interval":         30,
+				"monitoring_role_arn":         "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -134,6 +138,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("backup_window", "01:02-03:04"),
 					HaveKeyWithValue("copy_tags_to_snapshot", false),
 					HaveKeyWithValue("delete_automated_backups", false),
+					HaveKeyWithValue("monitoring_interval", float64(30)),
+					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
 				),
 			)
 		})
@@ -172,6 +178,12 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "require_ssl", true),
 			Entry(nil, "provider_verify_certificate", false),
 			Entry(nil, "deletion_protection", true),
+			Entry(nil, "monitoring_interval", 0),
+			Entry(nil, "monitoring_role_arn", ""),
+			Entry(nil, "backup_retention_period", float64(2)),
+			Entry(nil, "backup_window", "01:02-03:04"),
+			Entry(nil, "copy_tags_to_snapshot", false),
+			Entry(nil, "delete_automated_backups", false),
 		)
 	})
 })

@@ -20,6 +20,8 @@ data "aws_vpc" "vpc" {
 locals {
   instance_types = {
     // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html
+    # Enhanced Monitoring is available for all DB instance classes except for the db.m1.small instance class.
+    # Consider adding a clarifying comment to improve UX if we add this instance class.
     1  = "db.t2.small"
     2  = "db.t3.medium"
     4  = "db.m5.xlarge"
