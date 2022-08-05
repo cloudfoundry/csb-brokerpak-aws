@@ -203,8 +203,13 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update sse_default_algorithm null", map[string]any{"sse_default_algorithm": nil}),
 			Entry("update sse_bucket_key_enabled", map[string]any{"sse_bucket_key_enabled": true}),
 			Entry("update ol_configuration_default_retention_enabled", map[string]any{"ol_configuration_default_retention_enabled": false}),
+			Entry("unset ol_configuration_default_retention_enabled", map[string]any{"ol_configuration_default_retention_enabled": nil}),
 			Entry("update ol_configuration_default_retention_mode", map[string]any{"ol_configuration_default_retention_mode": "COMPLIANCE"}),
-			Entry("update ol_configuration_default_retention_days", map[string]any{"ol_configuration_default_retention_days": 1}),
+			Entry("unset ol_configuration_default_retention_mode", map[string]any{"ol_configuration_default_retention_mode": nil}),
+			Entry("update ol_configuration_default_retention_days", map[string]any{"ol_configuration_default_retention_days": 42}),
+			Entry("unset ol_configuration_default_retention_days", map[string]any{"ol_configuration_default_retention_days": nil}),
+			Entry("update ol_configuration_default_retention_years", map[string]any{"ol_configuration_default_retention_years": 42}),
+			Entry("unset ol_configuration_default_retention_years", map[string]any{"ol_configuration_default_retention_years": nil}),
 			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
 		)
 
