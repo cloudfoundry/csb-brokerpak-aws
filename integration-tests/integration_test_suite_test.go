@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
@@ -51,4 +52,8 @@ func marshall(element any) string {
 	b, err := json.Marshal(element)
 	Expect(err).NotTo(HaveOccurred())
 	return string(b)
+}
+
+func stringOfLen(length int) string {
+	return strings.Repeat("a", length)
 }
