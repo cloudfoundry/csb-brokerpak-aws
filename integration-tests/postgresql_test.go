@@ -49,11 +49,34 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 	})
 
 	Describe("provisioning", func() {
-		It("should check region constraints", func() {
-			_, err := broker.Provision(serviceName, "small", map[string]any{"region": "-Asia-northeast1"})
 
-			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
-		})
+		DescribeTable("property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(serviceName, "small", params)
+
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"instance name minimum length is 6 characters",
+				map[string]any{"instance_name": stringOfLen(5)},
+				"instance_name: String length must be greater than or equal to 6",
+			),
+			Entry(
+				"instance name invalid characters",
+				map[string]any{"instance_name": ".aaaaa"},
+				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"database name maximum length is 98 characters",
+				map[string]any{"db_name": stringOfLen(99)},
+				"db_name: String length must be less than or equal to 64",
+			),
+		)
 
 		It("should provision a plan", func() {
 			instanceID, err := broker.Provision(serviceName, "small", nil)
@@ -74,6 +97,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("publicly_accessible", false),
 					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("storage_encrypted", false),
+					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("multi_az", false),
 					HaveKeyWithValue("allow_major_version_upgrade", true),
 					HaveKeyWithValue("auto_minor_version_upgrade", true),
@@ -100,6 +125,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"db_name":                     "cottontail",
 				"publicly_accessible":         true,
 				"region":                      "africa-north-4",
+				"storage_encrypted":           true,
+				"kms_key_id":                  "arn:aws:xxxx",
 				"multi_az":                    true,
 				"allow_major_version_upgrade": false,
 				"auto_minor_version_upgrade":  false,
@@ -129,6 +156,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("db_name", "cottontail"),
 					HaveKeyWithValue("publicly_accessible", true),
 					HaveKeyWithValue("region", "africa-north-4"),
+					HaveKeyWithValue("storage_encrypted", true),
+					HaveKeyWithValue("kms_key_id", "arn:aws:xxxx"),
 					HaveKeyWithValue("multi_az", true),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
@@ -155,18 +184,22 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should prevent updating region because it is flagged as `prohibit_update` and it can result in the recreation of the service instance and lost data", func() {
-			err := broker.Update(instanceID, serviceName, "small", map[string]any{"region": "no-matter-what-region"})
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
+			func(params map[string]any) {
+				err := broker.Update(instanceID, serviceName, "small", params)
 
-			Expect(err).To(MatchError(
-				ContainSubstring(
-					"attempt to update parameter that may result in service instance re-creation and data loss",
-				),
-			))
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
 
-			const initialProvisionInvocation = 1
-			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
-		})
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
+			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
+		)
 
 		DescribeTable(
 			"some allowed updates",
