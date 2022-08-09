@@ -18,6 +18,7 @@
 - PostgreSQL: Only "instance_class" are now exposed when provisioning or updating an instance. The previous “cores” abstraction is removed, in favor of using the underlying AWS instance class property.
 - PostgreSQL: Automated backups can now be scheduled through "backup_window". By default, the automated backups are disabled.
 - PostgreSQL: Automated backups can be customised through the following properties: "delete_automated_backups" - delete backups when deleting the instance, defaults to true; "copy_tags_to_snapshot" - copy all instance tags to snapshots, defaults to true. 
+- PostgreSQL: Added deprecation warning to `cores` property and made it optional. It is recomended to use the `instance_class` property instead. 
 - Terraform upgrade (from 0.12.30 to 0.12.31) has been added
 
 ### Fix:
