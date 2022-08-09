@@ -15,9 +15,10 @@
 - PostgreSQL: a new "provider_verify_certificate" property allows for the PostgreSQL Terraform provider to skip the verification of the server certificate.
 - PostgreSQL: server can reject non-SSL connections by default. Renamed "use_tls" to "require_ssl". Wheh the "require_ssl" property is true, it will make the server require SSL connections. When false (default), the server will accept SSL and non-SSL connections.
 - PostgreSQL: Enhanced Monitoring. Amazon RDS provides metrics in real time for the operating system (OS) of the DB instance. Enhanced Monitoring enables all the system metrics and process information for the RDS DB instances on the console.
-- PostgreSQL: Only "instance_class" are now exposed when provisioning or updating an instance. The previous “cores” abstraction is removed, in favor of using the underlying AWS instance class property.
+- PostgreSQL: Only "instance_class" are now exposed when provisioning or updating an instance. The previous “cores” abstraction is deprecated, in favour of using the underlying AWS instance class property.
 - PostgreSQL: Automated backups can now be scheduled through "backup_window". By default, the automated backups are disabled.
 - PostgreSQL: Automated backups can be customised through the following properties: "delete_automated_backups" - delete backups when deleting the instance, defaults to true; "copy_tags_to_snapshot" - copy all instance tags to snapshots, defaults to true. 
+- PostgreSQL: Added deprecation warning to `cores` property and made it optional. It is recomended to use the `instance_class` property instead. 
 - Terraform upgrade (from 0.12.30 to 0.12.31) has been added
 
 ### Fix:
