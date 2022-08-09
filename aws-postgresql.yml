@@ -286,6 +286,17 @@ provision:
       This property represents the ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
       To read about setting up and enabling Enhanced Monitoring see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.Enabling.html.
     default: ""
+  - field_name: performance_insights_enabled
+    type: boolean
+    details: Specifies whether Performance Insights are enabled (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.Overview.html).
+    default: false
+  - field_name: performance_insights_kms_key_id
+    type: string
+    details: |
+      The ARN for the KMS key to encrypt Performance Insights data.
+      When specifying `performance_insights_kms_key_id`, `performance_insights_enabled` needs to be set to true.
+      Once KMS key is set, it can never be changed.
+    default: ""
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
