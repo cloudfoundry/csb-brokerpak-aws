@@ -22,7 +22,7 @@ type config struct {
 	name              string
 	serviceBrokerName func() string
 	parameters        string
-	plan string
+	plan              string
 }
 
 type Option func(*config)
