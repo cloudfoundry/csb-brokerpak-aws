@@ -27,6 +27,7 @@ var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb", "upgrade"), func() {
 				"csb-aws-dynamodb",
 				services.WithPlan("ondemand"),
 				services.WithParameters(config(tableName)),
+				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
 
