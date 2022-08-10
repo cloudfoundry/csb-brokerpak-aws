@@ -14,7 +14,7 @@ var _ = Describe("DynamoDB", Label("dynamodb"), func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
 			"csb-aws-dynamodb",
-			"ondemand",
+			services.WithPlan("ondemand"),
 			services.WithParameters(config()),
 		)
 		defer serviceInstance.Delete()

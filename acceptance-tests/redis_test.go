@@ -12,7 +12,7 @@ import (
 var _ = Describe("Redis", Label("redis"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-redis", "small")
+		serviceInstance := services.CreateInstance("csb-aws-redis", services.WithPlan("small"))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
