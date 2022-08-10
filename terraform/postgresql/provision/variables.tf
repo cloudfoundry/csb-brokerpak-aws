@@ -43,3 +43,5 @@ variable "copy_tags_to_snapshot" { type = bool }
 variable "delete_automated_backups" { type = bool }
 variable "monitoring_interval" { type = number }
 variable "monitoring_role_arn" { type = string }
+variable "performance_insights_enabled" { type = bool }
+variable "performance_insights_kms_key_id" { type = string }
