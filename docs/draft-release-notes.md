@@ -20,7 +20,7 @@
 - PostgreSQL: Automated backups can be customised through the following properties: "delete_automated_backups" - delete backups when deleting the instance, defaults to true; "copy_tags_to_snapshot" - copy all instance tags to snapshots, defaults to true. 
 - PostgreSQL: Enable encryption with a custom key. Amazon RDS encrypted DB instances provide an additional layer of data protection by securing data from unauthorized access to the underlying storage. Amazon RDS uses an AWS KMS key to encrypt these resources, and now a custom key with the desired configuration can be used.
 - PostgreSQL: Added deprecation warning to `cores` property and made it optional. It is recommended to use the `instance_class` property instead. 
-- PostgreSQL: Monitoring DB load with Performance Insights. Performance Insights expands on existing Amazon RDS monitoring features to illustrate and help you analyze your database performance. With the Performance Insights dashboard, you can visualize the database load on your Amazon RDS DB instance load and filter the load by waits, SQL statements, hosts, or users.
+- PostgreSQL: Performance Insights can now be enabled and a kms key can be provided to encrypt the performance insights data. Performance insights is disabled by default.
 - Terraform upgrade (from 0.12.30 to 0.12.31) has been added
 
 ### Fix:
