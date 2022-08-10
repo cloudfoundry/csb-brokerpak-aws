@@ -34,7 +34,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 			appTwo := apps.Push(apps.WithApp(apps.Redis))
 			defer apps.Delete(appOne, appTwo)
 
-			By("bindingOne the apps to the Redis service instance")
+			By("binding the apps to the Redis service instance")
 			bindingOne := serviceInstance.Bind(appOne)
 			bindingTwo := serviceInstance.Bind(appTwo)
 
