@@ -15,7 +15,7 @@ import (
 var _ = Describe("S3", Label("s3"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-s3-bucket", "default")
+		serviceInstance := services.CreateInstance("csb-aws-s3-bucket", services.WithPlan("default"))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")

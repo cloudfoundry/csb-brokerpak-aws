@@ -13,7 +13,9 @@ import (
 var _ = Describe("MySQL", Label("mysql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-mysql", "small")
+		serviceInstance := services.CreateInstance(
+			"csb-aws-mysql",
+			services.WithPlan("small"))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")

@@ -13,7 +13,7 @@ import (
 var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-postgresql", "small")
+		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("small"))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")

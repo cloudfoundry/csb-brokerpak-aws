@@ -10,12 +10,12 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func() {
+var _ = Describe("UpgradeMySQLTest", Label("mysql", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
 			serviceBroker := brokers.Create(
-				brokers.WithPrefix("csb-postgresql"),
+				brokers.WithPrefix("csb-aws-mysql"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
 			)
@@ -23,15 +23,15 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 
 			By("creating a service")
 			serviceInstance := services.CreateInstance(
-				"csb-aws-postgresql",
+				"csb-aws-mysql",
 				services.WithPlan("small"),
 				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
-			appOne := apps.Push(apps.WithApp(apps.PostgreSQL))
-			appTwo := apps.Push(apps.WithApp(apps.PostgreSQL))
+			appOne := apps.Push(apps.WithApp(apps.MySQL))
+			appTwo := apps.Push(apps.WithApp(apps.MySQL))
 			defer apps.Delete(appOne, appTwo)
 
 			By("binding to the apps")
@@ -41,18 +41,12 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			By("starting the apps")
 			apps.Start(appOne, appTwo)
 
-			By("creating a schema using the first app")
-			schema := random.Name(random.WithMaxLength(10))
-			appOne.PUT("", schema)
-
 			By("setting a key-value using the first app")
-			keyOne := random.Hexadecimal()
-			valueOne := random.Hexadecimal()
-			appOne.PUT(valueOne, "%s/%s", schema, keyOne)
-
+			key := random.Hexadecimal()
+			value := random.Hexadecimal()
+			appOne.PUT(value, key)
 			By("getting the value using the second app")
-			got := appTwo.GET("%s/%s", schema, keyOne)
-			Expect(got).To(Equal(valueOne))
+			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("pushing the development version of the broker")
 			serviceBroker.UpdateBroker(developmentBuildDir)
@@ -60,16 +54,14 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			By("upgrading service instance")
 			serviceInstance.Upgrade()
 
-			By("checking previously written data still accessible")
-			got = appTwo.GET("%s/%s", schema, keyOne)
-			Expect(got).To(Equal(valueOne))
+			By("getting the value using the second app")
+			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("updating the instance plan")
 			serviceInstance.Update(services.WithPlan("medium"))
 
-			By("checking previously written data still accessible")
-			got = appTwo.GET("%s/%s", schema, keyOne)
-			Expect(got).To(Equal(valueOne))
+			By("getting the value using the second app")
+			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("deleting bindings created before the upgrade")
 			bindingOne.Unbind()
@@ -80,17 +72,14 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			serviceInstance.Bind(appTwo)
 			apps.Restage(appOne, appTwo)
 
-			By("checking previously written data still accessible")
-			got = appTwo.GET("%s/%s", schema, keyOne)
-			Expect(got).To(Equal(valueOne))
+			By("getting the value using the second app")
+			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("checking data can still be written and read")
 			keyTwo := random.Hexadecimal()
 			valueTwo := random.Hexadecimal()
-			appOne.PUT(valueTwo, "%s/%s", schema, keyTwo)
-
-			got = appTwo.GET("%s/%s", schema, keyTwo)
-			Expect(got).To(Equal(valueTwo))
+			appOne.PUT(valueTwo, keyTwo)
+			Expect(appTwo.GET(keyTwo)).To(Equal(valueTwo))
 		})
 	})
 })
