@@ -3,12 +3,12 @@
 ### Features
 - region property as a text field instead of an enumerated enabling selection of any region available in the Cloud Provider
 - S3: region updates for existing buckets are now blocked by the broker resulting in faster feedback and improved error message.
-- S3: ACL can now be specified on creation/update if the plan does not specify a value for it. Previously it was a plan-only input and as such could only be specified in the plan definition.
-- S3: Bucket Ownership controls can now be specified in a plan or on creation/update if the plan does not specify a value for it.
+- S3: ACL can now be specified on creation if the plan does not specify a value for it. Previously it was a plan-only input and as such could only be specified in the plan definition.
+- S3: Bucket Ownership controls can now be specified in a plan or on creation if the plan does not specify a value for it. It defaults to `ObjectOwnershipEnforced` and this disables ACLs by default. If you have custom plans refer to the upgrading instructions for information regarding this change.
 - S3: Blocking public access to Amazon S3 storage. This feature provides settings for buckets to help manage public access to Amazon S3 resources. S3 Block Public Access settings override policies and permissions so that it is possible to limit public access to these resources.
 - S3: Server Side encryption can now be enabled and configured. This feature provides settings for configuring encryption of data in an S3 bucket.
 - S3: Object Lock. This feature allows storing objects using a write-once-read-many (WORM) model. Object Lock can help prevent objects from being deleted or overwritten for a fixed amount of time.
-- S3: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS`.
+- S3: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS` or through the tile. Information on how to add old plans in the tile can be found in the service specific configuration page.
 - S3: Allow versioning updates. We add the ability to modify the versioning of an S3 bucket, to enable such functionality in step after its creation. Once versioning is enabled, it can no longer be disabled as the IaaS will throw an error.
 - Beta tag: all service offerings tagged as beta and will not be displayed by default in the marketplace. Set the environment variable `GSB_COMPATIBILITY_ENABLE_BETA_SERVICES` to true to enable them. 
 - PostgreSQL: when creating a binding, by default the PostgreSQL connection will be secured via the "verify-full" PosgreSQL configuration. This will require the AWS certificate bundle to be installed, or it can be disabled by setting "use_tls=false"

@@ -80,7 +80,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("enable_versioning", false),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
-					HaveKeyWithValue("acl", "private"),
+					HaveKeyWithValue("acl", BeNil()),
 					HaveKeyWithValue("ol_enabled", false),
 					HaveKeyWithValue("ol_configuration_default_retention_enabled", BeNil()),
 					HaveKeyWithValue("ol_configuration_default_retention_mode", BeNil()),
@@ -191,8 +191,6 @@ var _ = Describe("S3", Label("s3"), func() {
 			},
 			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
 			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
-			Entry("update acl", map[string]any{"acl": "public-read"}),
-			Entry("update boc_object_ownership", map[string]any{"boc_object_ownership": "BucketOwnerPreferred"}),
 			Entry("update pab_block_public_acls", map[string]any{"pab_block_public_acls": true}),
 			Entry("update pab_block_public_policy", map[string]any{"pab_block_public_policy": true}),
 			Entry("update pab_ignore_public_acls", map[string]any{"pab_ignore_public_acls": true}),
@@ -229,6 +227,8 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update bucket name", map[string]any{"bucket_name": "some-nicer-name"}),
 			Entry("update object lock enabled property", map[string]any{"ol_enabled": true}),
+			Entry("update acl", map[string]any{"acl": "public-read"}),
+			Entry("update boc_object_ownership", map[string]any{"boc_object_ownership": "BucketOwnerPreferred"}),
 		)
 
 		It("should not allow updating properties that are specified in the plan", func() {

@@ -33,7 +33,9 @@ provision:
     - field_name: acl
       type: string
       details: S3 bucket ACL (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl)
-      default: private
+      default: null
+      nullable: true
+      prohibit_update: true
       enum:
         private: private
         public-read: public-read
@@ -60,6 +62,7 @@ provision:
     - field_name: boc_object_ownership
       type: string
       details: S3 Bucket Ownership Controls (see https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html)
+      prohibit_update: true
       enum:
         BucketOwnerPreferred: BucketOwnerPreferred
         ObjectWriter: ObjectWriter
@@ -210,4 +213,9 @@ examples:
   description: Default S3 Bucket
   plan_id: f64891b4-5021-4742-9871-dfe1a9051302
   provision_params: {}
+  bind_params: {}
+- name: s3-authenticated-read
+  description: S3 Bucket with ACL authenticated-read
+  plan_id: f64891b4-5021-4742-9871-dfe1a9051302
+  provision_params: {"acl": "authenticated-read", "boc_object_ownership": "BucketOwnerPreferred"}
   bind_params: {}
