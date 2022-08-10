@@ -13,7 +13,7 @@ func (s *ServiceInstance) Update(opts ...Option) {
 	var cfg config
 	WithOptions(opts...)(&cfg)
 
-	args := append([]string{"update-service", s.Name})
+	args := []string{"update-service", s.Name}
 	if cfg.parameters != "" {
 		args = append(args, "-c", cfg.parameters)
 	}
@@ -24,9 +24,9 @@ func (s *ServiceInstance) Update(opts ...Option) {
 
 	switch cf.Version() {
 	case cf.VersionV8:
-		updateServiceWithWait(cfg.name, args)
+		updateServiceWithWait(s.Name, args)
 	default:
-		updateServiceWithPoll(cfg.name, args)
+		updateServiceWithPoll(s.Name, args)
 	}
 }
 

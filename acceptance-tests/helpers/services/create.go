@@ -29,6 +29,7 @@ type Option func(*config)
 
 func CreateInstance(offering string, opts ...Option) *ServiceInstance {
 	cfg := defaultConfig(offering, opts...)
+	Expect(cfg.plan).ToNot(BeEmpty())
 	args := []string{
 		"create-service",
 		offering,
