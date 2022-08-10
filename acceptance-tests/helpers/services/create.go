@@ -22,16 +22,18 @@ type config struct {
 	name              string
 	serviceBrokerName func() string
 	parameters        string
+	plan              string
 }
 
 type Option func(*config)
 
-func CreateInstance(offering, plan string, opts ...Option) *ServiceInstance {
-	cfg := defaultConfig(offering, plan, opts...)
+func CreateInstance(offering string, opts ...Option) *ServiceInstance {
+	cfg := defaultConfig(offering, opts...)
+	Expect(cfg.plan).ToNot(BeEmpty())
 	args := []string{
 		"create-service",
 		offering,
-		plan,
+		cfg.plan,
 		cfg.name,
 		"-b",
 		cfg.serviceBrokerName(),
@@ -96,6 +98,12 @@ func WithParameters(parameters any) Option {
 	}
 }
 
+func WithPlan(plan string) Option {
+	return func(c *config) {
+		c.plan = plan
+	}
+}
+
 func WithName(name string) Option {
 	return func(c *config) {
 		c.name = name
@@ -110,11 +118,11 @@ func WithOptions(opts ...Option) Option {
 	}
 }
 
-func defaultConfig(offering, plan string, opts ...Option) config {
+func defaultConfig(offering string, opts ...Option) config {
 	var cfg config
 	WithOptions(append([]Option{
 		WithDefaultBroker(),
-		WithName(random.Name(random.WithPrefix(offering, plan))),
+		WithName(random.Name(random.WithPrefix(offering))),
 	}, opts...)...)(&cfg)
 	return cfg
 }

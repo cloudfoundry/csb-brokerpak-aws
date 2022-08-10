@@ -24,7 +24,7 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			By("creating a service")
 			serviceInstance := services.CreateInstance(
 				"csb-aws-s3-bucket",
-				"private",
+				services.WithPlan("private"),
 				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
@@ -59,7 +59,7 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			Expect(got).To(Equal(blobDataOne))
 
 			By("updating the service instance")
-			serviceInstance.Update("-c", `{"pab_block_public_policy": true}`)
+			serviceInstance.Update(services.WithParameters(`{"pab_block_public_policy": true}`))
 
 			By("checking that previously written data is accessible")
 			got = appTwo.GET(blobNameOne)
