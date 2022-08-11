@@ -24,6 +24,7 @@ resource "aws_s3_bucket" "b" {
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
+  count  = (var.acl != null) ? 1 : 0
   bucket = aws_s3_bucket.b.id
   acl    = var.acl
 }
