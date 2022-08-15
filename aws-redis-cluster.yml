@@ -143,6 +143,7 @@ provision:
   template_refs:
     outputs: terraform/redis/cluster/provision/outputs.tf
     provider: terraform/redis/cluster/provision/provider.tf
+    versions: terraform/redis/cluster/provision/versions.tf
     variables: terraform/redis/cluster/provision/variables.tf
     main: terraform/redis/cluster/provision/main.tf
     data: terraform/redis/cluster/provision/data.tf

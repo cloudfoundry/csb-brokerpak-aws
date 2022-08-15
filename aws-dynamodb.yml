@@ -141,6 +141,7 @@ provision:
     main: terraform/dynamodb/provision/main.tf
     outputs: terraform/dynamodb/provision/outputs.tf
     provider: terraform/dynamodb/provision/provider.tf
+    versions: terraform/dynamodb/provision/versions.tf
     variables: terraform/dynamodb/provision/variables.tf
   outputs:
   - field_name: dynamodb_table_arn
@@ -192,6 +193,7 @@ bind:
     main: terraform/dynamodb/bind/main.tf
     outputs: terraform/dynamodb/bind/outputs.tf
     provider: terraform/dynamodb/bind/provider.tf
+    versions: terraform/dynamodb/bind/versions.tf
     variables: terraform/dynamodb/bind/variables.tf
   outputs: 
     - field_name: dynamodb_table_arn

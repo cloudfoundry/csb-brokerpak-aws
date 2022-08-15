@@ -273,6 +273,7 @@ provision:
   template_refs:
     outputs: terraform/mysql/provision/outputs.tf
     provider: terraform/mysql/provision/provider.tf
+    versions: terraform/mysql/provision/versions.tf
     variables: terraform/mysql/provision/variables.tf
     main: terraform/mysql/provision/main.tf
     data: terraform/mysql/provision/data.tf
@@ -319,6 +320,7 @@ bind:
   template_refs:
     outputs: terraform/mysql/bind/outputs.tf
     provider: terraform/mysql/bind/provider.tf
+    versions: terraform/mysql/bind/versions.tf
     variables: terraform/mysql/bind/variables.tf
     main: terraform/mysql/bind/main.tf
     data: terraform/mysql/bind/data.tf
