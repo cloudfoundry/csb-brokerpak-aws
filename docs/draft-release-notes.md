@@ -21,6 +21,7 @@
 - PostgreSQL: Enable encryption with a custom key. Amazon RDS encrypted DB instances provide an additional layer of data protection by securing data from unauthorized access to the underlying storage. Amazon RDS uses an AWS KMS key to encrypt these resources, and now a custom key with the desired configuration can be used.
 - PostgreSQL: Added deprecation warning to `cores` property and made it optional. It is recommended to use the `instance_class` property instead. 
 - PostgreSQL: Performance Insights can now be enabled and a kms key can be provided to encrypt the performance insights data. Performance insights is disabled by default.
+- PostgreSQL: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_POSTGRES_PLANS`.
 - Terraform upgrade (from 0.12.30 to 0.13.7) has been added
 
 ### Fix:
