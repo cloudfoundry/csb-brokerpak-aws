@@ -20,7 +20,7 @@ var customPostgresPlan = map[string]any{
 	"metadata": map[string]any{
 		"displayName": "custom-sample (Beta)",
 	},
-	"instance_class":   "db.m6l.large",
+	"instance_class":   "db.m6i.large",
 	"postgres_version": "14.2",
 	"storage_gb":       10,
 }
