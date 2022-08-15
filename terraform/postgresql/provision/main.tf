@@ -41,15 +41,16 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
-  length           = 32
-  special          = false
+  length  = 32
+  special = false
   // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html#RDS_Limits.Constraints
   override_special = "~_-."
 }
 
 resource "aws_db_instance" "db_instance" {
   allocated_storage               = var.storage_gb
-  storage_type                    = "gp2"
+  storage_type                    = var.storage_type
+  iops                            = var.storage_type == "io1" ? var.iops : null
   skip_final_snapshot             = true
   engine                          = var.engine
   engine_version                  = var.engine_version

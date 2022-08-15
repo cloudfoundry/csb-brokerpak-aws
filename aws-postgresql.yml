@@ -32,6 +32,7 @@ plans:
     storage_gb: 5
     postgres_version: 11
     subsume: false
+    storage_type: "gp2"
 - name: medium
   id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
   description: 'Beta - PostgreSQL 11, minimum 4 cores, minimum 8GB ram, 10GB storage'
@@ -41,6 +42,7 @@ plans:
     storage_gb: 10
     postgres_version: 11
     subsume: false
+    storage_type: "gp2"
 - name: large
   id: 48baef10-a14c-4ae1-aab5-25f26eba941a
   description: 'Beta - PostgreSQL 11, minimum 8 cores, minimum 16GB ram, 20GB storage'
@@ -50,12 +52,14 @@ plans:
     storage_gb: 20
     postgres_version: 11
     subsume: false
+    storage_type: "gp2"
 - name: subsume
   id: 886cb524-1d4f-11eb-b35f-8ba96a9085d7
   description: 'Beta - Subsume control of an existing PostgreSQL Database'
   display_name: "Subsume (Beta)"
   properties:
     subsume: true
+    storage_type: "gp2"
 provision:
   import_inputs:
   - field_name: aws_db_id
@@ -89,7 +93,7 @@ provision:
     required: true
     type: number
     details: Size of storage volume for service instance.
-    default: 5
+    default: 100
     constraints:
       maximum: 4096
       minimum: 5
@@ -97,6 +101,14 @@ provision:
     type: boolean
     details: Indicates an existing PostgreSQL instance should be subsumed
   user_inputs:
+  - field_name: storage_type
+    type: string
+    details: Type of storage to be used. One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD).
+    default: "io1"
+  - field_name: iops
+    type: number
+    details: The amount of provisioned IOPS. Setting this implies a storage_type of "io1". Setting storage_type to any value other than "io1" will result in this value being ignored.
+    default: 3000
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
