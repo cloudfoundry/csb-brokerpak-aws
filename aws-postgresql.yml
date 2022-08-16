@@ -29,7 +29,6 @@ plans:
   display_name: "Subsume (Beta)"
   properties:
     subsume: true
-    storage_type: "gp2"
 provision:
   import_inputs:
   - field_name: aws_db_id
