@@ -22,7 +22,7 @@ var customPostgresPlan = map[string]any{
 	},
 	"instance_class":   "db.m6i.large",
 	"postgres_version": "14.2",
-	"storage_gb":       10,
+	"storage_gb":       100,
 }
 
 var _ = Describe("Postgresql", Label("Postgresql"), func() {
@@ -98,7 +98,9 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("postgres_version", "14.2"),
-					HaveKeyWithValue("storage_gb", float64(10)),
+					HaveKeyWithValue("storage_gb", float64(100)),
+					HaveKeyWithValue("storage_type", "io1"),
+					HaveKeyWithValue("iops", float64(3000)),
 					HaveKeyWithValue("require_ssl", false),
 					HaveKeyWithValue("provider_verify_certificate", true),
 					HaveKeyWithValue("storage_autoscale", false),
@@ -130,9 +132,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
 				"require_ssl":                     true,
+				"storage_type":                    "gp2",
 				"provider_verify_certificate":     false,
 				"storage_autoscale":               true,
-				"storage_autoscale_limit_gb":      float64(10),
+				"storage_autoscale_limit_gb":      float64(150),
 				"parameter_group_name":            "flopsy",
 				"instance_name":                   "csb-postgresql-mopsy",
 				"db_name":                         "cottontail",
@@ -163,9 +166,10 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("require_ssl", true),
+					HaveKeyWithValue("storage_type", "gp2"),
 					HaveKeyWithValue("provider_verify_certificate", false),
 					HaveKeyWithValue("storage_autoscale", true),
-					HaveKeyWithValue("storage_autoscale_limit_gb", float64(10)),
+					HaveKeyWithValue("storage_autoscale_limit_gb", float64(150)),
 					HaveKeyWithValue("parameter_group_name", "flopsy"),
 					HaveKeyWithValue("instance_name", "csb-postgresql-mopsy"),
 					HaveKeyWithValue("db_name", "cottontail"),
@@ -226,6 +230,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				Expect(err).NotTo(HaveOccurred())
 			},
 			Entry(nil, "require_ssl", true),
+			Entry(nil, "storage_type", "gp2"),
 			Entry(nil, "provider_verify_certificate", false),
 			Entry(nil, "deletion_protection", true),
 			Entry(nil, "monitoring_interval", 0),
