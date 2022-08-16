@@ -13,6 +13,6 @@
 # limitations under the License.
 
 output "region" { value = var.region }
-output "dynamodb_table_arn" { value = element(concat(aws_dynamodb_table.this.*.arn, list("")), 0) }
-output "dynamodb_table_id" { value = element(concat(aws_dynamodb_table.this.*.id, list("")), 0) }
+output "dynamodb_table_arn" { value = element(concat(aws_dynamodb_table.this.*.arn, tolist([])), 0) }
+output "dynamodb_table_id" { value = element(concat(aws_dynamodb_table.this.*.id, tolist([])), 0) }
 output "dynamodb_table_name" { value = aws_dynamodb_table.this.name }

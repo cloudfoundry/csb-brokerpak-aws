@@ -15,7 +15,10 @@
 output "name" { value = aws_db_instance.db_instance.name }
 output "hostname" { value = aws_db_instance.db_instance.address }
 output "username" { value = aws_db_instance.db_instance.username }
-output "password" { value = aws_db_instance.db_instance.password }
+output "password" {
+  value     = aws_db_instance.db_instance.password
+  sensitive = true
+}
 output "require_ssl" { value = var.require_ssl }
 output "provider_verify_certificate" { value = var.provider_verify_certificate }
 output "status" {

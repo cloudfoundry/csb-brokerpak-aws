@@ -14,7 +14,10 @@
 
 output "name" { value = aws_elasticache_replication_group.redis.id }
 output "host" { value = aws_elasticache_replication_group.redis.primary_endpoint_address }
-output "password" { value = random_password.auth_token.result }
+output "password" {
+  value     = random_password.auth_token.result
+  sensitive = true
+}
 output "tls_port" { value = local.port }
 output "status" {
   value = format("created cache %s (id: %s)", aws_elasticache_replication_group.redis.primary_endpoint_address, aws_elasticache_replication_group.redis.id)
