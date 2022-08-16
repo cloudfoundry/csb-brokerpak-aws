@@ -4,7 +4,7 @@ A brokerpak for the [Cloud Service Broker](https://github.com/pivotal/cloud-serv
 
 ## Development Requirements
 
-* Either Go 1.18 or [Docker](https://docs.docker.com/get-docker/)
+* Either Go or [Docker](https://docs.docker.com/get-docker/)
 * make - covers development lifecycle steps
 
 A docker container for the cloud service broker binary is available at *cfplatformeng/csb*
@@ -62,7 +62,6 @@ terminal 1
 
 terminal 2
 >> make run-examples
-
 ```
 
 ## Acceptance tests
