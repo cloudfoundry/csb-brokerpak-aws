@@ -336,6 +336,7 @@ provision:
   template_refs:
     outputs: ./terraform/postgresql/provision/outputs.tf
     provider: ./terraform/postgresql/provision/provider.tf
+    versions: ./terraform/postgresql/provision/versions.tf
     variables: ./terraform/postgresql/provision/variables.tf
     main: ./terraform/postgresql/provision/main.tf
     data: ./terraform/postgresql/provision/data.tf
@@ -389,6 +390,7 @@ bind:
   template_refs:
     outputs: ./terraform/postgresql/bind/outputs.tf
     provider: ./terraform/postgresql/bind/provider.tf
+    versions: ./terraform/postgresql/bind/versions.tf
     variables: ./terraform/postgresql/bind/variables.tf
     main: ./terraform/postgresql/bind/main.tf
     data: ./terraform/postgresql/bind/data.tf

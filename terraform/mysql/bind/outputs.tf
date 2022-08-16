@@ -13,22 +13,31 @@
 # limitations under the License.
 
 output "username" { value = random_string.username.result }
-output "password" { value = random_password.password.result }
+output "password" {
+  value     = random_password.password.result
+  sensitive = true
+}
 output "uri" {
-  value = format("mysql://%s:%s@%s:%d/%s",
+  value = format(
+    "mysql://%s:%s@%s:%d/%s",
     random_string.username.result,
     random_password.password.result,
     var.hostname,
     local.port,
-  var.db_name)
+    var.db_name,
+  )
+  sensitive = true
 }
 output "port" { value = local.port }
 output "jdbcUrl" {
-  value = format("jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
+  value = format(
+    "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
     var.hostname,
     local.port,
     var.db_name,
     random_string.username.result,
     random_password.password.result,
-  var.use_tls)
+    var.use_tls,
+  )
+  sensitive = true
 }
