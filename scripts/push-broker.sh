@@ -81,7 +81,7 @@ fi
 echo "    GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS" | jq @json)" >>$cfmf
 
 if [[ -z "$GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS" ]]; then
-  GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS='[{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default","instance_class": "db.m6i.large","postgres_version": "14.2","storage_gb": 10}]'
+  GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS='[{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default","instance_class": "db.m6i.large","postgres_version": "14.2","storage_gb": 100}]'
 fi
 echo "    GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS" | jq @json)" >>$cfmf
 
