@@ -9,6 +9,22 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+var customPostgresPlans = []map[string]any{
+	customPostgresPlan,
+}
+
+var customPostgresPlan = map[string]any{
+	"name":        "custom-sample",
+	"id":          "de7dbcee-1c8d-11ed-9904-5f435c1e2316",
+	"description": "Beta - Default Postgres plan",
+	"metadata": map[string]any{
+		"displayName": "custom-sample (Beta)",
+	},
+	"instance_class":   "db.m6i.large",
+	"postgres_version": "14.2",
+	"storage_gb":       10,
+}
+
 var _ = Describe("Postgresql", Label("Postgresql"), func() {
 	const serviceName = "csb-aws-postgresql"
 
@@ -32,9 +48,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		Expect(service.Metadata.DisplayName).NotTo(BeNil())
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("small")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("medium")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("large")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("subsume")}),
 			),
 		)
@@ -49,10 +63,9 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 	})
 
 	Describe("provisioning", func() {
-
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(serviceName, "small", params)
+				_, err := broker.Provision(serviceName, "custom-sample", params)
 
 				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 			},
@@ -79,15 +92,13 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "small", nil)
+			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("cores", float64(2)),
-					HaveKeyWithValue("engine_version", "11"),
-					HaveKeyWithValue("storage_gb", float64(5)),
-					HaveKeyWithValue("subsume", false),
+					HaveKeyWithValue("postgres_version", "14.2"),
+					HaveKeyWithValue("storage_gb", float64(10)),
 					HaveKeyWithValue("require_ssl", false),
 					HaveKeyWithValue("provider_verify_certificate", true),
 					HaveKeyWithValue("storage_autoscale", false),
@@ -117,7 +128,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		})
 
 		It("should allow properties to be set on provision", func() {
-			_, err := broker.Provision(serviceName, "small", map[string]any{
+			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
 				"require_ssl":                     true,
 				"provider_verify_certificate":     false,
 				"storage_autoscale":               true,
@@ -185,14 +196,14 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "small", nil)
+			instanceID, err = broker.Provision(serviceName, "custom-sample", nil)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
 			func(params map[string]any) {
-				err := broker.Update(instanceID, serviceName, "small", params)
+				err := broker.Update(instanceID, serviceName, "custom-sample", params)
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -210,7 +221,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		DescribeTable(
 			"some allowed updates",
 			func(key string, value any) {
-				err := broker.Update(instanceID, serviceName, "small", map[string]any{key: value})
+				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{key: value})
 
 				Expect(err).NotTo(HaveOccurred())
 			},

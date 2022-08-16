@@ -23,33 +23,6 @@ support_url: https://aws.amazon.com/rds/postgresql/
 tags: [aws, postgresql, postgres, beta]
 plan_updateable: true
 plans:
-- name: small
-  id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  description: 'Beta - PostgreSQL 11, minimum 2 cores, minimum 4GB ram, 5GB storage'
-  display_name: "small (Beta)"
-  properties:
-    cores: 2
-    storage_gb: 5
-    postgres_version: 11
-    subsume: false
-- name: medium
-  id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
-  description: 'Beta - PostgreSQL 11, minimum 4 cores, minimum 8GB ram, 10GB storage'
-  display_name: "medium (Beta)"
-  properties:
-    cores: 4
-    storage_gb: 10
-    postgres_version: 11
-    subsume: false
-- name: large
-  id: 48baef10-a14c-4ae1-aab5-25f26eba941a
-  description: 'Beta - PostgreSQL 11, minimum 8 cores, minimum 16GB ram, 20GB storage'
-  display_name: "large (Beta)"
-  properties:
-    cores: 8
-    storage_gb: 20
-    postgres_version: 11
-    subsume: false
 - name: subsume
   id: 886cb524-1d4f-11eb-b35f-8ba96a9085d7
   description: 'Beta - Subsume control of an existing PostgreSQL Database'
@@ -399,38 +372,18 @@ bind:
     type: integer
     details: The port number of the exposed postgres instance.
 examples:
-- name: small
-  description: Create a small PostgreSQL instance
-  plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
+- name: default
+  description: Create a default PostgreSQL instance
+  plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
   provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
-- name: medium
-  description: Create a medium PostgreSQL instance
-  plan_id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
-  provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
-  bind_params: {}
-- name: large
-  description: Create a large PostgreSQL instance
-  plan_id: 48baef10-a14c-4ae1-aab5-25f26eba941a
-  provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
-  bind_params: {}
-- name: medium-multiaz
+- name: default-with-features
   description: Create a medium multiaz PostgreSQL instance
-  plan_id: e64d07f9-ceb2-40a6-abd9-391047fa3cf5
-  provision_params: { "publicly_accessible": true, "multi_az": true, "provider_verify_certificate": false }
+  plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
+  provision_params: { "publicly_accessible": true, "multi_az": true, "storage_encrypted": true, "provider_verify_certificate": false }
   bind_params: {}
-- name: small-encrypted
+- name: default-with-maintenance-window
   description: Create a small PostgreSQL instance with encrypted storage
-  plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  provision_params: { "storage_encrypted": true, "publicly_accessible": true, "provider_verify_certificate": false }
-  bind_params: {}
-- name: small-disable-upgrades
-  description: Create a small PostgreSQL instance with disabled upgrades
-  plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
-  provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true, "provider_verify_certificate": false }
-  bind_params: {}
-- name: small-with-maintenance-window
-  description: Create a small PostgreSQL instance with encrypted storage
-  plan_id: ffc51616-228b-41bd-bed1-d601c18d58f5
+  plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
   provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "provider_verify_certificate": false }
   bind_params: {}
