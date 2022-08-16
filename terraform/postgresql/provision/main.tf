@@ -49,7 +49,8 @@ resource "random_password" "password" {
 
 resource "aws_db_instance" "db_instance" {
   allocated_storage               = var.storage_gb
-  storage_type                    = "gp2"
+  storage_type                    = var.storage_type
+  iops                            = var.storage_type == "io1" ? var.iops : null
   skip_final_snapshot             = true
   engine                          = local.engine
   engine_version                  = var.postgres_version

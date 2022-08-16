@@ -62,7 +62,7 @@ provision:
     required: true
     type: number
     details: Size of storage volume for service instance.
-    default: 5
+    default: 100
     constraints:
       maximum: 4096
       minimum: 5
@@ -70,6 +70,14 @@ provision:
     type: boolean
     details: Indicates an existing PostgreSQL instance should be subsumed
   user_inputs:
+  - field_name: storage_type
+    type: string
+    details: Type of storage to be used. One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD).
+    default: "io1"
+  - field_name: iops
+    type: number
+    details: The amount of provisioned IOPS. Setting this implies a storage_type of "io1". Setting storage_type to any value other than "io1" will result in this value being ignored.
+    default: 3000
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
