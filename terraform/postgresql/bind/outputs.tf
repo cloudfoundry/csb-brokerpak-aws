@@ -13,7 +13,10 @@
 # limitations under the License.
 
 output "username" { value = csbpg_binding_user.new_user.username }
-output "password" { value = csbpg_binding_user.new_user.password }
+output "password" {
+  value     = csbpg_binding_user.new_user.password
+  sensitive = true
+}
 output "uri" {
   value = format(
     "postgresql://%s:%s@%s:%d/%s",
@@ -23,6 +26,7 @@ output "uri" {
     local.port,
     var.db_name,
   )
+  sensitive = true
 }
 output "port" { value = local.port }
 output "jdbcUrl" {
@@ -35,4 +39,5 @@ output "jdbcUrl" {
     csbpg_binding_user.new_user.password,
     var.require_ssl,
   )
+  sensitive = true
 }
