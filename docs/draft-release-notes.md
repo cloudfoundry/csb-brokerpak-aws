@@ -1,5 +1,9 @@
 ## Release notes for next release:
 
+### Breaking
+- PostgreSQL: the default storage type is now set as 'io1' (provisioned IOPS SSD). Previously the default used 'gp2' (general purpose SSD). Users who previously had custom plans should add the property `"storage_type":"gp2"` to the plan definition, to ensure the storage type is not amended on any update. 
+  As part of this work, the default storage size has also been increased to 100GB, as this is the smallest storage supported by the 'io1' storage type.
+
 ### Features
 - region property as a text field instead of an enumerated enabling selection of any region available in the Cloud Provider
 - S3: region updates for existing buckets are now blocked by the broker resulting in faster feedback and improved error message.
@@ -21,6 +25,7 @@
 - PostgreSQL: Enable encryption with a custom key. Amazon RDS encrypted DB instances provide an additional layer of data protection by securing data from unauthorized access to the underlying storage. Amazon RDS uses an AWS KMS key to encrypt these resources, and now a custom key with the desired configuration can be used.
 - PostgreSQL: Added deprecation warning to `cores` property and made it optional. It is recommended to use the `instance_class` property instead. 
 - PostgreSQL: Performance Insights can now be enabled and a kms key can be provided to encrypt the performance insights data. Performance insights is disabled by default.
+- PostgreSQL: The storage type can now be defined through the property "storage_type". In addition to this, if using the provisioned IOPS SSD (io1) storage type, then the 'iops' value can also be defined through the property "iops".
 - Terraform upgrade (from 0.12.30 to 0.12.31) has been added
 
 ### Fix:
