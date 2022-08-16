@@ -51,8 +51,8 @@ resource "aws_db_instance" "db_instance" {
   allocated_storage               = var.storage_gb
   storage_type                    = "gp2"
   skip_final_snapshot             = true
-  engine                          = var.engine
-  engine_version                  = var.engine_version
+  engine                          = local.engine
+  engine_version                  = var.postgres_version
   instance_class                  = local.instance_class
   identifier                      = var.instance_name
   db_name                         = var.db_name
@@ -90,7 +90,7 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   count = length(var.parameter_group_name) == 0 ? 1 : 0
 
   name   = format("rds-pg-%s", var.instance_name)
-  family = format("%s%s", var.engine, var.engine_version)
+  family = format("%s%s", local.engine, local.major_version)
 
   parameter {
     name  = "rds.force_ssl"
