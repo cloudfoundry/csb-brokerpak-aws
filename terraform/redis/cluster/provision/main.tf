@@ -21,7 +21,7 @@ resource "aws_security_group" "sg" {
 resource "aws_elasticache_subnet_group" "subnet_group" {
   count      = length(var.elasticache_subnet_group) == 0 ? 1 : 0
   name       = format("%s-p-sn", var.instance_name)
-  subnet_ids = data.aws_subnet_ids.all.ids
+  subnet_ids = data.aws_subnets.all.ids
 }
 
 resource "aws_security_group_rule" "inbound_access" {
@@ -44,18 +44,18 @@ resource "random_password" "auth_token" {
 }
 
 resource "aws_elasticache_replication_group" "redis" {
-  automatic_failover_enabled    = var.node_count > 1
-  replication_group_id          = var.instance_name
-  replication_group_description = format("%s redis", var.instance_name)
-  node_type                     = local.node_type
-  number_cache_clusters         = var.node_count
-  parameter_group_name          = local.parameter_group_names[var.redis_version]
-  port                          = local.port
-  tags                          = var.labels
-  security_group_ids            = local.elasticache_vpc_security_group_ids
-  subnet_group_name             = local.subnet_group
-  transit_encryption_enabled    = true
-  auth_token                    = random_password.auth_token.result
+  automatic_failover_enabled = var.node_count > 1
+  replication_group_id       = var.instance_name
+  description                = format("%s redis", var.instance_name)
+  node_type                  = local.node_type
+  num_cache_clusters         = var.node_count
+  parameter_group_name       = local.parameter_group_names[var.redis_version]
+  port                       = local.port
+  tags                       = var.labels
+  security_group_ids         = local.elasticache_vpc_security_group_ids
+  subnet_group_name          = local.subnet_group
+  transit_encryption_enabled = true
+  auth_token                 = random_password.auth_token.result
 
   lifecycle {
     prevent_destroy = true
