@@ -46,8 +46,9 @@ locals {
   elasticache_vpc_security_group_ids = length(var.elasticache_vpc_security_group_ids) == 0 ? [aws_security_group.sg[0].id] : split(",", var.elasticache_vpc_security_group_ids)
 }
 
-data "aws_subnet_ids" "all" {
-  vpc_id = data.aws_vpc.vpc.id
+data "aws_subnets" "all" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
 }
-
-

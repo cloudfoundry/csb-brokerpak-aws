@@ -31,9 +31,9 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
-  engine = "postgres"
+  engine        = "postgres"
   major_version = split(".", var.postgres_version)[0]
-  port = 5432
+  port          = 5432
 
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
 
@@ -44,6 +44,9 @@ locals {
   rds_vpc_security_group_ids = length(var.rds_vpc_security_group_ids) == 0 ? [aws_security_group.rds-sg[0].id] : split(",", var.rds_vpc_security_group_ids)
 }
 
-data "aws_subnet_ids" "all" {
-  vpc_id = data.aws_vpc.vpc.id
+data "aws_subnets" "all" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.vpc.id]
+  }
 }

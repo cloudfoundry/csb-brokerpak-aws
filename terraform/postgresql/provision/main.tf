@@ -21,7 +21,7 @@ resource "aws_security_group" "rds-sg" {
 resource "aws_db_subnet_group" "rds-private-subnet" {
   count      = length(var.rds_subnet_group) == 0 ? 1 : 0
   name       = format("%s-p-sn", var.instance_name)
-  subnet_ids = data.aws_subnet_ids.all.ids
+  subnet_ids = data.aws_subnets.all.ids
 }
 
 resource "aws_security_group_rule" "rds_inbound_access" {
@@ -37,7 +37,7 @@ resource "aws_security_group_rule" "rds_inbound_access" {
 resource "random_string" "username" {
   length  = 16
   special = false
-  number  = false
+  numeric = false
 }
 
 resource "random_password" "password" {
