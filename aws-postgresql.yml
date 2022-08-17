@@ -57,7 +57,6 @@ provision:
     required: true
     type: string
     details: The version for the PostgreSQL instance. Can be any supported major or major and minor version.
-    default: 13.4
   - field_name: storage_gb
     required: true
     type: number
