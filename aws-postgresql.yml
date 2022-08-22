@@ -75,7 +75,7 @@ provision:
     default: "io1"
   - field_name: iops
     type: number
-    details: The amount of provisioned IOPS. Setting this implies a storage_type of "io1". Setting storage_type to any value other than "io1" will result in this value being ignored.
+    details: The amount of provisioned IOPS. In order for this property to take effect, `storage_type` must be set to `io1`.
     default: 3000
   - field_name: require_ssl
     type: boolean
