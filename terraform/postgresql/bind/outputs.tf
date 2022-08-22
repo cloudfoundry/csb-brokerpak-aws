@@ -31,13 +31,12 @@ output "uri" {
 output "port" { value = local.port }
 output "jdbcUrl" {
   value = format(
-    "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=%v",
+    "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026ssl=true",
     var.hostname,
     local.port,
     var.db_name,
     csbpg_binding_user.new_user.username,
     csbpg_binding_user.new_user.password,
-    var.require_ssl,
   )
   sensitive = true
 }
