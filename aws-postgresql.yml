@@ -289,10 +289,6 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
-  - name: engine
-    default: postgres
-    overwrite: true
-    type: string
   - name: engine_version
     default: ${postgres_version}
     overwrite: true
