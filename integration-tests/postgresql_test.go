@@ -220,6 +220,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			},
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
+			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
 		)
 
 		DescribeTable(

@@ -27,6 +27,7 @@
 - PostgreSQL: Performance Insights can now be enabled and a kms key can be provided to encrypt the performance insights data. Performance insights is disabled by default.
 - PostgreSQL: The storage type can now be defined through the property "storage_type". In addition to this, if using the provisioned IOPS SSD (io1) storage type, then the 'iops' value can also be defined through the property "iops".
 - PostgreSQL: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`.
+- PostgreSQL: `db_name` property is no longer updatable. Previously updating this field would have led to data loss as a new database would be created on update.
 - Terraform upgrade (from 0.12.30 to 1.1.9) has been added.
 
 ### Fix:
