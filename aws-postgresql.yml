@@ -126,6 +126,7 @@ provision:
     default: vsbdb
     constraints:
       maxLength: 64
+    prohibit_update: true
   - field_name: publicly_accessible
     type: boolean
     details: Make instance public if true
