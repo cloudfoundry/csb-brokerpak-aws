@@ -75,7 +75,7 @@ provision:
     default: "io1"
   - field_name: iops
     type: number
-    details: The amount of provisioned IOPS. Setting this implies a storage_type of "io1". Setting storage_type to any value other than "io1" will result in this value being ignored.
+    details: The amount of provisioned IOPS. In order for this property to take effect, `storage_type` must be set to `io1`.
     default: 3000
   - field_name: require_ssl
     type: boolean
@@ -126,6 +126,7 @@ provision:
     default: vsbdb
     constraints:
       maxLength: 64
+    prohibit_update: true
   - field_name: publicly_accessible
     type: boolean
     details: Make instance public if true
@@ -157,7 +158,7 @@ provision:
     default: ""
   - field_name: instance_class
     type: string
-    details: AWS DB instance class (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html) Will be computed from cache_size if empty.
+    details: AWS DB instance class (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html)
     default: ""
   - field_name: rds_subnet_group
     type: string
@@ -289,10 +290,6 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
-  - name: engine
-    default: postgres
-    overwrite: true
-    type: string
   - name: engine_version
     default: ${postgres_version}
     overwrite: true
