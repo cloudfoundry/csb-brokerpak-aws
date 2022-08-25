@@ -158,7 +158,7 @@ provision:
     default: ""
   - field_name: instance_class
     type: string
-    details: AWS DB instance class (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html) Will be computed from cache_size if empty.
+    details: AWS DB instance class (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html)
     default: ""
   - field_name: rds_subnet_group
     type: string
@@ -290,10 +290,6 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
-  - name: engine
-    default: postgres
-    overwrite: true
-    type: string
   - name: engine_version
     default: ${postgres_version}
     overwrite: true
