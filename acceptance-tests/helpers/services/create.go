@@ -85,6 +85,12 @@ func WithBroker(broker *brokers.Broker) Option {
 	}
 }
 
+func WithBrokerName(name string) Option {
+	return func(c *config) {
+		c.serviceBrokerName = func() string { return name }
+	}
+}
+
 func WithParameters(parameters any) Option {
 	return func(c *config) {
 		switch p := parameters.(type) {
