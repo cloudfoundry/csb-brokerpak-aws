@@ -96,7 +96,8 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf | $(
 
 ###### Run ###################################################################
 .PHONY: run
-run: build aws_access_key_id aws_secret_access_key ## start broker with this brokerpak
+run: aws_access_key_id aws_secret_access_key ## start broker with this brokerpak
+	$(RUN_CSB) pak build --target current
 	$(RUN_CSB) serve
 
 ###### docs ###################################################################
