@@ -92,10 +92,10 @@ provision:
       type: boolean
       details: Whether Amazon S3 should restrict public bucket policies for the bucket.
       default: false
-    - field_name: sse_default_kms_master_key_id
+    - field_name: sse_default_kms_key_id
       type: string
       nullable: true
-      details: The AWS KMS master key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
+      details: The AWS KMS key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
       default: null
     - field_name: sse_default_algorithm
       type: string

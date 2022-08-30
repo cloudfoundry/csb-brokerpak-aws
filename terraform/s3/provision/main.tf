@@ -61,7 +61,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encry
     dynamic "apply_server_side_encryption_by_default" {
       for_each = var.sse_default_algorithm[*]
       content {
-        kms_master_key_id = var.sse_default_kms_master_key_id
+        kms_master_key_id = var.sse_default_kms_key_id
         sse_algorithm     = var.sse_default_algorithm
       }
     }
