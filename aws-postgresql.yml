@@ -176,12 +176,12 @@ provision:
     type: boolean
     details: Allow minor version upgrades automatically during the maintenance window
     default: true
-  - &nullable_list
+  - <<: &nullable_string
+      type: string
+      default: null
+      nullable: true
     field_name: maintenance_day
-    type: string
     details: The preferred maintenance day
-    default: null
-    nullable: true
     enum:
       Sun: Sunday
       Mon: Monday
@@ -190,7 +190,7 @@ provision:
       Thu: Thursday
       Fri: Friday
       Sat: Saturday
-  - <<: *nullable_list
+  - <<: *nullable_string
     field_name: maintenance_start_hour
     details: The preferred maintenance start hour
     enum: &hour_enum
@@ -218,7 +218,7 @@ provision:
       "21": 9 pm
       "22": 10 pm
       "23": 11 pm
-  - <<: *nullable_list
+  - <<: *nullable_string
     field_name: maintenance_start_min
     details: The preferred maintenance start minute
     enum: &minute_enum
@@ -226,11 +226,11 @@ provision:
       "15": 15 minutes
       "30": 30 minutes
       "45": 45 minutes
-  - <<: *nullable_list
+  - <<: *nullable_string
     field_name: maintenance_end_hour
     details: The preferred maintenance end hour
     enum: *hour_enum
-  - <<: *nullable_list
+  - <<: *nullable_string
     field_name: maintenance_end_min
     details: The preferred maintenance end minute
     enum: *minute_enum
@@ -242,11 +242,9 @@ provision:
     type: number
     details: The number of days (1-35) for which automatic backups are kept. Set the value to 0 to disable automated backups. An outage occurs if you change the backup retention period from 0 to a nonzero value or vice versa. This applies to both Single-AZ and Multi-AZ DB instances.
     default: 7
-  - field_name: backup_window
-    type: string
+  - <<: *nullable_string
+    field_name: backup_window
     details: 'The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16". Must not overlap with the maintenance window. If not set, uses the default for the region (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html#USER_WorkingWithAutomatedBackups.BackupWindow)'
-    default: null
-    nullable: true
   - field_name: delete_automated_backups
     type: boolean
     details: Specifies whether to remove automated backups immediately after the DB instance is deleted
