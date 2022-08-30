@@ -45,7 +45,7 @@ Broker service configuration values:
 | <tt>HOST</tt>                            | api.host          | string | <p>Host to bind broker to</p>         |
 
 ## Credhub Configuration
-The broker supports passing credentials to apps via [credhub references](https://github.com/cloudfoundry/credhub/blob/master/docs/secure-service-credentials.md#service-brokers), thus keeping them private to the application (they won't show up in `cf env app_name` output.)
+The broker supports passing credentials to apps via [credhub references](https://github.com/cloudfoundry/credhub/blob/main/docs/secure-service-credentials.md#service-brokers), thus keeping them private to the application (they won't show up in `cf env app_name` output.)
 
 | Environment Variable   | Config File Value           | Type    | Description                                                                                                 |
 |------------------------|-----------------------------|---------|-------------------------------------------------------------------------------------------------------------|
