@@ -39,9 +39,22 @@ locals {
 
   subnet_group = length(var.rds_subnet_group) > 0 ? var.rds_subnet_group : aws_db_subnet_group.rds-private-subnet[0].name
 
-  max_allocated_storage = (var.storage_autoscale && var.storage_autoscale_limit_gb > var.storage_gb) ? var.storage_autoscale_limit_gb : null
+  should_limit_autoscale_storage = var.storage_autoscale && var.storage_autoscale_limit_gb > var.storage_gb
+  max_allocated_storage          = local.should_limit_autoscale_storage ? var.storage_autoscale_limit_gb : null
 
-  rds_vpc_security_group_ids = length(var.rds_vpc_security_group_ids) == 0 ? [aws_security_group.rds-sg[0].id] : split(",", var.rds_vpc_security_group_ids)
+  rds_vpc_security_group_ids = length(var.rds_vpc_security_group_ids) == 0 ? [
+    aws_security_group.rds-sg[0].id
+  ] : split(",", var.rds_vpc_security_group_ids)
+
+  is_maintenance_window_blank = length(compact([
+    var.maintenance_day,
+    var.maintenance_start_hour, var.maintenance_end_hour,
+    var.maintenance_start_min, var.maintenance_end_min
+  ])) == 0
+
+  maintenance_window = local.is_maintenance_window_blank ? null : format("%s:%s:%s-%s:%s:%s",
+    var.maintenance_day, var.maintenance_start_hour, var.maintenance_start_min,
+    var.maintenance_day, var.maintenance_end_hour, var.maintenance_end_min)
 }
 
 data "aws_subnets" "all" {
