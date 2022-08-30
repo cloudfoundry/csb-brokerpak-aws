@@ -67,14 +67,14 @@ resource "aws_db_instance" "db_instance" {
   multi_az                        = var.multi_az
   allow_major_version_upgrade     = var.allow_major_version_upgrade
   auto_minor_version_upgrade      = var.auto_minor_version_upgrade
-  maintenance_window              = var.maintenance_window == "Sun:00:00-Sun:00:00" ? null : var.maintenance_window
+  maintenance_window              = local.maintenance_window
   apply_immediately               = true
   max_allocated_storage           = local.max_allocated_storage
   storage_encrypted               = var.storage_encrypted
   kms_key_id                      = var.kms_key_id == "" ? null : var.kms_key_id
   deletion_protection             = var.deletion_protection
   backup_retention_period         = var.backup_retention_period
-  backup_window                   = var.backup_window == "00:00-00:00" ? null : var.backup_window
+  backup_window                   = var.backup_window
   copy_tags_to_snapshot           = var.copy_tags_to_snapshot
   delete_automated_backups        = var.delete_automated_backups
   monitoring_interval             = var.monitoring_interval
