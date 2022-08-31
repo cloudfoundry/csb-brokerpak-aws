@@ -29,6 +29,8 @@
 - PostgreSQL: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`.
 - PostgreSQL: `db_name` property is no longer updatable. Previously updating this field would have led to data loss as a new database would be created on update.
 - Terraform upgrade (from 0.12.30 to 1.1.9) has been added.
+- Provider display name for service offerings that set a value it is now returned in the catalog
+- Improved services metadata: documentation url now links to Tanzu docs. Name includes CSB to differentiate services from other broker's offerings
 
 ### Fix:
 - minimum constraints on MySQL and PostgreSQL storage_gb are now enforced

@@ -15,10 +15,11 @@
 version: 1
 name: csb-aws-redis
 id: e9c11b1b-0caa-45c9-b9b2-592939c9a5a6
-description: Beta - Amazon ElastiCache for Redis - multinode with automatic failover
-display_name: Amazon ElastiCache for Redis (Beta)
+description: Beta - CSB Amazon ElastiCache for Redis - multinode with automatic failover
+display_name: CSB Amazon ElastiCache for Redis (Beta)
 image_url: https://www.edrawsoft.com/symbols/awsdatabase/elasticacheredis.png
-documentation_url: https://aws.amazon.com/elasticache/redis/resources/?nc=sn&loc=5
+documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html
+provider_display_name: VMware
 support_url: https://aws.amazon.com/redis/
 tags: [aws, redis, beta]
 plan_updateable: true
