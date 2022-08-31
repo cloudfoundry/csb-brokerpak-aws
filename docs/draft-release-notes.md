@@ -37,3 +37,4 @@
 - Modification of the region generates the same service without eliminating the existing one in the newly established region. Blocking updating operation of such property to avoid the generation of infrastructure unintentionally.
 - PostgreSQL role is now always cleanly deleted during unbind
 - PostgreSQL jdbc URL includes the valid query parameter to use ssl. The parameter is now always set to true since RDS for PostgreSQL uses and expects all clients to connect using SSL.
+- PostgreSQL: The properties for setting the maintenance and backup window no longer use magic default values
