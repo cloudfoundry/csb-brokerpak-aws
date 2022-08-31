@@ -49,7 +49,6 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("subsume")}),
 			),
 		)
 		Expect(service.Plans).To(
