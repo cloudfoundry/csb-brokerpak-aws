@@ -28,6 +28,7 @@
 - PostgreSQL: The storage type can now be defined through the property "storage_type". In addition to this, if using the provisioned IOPS SSD (io1) storage type, then the 'iops' value can also be defined through the property "iops".
 - PostgreSQL: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`.
 - PostgreSQL: `db_name` property is no longer updatable. Previously updating this field would have led to data loss as a new database would be created on update.
+- PostgreSQL: `subsume` functionality has been removed from the PostgreSQL offering. The previously available plan and associated properties have been removed due to the functionality not working.
 - Terraform upgrade (from 0.12.30 to 1.1.9) has been added.
 
 ### Fix:

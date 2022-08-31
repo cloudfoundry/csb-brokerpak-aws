@@ -30,7 +30,6 @@ variable "storage_encrypted" { type = bool }
 variable "kms_key_id" { type = string }
 variable "parameter_group_name" { type = string }
 variable "rds_subnet_group" { type = string }
-variable "subsume" { type = bool }
 variable "rds_vpc_security_group_ids" { type = string }
 variable "allow_major_version_upgrade" { type = bool }
 variable "auto_minor_version_upgrade" { type = bool }
