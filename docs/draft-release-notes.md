@@ -28,6 +28,7 @@
 - PostgreSQL: The storage type can now be defined through the property "storage_type". In addition to this, if using the provisioned IOPS SSD (io1) storage type, then the 'iops' value can also be defined through the property "iops".
 - PostgreSQL: There are no default plans defined. Plans must be configured through the environment variable: `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`.
 - PostgreSQL: `db_name` property is no longer updatable. Previously updating this field would have led to data loss as a new database would be created on update.
+- PostgreSQL: `subsume` functionality has been removed from the PostgreSQL offering. The previously available plan and associated properties have been removed due to the functionality not working.
 - Terraform upgrade (from 0.12.30 to 1.1.9) has been added.
 - Provider display name for service offerings that set a value it is now returned in the catalog
 - Improved services metadata: documentation url now links to Tanzu docs. Name includes CSB to differentiate services from other broker's offerings
@@ -38,3 +39,4 @@
 - Modification of the region generates the same service without eliminating the existing one in the newly established region. Blocking updating operation of such property to avoid the generation of infrastructure unintentionally.
 - PostgreSQL role is now always cleanly deleted during unbind
 - PostgreSQL jdbc URL includes the valid query parameter to use ssl. The parameter is now always set to true since RDS for PostgreSQL uses and expects all clients to connect using SSL.
+- PostgreSQL: The properties for setting the maintenance and backup window no longer use magic default values

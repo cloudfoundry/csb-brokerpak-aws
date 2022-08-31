@@ -49,7 +49,6 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("subsume")}),
 			),
 		)
 		Expect(service.Plans).To(
@@ -115,10 +114,14 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("multi_az", false),
 					HaveKeyWithValue("allow_major_version_upgrade", true),
 					HaveKeyWithValue("auto_minor_version_upgrade", true),
-					HaveKeyWithValue("maintenance_window", "Sun:00:00-Sun:00:00"),
+					HaveKeyWithValue("maintenance_day", BeNil()),
+					HaveKeyWithValue("maintenance_start_hour", BeNil()),
+					HaveKeyWithValue("maintenance_start_min", BeNil()),
+					HaveKeyWithValue("maintenance_end_hour", BeNil()),
+					HaveKeyWithValue("maintenance_end_min", BeNil()),
 					HaveKeyWithValue("deletion_protection", false),
 					HaveKeyWithValue("backup_retention_period", float64(7)),
-					HaveKeyWithValue("backup_window", "00:00-00:00"),
+					HaveKeyWithValue("backup_window", BeNil()),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
 					HaveKeyWithValue("monitoring_interval", float64(0)),
@@ -180,7 +183,11 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("multi_az", true),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
-					HaveKeyWithValue("maintenance_window", "Mon:03:45-Mon:10:15"),
+					HaveKeyWithValue("maintenance_day", "Mon"),
+					HaveKeyWithValue("maintenance_start_hour", "03"),
+					HaveKeyWithValue("maintenance_start_min", "45"),
+					HaveKeyWithValue("maintenance_end_hour", "10"),
+					HaveKeyWithValue("maintenance_end_min", "15"),
 					HaveKeyWithValue("deletion_protection", true),
 					HaveKeyWithValue("backup_retention_period", float64(2)),
 					HaveKeyWithValue("backup_window", "01:02-03:04"),
