@@ -15,10 +15,11 @@
 version: 1
 name: csb-aws-dynamodb
 id: bf1db66a-1316-11eb-b959-e73b704ea230
-description: Beta - Amazon DynamoDB
-display_name: Amazon DynamoDB (Beta)
+description: Beta - CSB Amazon DynamoDB
+display_name: CSB Amazon DynamoDB (Beta)
 image_url: https://www.pnglogos.com/images/other/aws-dynamodb.svg
-documentation_url: https://aws.amazon.com/dynamodb/
+documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-dynamodb.html
+provider_display_name: VMware
 support_url: https://aws.amazon.com/dynamodb/
 tags: [aws, dynamodb, beta]
 plan_updateable: true

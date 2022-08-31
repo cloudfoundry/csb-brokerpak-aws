@@ -15,10 +15,11 @@
 version: 1
 name: csb-aws-s3-bucket
 id: ffe28d48-c235-4e07-9c51-ddff5699e48c
-description: Beta - AWS S3 Bucket
-display_name: AWS S3 Bucket (Beta)
+description: Beta - CSB AWS S3 Bucket
+display_name: CSB AWS S3 Bucket (Beta)
 image_url: https://www.pikpng.com/pngl/m/73-731373_aws-s3-logo-png-transparent-amazon-s3-logo.png
-documentation_url: https://aws.amazon.com/s3/
+documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-s3.html
+provider_display_name: VMware
 support_url: https://aws.amazon.com/s3/
 tags: [aws, s3, beta]
 plan_updateable: true
