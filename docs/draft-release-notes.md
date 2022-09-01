@@ -41,3 +41,4 @@
 - PostgreSQL role is now always cleanly deleted during unbind
 - PostgreSQL jdbc URL includes the valid query parameter to use ssl. The parameter is now always set to true since RDS for PostgreSQL uses and expects all clients to connect using SSL.
 - PostgreSQL: The properties for setting the maintenance and backup window no longer use magic default values
+- image_url value has been fixed on service offerings so an image will now display for GUI applications.
