@@ -6,6 +6,7 @@
 
 ### Features
 - region property as a text field instead of an enumerated enabling selection of any region available in the Cloud Provider
+- S3 General Availability: S3 service offering is no longer Beta and can be used in production environments.
 - S3: region updates for existing buckets are now blocked by the broker resulting in faster feedback and improved error message.
 - S3: ACL can now be specified on creation if the plan does not specify a value for it. Previously it was a plan-only input and as such could only be specified in the plan definition.
 - S3: Bucket Ownership controls can now be specified in a plan or on creation if the plan does not specify a value for it. It defaults to `ObjectOwnershipEnforced` and this disables ACLs by default. If you have custom plans refer to the upgrading instructions for information regarding this change.

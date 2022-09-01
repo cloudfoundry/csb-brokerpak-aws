@@ -17,9 +17,9 @@ var customS3Plans = []map[string]any{
 var customS3Plan = map[string]any{
 	"name":        "custom-plan",
 	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc3",
-	"description": "Beta - custom S3 plan defined by customer",
+	"description": "custom S3 plan defined by customer",
 	"metadata": map[string]any{
-		"displayName": "custom S3 service (Beta)",
+		"displayName": "custom S3 service",
 	},
 }
 
@@ -27,9 +27,9 @@ var customS3PlanWithACL = map[string]any{
 	"name":        "custom-plan-with-acl",
 	"acl":         "private",
 	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc4",
-	"description": "Beta - custom S3 plan defined by customer specifying acl",
+	"description": "custom S3 plan defined by customer specifying acl",
 	"metadata": map[string]any{
-		"displayName": "custom S3 service with acl (Beta)",
+		"displayName": "custom S3 service with acl",
 	},
 }
 
@@ -50,21 +50,13 @@ var _ = Describe("S3", Label("s3"), func() {
 		service := testframework.FindService(catalog, s3ServiceName)
 		Expect(service.ID).NotTo(BeNil())
 		Expect(service.Name).NotTo(BeNil())
-		Expect(service.Tags).To(ConsistOf("aws", "s3", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "s3"))
 		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
 		Expect(service.Metadata.DisplayName).NotTo(BeNil())
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan-with-acl")}),
-			),
-		)
-		Expect(service.Plans).To(
-			HaveEach(
-				MatchFields(IgnoreExtras, Fields{
-					"Description": HavePrefix("Beta -"),
-					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
-				}),
 			),
 		)
 	})
