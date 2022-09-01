@@ -16,9 +16,9 @@ var customPostgresPlans = []map[string]any{
 var customPostgresPlan = map[string]any{
 	"name":        "custom-sample",
 	"id":          "de7dbcee-1c8d-11ed-9904-5f435c1e2316",
-	"description": "Beta - Default Postgres plan",
+	"description": "Default Postgres plan",
 	"metadata": map[string]any{
-		"displayName": "custom-sample (Beta)",
+		"displayName": "custom-sample",
 	},
 	"instance_class":   "db.m6i.large",
 	"postgres_version": "14.2",
@@ -43,20 +43,12 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		service := testframework.FindService(catalog, serviceName)
 		Expect(service.ID).NotTo(BeNil())
 		Expect(service.Name).NotTo(BeNil())
-		Expect(service.Tags).To(ConsistOf("aws", "postgres", "postgresql", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "postgres", "postgresql"))
 		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
 		Expect(service.Metadata.DisplayName).NotTo(BeNil())
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
-			),
-		)
-		Expect(service.Plans).To(
-			HaveEach(
-				MatchFields(IgnoreExtras, Fields{
-					"Description": HavePrefix("Beta -"),
-					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
-				}),
 			),
 		)
 	})
