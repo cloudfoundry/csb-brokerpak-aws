@@ -15,13 +15,13 @@
 version: 1
 name: csb-aws-postgresql
 id: fa6334bc-5314-4b63-8a74-c0e4b638c950
-description: Beta - CSB Amazon RDS for PostgreSQL
-display_name: CSB Amazon RDS for PostgreSQL (Beta)
+description: CSB Amazon RDS for PostgreSQL
+display_name: CSB Amazon RDS for PostgreSQL
 image_url: https://d1.awsstatic.com/rdsImages/postgresql_logo.6de4615badd99412268bc6aa8fc958a0f403dd41.png
 documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-postgres.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/rds/postgresql/
-tags: [aws, postgresql, postgres, beta]
+tags: [aws, postgresql, postgres]
 plan_updateable: true
 provision:
   plan_inputs:
