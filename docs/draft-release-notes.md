@@ -6,6 +6,7 @@
 
 ### Features
 - region property as a text field instead of an enumerated enabling selection of any region available in the Cloud Provider
+- S3 General Availability: S3 service offering is no longer Beta and can be used in production environments.
 - S3: region updates for existing buckets are now blocked by the broker resulting in faster feedback and improved error message.
 - S3: ACL can now be specified on creation if the plan does not specify a value for it. Previously it was a plan-only input and as such could only be specified in the plan definition.
 - S3: Bucket Ownership controls can now be specified in a plan or on creation if the plan does not specify a value for it. It defaults to `ObjectOwnershipEnforced` and this disables ACLs by default. If you have custom plans refer to the upgrading instructions for information regarding this change.
@@ -30,6 +31,8 @@
 - PostgreSQL: `db_name` property is no longer updatable. Previously updating this field would have led to data loss as a new database would be created on update.
 - PostgreSQL: `subsume` functionality has been removed from the PostgreSQL offering. The previously available plan and associated properties have been removed due to the functionality not working.
 - Terraform upgrade (from 0.12.30 to 1.1.9) has been added.
+- Provider display name for service offerings that set a value it is now returned in the catalog
+- Improved services metadata: documentation url now links to Tanzu docs. Name includes CSB to differentiate services from other broker's offerings
 
 ### Fix:
 - minimum constraints on MySQL and PostgreSQL storage_gb are now enforced
