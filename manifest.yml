@@ -63,6 +63,7 @@ service_definitions:
 - aws-postgresql.yml
 - aws-s3-bucket.yml
 - aws-dynamodb.yml
+- aws-aurora-postgresql.yml
 
 
 

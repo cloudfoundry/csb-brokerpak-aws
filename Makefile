@@ -25,6 +25,7 @@ GSB_PROVISION_DEFAULTS := $(or $(GSB_PROVISION_DEFAULTS), {"aws_vpc_id": "$(AWS_
 GSB_COMPATIBILITY_ENABLE_BETA_SERVICES := $(or $(GSB_COMPATIBILITY_ENABLE_BETA_SERVICES), true)
 export GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS = [{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"}]
 export GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS = [{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default","instance_class": "db.m6i.large","postgres_version": "14.2","storage_gb": 100}]
+export GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS = [{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]
 
 ifeq ($(GO_OK), 0)  # use local go binary
 GO=go

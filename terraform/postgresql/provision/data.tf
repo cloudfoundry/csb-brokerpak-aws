@@ -54,7 +54,7 @@ locals {
 
   maintenance_window = local.is_maintenance_window_blank ? null : format("%s:%s:%s-%s:%s:%s",
     var.maintenance_day, var.maintenance_start_hour, var.maintenance_start_min,
-    var.maintenance_day, var.maintenance_end_hour, var.maintenance_end_min)
+  var.maintenance_day, var.maintenance_end_hour, var.maintenance_end_min)
 }
 
 data "aws_subnets" "all" {
