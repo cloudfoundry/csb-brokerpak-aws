@@ -1,0 +1,115 @@
+version: 1
+name: csb-aws-aurora-postgresql
+id: 36203e40-2945-11ed-8980-eb81bd131a02
+description: Beta - Amazon Aurora for PostgreSQL
+display_name: Amazon Aurora for PostgreSQL (Beta)
+image_url: file://service-images/csb.png
+documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html
+provider_display_name: VMware
+support_url: https://aws.amazon.com/rds/aurora/
+tags: [aws, aurora, postgresql, postgres, beta]
+plan_updateable: true
+provision:
+  user_inputs:
+  - field_name: instance_name
+    type: string
+    details: Name for the instance
+    default: csb-aurorapg-${request.instance_id}
+    constraints:
+      maxLength: 98
+      minLength: 6
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
+  - field_name: region
+    type: string
+    details: The region of AWS.
+    default: us-west-2
+    constraints:
+      examples:
+        - us-central1
+        - asia-northeast1
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
+  - field_name: aws_access_key_id
+    type: string
+    details: AWS access key
+    default: ${config("aws.access_key_id")}
+  - field_name: aws_secret_access_key
+    type: string
+    details: AWS secret key
+    default: ${config("aws.secret_access_key")}
+  - field_name: aws_vpc_id
+    details: VPC ID for instance
+    default: ""
+  template_refs:
+    outputs: ./terraform/aurora-postgresql/provision/outputs.tf
+    provider: ./terraform/aurora-postgresql/provision/provider.tf
+    versions: ./terraform/aurora-postgresql/provision/versions.tf
+    variables: ./terraform/aurora-postgresql/provision/variables.tf
+    main: ./terraform/aurora-postgresql/provision/main.tf
+    data: ./terraform/aurora-postgresql/provision/data.tf
+  outputs:
+  - field_name: name
+    type: string
+    details: The name of the database.
+  - field_name: hostname
+    type: string
+    details: Hostname or IP address of the exposed PostgreSQL endpoint used by clients to connect to the service.
+  - field_name: username
+    type: string
+    details: The username to authenticate to the database instance.
+  - field_name: password
+    type: string
+    details: The password to authenticate to the database instance.
+  - field_name: port
+    type: integer
+    details: The port number of the exposed postgres instance.
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: name
+    type: string
+    default: ${instance.details["name"]}
+    overwrite: true
+  - name: hostname
+    type: string
+    default: ${instance.details["hostname"]}
+    overwrite: true
+  - name: admin_username
+    type: string
+    default: ${instance.details["username"]}
+    overwrite: true
+  - name: admin_password
+    type: string
+    default: ${instance.details["password"]}
+    overwrite: true
+  - name: port
+    type: integer
+    default: ${instance.details["port"]}
+    overwrite: true
+  template_refs:
+    outputs: ./terraform/aurora-postgresql/bind/outputs.tf
+    provider: ./terraform/aurora-postgresql/bind/provider.tf
+    versions: ./terraform/aurora-postgresql/bind/versions.tf
+    variables: ./terraform/aurora-postgresql/bind/variables.tf
+    main: ./terraform/aurora-postgresql/bind/main.tf
+  outputs:
+  - field_name: username
+    type: string
+    details: The username to authenticate to the database instance.
+  - field_name: password
+    type: string
+    details: The password to authenticate to the database instance.
+  - field_name: uri
+    type: string
+    details: The uri to connect to the database instance and database.
+  - field_name: jdbcUrl
+    type: string
+    details: The jdbc url to connect to the database instance and database.
+  - field_name: port
+    type: integer
+    details: The port number of the exposed postgres instance.
+  - field_name: name
+    type: string
+    details: The name of the database.
