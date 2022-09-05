@@ -36,6 +36,7 @@ var _ = BeforeSuite(func() {
 	Expect(broker.Start(GinkgoWriter, []string{
 		"GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS=" + marshall(customS3Plans),
 		"GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS=" + marshall(customPostgresPlans),
+		"GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS=" + marshall(customAuroraPostgresPlans),
 		"AWS_ACCESS_KEY_ID=" + awsAccessKeyID,
 		"AWS_SECRET_ACCESS_KEY=" + awsSecretAccessKey,
 		"CSB_LISTENER_HOST=localhost",
