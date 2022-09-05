@@ -1,20 +1,20 @@
 version: 1
-name: csb-aws-aurora-postgresql
-id: 36203e40-2945-11ed-8980-eb81bd131a02
-description: Beta - Amazon Aurora for PostgreSQL
-display_name: Amazon Aurora for PostgreSQL (Beta)
+name: csb-aws-aurora-mysql
+id: 7446e75e-2a09-11ed-8816-23072dae39dc
+description: Beta - Amazon Aurora for MySQL
+display_name: Amazon Aurora for MySQL (Beta)
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/rds/aurora/
-tags: [aws, aurora, postgresql, postgres, beta]
+tags: [aws, aurora, mysql, beta]
 plan_updateable: true
 provision:
   user_inputs:
   - field_name: instance_name
     type: string
     details: Name for the instance
-    default: csb-aurorapg-${request.instance_id}
+    default: csb-auroramy-${request.instance_id}
     constraints:
       maxLength: 98
       minLength: 6
@@ -42,19 +42,19 @@ provision:
     details: VPC ID for instance
     default: ""
   template_refs:
-    outputs: ./terraform/aurora-postgresql/provision/outputs.tf
-    provider: ./terraform/aurora-postgresql/provision/provider.tf
-    versions: ./terraform/aurora-postgresql/provision/versions.tf
-    variables: ./terraform/aurora-postgresql/provision/variables.tf
-    main: ./terraform/aurora-postgresql/provision/main.tf
-    data: ./terraform/aurora-postgresql/provision/data.tf
+    outputs: ./terraform/aurora-mysql/provision/outputs.tf
+    provider: ./terraform/aurora-mysql/provision/provider.tf
+    versions: ./terraform/aurora-mysql/provision/versions.tf
+    variables: ./terraform/aurora-mysql/provision/variables.tf
+    main: ./terraform/aurora-mysql/provision/main.tf
+    data: ./terraform/aurora-mysql/provision/data.tf
   outputs:
   - field_name: name
     type: string
     details: The name of the database.
   - field_name: hostname
     type: string
-    details: Hostname or IP address of the exposed PostgreSQL endpoint used by clients to connect to the service.
+    details: Hostname or IP address of the exposed MySQL endpoint used by clients to connect to the service.
   - field_name: username
     type: string
     details: The username to authenticate to the database instance.
@@ -89,12 +89,15 @@ bind:
     default: ${instance.details["port"]}
     overwrite: true
   template_refs:
-    outputs: ./terraform/aurora-postgresql/bind/outputs.tf
-    provider: ./terraform/aurora-postgresql/bind/provider.tf
-    versions: ./terraform/aurora-postgresql/bind/versions.tf
-    variables: ./terraform/aurora-postgresql/bind/variables.tf
-    main: ./terraform/aurora-postgresql/bind/main.tf
+    outputs: ./terraform/aurora-mysql/bind/outputs.tf
+    provider: ./terraform/aurora-mysql/bind/provider.tf
+    versions: ./terraform/aurora-mysql/bind/versions.tf
+    variables: ./terraform/aurora-mysql/bind/variables.tf
+    main: ./terraform/aurora-mysql/bind/main.tf
   outputs:
+  - field_name: hostname
+    type: string
+    details: Hostname or IP address of the exposed MySQL endpoint used by clients to connect to the service.
   - field_name: username
     type: string
     details: The username to authenticate to the database instance.
@@ -110,6 +113,6 @@ bind:
   - field_name: port
     type: integer
     details: The port number of the exposed database instance.
-  - field_name: name
+  - field_name: database
     type: string
     details: The name of the database.

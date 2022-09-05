@@ -91,6 +91,10 @@ if [[ -z "$GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS" ]]; then
 fi
 echo "    GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS" | jq @json)" >>$cfmf
 
+if [[ -z "$GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS" ]]; then
+  GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS='[{"name":"default","id":"10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719","description":"Default Aurora MySQL plan","display_name":"default"}]'
+fi
+echo "    GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS" | jq @json)" >>$cfmf
 
 cf push --no-start -f "${cfmf}" --var app=${APP_NAME}
 

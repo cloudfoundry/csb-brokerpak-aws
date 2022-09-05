@@ -35,6 +35,7 @@
 - Provider display name for service offerings that set a value it is now returned in the catalog
 - Improved services metadata: documentation url now links to Tanzu docs. Name includes CSB to differentiate services from other broker's offerings
 - Aurora PostgreSQL: an experimental foundation has been added for development and test purposes only
+- Aurora MySQL: an experimental foundation has been added for development and test purposes only
 
 ### Fix:
 - minimum constraints on MySQL and PostgreSQL storage_gb are now enforced
