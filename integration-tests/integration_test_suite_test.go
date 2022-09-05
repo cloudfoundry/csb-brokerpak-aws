@@ -30,7 +30,7 @@ var _ = BeforeSuite(func() {
 	mockTerraform, err = testframework.NewTerraformMock()
 	Expect(err).NotTo(HaveOccurred())
 
-	broker, err = testframework.BuildTestInstance(testframework.PathToBrokerPack(), mockTerraform, GinkgoWriter)
+	broker, err = testframework.BuildTestInstance(testframework.PathToBrokerPack(), mockTerraform, GinkgoWriter, "service-images")
 	Expect(err).NotTo(HaveOccurred())
 
 	Expect(broker.Start(GinkgoWriter, []string{
