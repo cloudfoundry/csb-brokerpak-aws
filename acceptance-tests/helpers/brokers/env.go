@@ -40,6 +40,12 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "ENCRYPTION_PASSWORDS", Value: b.secrets},
 		apps.EnvVar{Name: "BROKERPAK_UPDATES_ENABLED", Value: true},
 		apps.EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
+		apps.EnvVar{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
+		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS", Value: `[{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"},{"name":"private","id":"8938b4c0-d67f-4c34-9f68-a66deef99b4e","description":"Private S3 bucket","display_name":"Private","acl":"private","boc_object_ownership":"ObjectWriter"}]`},
+		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS", Value: `[{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default", "instance_class": "db.m6i.large", "postgres_version": "11", "storage_gb": 100},{"name":"small","id":"ffc51616-228b-41bd-bed1-d601c18d58f5","description":"PostgreSQL 11, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb": 5, "storage_type": "gp2", "cores": 2, "postgres_version": "11"}]`},
+		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS", Value: `[{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]`},
+		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS", Value: `[{"name":"default","id":"10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719","description":"Default Aurora MySQL plan","display_name":"default"}]`},
+		apps.EnvVar{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
 	)
 
 	return append(result, b.envExtras...)
@@ -50,12 +56,5 @@ func (b Broker) releaseEnv() []apps.EnvVar {
 }
 
 func (b Broker) latestEnv() []apps.EnvVar {
-	return []apps.EnvVar{
-		{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
-		{Name: "GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS", Value: `[{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"},{"name":"private","id":"8938b4c0-d67f-4c34-9f68-a66deef99b4e","description":"Private S3 bucket","display_name":"Private","acl":"private","boc_object_ownership":"ObjectWriter"}]`},
-		{Name: "GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS", Value: `[{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default", "instance_class": "db.m6i.large", "postgres_version": "11", "storage_gb": 100},{"name":"small","id":"ffc51616-228b-41bd-bed1-d601c18d58f5","description":"PostgreSQL 11, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb": 5, "storage_type": "gp2", "cores": 2, "postgres_version": "11"}]`},
-		{Name: "GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS", Value: `[{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]`},
-		{Name: "GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS", Value: `[{"name":"default","id":"10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719","description":"Default Aurora MySQL plan","display_name":"default"}]`},
-		{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
-	}
+	return []apps.EnvVar{}
 }
