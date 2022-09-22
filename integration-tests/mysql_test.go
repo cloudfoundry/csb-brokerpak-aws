@@ -15,7 +15,7 @@ var customMySQLPlan = map[string]any{
 	"name":          "custom-sample",
 	"id":            "c2ae1820-8c1a-4cf7-90cf-8340ba5aa0bf",
 	"description":   "Beta - Default MySQL plan",
-	"mysql_version": 5.8,
+	"mysql_version": 8,
 	"cores":         4,
 	"storage_gb":    10,
 	"subsume":       false,
@@ -24,7 +24,7 @@ var customMySQLPlan = map[string]any{
 	},
 }
 
-var _ = FDescribe("MySQL", Label("MySQL"), func() {
+var _ = Describe("MySQL", Label("MySQL"), func() {
 	const serviceName = "csb-aws-mysql"
 
 	BeforeEach(func() {
