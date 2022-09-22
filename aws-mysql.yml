@@ -65,11 +65,10 @@ provision:
   - field_name: mysql_version
     required: true
     type: string
-    details: The version for the mysql instance.
-    default: 5.7
-    enum:
-      5.6: MySQL v5.6
-      5.7: MySQL v5.7
+    details: |
+      The version for the MySQL instance. Can be any supported version by the provider.
+      If `auto_minor_version_upgrade` is enabled, you can provide a prefix of the version such as 5.7 (for 5.7.10).
+      See https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html#MySQL.Concepts.VersionMgmt.Supported
   - field_name: storage_gb
     required: true
     type: number
