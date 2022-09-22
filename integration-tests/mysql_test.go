@@ -7,6 +7,23 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+var customMySQLPlans = []map[string]any{
+	customMySQLPlan,
+}
+
+var customMySQLPlan = map[string]any{
+	"name":          "custom-sample",
+	"id":            "c2ae1820-8c1a-4cf7-90cf-8340ba5aa0bf",
+	"description":   "Beta - Default MySQL plan",
+	"mysql_version": 8,
+	"cores":         4,
+	"storage_gb":    10,
+	"subsume":       false,
+	"metadata": map[string]any{
+		"displayName": "custom-sample (Beta)",
+	},
+}
+
 var _ = Describe("MySQL", Label("MySQL"), func() {
 	const serviceName = "csb-aws-mysql"
 
@@ -18,7 +35,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 		Expect(mockTerraform.Reset()).To(Succeed())
 	})
 
-	It("should publish AWS S3 in the catalog", func() {
+	It("should publish AWS MySQL in the catalog", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
@@ -33,6 +50,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("small")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("medium")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("large")}),
+				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
 			),
 		)
 
