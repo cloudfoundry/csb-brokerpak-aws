@@ -165,10 +165,12 @@ provision:
     type: boolean
     details: Allow minor version upgrades automatically during the maintenance window
     default: true
-  - field_name: maintenance_day
-    type: string
+  - <<: &nullable_string
+      type: string
+      default: null
+      nullable: true
+    field_name: maintenance_day
     details: The preferred maintenance day
-    default: Sun
     enum:
       Sun: Sunday
       Mon: Monday
@@ -177,11 +179,10 @@ provision:
       Thu: Thursday
       Fri: Friday
       Sat: Saturday
-  - field_name: maintenance_start_hour
-    type: string
+  - <<: *nullable_string
+    field_name: maintenance_start_hour
     details: The preferred maintenance start hour
-    default: "00"
-    enum:
+    enum: &hour_enum
       "00": 12 am
       "01": 1 am
       "02": 2 am
@@ -206,53 +207,23 @@ provision:
       "21": 9 pm
       "22": 10 pm
       "23": 11 pm
-  - field_name: maintenance_start_min
+  - <<: *nullable_string
+    field_name: maintenance_start_min
     type: string
     details: The preferred maintenance start minute
-    default: "00"
-    enum:
+    enum: &minute_enum
       "00": Top of the hour
       "15": 15 minutes
       "30": 30 minutes
       "45": 45 minutes
-  - field_name: maintenance_end_hour
-    type: string
+  - <<: *nullable_string
+    field_name: maintenance_end_hour
     details: The preferred maintenance end hour
-    default: "00"
-    enum:
-      "00": 12 am
-      "01": 1 am
-      "02": 2 am
-      "03": 3 am
-      "04": 4 am
-      "05": 5 am
-      "06": 6 am
-      "07": 7 am
-      "08": 8 am
-      "09": 9 am
-      "10": 10 am
-      "11": 11 am
-      "12": 12 pm
-      "13": 1 pm
-      "14": 2 pm
-      "15": 3 pm
-      "16": 4 pm
-      "17": 5 pm
-      "18": 6 pm
-      "19": 7 pm
-      "20": 8 pm
-      "21": 9 pm
-      "22": 10 pm
-      "23": 11 pm
-  - field_name: maintenance_end_min
-    type: string
+    enum: *hour_enum
+  - <<: *nullable_string
+    field_name: maintenance_end_min
     details: The preferred maintenance end minute
-    default: "00"
-    enum:
-      "00": Top of the hour
-      "15": 15 minutes
-      "30": 30 minutes
-      "45": 45 minutes
+    enum: *minute_enum
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -264,10 +235,6 @@ provision:
     type: string
   - name: engine_version
     default: ${mysql_version}
-    overwrite: true
-    type: string
-  - name: maintenance_window
-    default: ${maintenance_day}:${maintenance_start_hour}:${maintenance_start_min}-${maintenance_day}:${maintenance_end_hour}:${maintenance_end_min}
     overwrite: true
     type: string
   template_refs:

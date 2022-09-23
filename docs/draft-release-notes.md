@@ -5,5 +5,6 @@
 
 ### Features
 - MySQL: `mysql_version` property is no longer restrictive. Previously the parameter `mysql_version` was restricted to a list of supported values that we needed to keep updating.
+- MySQL: The properties for setting the maintenance window are nullables.
 
 ### Fix:

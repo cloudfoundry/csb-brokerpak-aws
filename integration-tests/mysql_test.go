@@ -1,6 +1,8 @@
 package integration_test
 
 import (
+	"fmt"
+
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -69,6 +71,91 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			_, err := broker.Provision(serviceName, "small", map[string]any{"region": "-Asia-northeast1"})
 
 			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
+		})
+
+		It("should provision a plan", func() {
+			instanceID, err := broker.Provision(serviceName, customMySQLPlan["name"].(string), nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("use_tls", true),
+					HaveKeyWithValue("storage_autoscale", false),
+					HaveKeyWithValue("storage_autoscale_limit_gb", float64(0)),
+					HaveKeyWithValue("storage_encrypted", false),
+					HaveKeyWithValue("parameter_group_name", ""),
+					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-mysql-%s", instanceID)),
+					HaveKeyWithValue("db_name", "vsbdb"),
+					HaveKeyWithValue("publicly_accessible", false),
+					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("multi_az", false),
+					HaveKeyWithValue("instance_class", ""),
+					HaveKeyWithValue("rds_subnet_group", ""),
+					HaveKeyWithValue("rds_vpc_security_group_ids", ""),
+					HaveKeyWithValue("allow_major_version_upgrade", true),
+					HaveKeyWithValue("auto_minor_version_upgrade", true),
+					HaveKeyWithValue("maintenance_day", BeNil()),
+					HaveKeyWithValue("maintenance_start_hour", BeNil()),
+					HaveKeyWithValue("maintenance_start_min", BeNil()),
+					HaveKeyWithValue("maintenance_end_hour", BeNil()),
+					HaveKeyWithValue("maintenance_end_min", BeNil()),
+				),
+			)
+		})
+
+		It("should allow properties to be set on provision", func() {
+			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+				"use_tls":                     false,
+				"storage_autoscale":           true,
+				"storage_autoscale_limit_gb":  float64(150),
+				"storage_encrypted":           true,
+				"parameter_group_name":        "fake-parameter-group",
+				"instance_name":               "csb-mysql-fake-name",
+				"db_name":                     "fake-db-name",
+				"publicly_accessible":         true,
+				"region":                      "africa-north-4",
+				"multi_az":                    true,
+				"instance_class":              "",
+				"rds_subnet_group":            "",
+				"rds_vpc_security_group_ids":  "",
+				"allow_major_version_upgrade": false,
+				"auto_minor_version_upgrade":  false,
+				"maintenance_day":             "Mon",
+				"maintenance_start_hour":      "03",
+				"maintenance_start_min":       "45",
+				"maintenance_end_hour":        "10",
+				"maintenance_end_min":         "15",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("engine", "mysql"),
+					HaveKeyWithValue("engine_version", "8"),
+					HaveKeyWithValue("cores", float64(4)),
+					HaveKeyWithValue("storage_gb", float64(10)),
+					HaveKeyWithValue("use_tls", false),
+					HaveKeyWithValue("storage_autoscale", true),
+					HaveKeyWithValue("storage_autoscale_limit_gb", float64(150)),
+					HaveKeyWithValue("storage_encrypted", true),
+					HaveKeyWithValue("parameter_group_name", "fake-parameter-group"),
+					HaveKeyWithValue("instance_name", "csb-mysql-fake-name"),
+					HaveKeyWithValue("db_name", "fake-db-name"),
+					HaveKeyWithValue("publicly_accessible", true),
+					HaveKeyWithValue("region", "africa-north-4"),
+					HaveKeyWithValue("multi_az", true),
+					HaveKeyWithValue("instance_class", ""),
+					HaveKeyWithValue("rds_subnet_group", ""),
+					HaveKeyWithValue("rds_vpc_security_group_ids", ""),
+					HaveKeyWithValue("allow_major_version_upgrade", false),
+					HaveKeyWithValue("auto_minor_version_upgrade", false),
+					HaveKeyWithValue("maintenance_day", "Mon"),
+					HaveKeyWithValue("maintenance_start_hour", "03"),
+					HaveKeyWithValue("maintenance_start_min", "45"),
+					HaveKeyWithValue("maintenance_end_hour", "10"),
+					HaveKeyWithValue("maintenance_end_min", "15"),
+				),
+			)
 		})
 	})
 
