@@ -86,7 +86,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry(
 				"instance name maximum length is 98 characters",
 				map[string]any{"instance_name": stringOfLen(99)},
-				"instance_name: String length must be greater than or equal to 98",
+				"instance_name: String length must be less than or equal to 98",
 			),
 			Entry(
 				"instance name invalid characters",
