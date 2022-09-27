@@ -67,11 +67,38 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 	})
 
 	Describe("provisioning", func() {
-		It("should check region constraints", func() {
-			_, err := broker.Provision(serviceName, "small", map[string]any{"region": "-Asia-northeast1"})
+		DescribeTable("property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(serviceName, "custom-sample", params)
 
-			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
-		})
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"instance name minimum length is 6 characters",
+				map[string]any{"instance_name": stringOfLen(5)},
+				"instance_name: String length must be greater than or equal to 6",
+			),
+			Entry(
+				"instance name maximum length is 98 characters",
+				map[string]any{"instance_name": stringOfLen(99)},
+				"instance_name: String length must be greater than or equal to 99",
+			),
+			Entry(
+				"instance name invalid characters",
+				map[string]any{"instance_name": ".aaaaa"},
+				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"database name maximum length is 64 characters",
+				map[string]any{"db_name": stringOfLen(65)},
+				"db_name: String length must be less than or equal to 64",
+			),
+		)
 
 		It("should provision a plan", func() {
 			instanceID, err := broker.Provision(serviceName, customMySQLPlan["name"].(string), nil)
@@ -99,12 +126,17 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("maintenance_start_min", BeNil()),
 					HaveKeyWithValue("maintenance_end_hour", BeNil()),
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
+					HaveKeyWithValue("deletion_protection", false),
+					HaveKeyWithValue("backup_retention_period", float64(7)),
+					HaveKeyWithValue("backup_window", BeNil()),
+					HaveKeyWithValue("copy_tags_to_snapshot", true),
+					HaveKeyWithValue("delete_automated_backups", true),
 				),
 			)
 		})
 
 		It("should allow properties to be set on provision", func() {
-			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+			_, err := broker.Provision(serviceName, customMySQLPlan["name"].(string), map[string]any{
 				"use_tls":                     false,
 				"storage_autoscale":           true,
 				"storage_autoscale_limit_gb":  float64(150),
@@ -125,6 +157,11 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"maintenance_start_min":       "45",
 				"maintenance_end_hour":        "10",
 				"maintenance_end_min":         "15",
+				"deletion_protection":         true,
+				"backup_retention_period":     float64(2),
+				"backup_window":               "01:02-03:04",
+				"copy_tags_to_snapshot":       false,
+				"delete_automated_backups":    false,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -154,6 +191,11 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("maintenance_start_min", "45"),
 					HaveKeyWithValue("maintenance_end_hour", "10"),
 					HaveKeyWithValue("maintenance_end_min", "15"),
+					HaveKeyWithValue("deletion_protection", true),
+					HaveKeyWithValue("backup_retention_period", float64(2)),
+					HaveKeyWithValue("backup_window", "01:02-03:04"),
+					HaveKeyWithValue("copy_tags_to_snapshot", false),
+					HaveKeyWithValue("delete_automated_backups", false),
 				),
 			)
 		})
@@ -169,17 +211,38 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should prevent updating region because it is flagged as `prohibit_update` and it can result in the recreation of the service instance and lost data", func() {
-			err := broker.Update(instanceID, serviceName, "small", map[string]any{"region": "no-matter-what-region"})
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
+			func(params map[string]any) {
+				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), params)
 
-			Expect(err).To(MatchError(
-				ContainSubstring(
-					"attempt to update parameter that may result in service instance re-creation and data loss",
-				),
-			))
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
 
-			const initialProvisionInvocation = 1
-			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
-		})
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
+			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
+		)
+
+		DescribeTable("should allow updating properties",
+			func(params map[string]any) {
+				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), params)
+
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry("update use_tls", map[string]any{"use_tls": false}),
+			Entry("update storage_autoscale", map[string]any{"storage_autoscale": true}),
+			Entry("update storage_autoscale_limit_gb", map[string]any{"storage_autoscale_limit_gb": 2}),
+			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
+			Entry("update deletion_protection", map[string]any{"deletion_protection": false}),
+			Entry("update backup_retention_period", map[string]any{"backup_retention_period": float64(2)}),
+			Entry("update backup_window", map[string]any{"backup_window": "01:02-03:04"}),
+			Entry("update copy_tags_to_snapshot", map[string]any{"copy_tags_to_snapshot": false}),
+			Entry("update delete_automated_backups", map[string]any{"delete_automated_backups": false}),
+		)
 	})
 })
