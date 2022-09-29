@@ -47,7 +47,7 @@ resource "aws_rds_cluster" "cluster" {
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                = 1
+  count                = var.cluster_instances
   identifier           = "${var.instance_name}-${count.index}"
   cluster_identifier   = aws_rds_cluster.cluster.id
   instance_class       = "db.r5.large"

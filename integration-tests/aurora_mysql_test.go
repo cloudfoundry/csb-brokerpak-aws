@@ -51,13 +51,69 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 	})
 
 	Describe("provisioning", func() {
+		It("should check region constraints", func() {
+			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{"region": "-Asia-northeast1"})
+
+			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
+		})
+
 		It("should provision a plan", func() {
 			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(SatisfyAll(
 				HaveKeyWithValue("instance_name", fmt.Sprintf("csb-auroramy-%s", instanceID)),
+				HaveKeyWithValue("region", "us-west-2"),
+				HaveKeyWithValue("cluster_instances", float64(3)),
+			))
+		})
+
+		It("should allow properties to be set on provision", func() {
+			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+				"instance_name":     "csb-aurora-mysql-fake-name",
+				"region":            "africa-north-4",
+				"cluster_instances": float64(12),
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("instance_name", "csb-aurora-mysql-fake-name"),
+					HaveKeyWithValue("region", "africa-north-4"),
+					HaveKeyWithValue("cluster_instances", float64(12)),
+				),
 			)
+		})
+	})
+
+	Describe("updating instance", func() {
+		var instanceID string
+
+		BeforeEach(func() {
+			var err error
+			instanceID, err = broker.Provision(serviceName, "custom-sample", nil)
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should prevent updating region because it is flagged as `prohibit_update` and it can result in the recreation of the service instance and lost data", func() {
+			err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{"region": "no-matter-what-region"})
+
+			Expect(err).To(MatchError(
+				ContainSubstring(
+					"attempt to update parameter that may result in service instance re-creation and data loss",
+				),
+			))
+
+			const initialProvisionInvocation = 1
+			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+		})
+
+		It("should allow updating the cluster_instances", func() {
+			err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{
+				"cluster_instances": 11,
+			})
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 })

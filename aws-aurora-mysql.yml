@@ -20,6 +20,10 @@ provision:
       minLength: 6
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
+  - field_name: cluster_instances
+    type: number
+    details: Number of Aurora cluster instances. The first instance is a writer instance, and additional instances are readers and will be distributed across the AZs available in the region.
+    default: 3
   - field_name: region
     type: string
     details: The region of AWS.
