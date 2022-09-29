@@ -32,6 +32,7 @@ plans:
     cores: 2
     mysql_version: 5.7
     storage_gb: 5
+    storage_type: "gp2"
     subsume: false
 - name: medium
   id: f2ae0bb7-6921-43b7-bae7-6d1fe1c5d1c6
@@ -41,6 +42,7 @@ plans:
     cores: 4
     mysql_version: 5.7
     storage_gb: 10
+    storage_type: "gp2"
     subsume: false
 - name: large
   id: a5fea013-e87f-488f-969d-1cf038881b57
@@ -50,13 +52,13 @@ plans:
     cores: 8
     mysql_version: 5.7
     storage_gb: 20
+    storage_type: "gp2"
     subsume: false
 provision:
   plan_inputs:
   - field_name: cores
-    required: true
     type: integer
-    details: Minimum number of cores for service instance.
+    details: Deprecated - Minimum number of cores for service instance. Suggest setting `instance_class` property instead.
     default: 2
     constraints:
       maximum: 64
@@ -73,7 +75,7 @@ provision:
     required: true
     type: number
     details: Size of storage volume for service instance.
-    default: 5
+    default: 100
     constraints:
       maximum: 4096
       minimum: 5
@@ -81,6 +83,14 @@ provision:
     type: boolean
     details: Indicates an existing PostgreSQL instance should be subsumed
   user_inputs:
+  - field_name: storage_type
+    type: string
+    details: Type of storage to be used. One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD).
+    default: "io1"
+  - field_name: iops
+    type: number
+    details: The amount of provisioned IOPS. In order for this property to take effect, `storage_type` must be set to `io1`.
+    default: 3000
   - field_name: use_tls
     type: boolean
     details: Use TLS for connection

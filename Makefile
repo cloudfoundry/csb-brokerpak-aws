@@ -27,6 +27,7 @@ export GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS = [{"name":"default","id":"f64891b4-5
 export GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS = [{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default","instance_class": "db.m6i.large","postgres_version": "14.2","storage_gb": 100}]
 export GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS = [{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]
 export GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS = [{"name":"default","id":"10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719","description":"Default Aurora MySQL plan","display_name":"default"}]
+export GSB_SERVICE_CSB_AWS_MYSQL_PLANS = [{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class": "db.m6i.large","mysql_version": "8.0","storage_gb": 100}]
 
 ifeq ($(GO_OK), 0)  # use local go binary
 GO=go
@@ -44,6 +45,7 @@ BROKER_GO_OPTS=PORT=8080 \
 				GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS='$(GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS)' \
 				GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS='$(GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS)' \
 				GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS='$(GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS)' \
+				GSB_SERVICE_CSB_AWS_MYSQL_PLANS='$(GSB_SERVICE_CSB_AWS_MYSQL_PLANS)' \
 				GSB_COMPATIBILITY_ENABLE_BETA_SERVICES='$(GSB_COMPATIBILITY_ENABLE_BETA_SERVICES)'
 
 PAK_PATH=$(PWD)
@@ -65,6 +67,7 @@ BROKER_DOCKER_OPTS=--rm -v $(PAK_CACHE):$(PAK_CACHE) -v $(PWD):/brokerpak -w /br
 		-e GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS \
 		-e GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS \
 		-e GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS \
+		-e GSB_SERVICE_CSB_AWS_MYSQL_PLANS \
 		-e GSB_COMPATIBILITY_ENABLE_BETA_SERVICES
 
 RUN_CSB=docker run $(BROKER_DOCKER_OPTS) $(CSB_DOCKER_IMAGE)
