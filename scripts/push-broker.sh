@@ -96,6 +96,11 @@ if [[ -z "$GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS" ]]; then
 fi
 echo "    GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS" | jq @json)" >>$cfmf
 
+if [[ -z "$GSB_SERVICE_CSB_AWS_MYSQL_PLANS" ]]; then
+  GSB_SERVICE_CSB_AWS_MYSQL_PLANS='[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class": "db.m6i.large","mysql_version": "8.0","storage_gb": 100}]'
+fi
+echo "    GSB_SERVICE_CSB_AWS_MYSQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_MYSQL_PLANS" | jq @json)" >>$cfmf
+
 cf push --no-start -f "${cfmf}" --var app=${APP_NAME}
 
 if [[ -z ${MSYQL_INSTANCE} ]]; then
