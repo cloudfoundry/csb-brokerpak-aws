@@ -5,6 +5,7 @@ acceptance-tests
 docs
 integration-tests
 providers
+terraform-tests
 scripts
 terraform
 tools

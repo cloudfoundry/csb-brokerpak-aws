@@ -1,4 +1,5 @@
 **/.idea
 aws-services-*.brokerpak
 cloud-service-broker
+.aws-terraform-tests
 
