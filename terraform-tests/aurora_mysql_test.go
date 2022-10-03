@@ -31,7 +31,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), func() {
 		})
 
 		Context("provisioning an aurora instance", Ordered, func() {
-			Context("Default values", func() {
+			Context("with Default values", func() {
 				BeforeEach(func() {
 					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 				})
@@ -72,14 +72,14 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), func() {
 					}))
 				})
 			})
-			Context("cluster_instances", func() {
+			Context("cluster_instances is 0", func() {
 				BeforeEach(func() {
 					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 						"cluster_instances": 0,
 					}))
 				})
 
-				It("should create the right resources", func() {
+				It("should not create any cluster_instance", func() {
 					Expect(plan.ResourceChanges).To(HaveLen(6))
 
 					Expect(ResourceChangesTypes(plan)).To(ConsistOf(
