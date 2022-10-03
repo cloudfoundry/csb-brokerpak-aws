@@ -17,8 +17,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Init(dir string, args ...string) {
-	//command := exec.Command(tfBinary, "-chdir=" + dir, "init", "--plugin-dir=../../../terraform-tests/terraform-plugins")
+func Init(dir string) {
 	command := exec.Command("terraform", "-chdir="+dir, "init")
 	CommandStart(command)
 }
@@ -50,11 +49,11 @@ func decodePlan(dir, planFile string) []byte {
 	return jsonPlan
 }
 
-func CommandStart(command *exec.Cmd) (*gexec.Session, error) {
+func CommandStart(command *exec.Cmd) *gexec.Session {
 	session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
 	Eventually(session, 35*time.Minute).Should(gexec.Exit(0))
-	return session, err
+	return session
 }
 
 func writeTFVarsFile(vars map[string]any, tfvarsPath string) {

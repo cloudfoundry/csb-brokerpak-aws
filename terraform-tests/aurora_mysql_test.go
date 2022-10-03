@@ -18,6 +18,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), func() {
 		"aws_access_key_id":     awsAccessKeyID,
 		"aws_secret_access_key": awsSecretAccessKey,
 		"aws_vpc_id":            awsVPCID,
+		"cluster_instances":     3,
 	}
 
 	var plan tfjson.Plan
@@ -36,9 +37,11 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), func() {
 				})
 
 				It("should create the right resources", func() {
-					Expect(plan.ResourceChanges).To(HaveLen(7))
+					Expect(plan.ResourceChanges).To(HaveLen(9))
 
 					Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+						"aws_rds_cluster_instance",
+						"aws_rds_cluster_instance",
 						"aws_rds_cluster_instance",
 						"aws_rds_cluster",
 						"random_password",
@@ -56,6 +59,37 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), func() {
 						"instance_class":       Equal("db.r5.large"),
 						"db_subnet_group_name": Equal("csb-auroramy-test-p-sn"),
 					}))
+				})
+
+				It("should create a cluster with the right values", func() {
+					Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
+						"cluster_identifier":   Equal("csb-auroramy-test"),
+						"engine":               Equal("aurora-mysql"),
+						"database_name":        Equal("auroradb"),
+						"port":                 Equal(float64(3306)),
+						"db_subnet_group_name": Equal("csb-auroramy-test-p-sn"),
+						"skip_final_snapshot":  BeTrue(),
+					}))
+				})
+			})
+			Context("cluster_instances", func() {
+				BeforeEach(func() {
+					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+						"cluster_instances": 0,
+					}))
+				})
+
+				It("should create the right resources", func() {
+					Expect(plan.ResourceChanges).To(HaveLen(6))
+
+					Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+						"aws_rds_cluster",
+						"random_password",
+						"random_string",
+						"aws_security_group_rule",
+						"aws_db_subnet_group",
+						"aws_security_group",
+					))
 				})
 
 				It("should create a cluster with the right values", func() {

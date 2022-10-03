@@ -4,10 +4,10 @@ import (
 	tfjson "github.com/hashicorp/terraform-json"
 )
 
-func ResourceChangesForType(plan tfjson.Plan, resourceType string) []tfjson.ResourceChange {
+func ResourceCreationForType(plan tfjson.Plan, resourceType string) []tfjson.ResourceChange {
 	var result []tfjson.ResourceChange
 	for _, change := range plan.ResourceChanges {
-		if change.Type == resourceType {
+		if change.Type == resourceType && change.Change.Actions.Create() {
 			result = append(result, *change)
 		}
 	}
@@ -23,15 +23,14 @@ func AfterValuesForType(plan tfjson.Plan, resourceType string) interface{} {
 	return nil
 }
 
-//func AfterValuesForType(plan tfjson.Plan, resourceType string) []tfjson.ResourceChange {
-//	var result []tfjson.ResourceChange
-//	for _, change := range plan.ResourceChanges {
-//		if change.Type == resourceType {
-//			result = append(result, *change)
-//		}
-//	}
-//	return result
-//}
+func UnknownValuesForType(plan tfjson.Plan, resourceType string) interface{} {
+	for _, change := range plan.ResourceChanges {
+		if change.Type == resourceType {
+			return change.Change.AfterUnknown
+		}
+	}
+	return nil
+}
 
 func ResourceChangesTypes(plan tfjson.Plan) []string {
 	var result []string
