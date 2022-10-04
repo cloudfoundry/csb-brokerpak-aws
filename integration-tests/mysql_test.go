@@ -20,7 +20,6 @@ var customMySQLPlan = map[string]any{
 	"mysql_version": 8,
 	"cores":         4,
 	"storage_gb":    100,
-	"subsume":       false,
 	"metadata": map[string]any{
 		"displayName": "custom-sample (Beta)",
 	},
@@ -134,6 +133,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("backup_window", BeNil()),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
+					HaveKeyWithValue("option_group_name", BeNil()),
 				),
 			)
 		})
@@ -166,6 +166,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"backup_window":               "01:02-03:04",
 				"copy_tags_to_snapshot":       false,
 				"delete_automated_backups":    false,
+				"option_group_name":           "option-group-name",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -201,6 +202,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("backup_window", "01:02-03:04"),
 					HaveKeyWithValue("copy_tags_to_snapshot", false),
 					HaveKeyWithValue("delete_automated_backups", false),
+					HaveKeyWithValue("option_group_name", "option-group-name"),
 				),
 			)
 		})
@@ -250,6 +252,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update backup_window", map[string]any{"backup_window": "01:02-03:04"}),
 			Entry("update copy_tags_to_snapshot", map[string]any{"copy_tags_to_snapshot": false}),
 			Entry("update delete_automated_backups", map[string]any{"delete_automated_backups": false}),
+			Entry("update option_group_name", map[string]any{"option_group_name": "option-group-name"}),
 		)
 	})
 })
