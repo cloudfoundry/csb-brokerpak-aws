@@ -17,15 +17,15 @@ func TestTerraformTests(t *testing.T) {
 }
 
 var (
+	workingDir string
+
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	awsAccessKeyID     = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsVPCID           = "vpc-72464617"
-	workingDir         = "../.aws-terraform-tests"
 )
 
 var _ = BeforeSuite(func() {
-	err := os.MkdirAll(workingDir, os.ModePerm)
-	Expect(err).ToNot(HaveOccurred())
+	workingDir = GinkgoT().TempDir()
 	Expect(cp.Copy("../terraform", workingDir)).NotTo(HaveOccurred())
 })
 
