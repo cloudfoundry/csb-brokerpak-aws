@@ -254,7 +254,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			})
 		})
 
-		Context("only maintenance_day specified", func() {
+		Context("maintainance window specified with all values", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"maintenance_day":        "Mon",
