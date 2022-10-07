@@ -49,3 +49,4 @@ variable "monitoring_interval" { type = number }
 variable "monitoring_role_arn" { type = string }
 variable "performance_insights_enabled" { type = bool }
 variable "performance_insights_kms_key_id" { type = string }
+variable "performance_insights_retention_period" { type = number }

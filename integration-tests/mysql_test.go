@@ -107,6 +107,11 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				map[string]any{"monitoring_interval": -1},
 				"monitoring_interval: Must be greater than or equal to 0",
 			),
+			Entry(
+				"performance_insights_retention_period minimum value is 7",
+				map[string]any{"performance_insights_retention_period": 1},
+				"performance_insights_retention_period: Must be greater than or equal to 7",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -148,43 +153,45 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("monitoring_role_arn", ""),
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
+					HaveKeyWithValue("performance_insights_retention_period", float64(7)),
 				),
 			)
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, customMySQLPlan["name"].(string), map[string]any{
-				"use_tls":                         false,
-				"storage_type":                    "gp2",
-				"storage_autoscale":               true,
-				"storage_autoscale_limit_gb":      float64(150),
-				"storage_encrypted":               true,
-				"parameter_group_name":            "fake-parameter-group",
-				"instance_name":                   "csb-mysql-fake-name",
-				"db_name":                         "fake-db-name",
-				"publicly_accessible":             true,
-				"region":                          "africa-north-4",
-				"multi_az":                        true,
-				"instance_class":                  "",
-				"rds_subnet_group":                "",
-				"rds_vpc_security_group_ids":      "",
-				"allow_major_version_upgrade":     false,
-				"auto_minor_version_upgrade":      false,
-				"maintenance_day":                 "Mon",
-				"maintenance_start_hour":          "03",
-				"maintenance_start_min":           "45",
-				"maintenance_end_hour":            "10",
-				"maintenance_end_min":             "15",
-				"deletion_protection":             true,
-				"backup_retention_period":         float64(2),
-				"backup_window":                   "01:02-03:04",
-				"copy_tags_to_snapshot":           false,
-				"delete_automated_backups":        false,
-				"option_group_name":               "option-group-name",
-				"monitoring_interval":             30,
-				"monitoring_role_arn":             "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
-				"performance_insights_enabled":    true,
-				"performance_insights_kms_key_id": "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"use_tls":                               false,
+				"storage_type":                          "gp2",
+				"storage_autoscale":                     true,
+				"storage_autoscale_limit_gb":            float64(150),
+				"storage_encrypted":                     true,
+				"parameter_group_name":                  "fake-parameter-group",
+				"instance_name":                         "csb-mysql-fake-name",
+				"db_name":                               "fake-db-name",
+				"publicly_accessible":                   true,
+				"region":                                "africa-north-4",
+				"multi_az":                              true,
+				"instance_class":                        "",
+				"rds_subnet_group":                      "",
+				"rds_vpc_security_group_ids":            "",
+				"allow_major_version_upgrade":           false,
+				"auto_minor_version_upgrade":            false,
+				"maintenance_day":                       "Mon",
+				"maintenance_start_hour":                "03",
+				"maintenance_start_min":                 "45",
+				"maintenance_end_hour":                  "10",
+				"maintenance_end_min":                   "15",
+				"deletion_protection":                   true,
+				"backup_retention_period":               float64(2),
+				"backup_window":                         "01:02-03:04",
+				"copy_tags_to_snapshot":                 false,
+				"delete_automated_backups":              false,
+				"option_group_name":                     "option-group-name",
+				"monitoring_interval":                   30,
+				"monitoring_role_arn":                   "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
+				"performance_insights_enabled":          true,
+				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_retention_period": 93,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -225,6 +232,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					HaveKeyWithValue("performance_insights_retention_period", float64(93)),
 				),
 			)
 		})
@@ -279,6 +287,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update monitoring_role_arn", map[string]any{"monitoring_role_arn": ""}),
 			Entry("update performance_insights_enabled", map[string]any{"performance_insights_enabled": true}),
 			Entry("update performance_insights_kms_key_id", map[string]any{"performance_insights_kms_key_id": "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"}),
+			Entry("update performance_insights_retention_period", map[string]any{"performance_insights_retention_period": 31}),
 		)
 	})
 })
