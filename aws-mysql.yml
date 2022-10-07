@@ -265,6 +265,35 @@ provision:
     type: boolean
     details: Copy all instance tags to snapshots
     default: true
+  - field_name: monitoring_interval
+    type: number
+    details: |
+      The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
+      To disable collecting Enhanced Monitoring metrics, specify 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
+      A `monitoring_role_arn` value is required if you specify a `monitoring_interval` value other than 0.
+      To read about Enhanced Monitoring metrics see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.overview.html.
+    default: 0
+    constraints:
+      maximum: 60
+      minimum: 0
+  - field_name: monitoring_role_arn
+    type: string
+    details: |
+      Enhanced Monitoring requires permission to act on your behalf to send OS metric information to CloudWatch Logs.
+      This property represents the ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
+      To read about setting up and enabling Enhanced Monitoring see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.Enabling.html.
+    default: ""
+  - field_name: performance_insights_enabled
+    type: boolean
+    details: Specifies whether Performance Insights are enabled (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.Overview.html).
+    default: false
+  - field_name: performance_insights_kms_key_id
+    type: string
+    details: |
+      The ARN for the KMS key to encrypt Performance Insights data.
+      When specifying `performance_insights_kms_key_id`, `performance_insights_enabled` needs to be set to true.
+      Once KMS key is set, it can never be changed.
+    default: ""
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
