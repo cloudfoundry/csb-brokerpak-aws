@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "name" { value = aws_db_instance.db_instance.name }
+output "name" { value = aws_db_instance.db_instance.db_name }
 output "hostname" { value = aws_db_instance.db_instance.address }
 output "username" { value = aws_db_instance.db_instance.username }
 output "password" {
@@ -24,7 +24,7 @@ output "provider_verify_certificate" { value = var.provider_verify_certificate }
 output "status" {
   value = format(
     "created db %s (id: %s) on server %s URL: https://%s.console.aws.amazon.com/rds/home?region=%s#database:id=%s;is-cluster=false",
-    aws_db_instance.db_instance.name,
+    aws_db_instance.db_instance.db_name,
     aws_db_instance.db_instance.id,
     aws_db_instance.db_instance.address,
     var.region,
