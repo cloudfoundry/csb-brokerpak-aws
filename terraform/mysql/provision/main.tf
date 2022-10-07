@@ -48,35 +48,39 @@ resource "random_password" "password" {
 }
 
 resource "aws_db_instance" "db_instance" {
-  allocated_storage           = var.storage_gb
-  storage_type                = var.storage_type
-  iops                        = var.storage_type == "io1" ? var.iops : null
-  skip_final_snapshot         = true
-  engine                      = var.engine
-  engine_version              = var.engine_version
-  instance_class              = local.instance_class
-  identifier                  = var.instance_name
-  db_name                     = var.db_name
-  username                    = random_string.username.result
-  password                    = random_password.password.result
-  parameter_group_name        = local.parameter_group_name
-  tags                        = var.labels
-  vpc_security_group_ids      = local.rds_vpc_security_group_ids
-  db_subnet_group_name        = local.subnet_group
-  publicly_accessible         = var.publicly_accessible
-  multi_az                    = var.multi_az
-  allow_major_version_upgrade = var.allow_major_version_upgrade
-  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
-  maintenance_window          = local.maintenance_window
-  apply_immediately           = true
-  max_allocated_storage       = local.max_allocated_storage
-  storage_encrypted           = var.storage_encrypted
-  deletion_protection         = var.deletion_protection
-  backup_retention_period     = var.backup_retention_period
-  backup_window               = var.backup_window
-  copy_tags_to_snapshot       = var.copy_tags_to_snapshot
-  delete_automated_backups    = var.delete_automated_backups
-  option_group_name           = var.option_group_name
+  allocated_storage               = var.storage_gb
+  storage_type                    = var.storage_type
+  iops                            = var.storage_type == "io1" ? var.iops : null
+  skip_final_snapshot             = true
+  engine                          = var.engine
+  engine_version                  = var.engine_version
+  instance_class                  = local.instance_class
+  identifier                      = var.instance_name
+  db_name                         = var.db_name
+  username                        = random_string.username.result
+  password                        = random_password.password.result
+  parameter_group_name            = local.parameter_group_name
+  tags                            = var.labels
+  vpc_security_group_ids          = local.rds_vpc_security_group_ids
+  db_subnet_group_name            = local.subnet_group
+  publicly_accessible             = var.publicly_accessible
+  multi_az                        = var.multi_az
+  allow_major_version_upgrade     = var.allow_major_version_upgrade
+  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
+  maintenance_window              = local.maintenance_window
+  apply_immediately               = true
+  max_allocated_storage           = local.max_allocated_storage
+  storage_encrypted               = var.storage_encrypted
+  deletion_protection             = var.deletion_protection
+  backup_retention_period         = var.backup_retention_period
+  backup_window                   = var.backup_window
+  copy_tags_to_snapshot           = var.copy_tags_to_snapshot
+  delete_automated_backups        = var.delete_automated_backups
+  option_group_name               = var.option_group_name
+  monitoring_interval             = var.monitoring_interval
+  monitoring_role_arn             = var.monitoring_role_arn
+  performance_insights_enabled    = var.performance_insights_enabled
+  performance_insights_kms_key_id = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
 
   lifecycle {
     prevent_destroy = true
