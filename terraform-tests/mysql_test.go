@@ -10,103 +10,75 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
+var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":                   "csb-postgresql-test",
-		"db_name":                         "vsbdb",
-		"cores":                           nil,
-		"labels":                          map[string]string{"label1": "value1"},
-		"storage_gb":                      5,
-		"publicly_accessible":             false,
-		"multi_az":                        false,
-		"instance_class":                  "db.r5.large",
-		"postgres_version":                14,
-		"aws_vpc_id":                      awsVPCID,
-		"storage_autoscale":               false,
-		"storage_autoscale_limit_gb":      0,
-		"storage_encrypted":               false,
-		"parameter_group_name":            "",
-		"rds_subnet_group":                "",
-		"rds_vpc_security_group_ids":      "",
-		"allow_major_version_upgrade":     true,
-		"auto_minor_version_upgrade":      true,
-		"maintenance_end_hour":            nil,
-		"maintenance_start_hour":          nil,
-		"maintenance_end_min":             nil,
-		"maintenance_start_min":           nil,
-		"maintenance_day":                 nil,
-		"region":                          "us-west-2",
-		"backup_window":                   nil,
-		"copy_tags_to_snapshot":           true,
-		"delete_automated_backups":        true,
-		"deletion_protection":             false,
-		"iops":                            3000,
-		"kms_key_id":                      "",
-		"monitoring_interval":             0,
-		"monitoring_role_arn":             "",
-		"performance_insights_enabled":    false,
-		"performance_insights_kms_key_id": "",
-		"provider_verify_certificate":     true,
-		"require_ssl":                     false,
-		"storage_type":                    "io1",
-		"backup_retention_period":         7,
-		"aws_access_key_id":               awsAccessKeyID,
-		"aws_secret_access_key":           awsSecretAccessKey,
+		"cores":                       nil,
+		"instance_name":               "csb-mysql-test",
+		"db_name":                     "vsbdb",
+		"labels":                      map[string]string{"label1": "value1"},
+		"storage_gb":                  5,
+		"storage_type":                "io1",
+		"iops":                        3000,
+		"publicly_accessible":         false,
+		"multi_az":                    false,
+		"instance_class":              "an-instance-class",
+		"engine":                      "mysql",
+		"engine_version":              5.7,
+		"aws_vpc_id":                  awsVPCID,
+		"storage_autoscale":           false,
+		"storage_autoscale_limit_gb":  0,
+		"storage_encrypted":           false,
+		"parameter_group_name":        "",
+		"rds_subnet_group":            "",
+		"rds_vpc_security_group_ids":  "",
+		"allow_major_version_upgrade": true,
+		"auto_minor_version_upgrade":  true,
+		"maintenance_end_hour":        nil,
+		"maintenance_start_hour":      nil,
+		"maintenance_end_min":         nil,
+		"maintenance_start_min":       nil,
+		"maintenance_day":             nil,
+		"use_tls":                     true,
+		"deletion_protection":         false,
+		"backup_retention_period":     7,
+		"backup_window":               nil,
+		"copy_tags_to_snapshot":       true,
+		"delete_automated_backups":    true,
+		"aws_access_key_id":           awsAccessKeyID,
+		"aws_secret_access_key":       awsSecretAccessKey,
+		"region":                      "us-west-2",
+		"subsume":                     false,
+		"option_group_name":           nil,
 	}
 
 	BeforeAll(func() {
-		terraformProvisionDir = path.Join(workingDir, "postgresql/provision")
+		terraformProvisionDir = path.Join(workingDir, "mysql/provision")
 		Init(terraformProvisionDir)
 	})
 
-	Context("postgres parameter groups", func() {
-		When("no parameter group name passed", func() {
+	Context("mysql parameter groups", func() {
+		When("No parameter group name passed", func() {
 			BeforeAll(func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"postgres_version": "14.1",
-				}))
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
 
-			It("should create a parameter group", func() {
-				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(HaveLen(1))
+			It("should use the default parameter group", func() {
+				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(BeEmpty())
+
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"parameter_group_name": Equal("rds-pg-csb-postgresql-test"),
+						"parameter_group_name": Equal("default.mysql5.7"),
 					}))
-				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"name":   Equal("rds-pg-csb-postgresql-test"),
-						"family": Equal("postgres14"),
-						"parameter": ConsistOf(MatchKeys(IgnoreExtras, Keys{
-							"name":  Equal("rds.force_ssl"),
-							"value": Equal("0"),
-						}))}))
 			})
+
 		})
 
-		When("requiring SSL", func() {
-			BeforeAll(func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"require_ssl": true,
-				}))
-			})
-
-			It("should configure the parameter in the parameter group", func() {
-				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"parameter": ConsistOf(MatchKeys(IgnoreExtras, Keys{
-							"name":  Equal("rds.force_ssl"),
-							"value": Equal("1"),
-						}))}))
-			})
-		})
-
-		When("parameter group passed", func() {
+		Context("Parameter group passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"parameter_group_name": "some-parameter-group-name",
@@ -126,7 +98,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	})
 
 	Context("storage type", func() {
-		Context("default values", func() {
+		When("default values are passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
@@ -140,7 +112,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			})
 		})
 
-		Context("storage_type gp2", func() {
+		When("storage_type is gp2", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"storage_type": "gp2",
@@ -155,6 +127,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					}))
 			})
 		})
+
 	})
 
 	Context("autoscaling", func() {
@@ -205,10 +178,11 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					}))
 			})
 		})
+
 	})
 
 	Context("security groups", func() {
-		Context("no security group ids passed", func() {
+		When("no security group ids passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
@@ -221,12 +195,12 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 				Expect(ResourceCreationForType(plan, "aws_security_group")).To(HaveLen(1))
 				Expect(AfterValuesForType(plan, "aws_security_group")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"name": Equal("csb-postgresql-test-sg"),
+						"name": Equal("csb-mysql-test-sg"),
 					}))
 			})
 		})
 
-		Context("security group ids passed", func() {
+		When("security group ids passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"rds_vpc_security_group_ids": "group1,group2,group3",
@@ -244,17 +218,16 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	})
 
 	Context("maintenance_window", func() {
-		Context("no window", func() {
+		When("no window is set", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
-
 			It("should not be passed", func() {
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(Not(HaveKey("maintenance_window")))
 			})
 		})
 
-		Context("maintainance window specified with all values", func() {
+		When("maintainance window specified with all values", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"maintenance_day":        "Mon",
@@ -271,6 +244,9 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 						"maintenance_window": Equal("mon:01:03-mon:02:04"),
 					}))
 			})
+
 		})
+
 	})
+
 })
