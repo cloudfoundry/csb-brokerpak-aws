@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/terraform-json v0.14.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.2.0
-	github.com/onsi/gomega v1.20.2
+	github.com/onsi/gomega v1.21.1
 	github.com/otiai10/copy v1.7.0
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
 	golang.org/x/tools v0.1.12
