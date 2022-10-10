@@ -127,6 +127,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("storage_autoscale", false),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(0)),
 					HaveKeyWithValue("storage_encrypted", false),
+					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("parameter_group_name", ""),
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-mysql-%s", instanceID)),
 					HaveKeyWithValue("db_name", "vsbdb"),
@@ -165,6 +166,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"storage_autoscale":                     true,
 				"storage_autoscale_limit_gb":            float64(150),
 				"storage_encrypted":                     true,
+				"kms_key_id":                            "arn:aws:xxxx",
 				"parameter_group_name":                  "fake-parameter-group",
 				"instance_name":                         "csb-mysql-fake-name",
 				"db_name":                               "fake-db-name",
@@ -206,6 +208,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("storage_autoscale", true),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(150)),
 					HaveKeyWithValue("storage_encrypted", true),
+					HaveKeyWithValue("kms_key_id", "arn:aws:xxxx"),
 					HaveKeyWithValue("parameter_group_name", "fake-parameter-group"),
 					HaveKeyWithValue("instance_name", "csb-mysql-fake-name"),
 					HaveKeyWithValue("db_name", "fake-db-name"),
@@ -263,6 +266,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			},
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
+			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
 			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
 		)
 

@@ -34,6 +34,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"storage_autoscale":                     false,
 		"storage_autoscale_limit_gb":            0,
 		"storage_encrypted":                     false,
+		"kms_key_id":                            "",
 		"parameter_group_name":                  "",
 		"rds_subnet_group":                      "",
 		"rds_vpc_security_group_ids":            "",
@@ -281,6 +282,33 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 						"performance_insights_enabled":          Equal(true),
 						"performance_insights_retention_period": BeNumerically("==", retentionPeriod),
 					}))
+			})
+		})
+	})
+
+	Context("storage_encrypted", func() {
+		kmsKeyID := "arn:aws:kms:region:111111111111:key/xxxx7xxx-ddfb-4e2f-8e93-c96d7bc43daa"
+		When("is not enabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(
+					defaultVars,
+					map[string]any{
+						"storage_encrypted": false,
+						"kms_key_id":        kmsKeyID,
+					},
+				))
+			})
+			It("should not set kms_key_id", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(Not(HaveKey("kms_key_id")))
+			})
+		})
+
+		When("is enabled and key is not passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"storage_encrypted": true}))
+			})
+			It("should not set kms_key_id", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(Not(HaveKey("kms_key_id")))
 			})
 		})
 	})

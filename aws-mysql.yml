@@ -110,6 +110,13 @@ provision:
     default: false
     details: Enable encrypted storage
     prohibit_update: true
+  - field_name: kms_key_id
+    type: string
+    default: ""
+    details: |
+      The ARN for the KMS encryption key (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html)
+      The `storage_encrypted` property must be enabled if the key is specified.
+    prohibit_update: true
   - field_name: parameter_group_name
     type: string
     default: ""
