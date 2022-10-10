@@ -301,7 +301,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"performance_insights_enabled":          Equal(true),
-						"performance_insights_retention_period": Equal(float64(retentionPeriod)),
+						"performance_insights_retention_period": BeNumerically("==", retentionPeriod),
 					}))
 			})
 		})
