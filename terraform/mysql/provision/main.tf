@@ -81,7 +81,7 @@ resource "aws_db_instance" "db_instance" {
   monitoring_role_arn                   = var.monitoring_role_arn
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
-  performance_insights_retention_period = var.performance_insights_retention_period
+  performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention_period : null
 
   lifecycle {
     prevent_destroy = true
