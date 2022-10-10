@@ -80,6 +80,11 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				map[string]any{"db_name": stringOfLen(99)},
 				"db_name: String length must be less than or equal to 64",
 			),
+			Entry(
+				"performance_insights_retention_period minimum value is 7",
+				map[string]any{"performance_insights_retention_period": 1},
+				"performance_insights_retention_period: Must be greater than or equal to 7",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -120,41 +125,43 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("monitoring_role_arn", ""),
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
+					HaveKeyWithValue("performance_insights_retention_period", float64(7)),
 				),
 			)
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
-				"require_ssl":                     true,
-				"storage_type":                    "gp2",
-				"provider_verify_certificate":     false,
-				"storage_autoscale":               true,
-				"storage_autoscale_limit_gb":      float64(150),
-				"parameter_group_name":            "flopsy",
-				"instance_name":                   "csb-postgresql-mopsy",
-				"db_name":                         "cottontail",
-				"publicly_accessible":             true,
-				"region":                          "africa-north-4",
-				"storage_encrypted":               true,
-				"kms_key_id":                      "arn:aws:xxxx",
-				"multi_az":                        true,
-				"allow_major_version_upgrade":     false,
-				"auto_minor_version_upgrade":      false,
-				"maintenance_day":                 "Mon",
-				"maintenance_start_hour":          "03",
-				"maintenance_start_min":           "45",
-				"maintenance_end_hour":            "10",
-				"maintenance_end_min":             "15",
-				"deletion_protection":             true,
-				"backup_retention_period":         float64(2),
-				"backup_window":                   "01:02-03:04",
-				"copy_tags_to_snapshot":           false,
-				"delete_automated_backups":        false,
-				"monitoring_interval":             30,
-				"monitoring_role_arn":             "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
-				"performance_insights_enabled":    true,
-				"performance_insights_kms_key_id": "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"require_ssl":                           true,
+				"storage_type":                          "gp2",
+				"provider_verify_certificate":           false,
+				"storage_autoscale":                     true,
+				"storage_autoscale_limit_gb":            float64(150),
+				"parameter_group_name":                  "flopsy",
+				"instance_name":                         "csb-postgresql-mopsy",
+				"db_name":                               "cottontail",
+				"publicly_accessible":                   true,
+				"region":                                "africa-north-4",
+				"storage_encrypted":                     true,
+				"kms_key_id":                            "arn:aws:xxxx",
+				"multi_az":                              true,
+				"allow_major_version_upgrade":           false,
+				"auto_minor_version_upgrade":            false,
+				"maintenance_day":                       "Mon",
+				"maintenance_start_hour":                "03",
+				"maintenance_start_min":                 "45",
+				"maintenance_end_hour":                  "10",
+				"maintenance_end_min":                   "15",
+				"deletion_protection":                   true,
+				"backup_retention_period":               float64(2),
+				"backup_window":                         "01:02-03:04",
+				"copy_tags_to_snapshot":                 false,
+				"delete_automated_backups":              false,
+				"monitoring_interval":                   30,
+				"monitoring_role_arn":                   "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
+				"performance_insights_enabled":          true,
+				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_retention_period": 93,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -189,6 +196,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					HaveKeyWithValue("performance_insights_retention_period", float64(93)),
 				),
 			)
 		})
@@ -243,6 +251,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "monitoring_role_arn", "arn:aws:iam::649758297924:role/enhanced_monitoring_access"),
 			Entry(nil, "performance_insights_enabled", true),
 			Entry(nil, "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+			Entry(nil, "performance_insights_retention_period", 31),
 		)
 	})
 })
