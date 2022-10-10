@@ -254,4 +254,35 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 
 	})
 
+	Context("performance_insights", func() {
+		When("is not enabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"performance_insights_enabled": false}))
+			})
+			It("should not set performance_insights_retention_period", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(Not(HaveKey("performance_insights_retention_period")))
+			})
+		})
+
+		When("is enabled", func() {
+			retentionPeriod := 7
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(
+					defaultVars,
+					map[string]any{
+						"performance_insights_enabled":          true,
+						"performance_insights_retention_period": retentionPeriod,
+					},
+				))
+			})
+			It("should set the passed value for performance_insights_retention_period", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"performance_insights_enabled":          Equal(true),
+						"performance_insights_retention_period": Equal(float64(retentionPeriod)),
+					}))
+			})
+		})
+	})
+
 })
