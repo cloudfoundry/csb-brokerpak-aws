@@ -109,6 +109,7 @@ provision:
     type: boolean
     default: false
     details: Enable encrypted storage
+    prohibit_update: true
   - field_name: kms_key_id
     type: string
     default: ""
