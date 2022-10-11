@@ -109,6 +109,7 @@ provision:
     type: boolean
     default: false
     details: Enable encrypted storage
+    prohibit_update: true
   - field_name: parameter_group_name
     type: string
     default: ""

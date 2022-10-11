@@ -263,6 +263,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			},
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
+			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
 		)
 
 		DescribeTable("should allow updating properties",
@@ -276,7 +277,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update iops", map[string]any{"iops": 1500}),
 			Entry("update storage_autoscale", map[string]any{"storage_autoscale": true}),
 			Entry("update storage_autoscale_limit_gb", map[string]any{"storage_autoscale_limit_gb": 2}),
-			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
 			Entry("update deletion_protection", map[string]any{"deletion_protection": false}),
 			Entry("update backup_retention_period", map[string]any{"backup_retention_period": float64(2)}),
 			Entry("update backup_window", map[string]any{"backup_window": "01:02-03:04"}),
