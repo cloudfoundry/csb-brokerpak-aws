@@ -64,15 +64,18 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(SatisfyAll(
 				HaveKeyWithValue("instance_name", fmt.Sprintf("csb-auroramy-%s", instanceID)),
 				HaveKeyWithValue("region", "us-west-2"),
-				HaveKeyWithValue("cluster_instances", float64(3)),
+				HaveKeyWithValue("cluster_instances", BeNumerically("==", 3)),
 			))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
-				"instance_name":     "csb-aurora-mysql-fake-name",
-				"region":            "africa-north-4",
-				"cluster_instances": float64(12),
+				"instance_name":           "csb-aurora-mysql-fake-name",
+				"region":                  "africa-north-4",
+				"cluster_instances":       12,
+				"serverless_min_capacity": 0.2,
+				"serverless_max_capacity": 100,
+				"engine_version":          "8.0.mysql_aurora.3.02.0",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -80,7 +83,10 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("instance_name", "csb-aurora-mysql-fake-name"),
 					HaveKeyWithValue("region", "africa-north-4"),
-					HaveKeyWithValue("cluster_instances", float64(12)),
+					HaveKeyWithValue("cluster_instances", BeNumerically("==", 12)),
+					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
+					HaveKeyWithValue("serverless_max_capacity", BeNumerically("==", 100)),
+					HaveKeyWithValue("engine_version", "8.0.mysql_aurora.3.02.0"),
 				),
 			)
 		})
@@ -96,24 +102,33 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should prevent updating region because it is flagged as `prohibit_update` and it can result in the recreation of the service instance and lost data", func() {
-			err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{"region": "no-matter-what-region"})
+		DescribeTable(
+			"preventing updates with `prohibit_update` as it can force resource replacement or re-creation",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
 
-			Expect(err).To(MatchError(
-				ContainSubstring(
-					"attempt to update parameter that may result in service instance re-creation and data loss",
-				),
-			))
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
 
-			const initialProvisionInvocation = 1
-			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
-		})
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("region", "region", "no-matter-what-region"),
+			Entry("instance_name", "instance_name", "marmaduke"),
+		)
 
-		It("should allow updating the cluster_instances", func() {
-			err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{
-				"cluster_instances": 11,
-			})
-			Expect(err).NotTo(HaveOccurred())
-		})
+		DescribeTable(
+			"allowed updates",
+			func(prop string, value any) {
+				Expect(broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})).To(Succeed())
+			},
+			Entry("cluster_instances", "cluster_instances", 11),
+			Entry("serverless_min_capacity", "serverless_min_capacity", 1),
+			Entry("serverless_max_capacity", "serverless_max_capacity", 30),
+			Entry("engine_version", "engine_version", "8.0.mysql_aurora.3.02.0"),
+		)
 	})
 })
