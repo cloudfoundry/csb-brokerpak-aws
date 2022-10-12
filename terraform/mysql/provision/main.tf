@@ -41,8 +41,8 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
-  length           = 32
-  special          = false
+  length  = 32
+  special = false
   // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html#RDS_Limits.Constraints
   override_special = "~_-."
 }
