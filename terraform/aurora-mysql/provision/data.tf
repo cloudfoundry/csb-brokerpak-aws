@@ -11,5 +11,6 @@ data "aws_subnets" "all" {
 }
 
 locals {
-  port = 3306
+  port       = 3306
+  serverless = var.serverless_max_capacity != null || var.serverless_min_capacity != null
 }

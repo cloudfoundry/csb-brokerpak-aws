@@ -17,12 +17,15 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":         "csb-auroramy-test",
-		"region":                "us-west-2",
-		"aws_access_key_id":     awsAccessKeyID,
-		"aws_secret_access_key": awsSecretAccessKey,
-		"aws_vpc_id":            awsVPCID,
-		"cluster_instances":     3,
+		"instance_name":           "csb-auroramy-test",
+		"region":                  "us-west-2",
+		"aws_access_key_id":       awsAccessKeyID,
+		"aws_secret_access_key":   awsSecretAccessKey,
+		"aws_vpc_id":              awsVPCID,
+		"cluster_instances":       3,
+		"serverless_min_capacity": nil,
+		"serverless_max_capacity": nil,
+		"engine_version":          nil,
 	}
 
 	BeforeAll(func() {
@@ -62,12 +65,13 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 		It("should create a cluster with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"cluster_identifier":   Equal("csb-auroramy-test"),
-				"engine":               Equal("aurora-mysql"),
-				"database_name":        Equal("auroradb"),
-				"port":                 Equal(float64(3306)),
-				"db_subnet_group_name": Equal("csb-auroramy-test-p-sn"),
-				"skip_final_snapshot":  BeTrue(),
+				"cluster_identifier":                 Equal("csb-auroramy-test"),
+				"engine":                             Equal("aurora-mysql"),
+				"database_name":                      Equal("auroradb"),
+				"port":                               Equal(float64(3306)),
+				"db_subnet_group_name":               Equal("csb-auroramy-test-p-sn"),
+				"skip_final_snapshot":                BeTrue(),
+				"serverlessv2_scaling_configuration": BeEmpty(),
 			}))
 		})
 	})
@@ -100,6 +104,42 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"port":                 Equal(float64(3306)),
 				"db_subnet_group_name": Equal("csb-auroramy-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
+			}))
+		})
+	})
+
+	Context("serverless", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"serverless_min_capacity": 0.5,
+				"serverless_max_capacity": 11.0,
+			}))
+		})
+
+		It("passes the min_capacity, max_capacity and correct instance_class", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
+				"serverlessv2_scaling_configuration": ConsistOf(MatchAllKeys(Keys{
+					"min_capacity": Equal(0.5),
+					"max_capacity": Equal(11.0),
+				})),
+			}))
+
+			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
+				"instance_class": Equal("db.serverless"),
+			}))
+		})
+	})
+
+	Context("engine_version", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"engine_version": "8.0.mysql_aurora.3.02.0",
+			}))
+		})
+
+		It("passes the min_capacity, max_capacity and correct instance_class", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
+				"engine_version": Equal("8.0.mysql_aurora.3.02.0"),
 			}))
 		})
 	})
