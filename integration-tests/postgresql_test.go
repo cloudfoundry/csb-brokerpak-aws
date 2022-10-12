@@ -212,7 +212,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(params map[string]any) {
 				err := broker.Update(instanceID, serviceName, "custom-sample", params)
 
@@ -228,6 +228,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
 			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
+			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
 		)
 
 		DescribeTable(

@@ -127,6 +127,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("storage_autoscale", false),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(0)),
 					HaveKeyWithValue("storage_encrypted", false),
+					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("parameter_group_name", ""),
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-mysql-%s", instanceID)),
 					HaveKeyWithValue("db_name", "vsbdb"),
@@ -165,6 +166,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"storage_autoscale":                     true,
 				"storage_autoscale_limit_gb":            float64(150),
 				"storage_encrypted":                     true,
+				"kms_key_id":                            "arn:aws:xxxx",
 				"parameter_group_name":                  "fake-parameter-group",
 				"instance_name":                         "csb-mysql-fake-name",
 				"db_name":                               "fake-db-name",
@@ -206,6 +208,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("storage_autoscale", true),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(150)),
 					HaveKeyWithValue("storage_encrypted", true),
+					HaveKeyWithValue("kms_key_id", "arn:aws:xxxx"),
 					HaveKeyWithValue("parameter_group_name", "fake-parameter-group"),
 					HaveKeyWithValue("instance_name", "csb-mysql-fake-name"),
 					HaveKeyWithValue("db_name", "fake-db-name"),
@@ -248,7 +251,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(params map[string]any) {
 				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), params)
 
@@ -263,6 +266,8 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			},
 			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
 			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
+			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
+			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
 		)
 
 		DescribeTable("should allow updating properties",
@@ -276,7 +281,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update iops", map[string]any{"iops": 1500}),
 			Entry("update storage_autoscale", map[string]any{"storage_autoscale": true}),
 			Entry("update storage_autoscale_limit_gb", map[string]any{"storage_autoscale_limit_gb": 2}),
-			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
 			Entry("update deletion_protection", map[string]any{"deletion_protection": false}),
 			Entry("update backup_retention_period", map[string]any{"backup_retention_period": float64(2)}),
 			Entry("update backup_window", map[string]any{"backup_window": "01:02-03:04"}),
