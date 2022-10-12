@@ -71,6 +71,7 @@ resource "aws_db_instance" "db_instance" {
   apply_immediately                     = true
   max_allocated_storage                 = local.max_allocated_storage
   storage_encrypted                     = var.storage_encrypted
+  kms_key_id                            = var.kms_key_id == "" ? null : var.kms_key_id
   deletion_protection                   = var.deletion_protection
   backup_retention_period               = var.backup_retention_period
   backup_window                         = var.backup_window

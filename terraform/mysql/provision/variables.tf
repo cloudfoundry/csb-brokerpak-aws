@@ -28,6 +28,7 @@ variable "aws_vpc_id" { type = string }
 variable "storage_autoscale" { type = bool }
 variable "storage_autoscale_limit_gb" { type = number }
 variable "storage_encrypted" { type = bool }
+variable "kms_key_id" { type = string }
 variable "parameter_group_name" { type = string }
 variable "rds_subnet_group" { type = string }
 variable "rds_vpc_security_group_ids" { type = string }

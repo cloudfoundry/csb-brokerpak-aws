@@ -34,6 +34,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"storage_autoscale":                     false,
 		"storage_autoscale_limit_gb":            0,
 		"storage_encrypted":                     false,
+		"kms_key_id":                            "",
 		"parameter_group_name":                  "",
 		"rds_subnet_group":                      "",
 		"rds_vpc_security_group_ids":            "",
@@ -284,5 +285,4 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			})
 		})
 	})
-
 })
