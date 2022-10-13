@@ -11,15 +11,16 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
+var _ = FDescribe("mysql", Label("mysql-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
 	)
 
+	instanceName := "csb-mysql-test"
 	defaultVars := map[string]any{
 		"cores":                                 nil,
-		"instance_name":                         "csb-mysql-test",
+		"instance_name":                         instanceName,
 		"db_name":                               "vsbdb",
 		"labels":                                map[string]string{"label1": "value1"},
 		"storage_gb":                            5,
@@ -28,8 +29,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"publicly_accessible":                   false,
 		"multi_az":                              false,
 		"instance_class":                        "an-instance-class",
-		"engine":                                "mysql",
-		"engine_version":                        5.7,
+		"mysql_version":                         "5.7",
 		"aws_vpc_id":                            awsVPCID,
 		"storage_autoscale":                     false,
 		"storage_autoscale_limit_gb":            0,
@@ -45,7 +45,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"maintenance_end_min":                   nil,
 		"maintenance_start_min":                 nil,
 		"maintenance_day":                       nil,
-		"use_tls":                               true,
+		"require_ssl":                           true,
 		"deletion_protection":                   false,
 		"backup_retention_period":               7,
 		"backup_window":                         nil,
@@ -68,23 +68,38 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 	})
 
 	Context("mysql parameter groups", func() {
+		parameterGroupNameMatcher := Equal("rds-mysql-" + instanceName)
 		When("No parameter group name passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
 
 			It("should use the default parameter group", func() {
-				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(BeEmpty())
+				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(HaveLen(1))
 
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"parameter_group_name": Equal("default.mysql5.7"),
-					}))
+						"parameter_group_name": parameterGroupNameMatcher,
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"name":   parameterGroupNameMatcher,
+						"family": Equal("mysql5.7"),
+						"parameter": ConsistOf(
+							MatchKeys(IgnoreExtras, Keys{
+								"name":  Equal("require_secure_transport"),
+								"value": Equal("1"),
+							}),
+						),
+					}),
+				)
 			})
 
 		})
 
-		Context("Parameter group passed", func() {
+		When("parameter group name is passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"parameter_group_name": "some-parameter-group-name",
@@ -99,6 +114,58 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 						"parameter_group_name": Equal("some-parameter-group-name"),
 					}))
 			})
+		})
+
+		When("when no SSL is required", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"require_ssl": false,
+				}))
+			})
+
+			It("should configure the parameter in the parameter group", func() {
+				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"name":   parameterGroupNameMatcher,
+						"family": Equal("mysql5.7"),
+						"parameter": ConsistOf(
+							MatchKeys(IgnoreExtras, Keys{
+								"name":  Equal("require_secure_transport"),
+								"value": Equal("0"),
+							}),
+						),
+					}),
+				)
+			})
+		})
+
+		When("a mayor mysql version is passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"mysql_version": "5"}))
+			})
+
+			It("should use the correct family name", func() {
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"parameter_group_name": parameterGroupNameMatcher,
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"name":   parameterGroupNameMatcher,
+						"family": Equal("mysql5.7"),
+						"parameter": ConsistOf(
+							MatchKeys(IgnoreExtras, Keys{
+								"name":  Equal("require_secure_transport"),
+								"value": Equal("1"),
+							}),
+						),
+					}),
+				)
+			})
+
 		})
 
 	})

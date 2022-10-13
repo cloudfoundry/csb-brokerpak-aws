@@ -52,14 +52,14 @@ resource "aws_db_instance" "db_instance" {
   storage_type                          = var.storage_type
   iops                                  = var.storage_type == "io1" ? var.iops : null
   skip_final_snapshot                   = true
-  engine                                = var.engine
-  engine_version                        = var.engine_version
+  engine                                = local.engine
+  engine_version                        = var.mysql_version
   instance_class                        = local.instance_class
   identifier                            = var.instance_name
   db_name                               = var.db_name
   username                              = random_string.username.result
   password                              = random_password.password.result
-  parameter_group_name                  = local.parameter_group_name
+  parameter_group_name                  = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
   tags                                  = var.labels
   vpc_security_group_ids                = local.rds_vpc_security_group_ids
   db_subnet_group_name                  = local.subnet_group
@@ -86,5 +86,17 @@ resource "aws_db_instance" "db_instance" {
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+resource "aws_db_parameter_group" "db_parameter_group" {
+  count = length(var.parameter_group_name) == 0 ? 1 : 0
+
+  name   = format("rds-mysql-%s", var.instance_name)
+  family = local.parameter_group_family
+
+  parameter {
+    name  = "require_secure_transport"
+    value = var.require_ssl ? 1 : 0
   }
 }

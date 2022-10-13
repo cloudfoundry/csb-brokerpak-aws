@@ -16,7 +16,7 @@ resource "mysql_user" "newuser" {
   user               = random_string.username.result
   plaintext_password = random_password.password.result
   host               = "%"
-  tls_option         = var.use_tls ? "SSL" : "NONE"
+  tls_option         = var.require_ssl ? "SSL" : "NONE"
 }
 
 resource "mysql_grant" "newuser" {

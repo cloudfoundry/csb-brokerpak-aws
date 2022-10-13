@@ -29,13 +29,14 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
-  port = 3306
+  engine                 = "mysql"
+  major_version          = split(".", var.mysql_version)[0]
+  parameter_group_family = format("%s%s", local.engine, local.major_version == "5" ? "5.7" : "8.0")
+  port                   = 3306
 
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
 
   subnet_group = length(var.rds_subnet_group) > 0 ? var.rds_subnet_group : aws_db_subnet_group.rds-private-subnet[0].name
-
-  parameter_group_name = length(var.parameter_group_name) == 0 ? format("default.%s%s", var.engine, var.engine_version) : var.parameter_group_name
 
   max_allocated_storage = (var.storage_autoscale && var.storage_autoscale_limit_gb > var.storage_gb) ? var.storage_autoscale_limit_gb : null
 

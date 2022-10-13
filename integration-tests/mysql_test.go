@@ -17,7 +17,7 @@ var customMySQLPlan = map[string]any{
 	"name":          "custom-sample",
 	"id":            "c2ae1820-8c1a-4cf7-90cf-8340ba5aa0bf",
 	"description":   "Beta - Default MySQL plan",
-	"mysql_version": 8,
+	"mysql_version": "8.0",
 	"cores":         4,
 	"storage_gb":    100,
 	"metadata": map[string]any{
@@ -120,7 +120,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("use_tls", true),
+					HaveKeyWithValue("require_ssl", true),
 					HaveKeyWithValue("storage_gb", float64(100)),
 					HaveKeyWithValue("storage_type", "io1"),
 					HaveKeyWithValue("iops", float64(3000)),
@@ -161,7 +161,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, customMySQLPlan["name"].(string), map[string]any{
-				"use_tls":                               false,
+				"require_ssl":                           false,
 				"storage_type":                          "gp2",
 				"storage_autoscale":                     true,
 				"storage_autoscale_limit_gb":            float64(150),
@@ -199,11 +199,10 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("engine", "mysql"),
-					HaveKeyWithValue("engine_version", "8"),
+					HaveKeyWithValue("mysql_version", "8.0"),
 					HaveKeyWithValue("cores", float64(4)),
 					HaveKeyWithValue("storage_gb", float64(100)),
-					HaveKeyWithValue("use_tls", false),
+					HaveKeyWithValue("require_ssl", false),
 					HaveKeyWithValue("storage_type", "gp2"),
 					HaveKeyWithValue("storage_autoscale", true),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(150)),
@@ -276,7 +275,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry("update use_tls", map[string]any{"use_tls": false}),
+			Entry("update require_ssl", map[string]any{"require_ssl": false}),
 			Entry("update storage_type", map[string]any{"storage_type": "gp2"}),
 			Entry("update iops", map[string]any{"iops": 1500}),
 			Entry("update storage_autoscale", map[string]any{"storage_autoscale": true}),
