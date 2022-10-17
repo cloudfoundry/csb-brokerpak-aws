@@ -33,6 +33,7 @@ resource "random_password" "password" {
 resource "aws_rds_cluster" "cluster" {
   cluster_identifier     = var.instance_name
   engine                 = "aurora-postgresql"
+  engine_version         = var.engine_version
   database_name          = "auroradb"
   master_username        = random_string.username.result
   master_password        = random_password.password.result
@@ -40,6 +41,14 @@ resource "aws_rds_cluster" "cluster" {
   db_subnet_group_name   = aws_db_subnet_group.rds_private_subnet.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   skip_final_snapshot    = true
+
+  dynamic "serverlessv2_scaling_configuration" {
+    for_each = local.serverless ? [null] : []
+    content {
+      min_capacity = var.serverless_min_capacity
+      max_capacity = var.serverless_max_capacity
+    }
+  }
 
   lifecycle {
     prevent_destroy = true
@@ -50,7 +59,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   count                = var.cluster_instances
   identifier           = "${var.instance_name}-${count.index}"
   cluster_identifier   = aws_rds_cluster.cluster.id
-  instance_class       = "db.r5.large"
+  instance_class       = local.serverless ? "db.serverless" : "db.r5.large"
   engine               = aws_rds_cluster.cluster.engine
   engine_version       = aws_rds_cluster.cluster.engine_version
   db_subnet_group_name = aws_db_subnet_group.rds_private_subnet.name

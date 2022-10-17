@@ -34,6 +34,21 @@ provision:
         - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
+  - field_name: serverless_min_capacity
+    type: number
+    nullable: true
+    details: The minimum capacity for the cluster. Must be less than or equal to `serverless_max_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+    default: null
+  - field_name: serverless_max_capacity
+    type: number
+    nullable: true
+    details: The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+    default: null
+  - field_name: engine_version
+    type: string
+    nullable: true
+    details: The Aurora engine version, e.g. "13.7". Not all features are supported by all versions. Refer to the AWS documentation for more details.
+    default: null
   - field_name: aws_access_key_id
     type: string
     details: AWS access key
