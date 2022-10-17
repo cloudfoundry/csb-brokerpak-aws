@@ -77,14 +77,6 @@ provision:
       maximum: 4096
       minimum: 5
   user_inputs:
-  - field_name: option_group_name
-    type: string
-    default: null
-    nullable: true
-    details: |
-      Name of the DB option group to associate.
-      MySQL offers additional features such as the audit plugin or Memcached to manage data and database or to provide additional security for the database.
-      RDS uses option groups to enable and configure these features.
   - field_name: storage_type
     type: string
     details: Type of storage to be used. One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD).
@@ -117,6 +109,14 @@ provision:
       The ARN for the KMS encryption key (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html)
       The `storage_encrypted` property must be enabled if the key is specified.
     prohibit_update: true
+  - field_name: option_group_name
+    type: string
+    default: ""
+    nullable: true
+    details: |
+      Name of the DB option group to associate. If left empty, defaults to `default:mysql-<version>-<minor_version>`
+      MySQL offers additional features such as the audit plugin or Memcached to manage data and database or to provide additional security for the database.
+      RDS uses option groups to enable and configure these features.
   - field_name: parameter_group_name
     type: string
     default: ""
@@ -314,6 +314,25 @@ provision:
     default: 7
     constraints:
       minimum: 7
+  - field_name: enable_audit_logging
+    type: boolean
+    default: false
+    details: |
+      Requires setting option_group_name with a pre-created option_group that fullfils requirements for audit log exports. 
+      See AWS Docs for config options: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.Options.AuditPlugin.html#Appendix.MySQL.Options.AuditPlugin.Add
+      If set will enable the `audit` cloud_watch_log_export on the rds instance. 
+  - field_name: cloudwatch_log_group_retention_in_days
+    type: number
+    details: |
+      Used in conjunction with `enable_audit_logging`. If provided will set the retention days for the log group containing the rds audit logs. Defaults to 30 Days.
+    default: 30
+    constraints:
+      minimum: 1
+      maximum: 3653 #10y
+  - field_name: cloudwatch_log_group_kms_key_id
+    type: string
+    default: ""
+    details: Used in conjunction with `enable_audit_logging`. If provided will set the kms_key to use for encrypting the cloudwatch log group create for the rds audit logs.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -349,7 +368,7 @@ provision:
     details: The password to authenticate to the database instance.
   - field_name: use_tls
     type: boolean
-    details: Using TLS for connection        
+    details: Using TLS for connection
 bind:
   plan_inputs: []
   user_inputs: []
@@ -373,7 +392,7 @@ bind:
     - name: use_tls
       type: boolean
       default: ${instance.details["use_tls"]}
-      overwrite: true        
+      overwrite: true
   template_refs:
     outputs: terraform/mysql/bind/outputs.tf
     provider: terraform/mysql/bind/provider.tf
