@@ -73,7 +73,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"cluster_instances":       12,
 				"serverless_min_capacity": 0.2,
 				"serverless_max_capacity": 100,
-				"engine_version":          "13.7",
+				"engine_version":          "8.0.postgresql_aurora.3.02.0",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -84,7 +84,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 12)),
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
 					HaveKeyWithValue("serverless_max_capacity", BeNumerically("==", 100)),
-					HaveKeyWithValue("engine_version", "8.0.mysql_aurora.3.02.0"),
+					HaveKeyWithValue("engine_version", "8.0.postgresql_aurora.3.02.0"),
 				),
 			)
 		})
@@ -126,7 +126,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("cluster_instances", "cluster_instances", 11),
 			Entry("serverless_min_capacity", "serverless_min_capacity", 1),
 			Entry("serverless_max_capacity", "serverless_max_capacity", 30),
-			Entry("engine_version", "engine_version", "8.0.mysql_aurora.3.02.0"),
+			Entry("engine_version", "engine_version", "8.0.postgresql_aurora.3.02.0"),
 		)
 	})
 })
