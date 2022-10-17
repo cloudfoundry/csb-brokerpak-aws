@@ -19,27 +19,31 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := apps.Push(apps.WithApp(apps.MySQL))
-		appTwo := apps.Push(apps.WithApp(apps.MySQL))
-		defer apps.Delete(appOne, appTwo)
+		appWriter := apps.Push(apps.WithApp(apps.MySQL))
+		appReader := apps.Push(apps.WithApp(apps.MySQL))
+		defer apps.Delete(appWriter, appReader)
 
-		By("binding the apps to the service instance")
-		binding := serviceInstance.Bind(appOne)
-		serviceInstance.Bind(appTwo)
+		By("binding the the writer")
+		binding := serviceInstance.Bind(appWriter)
+
+		By("binding the reader app as 'readonly'")
+		serviceInstance.Bind(appReader, services.WithBindParameters(map[string]any{"reader_endpoint": true}))
 
 		By("starting the apps")
-		apps.Start(appOne, appTwo)
+		apps.Start(appWriter, appReader)
 
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(matchers.HaveCredHubRef)
 
-		By("setting a key-value using the first app")
+		By("setting and getting a key-value using the writer app")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		appOne.PUT(value, key)
+		appWriter.PUT(value, key)
+		got := appWriter.GET(key)
+		Expect(got).To(Equal(value))
 
-		By("getting the value using the second app")
-		got := appTwo.GET(key)
+		By("getting the value using the reader app")
+		got = appReader.GET(key)
 		Expect(got).To(Equal(value))
 	})
 })

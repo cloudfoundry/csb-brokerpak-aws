@@ -1,4 +1,4 @@
-output "hostname" { value = var.hostname }
+output "hostname" { value = var.reader_endpoint ? var.reader_hostname : var.hostname }
 output "username" { value = random_string.username.result }
 output "password" {
   value     = random_password.password.result
@@ -20,7 +20,7 @@ output "port" { value = var.port }
 output "jdbcUrl" {
   value = format(
     "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSSL=true",
-    var.hostname,
+    var.reader_endpoint ? var.reader_hostname : var.hostname,
     var.port,
     var.name,
     random_string.username.result,
