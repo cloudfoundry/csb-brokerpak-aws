@@ -112,7 +112,6 @@ provision:
   - field_name: option_group_name
     type: string
     default: ""
-    nullable: true
     details: |
       Name of the DB option group to associate. If left empty, defaults to `default:mysql-<version>-<minor_version>`
       MySQL offers additional features such as the audit plugin or Memcached to manage data and database or to provide additional security for the database.
@@ -318,13 +317,13 @@ provision:
     type: boolean
     default: false
     details: |
-      Requires setting option_group_name with a pre-created option_group that fullfils requirements for audit log exports. 
+      Requires setting option_group_name with a pre-created Option Group that fullfils requirements for audit log exports. 
       See AWS Docs for config options: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.Options.AuditPlugin.html#Appendix.MySQL.Options.AuditPlugin.Add
       If set will enable the `audit` cloud_watch_log_export on the rds instance. 
   - field_name: cloudwatch_log_group_retention_in_days
     type: number
     details: |
-      Used in conjunction with `enable_audit_logging`. If provided will set the retention days for the log group containing the rds audit logs. Defaults to 30 Days.
+      Used in conjunction with `enable_audit_logging`. If provided will set the retention days for the log group containing the RDS audit logs. Defaults to 30 Days.
     default: 30
     constraints:
       minimum: 1
@@ -332,7 +331,7 @@ provision:
   - field_name: cloudwatch_log_group_kms_key_id
     type: string
     default: ""
-    details: Used in conjunction with `enable_audit_logging`. If provided will set the kms_key to use for encrypting the cloudwatch log group create for the rds audit logs.
+    details: Used in conjunction with `enable_audit_logging`. If provided will set the KSM key to use for encrypting the Cloudwatch log group created for the RDS audit logs.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

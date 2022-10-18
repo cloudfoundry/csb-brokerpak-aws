@@ -149,7 +149,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("backup_window", BeNil()),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
-					HaveKeyWithValue("option_group_name", BeNil()),
+					HaveKeyWithValue("option_group_name", ""),
 					HaveKeyWithValue("monitoring_interval", float64(0)),
 					HaveKeyWithValue("monitoring_role_arn", ""),
 					HaveKeyWithValue("performance_insights_enabled", false),

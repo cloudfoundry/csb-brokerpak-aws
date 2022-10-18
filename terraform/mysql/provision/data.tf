@@ -37,6 +37,7 @@ locals {
 
   parameter_group_name = length(var.parameter_group_name) == 0 ? format("default.%s%s", var.engine, var.engine_version) : var.parameter_group_name
   option_group_name    = length(var.option_group_name) == 0 ? format("default:%s-%s", var.engine, replace(var.engine_version, ".", "-")) : var.option_group_name
+  log_groups           = var.enable_audit_logging == true ? { "audit" : true } : {}
 
   max_allocated_storage = (var.storage_autoscale && var.storage_autoscale_limit_gb > var.storage_gb) ? var.storage_autoscale_limit_gb : null
 

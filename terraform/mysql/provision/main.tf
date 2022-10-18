@@ -94,9 +94,7 @@ resource "aws_db_instance" "db_instance" {
   depends_on = [aws_cloudwatch_log_group.this]
 
 }
-locals {
-  log_groups = var.enable_audit_logging == true ? { "audit" : true } : {}
-}
+
 resource "aws_cloudwatch_log_group" "this" {
   for_each = local.log_groups
   lifecycle {
