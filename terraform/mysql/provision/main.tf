@@ -77,7 +77,7 @@ resource "aws_db_instance" "db_instance" {
   backup_window                         = var.backup_window
   copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
   delete_automated_backups              = var.delete_automated_backups
-  option_group_name                     = local.option_group_name
+  option_group_name                     = length(var.option_group_name) == 0 ? null : var.option_group_name
   monitoring_interval                   = var.monitoring_interval
   monitoring_role_arn                   = var.monitoring_role_arn
   performance_insights_enabled          = var.performance_insights_enabled
