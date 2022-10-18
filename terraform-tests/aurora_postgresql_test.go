@@ -1,8 +1,9 @@
 package terraformtests
 
 import (
-	. "csbbrokerpakaws/terraform-tests/helpers"
 	"path"
+
+	. "csbbrokerpakaws/terraform-tests/helpers"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
@@ -68,7 +69,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"cluster_identifier":                 Equal("csb-aurorapg-test"),
 				"engine":                             Equal("aurora-postgresql"),
 				"database_name":                      Equal("auroradb"),
-				"port":                               Equal(float64(3306)),
+				"port":                               BeNumerically("==", 5432),
 				"db_subnet_group_name":               Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
@@ -101,7 +102,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"cluster_identifier":   Equal("csb-aurorapg-test"),
 				"engine":               Equal("aurora-postgresql"),
 				"database_name":        Equal("auroradb"),
-				"port":                 Equal(float64(3306)),
+				"port":                 BeNumerically("==", 5432),
 				"db_subnet_group_name": Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
 			}))
