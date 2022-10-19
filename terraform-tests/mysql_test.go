@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = FDescribe("mysql", Label("mysql-terraform"), Ordered, func() {
+var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
