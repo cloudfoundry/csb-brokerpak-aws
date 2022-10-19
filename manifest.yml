@@ -54,6 +54,11 @@ terraform_binaries:
   source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.0.1.zip
   provider: cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
+- name: terraform-provider-csbmysql
+  version: 1.0.0
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.0.0.zip
+  provider: cloud-service-broker/csbmysql
+  url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 env_config_mapping:
   AWS_ACCESS_KEY_ID: aws.access_key_id
   AWS_SECRET_ACCESS_KEY: aws.secret_access_key

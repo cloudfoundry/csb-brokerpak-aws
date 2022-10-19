@@ -30,9 +30,12 @@ locals {
   }
 
   engine                 = "mysql"
-  major_version          = split(".", var.mysql_version)[0]
-  parameter_group_family = format("%s%s", local.engine, local.major_version == "5" ? "5.7" : "8.0")
+  split_version          = split(".", var.mysql_version)
+  major_version          = local.split_version[0]
+  default_minor_version  = local.major_version == "5" ? "7" : "0"
+  minor_version          = length(local.split_version) > 1 ? local.split_version[1] : local.default_minor_version
   port                   = 3306
+  parameter_group_family = format("%s%s", local.engine, local.major_version == "5" ? "5.7" : "8.0")
 
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
 

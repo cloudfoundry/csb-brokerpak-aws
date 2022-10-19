@@ -20,12 +20,4 @@ variable "require_ssl" { type = bool }
 
 locals {
   port = 3306
-
-  # The following values are allowed:
-  # "DISABLED" - Establish unencrypted connections;
-  # "PREFERRED" - Establish encrypted connections if the server enabled them, otherwise fall back to unencrypted connections;
-  # "REQUIRED" - Establish secure connections if the server enabled them, fail otherwise;
-  # "VERIFY_CA" - Like "REQUIRED" but additionally verify the server TLS certificate against the configured Certificate Authority (CA) certificates;
-  # "VERIFY_IDENTITY" - Like "VERIFY_CA", but additionally verify that the server certificate matches the host to which the connection is attempted.
-  sslMode = var.require_ssl ? "REQUIRED" : "PREFERRED"
 }

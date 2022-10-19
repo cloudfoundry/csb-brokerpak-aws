@@ -12,16 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "mysql_user" "newuser" {
-  user               = random_string.username.result
-  plaintext_password = random_password.password.result
-  host               = "%"
-  tls_option         = var.require_ssl ? "SSL" : "NONE"
-}
-
-resource "mysql_grant" "newuser" {
-  user       = mysql_user.newuser.user
-  database   = var.db_name
-  host       = mysql_user.newuser.host
-  privileges = ["ALL"]
+resource "csbmysql_binding_user" "new_user" {
+  username = random_string.username.result
+  password = random_password.password.result
 }

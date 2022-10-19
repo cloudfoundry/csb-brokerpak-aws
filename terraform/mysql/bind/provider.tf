@@ -16,5 +16,14 @@ provider "mysql" {
   endpoint = format("%s:%d", var.hostname, local.port)
   username = var.admin_username
   password = var.admin_password
-  tls      = var.require_ssl ? true : false
+  tls      = var.require_ssl
+}
+
+provider "csbmysql" {
+  database    = var.db_name
+  password    = var.admin_password
+  username    = var.admin_username
+  port        = local.port
+  host        = var.hostname
+  require_ssl = var.require_ssl
 }

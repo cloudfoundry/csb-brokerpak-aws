@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-output "username" { value = random_string.username.result }
+output "username" { value = csbmysql_binding_user.new_user.username }
 output "password" {
-  value     = random_password.password.result
+  value     = csbmysql_binding_user.new_user.password
   sensitive = true
 }
 output "uri" {
   value = format(
     "mysql://%s:%s@%s:%d/%s",
-    random_string.username.result,
-    random_password.password.result,
+    csbmysql_binding_user.new_user.username,
+    csbmysql_binding_user.new_user.password,
     var.hostname,
     local.port,
     var.db_name,
@@ -31,13 +31,12 @@ output "uri" {
 output "port" { value = local.port }
 output "jdbcUrl" {
   value = format(
-    "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026sslMode=%v",
+    "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026ssl=true",
     var.hostname,
     local.port,
     var.db_name,
-    random_string.username.result,
-    random_password.password.result,
-    local.sslMode,
+    csbmysql_binding_user.new_user.username,
+    csbmysql_binding_user.new_user.password,
   )
   sensitive = true
 }
