@@ -74,6 +74,9 @@ provision:
   - field_name: hostname
     type: string
     details: Hostname or IP address of the exposed PostgreSQL endpoint used by clients to connect to the service.
+  - field_name: reader_hostname
+    type: string
+    details: Hostname or IP address of the exposed reader PostgreSQL endpoint used by clients to connect to the service.
   - field_name: username
     type: string
     details: The username to authenticate to the database instance.
@@ -85,7 +88,11 @@ provision:
     details: The port number of the exposed database instance.
 bind:
   plan_inputs: []
-  user_inputs: []
+  user_inputs:
+  - field_name: reader_endpoint
+    type: boolean
+    details: Expose the Aurora reader endpoint, which is balanced across Reader and Writer instances
+    default: false
   computed_inputs:
   - name: name
     type: string
@@ -94,6 +101,10 @@ bind:
   - name: hostname
     type: string
     default: ${instance.details["hostname"]}
+    overwrite: true
+  - name: reader_hostname
+    type: string
+    default: ${instance.details["reader_hostname"]}
     overwrite: true
   - name: admin_username
     type: string

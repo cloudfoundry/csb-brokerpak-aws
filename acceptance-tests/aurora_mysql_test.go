@@ -23,10 +23,10 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		appReader := apps.Push(apps.WithApp(apps.MySQL))
 		defer apps.Delete(appWriter, appReader)
 
-		By("binding the the writer")
+		By("binding the the writer app")
 		binding := serviceInstance.Bind(appWriter)
 
-		By("binding the reader app as 'readonly'")
+		By("binding the reader app to the reader endpoint")
 		serviceInstance.Bind(appReader, services.WithBindParameters(map[string]any{"reader_endpoint": true}))
 
 		By("starting the apps")
