@@ -18,17 +18,12 @@ const (
 )
 
 func App(uri string) *mux.Router {
-	db, err := connect(uri)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	r := mux.NewRouter()
 	r.HandleFunc("/", aliveness).Methods(http.MethodHead, http.MethodGet)
-	r.HandleFunc("/{schema}", handleCreateSchema(db)).Methods(http.MethodPut)
-	r.HandleFunc("/{schema}", handleDropSchema(db)).Methods(http.MethodDelete)
-	r.HandleFunc("/{schema}/{key}", handleSet(db)).Methods(http.MethodPut)
-	r.HandleFunc("/{schema}/{key}", handleGet(db)).Methods(http.MethodGet)
+	r.HandleFunc("/{schema}", handleCreateSchema(uri)).Methods(http.MethodPut)
+	r.HandleFunc("/{schema}", handleDropSchema(uri)).Methods(http.MethodDelete)
+	r.HandleFunc("/{schema}/{key}", handleSet(uri)).Methods(http.MethodPut)
+	r.HandleFunc("/{schema}/{key}", handleGet(uri)).Methods(http.MethodGet)
 
 	return r
 }
@@ -38,13 +33,22 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func connect(uri string) (*sql.DB, error) {
+func connectReadOnly(uri string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", uri)
-
 	if err != nil {
 		return nil, fmt.Errorf("%w: failed to connect to database", err)
 	}
+
 	db.SetMaxIdleConns(0)
+
+	return db, nil
+}
+
+func connect(uri string) (*sql.DB, error) {
+	db, err := connectReadOnly(uri)
+	if err != nil {
+		return nil, err
+	}
 
 	_, err = db.Exec(fmt.Sprintf(`CREATE TABLE IF NOT EXISTS public.%s (%s VARCHAR(255) NOT NULL, %s VARCHAR(255) NOT NULL)`, tableName, keyColumn, valueColumn))
 	if err != nil {

@@ -9,7 +9,7 @@ output "uri" {
     "postgresql://%s:%s@%s:%d/%s",
     csbpg_binding_user.new_user.username,
     csbpg_binding_user.new_user.password,
-    var.hostname,
+    var.reader_endpoint ? var.reader_hostname : var.hostname,
     var.port,
     var.name,
   )
@@ -19,7 +19,7 @@ output "port" { value = var.port }
 output "jdbcUrl" {
   value = format(
     "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026ssl=true",
-    var.hostname,
+    var.reader_endpoint ? var.reader_hostname : var.hostname,
     var.port,
     var.name,
     csbpg_binding_user.new_user.username,
