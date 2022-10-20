@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"mysqlapp/internal/app"
-	"mysqlapp/internal/credentials"
+	"mysqlapp/internal/connector"
 	"net/http"
 	"os"
 )
@@ -13,14 +13,14 @@ func main() {
 	log.Println("Starting.")
 
 	log.Println("Reading credentials.")
-	creds, err := credentials.Read()
+	conn, err := connector.New()
 	if err != nil {
 		panic(err)
 	}
 
 	port := port()
 	log.Printf("Listening on port: %s", port)
-	http.Handle("/", app.App(creds))
+	http.Handle("/", app.App(conn))
 	http.ListenAndServe(port, nil)
 }
 
