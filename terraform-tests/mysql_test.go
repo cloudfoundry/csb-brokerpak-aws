@@ -54,12 +54,14 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"aws_access_key_id":                     awsAccessKeyID,
 		"aws_secret_access_key":                 awsSecretAccessKey,
 		"region":                                "us-west-2",
-		"option_group_name":                     nil,
+		"option_group_name":                     "",
 		"monitoring_interval":                   0,
 		"monitoring_role_arn":                   "",
 		"performance_insights_enabled":          true,
 		"performance_insights_kms_key_id":       "",
 		"performance_insights_retention_period": 7,
+		"enable_audit_logging":                  false,
+		"cloudwatch_log_group_kms_key_id":       "",
 	}
 
 	BeforeAll(func() {
@@ -68,7 +70,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 	})
 
 	Context("mysql parameter groups", func() {
-		When("No parameter group name passed", func() {
+		When("no parameter group name passed", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
