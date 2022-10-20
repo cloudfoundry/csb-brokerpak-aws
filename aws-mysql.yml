@@ -99,8 +99,8 @@ provision:
     default: 0
   - field_name: storage_encrypted
     type: boolean
-    default: false
-    details: Enable encrypted storage
+    default: true
+    details: Specifies whether the DB instance is encrypted
     prohibit_update: true
   - field_name: kms_key_id
     type: string
@@ -152,8 +152,8 @@ provision:
     prohibit_update: true
   - field_name: multi_az
     type: boolean
-    details: Make instance multi AZ if true (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)
-    default: false
+    details: Enables Multi-AZ DB instance deployment (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html)
+    default: true
   - field_name: aws_access_key_id
     type: string
     details: AWS access key
@@ -449,5 +449,5 @@ examples:
 - name: medium-multiaz
   description: Create a medium MySQL instance
   plan_id: f2ae0bb7-6921-43b7-bae7-6d1fe1c5d1c6
-  provision_params: { "publicly_accessible": true, "multi_az": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true, "use_tls": false }
   bind_params: {}
