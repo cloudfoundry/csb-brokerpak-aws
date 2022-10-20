@@ -77,14 +77,33 @@ resource "aws_db_instance" "db_instance" {
   backup_window                         = var.backup_window
   copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
   delete_automated_backups              = var.delete_automated_backups
-  option_group_name                     = var.option_group_name
+  option_group_name                     = length(var.option_group_name) == 0 ? null : var.option_group_name
   monitoring_interval                   = var.monitoring_interval
   monitoring_role_arn                   = var.monitoring_role_arn
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
   performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention_period : null
 
+  # Audit Logging
+  enabled_cloudwatch_logs_exports = var.enable_audit_logging == true ? ["audit"] : []
+
   lifecycle {
     prevent_destroy = true
   }
+
+  depends_on = [aws_cloudwatch_log_group.this]
+
+}
+
+resource "aws_cloudwatch_log_group" "this" {
+  for_each = local.log_groups
+  lifecycle {
+    create_before_destroy = true
+  }
+  name              = "/aws/rds/instance/${var.instance_name}/${each.key}"
+  retention_in_days = var.cloudwatch_log_group_retention_in_days
+  kms_key_id        = var.cloudwatch_log_group_kms_key_id == "" ? null : var.cloudwatch_log_group_kms_key_id
+
+  tags = var.labels
+
 }
