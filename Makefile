@@ -18,6 +18,7 @@ DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
 
 ####### broker environment variables
 PAK_CACHE=/tmp/.pak-cache
+BROKERPAK_UPDATES_ENABLED := true
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
 PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 10000)
@@ -35,6 +36,7 @@ GOFMT=gofmt
 BROKER_GO_OPTS=PORT=8080 \
 				DB_TYPE=sqlite3 \
 				DB_PATH=/tmp/csb-db \
+				BROKERPAK_UPDATES_ENABLED=$(BROKERPAK_UPDATES_ENABLED) \
 				SECURITY_USER_NAME=$(SECURITY_USER_NAME) \
 				SECURITY_USER_PASSWORD=$(SECURITY_USER_PASSWORD) \
 				AWS_ACCESS_KEY_ID='$(AWS_ACCESS_KEY_ID)' \
