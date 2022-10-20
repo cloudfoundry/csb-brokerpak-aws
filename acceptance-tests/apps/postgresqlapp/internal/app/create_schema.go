@@ -1,15 +1,20 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 )
 
-func handleCreateSchema(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
+func handleCreateSchema(uri string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling create schema.")
+
+		db, err := connect(uri)
+		if err != nil {
+			fail(w, http.StatusInternalServerError, "failed to connect to database: %e", err)
+		}
+		defer db.Close()
 
 		schema, err := schemaName(r)
 		if err != nil {

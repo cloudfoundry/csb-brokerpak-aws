@@ -17,34 +17,36 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
-		appOne := apps.Push(apps.WithApp(apps.PostgreSQL))
-		appTwo := apps.Push(apps.WithApp(apps.PostgreSQL))
-		defer apps.Delete(appOne, appTwo)
+		appWriter := apps.Push(apps.WithApp(apps.PostgreSQL))
+		appReader := apps.Push(apps.WithApp(apps.PostgreSQL))
+		defer apps.Delete(appWriter, appReader)
 
-		By("binding the apps to the service instance")
-		binding := serviceInstance.Bind(appOne)
-		serviceInstance.Bind(appTwo)
+		By("binding the the writer app")
+		binding := serviceInstance.Bind(appWriter)
+
+		By("binding the reader app to the reader endpoint")
+		serviceInstance.Bind(appReader, services.WithBindParameters(map[string]any{"reader_endpoint": true}))
 
 		By("starting the apps")
-		apps.Start(appOne, appTwo)
+		apps.Start(appWriter, appReader)
 
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(matchers.HaveCredHubRef)
 
-		By("creating a schema using the first app")
+		By("creating a schema using the writer app")
 		schema := random.Name(random.WithMaxLength(8))
-		appOne.PUT("", schema)
+		appWriter.PUT("", schema)
 
-		By("setting a key-value using the first app")
+		By("setting a key-value using the writer app")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		appOne.PUT(value, "%s/%s", schema, key)
+		appWriter.PUT(value, "%s/%s", schema, key)
 
-		By("getting the value using the second app")
-		got := appTwo.GET("%s/%s", schema, key)
+		By("getting the value using the reader app")
+		got := appReader.GET("%s/%s", schema, key)
 		Expect(got).To(Equal(value))
 
-		By("dropping the schema using the first app")
-		appOne.DELETE(schema)
+		By("dropping the schema using the writer app")
+		appWriter.DELETE(schema)
 	})
 })
