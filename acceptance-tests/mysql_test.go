@@ -36,7 +36,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		By("setting a key-value using the first app")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		appOne.PUT(value, key)
+		appOne.PUT(value, "%s?tls=true", key)
 
 		By("getting the value using the second app")
 		got := appTwo.GET(key)

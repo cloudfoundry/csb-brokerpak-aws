@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"mysqlapp/internal/connector"
 	"net/http"
+
+	"mysqlapp/internal/connector"
 
 	"github.com/gorilla/mux"
 )
@@ -14,7 +15,7 @@ func handleSet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Re
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling set.")
 
-		db, err := conn.Connect()
+		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
 			fail(w, http.StatusInternalServerError, "error connecting to database: %s", err)
 		}

@@ -8,16 +8,19 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-type option func(*Connector, *mysql.Config) error
+type Option func(*Connector, *mysql.Config) error
 
-func (c *Connector) Connect(opts ...option) (*sql.DB, error) {
+func (c *Connector) Connect(opts ...Option) (*sql.DB, error) {
 	cfg := mysql.NewConfig()
 	cfg.Net = "tcp"
 	cfg.Addr = c.Host
 	cfg.User = c.Username
 	cfg.Passwd = c.Password
 	cfg.DBName = c.Database
-	withDefaults(opts...)(c, cfg)
+
+	if err := withDefaults(opts...)(c, cfg); err != nil {
+		return nil, err
+	}
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
@@ -30,7 +33,7 @@ func (c *Connector) Connect(opts ...option) (*sql.DB, error) {
 	return db, nil
 }
 
-func withOptions(opts ...option) option {
+func withOptions(opts ...Option) Option {
 	return func(conn *Connector, cfg *mysql.Config) error {
 		for _, o := range opts {
 			if err := o(conn, cfg); err != nil {
@@ -41,13 +44,20 @@ func withOptions(opts ...option) option {
 	}
 }
 
-func withDefaults(opts ...option) option {
-	return withOptions(append([]option{withTLS()}, opts...)...)
+func withDefaults(opts ...Option) Option {
+	return withOptions(append([]Option{WithTLS("true")}, opts...)...)
 }
 
-func withTLS() option {
+func WithTLS(tls string) Option {
 	return func(_ *Connector, cfg *mysql.Config) error {
-		cfg.TLSConfig = "true"
+		switch tls {
+		case "false", "true", "skip-verify", "preferred":
+			cfg.TLSConfig = tls
+		case "":
+			cfg.TLSConfig = "true"
+		default:
+			return fmt.Errorf("invalid tls value: %s", tls)
+		}
 		return nil
 	}
 }
