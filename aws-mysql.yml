@@ -33,6 +33,9 @@ plans:
     mysql_version: 5.7
     storage_gb: 5
     storage_type: "gp2"
+    storage_autoscale: false
+    storage_encrypted: false
+    multi_az: false
 - name: medium
   id: f2ae0bb7-6921-43b7-bae7-6d1fe1c5d1c6
   description: 'Beta - MySQL v5.7, minimum 4 cores, minimum 8GB ram, 10GB storage'
@@ -42,6 +45,9 @@ plans:
     mysql_version: 5.7
     storage_gb: 10
     storage_type: "gp2"
+    storage_autoscale: false
+    storage_encrypted: false
+    multi_az: false
 - name: large
   id: a5fea013-e87f-488f-969d-1cf038881b57
   description: 'Beta - MySQL v5.7, minimum 8 cores, minimum 16GB ram, 20GB storage'
@@ -51,6 +57,9 @@ plans:
     mysql_version: 5.7
     storage_gb: 20
     storage_type: "gp2"
+    storage_autoscale: false
+    storage_encrypted: false
+    multi_az: false
 provision:
   plan_inputs:
   - field_name: cores
@@ -91,12 +100,12 @@ provision:
     default: true 
   - field_name: storage_autoscale
     type: boolean
-    default: false
+    default: true
     details: Enable storage autoscaling up to storage_autoscale_limit_gb if true
   - field_name: storage_autoscale_limit_gb
     type: number
     details: Max storage size if storage_autoscale is true
-    default: 0
+    default: 250
   - field_name: storage_encrypted
     type: boolean
     default: true
@@ -424,7 +433,7 @@ examples:
 - name: small-encrypted
   description: Create a small MySQL instance with encrypted storage
   plan_id: 2268ce43-7fd7-48dc-be2f-8611e11fb12e
-  provision_params: { "storage_encrypted": true, "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true, "use_tls": false }
   bind_params: {}
 - name: small-disable-upgrades
   description: Create a small MySQL instance with disabled upgrades
