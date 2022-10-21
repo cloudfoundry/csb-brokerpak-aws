@@ -3,8 +3,9 @@ package app
 import (
 	"fmt"
 	"log"
-	"mysqlapp/internal/connector"
 	"net/http"
+
+	"mysqlapp/internal/connector"
 
 	"github.com/gorilla/mux"
 )
@@ -13,7 +14,7 @@ func handleGet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Re
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling get.")
 
-		db, err := conn.Connect()
+		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
 			fail(w, http.StatusInternalServerError, "error connecting to database: %s", err)
 		}
