@@ -20,9 +20,9 @@ provider "mysql" {
 }
 
 provider "csbmysql" {
-  database    = var.db_name
-  password    = var.admin_password
-  username    = var.admin_username
-  port        = local.port
-  host        = var.hostname
+  database = var.db_name
+  password = var.admin_password
+  username = var.admin_username
+  port     = local.port
+  host     = var.hostname
 }
