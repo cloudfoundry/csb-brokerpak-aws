@@ -120,7 +120,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("use_tls", true),
 					HaveKeyWithValue("storage_gb", float64(100)),
 					HaveKeyWithValue("storage_type", "io1"),
 					HaveKeyWithValue("iops", float64(3000)),
@@ -164,7 +163,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, customMySQLPlan["name"].(string), map[string]any{
-				"use_tls":                                false,
 				"storage_type":                           "gp2",
 				"storage_autoscale":                      true,
 				"storage_autoscale_limit_gb":             float64(150),
@@ -209,7 +207,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("engine_version", "8"),
 					HaveKeyWithValue("cores", float64(4)),
 					HaveKeyWithValue("storage_gb", float64(100)),
-					HaveKeyWithValue("use_tls", false),
 					HaveKeyWithValue("storage_type", "gp2"),
 					HaveKeyWithValue("storage_autoscale", true),
 					HaveKeyWithValue("storage_autoscale_limit_gb", float64(150)),
@@ -285,7 +282,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry("update use_tls", map[string]any{"use_tls": false}),
 			Entry("update storage_type", map[string]any{"storage_type": "gp2"}),
 			Entry("update iops", map[string]any{"iops": 1500}),
 			Entry("update storage_autoscale", map[string]any{"storage_autoscale": true}),

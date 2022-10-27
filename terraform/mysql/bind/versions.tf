@@ -6,7 +6,7 @@ terraform {
     }
     csbmysql = {
       source  = "cloud-service-broker/csbmysql"
-      version = ">= 1.0.0"
+      version = ">= 0.0.3"
     }
     random = {
       source  = "hashicorp/random"
