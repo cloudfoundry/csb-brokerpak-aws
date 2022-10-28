@@ -33,7 +33,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		Expect(mockTerraform.Reset()).To(Succeed())
 	})
 
-	It("should publish in the catalog", func() {
+	It("should publish Aurora Postgres in the catalog", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
@@ -51,24 +51,56 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	})
 
 	Describe("provisioning", func() {
-		It("should check region constraints", func() {
-			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{"region": "-Asia-northeast1"})
+		DescribeTable("should check property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(serviceName, "custom-sample", params)
 
-			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
-		})
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"instance name minimum length is 6 characters",
+				map[string]any{"instance_name": stringOfLen(5)},
+				"instance_name: String length must be greater than or equal to 6",
+			),
+			Entry(
+				"instance name maximum length is 98 characters",
+				map[string]any{"instance_name": stringOfLen(99)},
+				"instance_name: String length must be less than or equal to 98",
+			),
+			Entry(
+				"instance name invalid characters",
+				map[string]any{"instance_name": ".aaaaa"},
+				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"database name maximum length is 64 characters",
+				map[string]any{"db_name": stringOfLen(65)},
+				"db_name: String length must be less than or equal to 64",
+			),
+		)
 
 		It("should provision a plan", func() {
 			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
-				HaveKeyWithValue("instance_name", fmt.Sprintf("csb-aurorapg-%s", instanceID)),
-			)
+				SatisfyAll(
+					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-aurorapg-%s", instanceID)),
+					HaveKeyWithValue("cluster_instances", BeNumerically("==", 3)),
+					HaveKeyWithValue("db_name", "csbdb"),
+					HaveKeyWithValue("region", "us-west-2"),
+				))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
 				"instance_name":           "csb-aurora-postgres-fake-name",
+				"db_name":                 "fake-db-name",
 				"region":                  "africa-north-4",
 				"cluster_instances":       12,
 				"serverless_min_capacity": 0.2,
@@ -80,6 +112,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("instance_name", "csb-aurora-postgres-fake-name"),
+					HaveKeyWithValue("db_name", "fake-db-name"),
 					HaveKeyWithValue("region", "africa-north-4"),
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 12)),
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
@@ -116,6 +149,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			},
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
+			Entry("db_name", "db_name", "someNewName"),
 		)
 
 		DescribeTable(

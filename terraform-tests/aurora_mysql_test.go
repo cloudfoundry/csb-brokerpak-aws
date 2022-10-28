@@ -17,7 +17,8 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":           "csb-auroramy-test",
+		"instance_name":           "csb-auroramysql-test",
+		"db_name":                 "csbdb",
 		"region":                  "us-west-2",
 		"aws_access_key_id":       awsAccessKeyID,
 		"aws_secret_access_key":   awsSecretAccessKey,
@@ -57,19 +58,19 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		It("should create a cluster_instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"engine":               Equal("aurora-mysql"),
-				"identifier":           Equal("csb-auroramy-test-0"),
+				"identifier":           Equal("csb-auroramysql-test-0"),
 				"instance_class":       Equal("db.r5.large"),
-				"db_subnet_group_name": Equal("csb-auroramy-test-p-sn"),
+				"db_subnet_group_name": Equal("csb-auroramysql-test-p-sn"),
 			}))
 		})
 
 		It("should create a cluster with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"cluster_identifier":                 Equal("csb-auroramy-test"),
+				"cluster_identifier":                 Equal("csb-auroramysql-test"),
 				"engine":                             Equal("aurora-mysql"),
-				"database_name":                      Equal("auroradb"),
+				"database_name":                      Equal("csbdb"),
 				"port":                               Equal(float64(3306)),
-				"db_subnet_group_name":               Equal("csb-auroramy-test-p-sn"),
+				"db_subnet_group_name":               Equal("csb-auroramysql-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
 			}))
@@ -98,11 +99,11 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 		It("should create a cluster with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"cluster_identifier":   Equal("csb-auroramy-test"),
+				"cluster_identifier":   Equal("csb-auroramysql-test"),
 				"engine":               Equal("aurora-mysql"),
-				"database_name":        Equal("auroradb"),
+				"database_name":        Equal("csbdb"),
 				"port":                 Equal(float64(3306)),
-				"db_subnet_group_name": Equal("csb-auroramy-test-p-sn"),
+				"db_subnet_group_name": Equal("csb-auroramysql-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
 			}))
 		})
