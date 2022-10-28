@@ -17,16 +17,18 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":           "csb-auroramysql-test",
-		"db_name":                 "csbdb",
-		"region":                  "us-west-2",
-		"aws_access_key_id":       awsAccessKeyID,
-		"aws_secret_access_key":   awsSecretAccessKey,
-		"aws_vpc_id":              awsVPCID,
-		"cluster_instances":       3,
-		"serverless_min_capacity": nil,
-		"serverless_max_capacity": nil,
-		"engine_version":          nil,
+		"instance_name":               "csb-auroramysql-test",
+		"db_name":                     "csbdb",
+		"region":                      "us-west-2",
+		"aws_access_key_id":           awsAccessKeyID,
+		"aws_secret_access_key":       awsSecretAccessKey,
+		"aws_vpc_id":                  awsVPCID,
+		"cluster_instances":           3,
+		"serverless_min_capacity":     nil,
+		"serverless_max_capacity":     nil,
+		"engine_version":              nil,
+		"allow_major_version_upgrade": true,
+		"auto_minor_version_upgrade":  true,
 	}
 
 	BeforeAll(func() {
@@ -57,10 +59,11 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 		It("should create a cluster_instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine":               Equal("aurora-mysql"),
-				"identifier":           Equal("csb-auroramysql-test-0"),
-				"instance_class":       Equal("db.r5.large"),
-				"db_subnet_group_name": Equal("csb-auroramysql-test-p-sn"),
+				"engine":                     Equal("aurora-mysql"),
+				"identifier":                 Equal("csb-auroramysql-test-0"),
+				"instance_class":             Equal("db.r5.large"),
+				"db_subnet_group_name":       Equal("csb-auroramysql-test-p-sn"),
+				"auto_minor_version_upgrade": BeTrue(),
 			}))
 		})
 
@@ -73,6 +76,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"db_subnet_group_name":               Equal("csb-auroramysql-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
+				"allow_major_version_upgrade":        BeTrue(),
 			}))
 		})
 	})

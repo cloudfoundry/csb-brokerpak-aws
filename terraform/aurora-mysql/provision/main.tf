@@ -31,16 +31,17 @@ resource "random_password" "password" {
 }
 
 resource "aws_rds_cluster" "cluster" {
-  cluster_identifier     = var.instance_name
-  engine                 = "aurora-mysql"
-  engine_version         = var.engine_version
-  database_name          = var.db_name
-  master_username        = random_string.username.result
-  master_password        = random_password.password.result
-  port                   = local.port
-  db_subnet_group_name   = aws_db_subnet_group.rds_private_subnet.name
-  vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  skip_final_snapshot    = true
+  cluster_identifier          = var.instance_name
+  engine                      = "aurora-mysql"
+  engine_version              = var.engine_version
+  database_name               = var.db_name
+  master_username             = random_string.username.result
+  master_password             = random_password.password.result
+  port                        = local.port
+  db_subnet_group_name        = aws_db_subnet_group.rds_private_subnet.name
+  vpc_security_group_ids      = [aws_security_group.rds_sg.id]
+  skip_final_snapshot         = true
+  allow_major_version_upgrade = var.allow_major_version_upgrade
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
@@ -56,13 +57,14 @@ resource "aws_rds_cluster" "cluster" {
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                = var.cluster_instances
-  identifier           = "${var.instance_name}-${count.index}"
-  cluster_identifier   = aws_rds_cluster.cluster.id
-  instance_class       = local.serverless ? "db.serverless" : "db.r5.large"
-  engine               = aws_rds_cluster.cluster.engine
-  engine_version       = aws_rds_cluster.cluster.engine_version
-  db_subnet_group_name = aws_db_subnet_group.rds_private_subnet.name
+  count                      = var.cluster_instances
+  identifier                 = "${var.instance_name}-${count.index}"
+  cluster_identifier         = aws_rds_cluster.cluster.id
+  instance_class             = local.serverless ? "db.serverless" : "db.r5.large"
+  engine                     = aws_rds_cluster.cluster.engine
+  engine_version             = aws_rds_cluster.cluster.engine_version
+  db_subnet_group_name       = aws_db_subnet_group.rds_private_subnet.name
+  auto_minor_version_upgrade = var.auto_minor_version_upgrade
 
   lifecycle {
     prevent_destroy = true
