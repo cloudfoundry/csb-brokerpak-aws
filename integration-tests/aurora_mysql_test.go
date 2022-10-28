@@ -51,28 +51,57 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 	})
 
 	Describe("provisioning", func() {
-		It("should check region constraints", func() {
-			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{"region": "-Asia-northeast1"})
+		DescribeTable("should check property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(serviceName, "custom-sample", params)
 
-			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
-		})
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"instance name minimum length is 6 characters",
+				map[string]any{"instance_name": stringOfLen(5)},
+				"instance_name: String length must be greater than or equal to 6",
+			),
+			Entry(
+				"instance name maximum length is 98 characters",
+				map[string]any{"instance_name": stringOfLen(99)},
+				"instance_name: String length must be less than or equal to 98",
+			),
+			Entry(
+				"instance name invalid characters",
+				map[string]any{"instance_name": ".aaaaa"},
+				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"database name maximum length is 64 characters",
+				map[string]any{"db_name": stringOfLen(65)},
+				"db_name: String length must be less than or equal to 64",
+			),
+		)
 
 		It("should provision a plan", func() {
 			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(SatisfyAll(
-				HaveKeyWithValue("instance_name", fmt.Sprintf("csb-auroramy-%s", instanceID)),
-				HaveKeyWithValue("region", "us-west-2"),
+				HaveKeyWithValue("instance_name", fmt.Sprintf("csb-auroramysql-%s", instanceID)),
 				HaveKeyWithValue("cluster_instances", BeNumerically("==", 3)),
+				HaveKeyWithValue("db_name", "csbdb"),
+				HaveKeyWithValue("region", "us-west-2"),
 			))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
 				"instance_name":           "csb-aurora-mysql-fake-name",
-				"region":                  "africa-north-4",
 				"cluster_instances":       12,
+				"region":                  "africa-north-4",
+				"db_name":                 "fake-db-name",
 				"serverless_min_capacity": 0.2,
 				"serverless_max_capacity": 100,
 				"engine_version":          "8.0.mysql_aurora.3.02.0",
@@ -82,8 +111,9 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("instance_name", "csb-aurora-mysql-fake-name"),
-					HaveKeyWithValue("region", "africa-north-4"),
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 12)),
+					HaveKeyWithValue("db_name", "fake-db-name"),
+					HaveKeyWithValue("region", "africa-north-4"),
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
 					HaveKeyWithValue("serverless_max_capacity", BeNumerically("==", 100)),
 					HaveKeyWithValue("engine_version", "8.0.mysql_aurora.3.02.0"),
@@ -118,6 +148,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			},
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
+			Entry("db_name", "db_name", "some-new-name"),
 		)
 
 		DescribeTable(

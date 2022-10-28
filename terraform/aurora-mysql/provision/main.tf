@@ -34,7 +34,7 @@ resource "aws_rds_cluster" "cluster" {
   cluster_identifier     = var.instance_name
   engine                 = "aurora-mysql"
   engine_version         = var.engine_version
-  database_name          = "auroradb"
+  database_name          = var.db_name
   master_username        = random_string.username.result
   master_password        = random_password.password.result
   port                   = local.port

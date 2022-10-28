@@ -13,8 +13,8 @@ provision:
   user_inputs:
   - field_name: instance_name
     type: string
-    details: Name for the instance
-    default: csb-auroramy-${request.instance_id}
+    details: Name for the DB cluster
+    default: csb-auroramysql-${request.instance_id}
     constraints:
       maxLength: 98
       minLength: 6
@@ -24,6 +24,14 @@ provision:
     type: number
     details: Number of Aurora cluster instances. The first instance is a writer instance, and additional instances are readers and will be distributed across the AZs available in the region.
     default: 3
+  - field_name: db_name
+    type: string
+    details: Name for the database that Amazon RDS creates when it creates the DB instance
+    default: csbdb
+    constraints:
+      maxLength: 64
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
   - field_name: region
     type: string
     details: The region of AWS.
