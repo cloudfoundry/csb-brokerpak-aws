@@ -18,16 +18,18 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":           "csb-aurorapg-test",
-		"db_name":                 "csbdb",
-		"region":                  "us-west-2",
-		"aws_access_key_id":       awsAccessKeyID,
-		"aws_secret_access_key":   awsSecretAccessKey,
-		"aws_vpc_id":              awsVPCID,
-		"cluster_instances":       3,
-		"serverless_min_capacity": nil,
-		"serverless_max_capacity": nil,
-		"engine_version":          nil,
+		"instance_name":               "csb-aurorapg-test",
+		"db_name":                     "csbdb",
+		"region":                      "us-west-2",
+		"aws_access_key_id":           awsAccessKeyID,
+		"aws_secret_access_key":       awsSecretAccessKey,
+		"aws_vpc_id":                  awsVPCID,
+		"cluster_instances":           3,
+		"serverless_min_capacity":     nil,
+		"serverless_max_capacity":     nil,
+		"engine_version":              nil,
+		"allow_major_version_upgrade": true,
+		"auto_minor_version_upgrade":  true,
 	}
 
 	BeforeAll(func() {
@@ -58,10 +60,11 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 
 		It("should create a cluster_instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine":               Equal("aurora-postgresql"),
-				"identifier":           Equal("csb-aurorapg-test-0"),
-				"instance_class":       Equal("db.r5.large"),
-				"db_subnet_group_name": Equal("csb-aurorapg-test-p-sn"),
+				"engine":                     Equal("aurora-postgresql"),
+				"identifier":                 Equal("csb-aurorapg-test-0"),
+				"instance_class":             Equal("db.r5.large"),
+				"db_subnet_group_name":       Equal("csb-aurorapg-test-p-sn"),
+				"auto_minor_version_upgrade": BeTrue(),
 			}))
 		})
 
@@ -74,6 +77,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"db_subnet_group_name":               Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
+				"allow_major_version_upgrade":        BeTrue(),
 			}))
 		})
 	})

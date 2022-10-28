@@ -57,6 +57,14 @@ provision:
     nullable: true
     details: The Aurora engine version, e.g. "13.7". Not all features are supported by all versions. Refer to the AWS documentation for more details.
     default: null
+  - field_name: allow_major_version_upgrade
+    type: boolean
+    details: Allow major version upgrades. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible.
+    default: true
+  - field_name: auto_minor_version_upgrade
+    type: boolean
+    details: Allow minor version upgrades automatically during the maintenance window.
+    default: true
   - field_name: aws_access_key_id
     type: string
     details: AWS access key

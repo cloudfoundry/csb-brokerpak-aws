@@ -8,3 +8,5 @@ variable "cluster_instances" { type = number }
 variable "serverless_min_capacity" { type = number }
 variable "serverless_max_capacity" { type = number }
 variable "engine_version" { type = string }
+variable "allow_major_version_upgrade" { type = bool }
+variable "auto_minor_version_upgrade" { type = bool }
