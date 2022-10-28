@@ -93,18 +93,22 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("cluster_instances", BeNumerically("==", 3)),
 				HaveKeyWithValue("db_name", "csbdb"),
 				HaveKeyWithValue("region", "us-west-2"),
+				HaveKeyWithValue("allow_major_version_upgrade", BeTrue()),
+				HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
 			))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
-				"instance_name":           "csb-aurora-mysql-fake-name",
-				"cluster_instances":       12,
-				"region":                  "africa-north-4",
-				"db_name":                 "fake-db-name",
-				"serverless_min_capacity": 0.2,
-				"serverless_max_capacity": 100,
-				"engine_version":          "8.0.mysql_aurora.3.02.0",
+				"instance_name":               "csb-aurora-mysql-fake-name",
+				"cluster_instances":           12,
+				"region":                      "africa-north-4",
+				"db_name":                     "fake-db-name",
+				"serverless_min_capacity":     0.2,
+				"serverless_max_capacity":     100,
+				"engine_version":              "8.0.mysql_aurora.3.02.0",
+				"allow_major_version_upgrade": false,
+				"auto_minor_version_upgrade":  false,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -117,6 +121,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
 					HaveKeyWithValue("serverless_max_capacity", BeNumerically("==", 100)),
 					HaveKeyWithValue("engine_version", "8.0.mysql_aurora.3.02.0"),
+					HaveKeyWithValue("allow_major_version_upgrade", BeFalse()),
+					HaveKeyWithValue("auto_minor_version_upgrade", BeFalse()),
 				),
 			)
 		})
@@ -160,6 +166,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("serverless_min_capacity", "serverless_min_capacity", 1),
 			Entry("serverless_max_capacity", "serverless_max_capacity", 30),
 			Entry("engine_version", "engine_version", "8.0.mysql_aurora.3.02.0"),
+			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
+			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 		)
 	})
 })
