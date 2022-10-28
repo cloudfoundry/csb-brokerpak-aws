@@ -45,7 +45,6 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"maintenance_end_min":                   nil,
 		"maintenance_start_min":                 nil,
 		"maintenance_day":                       nil,
-		"use_tls":                               true,
 		"deletion_protection":                   false,
 		"backup_retention_period":               7,
 		"backup_window":                         nil,

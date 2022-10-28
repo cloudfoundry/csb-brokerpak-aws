@@ -39,7 +39,6 @@ variable "maintenance_start_hour" { type = string }
 variable "maintenance_start_min" { type = string }
 variable "maintenance_end_hour" { type = string }
 variable "maintenance_end_min" { type = string }
-variable "use_tls" { type = bool }
 variable "deletion_protection" { type = bool }
 variable "backup_retention_period" { type = number }
 variable "backup_window" { type = string }
