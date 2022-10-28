@@ -48,6 +48,14 @@ func (a *App) DELETE(format string, s ...any) {
 	Expect(response).To(HaveHTTPStatus(http.StatusGone, http.StatusNoContent))
 }
 
+func (a *App) GetRawResponse(format string, s ...any) *http.Response {
+	url := a.urlf(format, s...)
+	fmt.Fprintf(GinkgoWriter, "HTTP GET: %s\n", url)
+	response, err := http.Get(url)
+	Expect(err).NotTo(HaveOccurred())
+	return response
+}
+
 func (a *App) urlf(format string, s ...any) string {
 	base := a.URL
 	path := fmt.Sprintf(format, s...)

@@ -19,7 +19,6 @@ output "password" {
   value     = aws_db_instance.db_instance.password
   sensitive = true
 }
-output "use_tls" { value = var.use_tls }
 output "status" { value = format("created db %s (id: %s) on server %s URL: https://%s.console.aws.amazon.com/rds/home?region=%s#database:id=%s;is-cluster=false",
   aws_db_instance.db_instance.db_name,
   aws_db_instance.db_instance.id,

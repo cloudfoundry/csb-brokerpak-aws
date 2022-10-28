@@ -30,6 +30,10 @@ func (c *Connector) Connect(opts ...Option) (*sql.DB, error) {
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
+	if err := db.Ping(); err != nil {
+		return db, fmt.Errorf("failed to verify the connection to the database is still alive")
+	}
+
 	return db, nil
 }
 

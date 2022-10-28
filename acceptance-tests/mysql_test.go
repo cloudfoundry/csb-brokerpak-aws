@@ -1,6 +1,8 @@
 package acceptance_tests_test
 
 import (
+	"net/http"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
@@ -41,5 +43,10 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		By("getting the value using the second app")
 		got := appTwo.GET(key)
 		Expect(got).To(Equal(value))
+
+		By("getting the value using the second app using tls false should fail")
+		response := appOne.GetRawResponse("%s?tls=false", key)
+		defer response.Body.Close()
+		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "TLS is always enabled")
 	})
 })

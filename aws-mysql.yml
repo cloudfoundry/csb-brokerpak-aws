@@ -94,10 +94,6 @@ provision:
     type: number
     details: The amount of provisioned IOPS. In order for this property to take effect, `storage_type` must be set to `io1`.
     default: 3000
-  - field_name: use_tls
-    type: boolean
-    details: Use TLS for connection
-    default: true 
   - field_name: storage_autoscale
     type: boolean
     default: true
@@ -374,9 +370,6 @@ provision:
   - field_name: password
     type: string
     details: The password to authenticate to the database instance.
-  - field_name: use_tls
-    type: boolean
-    details: Using TLS for connection
 bind:
   plan_inputs: []
   user_inputs: []
@@ -396,10 +389,6 @@ bind:
     - name: admin_password
       type: string
       default: ${instance.details["password"]}
-      overwrite: true
-    - name: use_tls
-      type: boolean
-      default: ${instance.details["use_tls"]}
       overwrite: true
   template_refs:
     outputs: terraform/mysql/bind/outputs.tf
@@ -428,35 +417,35 @@ examples:
 - name: small
   description: Create a small MySQL instance
   plan_id: 2268ce43-7fd7-48dc-be2f-8611e11fb12e
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true }
   bind_params: {}
 - name: small-encrypted
   description: Create a small MySQL instance with encrypted storage
   plan_id: 2268ce43-7fd7-48dc-be2f-8611e11fb12e
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true }
   bind_params: {}
 - name: small-disable-upgrades
   description: Create a small MySQL instance with disabled upgrades
   plan_id: 2268ce43-7fd7-48dc-be2f-8611e11fb12e
-  provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true, "use_tls": false }
+  provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true }
   bind_params: {}
 - name: small-with-maintenance-window
   description: Create a small MySQL instance with encrypted storage
   plan_id: 2268ce43-7fd7-48dc-be2f-8611e11fb12e
-  provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "use_tls": false }
+  provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true }
   bind_params: {}
 - name: medium
   description: Create a medium MySQL instance
   plan_id: f2ae0bb7-6921-43b7-bae7-6d1fe1c5d1c6
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true }
   bind_params: {}
 - name: large
   description: Create a large MySQL instance
   plan_id: a5fea013-e87f-488f-969d-1cf038881b57
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true }
   bind_params: {}
 - name: medium-multiaz
   description: Create a medium MySQL instance
   plan_id: f2ae0bb7-6921-43b7-bae7-6d1fe1c5d1c6
-  provision_params: { "publicly_accessible": true, "use_tls": false }
+  provision_params: { "publicly_accessible": true }
   bind_params: {}
