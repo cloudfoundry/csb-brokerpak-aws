@@ -19,6 +19,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 
 	defaultVars := map[string]any{
 		"instance_name":           "csb-aurorapg-test",
+		"db_name":                 "csbdb",
 		"region":                  "us-west-2",
 		"aws_access_key_id":       awsAccessKeyID,
 		"aws_secret_access_key":   awsSecretAccessKey,
@@ -68,7 +69,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
 				"cluster_identifier":                 Equal("csb-aurorapg-test"),
 				"engine":                             Equal("aurora-postgresql"),
-				"database_name":                      Equal("auroradb"),
+				"database_name":                      Equal("csbdb"),
 				"port":                               BeNumerically("==", 5432),
 				"db_subnet_group_name":               Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
@@ -101,7 +102,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
 				"cluster_identifier":   Equal("csb-aurorapg-test"),
 				"engine":               Equal("aurora-postgresql"),
-				"database_name":        Equal("auroradb"),
+				"database_name":        Equal("csbdb"),
 				"port":                 BeNumerically("==", 5432),
 				"db_subnet_group_name": Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
