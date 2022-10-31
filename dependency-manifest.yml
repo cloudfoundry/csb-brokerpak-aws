@@ -33,10 +33,6 @@ dependencies:
       version: 1.1.9
       source: https://github.com/hashicorp/terraform/archive/v1.1.9.zip
       source_sha256: 98e4d48e2703cff237d64a865bffba56dec597d72e40e8c978e1beccbe49c27b
-    - name: terraform-provider-csbmysql
-      version: 1.0.0
-      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.0.0.zip
-      source_sha256: 77135ba6511aa546c85e988fcaef405504c59e7db6fba560c5511d85ba2c2c5b
     - name: terraform-provider-mysql
       version: 1.9.0
       source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
