@@ -94,9 +94,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 3)),
 					HaveKeyWithValue("db_name", "csbdb"),
 					HaveKeyWithValue("region", "us-west-2"),
-					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("allow_major_version_upgrade", BeTrue()),
 					HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
+					HaveKeyWithValue("rds_vpc_security_group_ids", BeEmpty()),
+					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 				))
 		})
 
