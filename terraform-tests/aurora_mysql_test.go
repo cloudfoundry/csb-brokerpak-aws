@@ -27,6 +27,8 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"serverless_min_capacity":     nil,
 		"serverless_max_capacity":     nil,
 		"engine_version":              nil,
+		"rds_subnet_group":            "",
+		"rds_vpc_security_group_ids":  "",
 		"allow_major_version_upgrade": true,
 		"auto_minor_version_upgrade":  true,
 	}
@@ -81,7 +83,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		})
 	})
 
-	Context("cluster_instances is 0", func() {
+	When("cluster_instances is 0", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"cluster_instances": 0,
@@ -110,6 +112,43 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"db_subnet_group_name": Equal("csb-auroramysql-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
 			}))
+		})
+	})
+
+	When("rds_vpc_security_group_ids is passed", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"rds_vpc_security_group_ids": "group1,group2,group3",
+			}))
+		})
+
+		It("should use the ids passed and not create new security groups", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"vpc_security_group_ids": ConsistOf("group1", "group2", "group3"),
+				}))
+			Expect(ResourceCreationForType(plan, "aws_security_group")).To(BeEmpty())
+		})
+	})
+
+	When("rds_subnet_group is passed", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"rds_subnet_group": "some-other-group",
+			}))
+		})
+
+		It("should use the ids passed and not create new security groups", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"db_subnet_group_name": Equal("some-other-group"),
+				}))
+			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"db_subnet_group_name": Equal("some-other-group"),
+				}))
+
+			Expect(ResourceCreationForType(plan, "rds_subnet_group")).To(BeEmpty())
 		})
 	})
 
