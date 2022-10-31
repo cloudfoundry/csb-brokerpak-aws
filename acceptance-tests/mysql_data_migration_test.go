@@ -24,7 +24,7 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 			services.WithBrokerName("aws-services-broker"),
 			services.WithParameters(map[string]any{
 				"CreateDbInstance": map[string]string{
-					"EngineVersion": "8.0.28",
+					"EngineVersion": "8.0",
 				},
 			}),
 		)
