@@ -17,7 +17,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
 			"csb-aws-mysql",
-			services.WithPlan("small"))
+			services.WithPlan("default"))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
