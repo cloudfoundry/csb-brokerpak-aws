@@ -129,6 +129,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 					"vpc_security_group_ids": ConsistOf("group1", "group2", "group3"),
 				}))
 			Expect(ResourceCreationForType(plan, "aws_security_group")).To(BeEmpty())
+			Expect(ResourceCreationForType(plan, "aws_security_group_rule")).To(BeEmpty())
 		})
 	})
 
