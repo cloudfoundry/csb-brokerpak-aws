@@ -139,7 +139,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			}))
 		})
 
-		It("should use the ids passed and not create new security groups", func() {
+		It("should use the ids passed and not create new db subnet group", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"db_subnet_group_name": Equal("some-other-group"),
