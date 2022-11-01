@@ -57,6 +57,14 @@ provision:
     nullable: true
     details: The Aurora engine version, e.g. "13.7". Not all features are supported by all versions. Refer to the AWS documentation for more details.
     default: null
+  - field_name: rds_subnet_group
+    type: string
+    details: AWS RDS subnet group already in existence to use
+    default: ""
+  - field_name: rds_vpc_security_group_ids
+    type: string
+    details: Comma delimited list of security group ID's for instance
+    default: ""
   - field_name: allow_major_version_upgrade
     type: boolean
     details: Allow major version upgrades. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible.
