@@ -1,8 +1,9 @@
 package terraformtests
 
 import (
-	. "csbbrokerpakaws/terraform-tests/helpers"
 	"path"
+
+	. "csbbrokerpakaws/terraform-tests/helpers"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
@@ -138,7 +139,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			}))
 		})
 
-		It("should use the ids passed and not create new security groups", func() {
+		It("should use the ids passed and not create new db subnet group", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"db_subnet_group_name": Equal("some-other-group"),
