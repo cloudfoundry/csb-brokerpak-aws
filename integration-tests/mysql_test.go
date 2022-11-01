@@ -48,9 +48,6 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 		Expect(service.Metadata.DisplayName).NotTo(BeNil())
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("small")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("medium")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("large")}),
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
 			),
 		)
@@ -252,7 +249,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "small", nil)
+			instanceID, err = broker.Provision(serviceName, customMySQLPlan["name"].(string), nil)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
