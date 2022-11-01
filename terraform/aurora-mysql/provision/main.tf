@@ -1,19 +1,20 @@
-resource "aws_security_group" "rds_sg" {
-  count  = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
-  name   = format("%s-sg", var.instance_name)
-  vpc_id = data.aws_vpc.vpc.id
-}
-
 resource "aws_db_subnet_group" "rds_private_subnet" {
   count      = length(var.rds_subnet_group) == 0 ? 1 : 0
   name       = format("%s-p-sn", var.instance_name)
   subnet_ids = data.aws_subnets.all.ids
 }
 
+resource "aws_security_group" "rds_sg" {
+  count  = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
+  name   = format("%s-sg", var.instance_name)
+  vpc_id = data.aws_vpc.vpc.id
+}
+
 resource "aws_security_group_rule" "rds_inbound_access" {
-  from_port         = local.port
+  count             = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
   protocol          = "tcp"
   security_group_id = aws_security_group.rds_sg[0].id
+  from_port         = local.port
   to_port           = local.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
