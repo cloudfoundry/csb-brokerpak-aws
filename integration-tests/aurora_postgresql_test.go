@@ -94,9 +94,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 3)),
 					HaveKeyWithValue("db_name", "csbdb"),
 					HaveKeyWithValue("region", "us-west-2"),
-					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("allow_major_version_upgrade", BeTrue()),
 					HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
+					HaveKeyWithValue("rds_vpc_security_group_ids", BeEmpty()),
+					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 				))
 		})
 
@@ -111,6 +112,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"engine_version":              "8.0.postgresql_aurora.3.02.0",
 				"allow_major_version_upgrade": false,
 				"auto_minor_version_upgrade":  false,
+				"rds_vpc_security_group_ids":  "group1,group2",
+				"rds_subnet_group":            "some-other-subnet",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -125,6 +128,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("engine_version", "8.0.postgresql_aurora.3.02.0"),
 					HaveKeyWithValue("allow_major_version_upgrade", BeFalse()),
 					HaveKeyWithValue("auto_minor_version_upgrade", BeFalse()),
+					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
+					HaveKeyWithValue("rds_subnet_group", "some-other-subnet"),
 				),
 			)
 		})
@@ -170,6 +175,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("engine_version", "engine_version", "8.0.postgresql_aurora.3.02.0"),
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
+			Entry("rds_subnet_group", "rds_subnet_group", "other-sn"),
 		)
 	})
 })

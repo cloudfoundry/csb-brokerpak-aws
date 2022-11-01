@@ -8,5 +8,7 @@ variable "cluster_instances" { type = number }
 variable "serverless_min_capacity" { type = number }
 variable "serverless_max_capacity" { type = number }
 variable "engine_version" { type = string }
+variable "rds_subnet_group" { type = string }
+variable "rds_vpc_security_group_ids" { type = string }
 variable "allow_major_version_upgrade" { type = bool }
 variable "auto_minor_version_upgrade" { type = bool }
