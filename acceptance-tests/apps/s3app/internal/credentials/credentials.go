@@ -49,7 +49,6 @@ func findService() (string, cfenv.Service, error) {
 			serviceTag := "s3"
 			srv, err := app.Services.WithTag(serviceTag)
 			return serviceTag, srv, err
-
 		},
 		func() (string, []cfenv.Service, error) {
 			serviceLabel := "aws-s3"
@@ -72,13 +71,8 @@ func ReadCSBS3(svs cfenv.Service) (S3Service, error) {
 		return S3Service{}, fmt.Errorf("failed to decode credentials: %w", err)
 	}
 
-	if s.AccessKeyId == "" ||
-		s.AccessKeySecret == "" ||
-		s.Region == "" ||
-		s.BucketName == "" ||
-		s.BucketDomainName == "" ||
-		s.Arn == "" {
-		return S3Service{}, fmt.Errorf("parsed credentials are not valid")
+	if err := s.Valid(); err != nil {
+		return S3Service{}, err
 	}
 
 	return s, nil
@@ -90,17 +84,47 @@ func ReadLegacyS3(svs cfenv.Service) (S3Service, error) {
 		return S3Service{}, fmt.Errorf("failed to decode credentials: %w", err)
 	}
 
-	if s.AccessKeyId == "" ||
-		s.AccessKeySecret == "" ||
-		s.Region == "" ||
-		s.BucketName == "" {
-		return S3Service{}, fmt.Errorf("parsed credentials are not valid")
+	if err := s.Valid(); err != nil {
+		return S3Service{}, err
 	}
-
 	return S3Service{
 		AccessKeyId:     s.AccessKeyId,
 		AccessKeySecret: s.AccessKeySecret,
 		Region:          s.Region,
 		BucketName:      s.BucketName,
 	}, nil
+}
+
+func (s S3Service) Valid() error {
+	switch {
+	case s.AccessKeyId == "":
+		return fmt.Errorf("missing access key id")
+	case s.AccessKeySecret == "":
+		return fmt.Errorf("missing access key secret")
+	case s.Region == "":
+		return fmt.Errorf("missing region")
+	case s.BucketName == "":
+		return fmt.Errorf("missing bucket name")
+	case s.BucketDomainName == "":
+		return fmt.Errorf("missing bucket domain name")
+	case s.Arn == "":
+		return fmt.Errorf("missing ARN")
+	}
+
+	return nil
+}
+
+func (s S3ServiceLegacy) Valid() error {
+	switch {
+	case s.AccessKeyId == "":
+		return fmt.Errorf("missing access key id")
+	case s.AccessKeySecret == "":
+		return fmt.Errorf("missing access key secret")
+	case s.Region == "":
+		return fmt.Errorf("missing region")
+	case s.BucketName == "":
+		return fmt.Errorf("missing bucket name")
+	}
+
+	return nil
 }
