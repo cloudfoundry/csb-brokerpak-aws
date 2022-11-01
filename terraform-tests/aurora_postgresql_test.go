@@ -123,12 +123,13 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			}))
 		})
 
-		It("should use the ids passed and not create new security groups", func() {
+		It("should use the ids passed and not create new security groups or rules", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"vpc_security_group_ids": ConsistOf("group1", "group2", "group3"),
 				}))
 			Expect(ResourceCreationForType(plan, "aws_security_group")).To(BeEmpty())
+			Expect(ResourceCreationForType(plan, "aws_security_group_rule")).To(BeEmpty())
 		})
 	})
 
