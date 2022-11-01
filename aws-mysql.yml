@@ -379,16 +379,16 @@ bind:
 examples:
 - name: example
   description: Create an example-plan MySQL instance
-  plan_id: facd366e-0528-47ef-b75b-44b981992548
+  plan_id: 0f3522b2-f040-443b-bc53-4aed25284840
   provision_params: { "publicly_accessible": true }
   bind_params: {}
 - name: disable-upgrades
   description: Create a MySQL instance with disabled upgrades
-  plan_id: facd366e-0528-47ef-b75b-44b981992548
+  plan_id: 0f3522b2-f040-443b-bc53-4aed25284840
   provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true }
   bind_params: {}
 - name: with-maintenance-window
   description: Create a MySQL instance with maintenance window
-  plan_id: facd366e-0528-47ef-b75b-44b981992548
+  plan_id: 0f3522b2-f040-443b-bc53-4aed25284840
   provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true }
   bind_params: {}
