@@ -5,5 +5,5 @@ provider "csbpg" {
   password        = var.admin_password
   database        = var.name
   data_owner_role = "binding_user_group"
-  sslmode         = "require"
+  sslmode         = "verify-full"
 }
