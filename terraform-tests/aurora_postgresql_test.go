@@ -33,6 +33,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"rds_vpc_security_group_ids":  "",
 		"allow_major_version_upgrade": true,
 		"auto_minor_version_upgrade":  true,
+		"deletion_protection":         false,
 	}
 
 	BeforeAll(func() {
@@ -83,6 +84,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"serverlessv2_scaling_configuration": BeEmpty(),
 				"allow_major_version_upgrade":        BeTrue(),
 				"tags":                               HaveKeyWithValue("key1", "some-postgres-value"),
+				"deletion_protection":                BeFalse(),
 			}))
 		})
 	})

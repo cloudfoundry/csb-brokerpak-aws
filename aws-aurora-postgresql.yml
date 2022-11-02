@@ -73,6 +73,10 @@ provision:
     type: boolean
     details: Allow minor version upgrades automatically during the maintenance window.
     default: true
+  - field_name: deletion_protection
+    type: boolean
+    details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
+    default: false
   - field_name: aws_access_key_id
     type: string
     details: AWS access key

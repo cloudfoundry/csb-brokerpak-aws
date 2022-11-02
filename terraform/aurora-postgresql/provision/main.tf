@@ -46,6 +46,7 @@ resource "aws_rds_cluster" "cluster" {
   vpc_security_group_ids      = local.rds_vpc_security_group_ids
   skip_final_snapshot         = true
   allow_major_version_upgrade = var.allow_major_version_upgrade
+  deletion_protection         = var.deletion_protection
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
