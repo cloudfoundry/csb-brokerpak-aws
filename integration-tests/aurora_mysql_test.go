@@ -97,6 +97,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
 				HaveKeyWithValue("rds_vpc_security_group_ids", BeEmpty()),
 				HaveKeyWithValue("rds_subnet_group", BeEmpty()),
+				HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 			))
 		})
 
