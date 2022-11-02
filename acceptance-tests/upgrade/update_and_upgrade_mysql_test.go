@@ -58,7 +58,7 @@ var _ = Describe("UpgradeMySQLTest", Label("mysql", "upgrade"), func() {
 			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("updating the instance plan")
-			serviceInstance.Update(services.WithPlan("default"))
+			serviceInstance.Update(services.WithPlan("default-5.7"))
 
 			By("getting the value using the second app")
 			Expect(appTwo.GET(key)).To(Equal(value))

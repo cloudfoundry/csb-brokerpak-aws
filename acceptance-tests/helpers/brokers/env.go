@@ -57,6 +57,6 @@ func (b Broker) releaseEnv() []apps.EnvVar {
 
 func (b Broker) latestEnv() []apps.EnvVar {
 	return []apps.EnvVar{
-		{Name: "GSB_SERVICE_CSB_AWS_MYSQL_PLANS", Value: `[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class": "db.m6i.large","mysql_version": "8.0","storage_gb": 100}]`},
+		{Name: "GSB_SERVICE_CSB_AWS_MYSQL_PLANS", Value: `[{"name":"default-5.7","id":"ce70e430-5a08-11ed-a801-367dda7ea869","description":"Default MySQL 5.7 plan","display_name":"default-5.7","instance_class": "db.t3.medium","mysql_version": "5.7","storage_gb": 10, "storage_encrypted": false, "multi_az": false, "storage_autoscale": false, "storage_type": "gp2"},{"name":"small","id":"2268ce43-7fd7-48dc-be2f-8611e11fb12e","description":"MySQL v5.7, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb": 5, "storage_type": "gp2", "cores": 2, "mysql_version": "5.7", "storage_encrypted": false, "multi_az": false, "storage_autoscale": false}]`},
 	}
 }
