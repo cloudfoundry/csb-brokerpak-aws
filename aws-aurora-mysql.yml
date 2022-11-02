@@ -84,6 +84,11 @@ provision:
   - field_name: aws_vpc_id
     details: VPC ID for instance
     default: ""
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
   template_refs:
     outputs: ./terraform/aurora-mysql/provision/outputs.tf
     provider: ./terraform/aurora-mysql/provision/provider.tf
