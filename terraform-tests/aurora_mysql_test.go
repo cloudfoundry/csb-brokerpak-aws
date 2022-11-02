@@ -20,6 +20,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 	defaultVars := map[string]any{
 		"instance_name":               "csb-auroramysql-test",
 		"db_name":                     "csbdb",
+		"labels":                      map[string]any{"key1": "some-mysql-value"},
 		"region":                      "us-west-2",
 		"aws_access_key_id":           awsAccessKeyID,
 		"aws_secret_access_key":       awsSecretAccessKey,
@@ -67,6 +68,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"instance_class":             Equal("db.r5.large"),
 				"db_subnet_group_name":       Equal("csb-auroramysql-test-p-sn"),
 				"auto_minor_version_upgrade": BeTrue(),
+				"tags":                       HaveKeyWithValue("key1", "some-mysql-value"),
 			}))
 		})
 
@@ -80,6 +82,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
 				"allow_major_version_upgrade":        BeTrue(),
+				"tags":                               HaveKeyWithValue("key1", "some-mysql-value"),
 			}))
 		})
 	})

@@ -38,6 +38,7 @@ resource "aws_rds_cluster" "cluster" {
   engine                      = "aurora-postgresql"
   engine_version              = var.engine_version
   database_name               = var.db_name
+  tags                        = var.labels
   master_username             = random_string.username.result
   master_password             = random_password.password.result
   port                        = local.port
@@ -63,6 +64,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   count                      = var.cluster_instances
   identifier                 = "${var.instance_name}-${count.index}"
   cluster_identifier         = aws_rds_cluster.cluster.id
+  tags                       = var.labels
   instance_class             = local.serverless ? "db.serverless" : "db.r5.large"
   engine                     = aws_rds_cluster.cluster.engine
   engine_version             = aws_rds_cluster.cluster.engine_version
