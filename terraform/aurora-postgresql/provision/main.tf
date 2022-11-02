@@ -1,17 +1,20 @@
-resource "aws_security_group" "rds_sg" {
-  name   = format("%s-sg", var.instance_name)
-  vpc_id = data.aws_vpc.vpc.id
-}
-
 resource "aws_db_subnet_group" "rds_private_subnet" {
+  count      = length(var.rds_subnet_group) == 0 ? 1 : 0
   name       = format("%s-p-sn", var.instance_name)
   subnet_ids = data.aws_subnets.all.ids
 }
 
+resource "aws_security_group" "rds_sg" {
+  count  = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
+  name   = format("%s-sg", var.instance_name)
+  vpc_id = data.aws_vpc.vpc.id
+}
+
 resource "aws_security_group_rule" "rds_inbound_access" {
-  from_port         = local.port
+  count             = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
   protocol          = "tcp"
-  security_group_id = aws_security_group.rds_sg.id
+  security_group_id = aws_security_group.rds_sg[0].id
+  from_port         = local.port
   to_port           = local.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -38,8 +41,8 @@ resource "aws_rds_cluster" "cluster" {
   master_username             = random_string.username.result
   master_password             = random_password.password.result
   port                        = local.port
-  db_subnet_group_name        = aws_db_subnet_group.rds_private_subnet.name
-  vpc_security_group_ids      = [aws_security_group.rds_sg.id]
+  db_subnet_group_name        = local.subnet_group
+  vpc_security_group_ids      = local.rds_vpc_security_group_ids
   skip_final_snapshot         = true
   allow_major_version_upgrade = var.allow_major_version_upgrade
 
@@ -63,7 +66,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   instance_class             = local.serverless ? "db.serverless" : "db.r5.large"
   engine                     = aws_rds_cluster.cluster.engine
   engine_version             = aws_rds_cluster.cluster.engine_version
-  db_subnet_group_name       = aws_db_subnet_group.rds_private_subnet.name
+  db_subnet_group_name       = local.subnet_group
   auto_minor_version_upgrade = var.auto_minor_version_upgrade
 
   lifecycle {
