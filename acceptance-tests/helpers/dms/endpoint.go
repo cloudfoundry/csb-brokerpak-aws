@@ -17,7 +17,7 @@ type Endpoint struct {
 	region string
 }
 
-func CreateEndpoint(endpointType EndpointType, username, password, server, dbname, region string, port int) *Endpoint {
+func CreateEndpoint(endpointType EndpointType, username, password, server, dbname, region, engine string, port int) *Endpoint {
 	id := random.Name()
 
 	var receiver struct {
@@ -30,7 +30,7 @@ func CreateEndpoint(endpointType EndpointType, username, password, server, dbnam
 		"create-endpoint",
 		"--endpoint-identifier", id,
 		"--endpoint-type", string(endpointType),
-		"--engine-name", "postgres",
+		"--engine-name", engine,
 		"--username", username,
 		"--password", password,
 		"--port", fmt.Sprintf("%d", port),

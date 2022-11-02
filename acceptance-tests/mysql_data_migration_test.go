@@ -36,13 +36,10 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 		legacyBinding := legacyServiceInstance.Bind(app)
 		app.Start()
 
-		By("creating a schema and adding some data in the source database")
-		schema := random.Name(random.WithMaxLength(8))
-		app.PUT("", schema)
-
+		By("adding some data in the source legacy database")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		app.PUT(value, "%s/%s", schema, key)
+		app.PUT(value, "%s?tls=true", key)
 
 		By("waiting for the replication instance to be ready")
 		replicationInstance.Wait()
@@ -65,7 +62,7 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 			Port     int    `mapstructure:"port"`
 		}
 		Expect(mapstructure.Decode(sourceCreds, &sourceReceiver)).NotTo(HaveOccurred())
-		sourceEndpoint := dms.CreateEndpoint(dms.Source, sourceReceiver.Username, sourceReceiver.Password, sourceReceiver.Server, sourceReceiver.DBName, metadata.Region, sourceReceiver.Port)
+		sourceEndpoint := dms.CreateEndpoint(dms.Source, sourceReceiver.Username, sourceReceiver.Password, sourceReceiver.Server, sourceReceiver.DBName, metadata.Region, "mysql", sourceReceiver.Port)
 		defer sourceEndpoint.Cleanup()
 
 		By("creating a DMS target endpoint")
@@ -79,11 +76,11 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 			Port     int    `json:"port"`
 		}
 		csbKey.Get(&targetReceiver)
-		targetEndpoint := dms.CreateEndpoint(dms.Target, targetReceiver.Username, targetReceiver.Password, targetReceiver.Server, targetReceiver.DBName, metadata.Region, targetReceiver.Port)
+		targetEndpoint := dms.CreateEndpoint(dms.Target, targetReceiver.Username, targetReceiver.Password, targetReceiver.Server, targetReceiver.DBName, metadata.Region, "mysql", targetReceiver.Port)
 		defer targetEndpoint.Cleanup()
 
 		By("running the replication task")
-		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, schema)
+		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, "%")
 
 		By("deleting the target service key to trigger data ownership update")
 		csbKey.Delete()
@@ -94,7 +91,6 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 		apps.Restart(app)
 
 		By("checking that the data is available in the target CSB created database")
-		got := app.GET("%s/%s", schema, key)
-		Expect(got).To(Equal(value))
+		Expect(app.GET(key)).To(Equal(value))
 	})
 })
