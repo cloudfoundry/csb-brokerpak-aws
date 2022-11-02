@@ -20,6 +20,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 	defaultVars := map[string]any{
 		"instance_name":               "csb-aurorapg-test",
 		"db_name":                     "csbdb",
+		"labels":                      map[string]any{"key1": "some-postgres-value"},
 		"region":                      "us-west-2",
 		"aws_access_key_id":           awsAccessKeyID,
 		"aws_secret_access_key":       awsSecretAccessKey,
@@ -67,6 +68,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"instance_class":             Equal("db.r5.large"),
 				"db_subnet_group_name":       Equal("csb-aurorapg-test-p-sn"),
 				"auto_minor_version_upgrade": BeTrue(),
+				"tags":                       HaveKeyWithValue("key1", "some-postgres-value"),
 			}))
 		})
 
@@ -80,6 +82,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
 				"allow_major_version_upgrade":        BeTrue(),
+				"tags":                               HaveKeyWithValue("key1", "some-postgres-value"),
 			}))
 		})
 	})
