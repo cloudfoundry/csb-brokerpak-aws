@@ -31,12 +31,7 @@ func RunReplicationTask(replicationInstance *ReplicationInstance, source, target
 		"--region", region,
 	)
 
-	defer AWS(
-		"dms",
-		"delete-replication-task",
-		"--region", region,
-		"--replication-task-arn", taskReceiver.ARN,
-	)
+	defer replicationTaskDeletion(taskReceiver.ARN, region)
 
 	waitForReplicationTaskCreation(taskID, region)
 
@@ -111,4 +106,31 @@ func waitForReplicationTaskCreation(taskID, region string) {
 	}
 
 	ginkgo.Fail("timed out")
+}
+
+func replicationTaskDeletion(taskARN, region string) {
+	AWS(
+		"dms",
+		"delete-replication-task",
+		"--region", region,
+		"--replication-task-arn", taskARN,
+	)
+
+	for start := time.Now(); time.Since(start) < time.Hour; {
+		if replicationTaskDoesntExist(taskARN, region) {
+			return
+		}
+		time.Sleep(taskPollPeriod)
+	}
+
+	ginkgo.Fail("timed out")
+}
+
+func replicationTaskDoesntExist(arn, region string) bool {
+	var receiver struct {
+		ARNs []string `jsonry:"ReplicationTasks.ReplicationTaskArn"`
+	}
+	AWSToJSON(&receiver, "dms", "describe-replication-tasks", "--region", region, "--filter", fmt.Sprintf("Name=replication-instance-arn,Values=%q", arn))
+
+	return len(receiver.ARNs) == 0
 }
