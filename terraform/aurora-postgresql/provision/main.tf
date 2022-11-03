@@ -49,6 +49,7 @@ resource "aws_rds_cluster" "cluster" {
   backup_retention_period     = var.backup_retention_period
   preferred_backup_window     = var.preferred_backup_window
   copy_tags_to_snapshot       = var.copy_tags_to_snapshot
+  deletion_protection         = var.deletion_protection
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
