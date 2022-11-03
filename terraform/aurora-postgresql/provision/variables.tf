@@ -13,3 +13,6 @@ variable "rds_subnet_group" { type = string }
 variable "rds_vpc_security_group_ids" { type = string }
 variable "allow_major_version_upgrade" { type = bool }
 variable "auto_minor_version_upgrade" { type = bool }
+variable "backup_retention_period" { type = number }
+variable "preferred_backup_window" { type = string }
+variable "copy_tags_to_snapshot" { type = bool }

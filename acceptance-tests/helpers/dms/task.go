@@ -117,7 +117,7 @@ func replicationTaskDeletion(taskARN, region string) {
 	)
 
 	for start := time.Now(); time.Since(start) < time.Hour; {
-		if replicationTaskDoesntExist(taskARN, region) {
+		if !replicationTaskExists(taskARN, region) {
 			return
 		}
 		time.Sleep(taskPollPeriod)
@@ -126,11 +126,16 @@ func replicationTaskDeletion(taskARN, region string) {
 	ginkgo.Fail("timed out")
 }
 
-func replicationTaskDoesntExist(arn, region string) bool {
+func replicationTaskExists(arn, region string) bool {
 	var receiver struct {
 		ARNs []string `jsonry:"ReplicationTasks.ReplicationTaskArn"`
 	}
-	AWSToJSON(&receiver, "dms", "describe-replication-tasks", "--region", region, "--filter", fmt.Sprintf("Name=replication-instance-arn,Values=%q", arn))
+	AWSToJSON(&receiver, "dms", "describe-replication-tasks", "--region", region)
 
-	return len(receiver.ARNs) == 0
+	for _, a := range receiver.ARNs {
+		if a == arn {
+			return true
+		}
+	}
+	return false
 }

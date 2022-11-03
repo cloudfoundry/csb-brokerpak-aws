@@ -163,6 +163,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
 			Entry("db_name", "db_name", "someNewName"),
+			Entry("rds_subnet_group", "rds_subnet_group", "some-new-subnet-name"),
 		)
 
 		DescribeTable(
@@ -177,7 +178,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
-			Entry("rds_subnet_group", "rds_subnet_group", "other-sn"),
 		)
 	})
 })
