@@ -27,8 +27,8 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
-  length           = 41 // This is the limit for Aurora/MySQL, we would prefer longer
-  special          = false
+  length  = 41 // This is the limit for Aurora/MySQL, we would prefer longer
+  special = false
   // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html#RDS_Limits.Constraints
   override_special = "~_-."
 }
