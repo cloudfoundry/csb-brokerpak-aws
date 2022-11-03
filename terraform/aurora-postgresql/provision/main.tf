@@ -46,6 +46,9 @@ resource "aws_rds_cluster" "cluster" {
   vpc_security_group_ids      = local.rds_vpc_security_group_ids
   skip_final_snapshot         = true
   allow_major_version_upgrade = var.allow_major_version_upgrade
+  backup_retention_period     = var.backup_retention_period
+  preferred_backup_window     = var.preferred_backup_window
+  copy_tags_to_snapshot       = var.copy_tags_to_snapshot
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
