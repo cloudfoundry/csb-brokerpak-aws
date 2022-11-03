@@ -99,6 +99,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("rds_vpc_security_group_ids", BeEmpty()),
 					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+					HaveKeyWithValue("deletion_protection", BeFalse()),
 				))
 		})
 
@@ -115,6 +116,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"auto_minor_version_upgrade":  false,
 				"rds_vpc_security_group_ids":  "group1,group2",
 				"rds_subnet_group":            "some-other-subnet",
+				"deletion_protection":         true,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -127,10 +129,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
 					HaveKeyWithValue("serverless_max_capacity", BeNumerically("==", 100)),
 					HaveKeyWithValue("engine_version", "8.0.postgresql_aurora.3.02.0"),
-					HaveKeyWithValue("allow_major_version_upgrade", BeFalse()),
-					HaveKeyWithValue("auto_minor_version_upgrade", BeFalse()),
+					HaveKeyWithValue("allow_major_version_upgrade", false),
+					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("rds_subnet_group", "some-other-subnet"),
+					HaveKeyWithValue("deletion_protection", true),
 				),
 			)
 		})
@@ -163,6 +166,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
 			Entry("db_name", "db_name", "someNewName"),
+			Entry("rds_subnet_group", "rds_subnet_group", "some-new-subnet-name"),
 		)
 
 		DescribeTable(
@@ -177,7 +181,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
-			Entry("rds_subnet_group", "rds_subnet_group", "other-sn"),
+			Entry("deletion_protection", "deletion_protection", true),
 		)
 	})
 })

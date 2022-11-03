@@ -10,6 +10,7 @@ support_url: https://aws.amazon.com/rds/aurora/
 tags: [aws, aurora, mysql, beta]
 plan_updateable: true
 provision:
+  plan_inputs: []
   user_inputs:
   - field_name: instance_name
     type: string
@@ -42,21 +43,21 @@ provision:
         - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
-  - field_name: serverless_min_capacity
-    type: number
-    nullable: true
+  - <<: &nullable_number
+      type: number
+      default: null
+      nullable: true
+    field_name: serverless_min_capacity
     details: The minimum capacity for the cluster. Must be less than or equal to `serverless_max_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
-    default: null
-  - field_name: serverless_max_capacity
-    type: number
-    nullable: true
+  - <<: *nullable_number
+    field_name: serverless_max_capacity
     details: The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
-    default: null
-  - field_name: engine_version
-    type: string
-    nullable: true
+  - <<: &nullable_string
+      type: string
+      default: null
+      nullable: true
+    field_name: engine_version
     details: The Aurora engine version, e.g. "8.0.mysql_aurora.3.02.0". Not all features are supported by all versions. Refer to the AWS documentation for more details.
-    default: null
   - field_name: allow_major_version_upgrade
     type: boolean
     details: Allow major version upgrades. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible.
@@ -65,6 +66,7 @@ provision:
     type: string
     details: AWS RDS subnet group already in existence to use
     default: ""
+    prohibit_update: true
   - field_name: rds_vpc_security_group_ids
     type: string
     details: Comma delimited list of security group ID's for instance
@@ -73,6 +75,10 @@ provision:
     type: boolean
     details: Allow minor version upgrades automatically during the maintenance window.
     default: true
+  - field_name: deletion_protection
+    type: boolean
+    details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
+    default: false
   - field_name: aws_access_key_id
     type: string
     details: AWS access key
@@ -82,8 +88,29 @@ provision:
     details: AWS secret key
     default: ${config("aws.secret_access_key")}
   - field_name: aws_vpc_id
+    type: string
     details: VPC ID for instance
     default: ""
+  - field_name: copy_tags_to_snapshot
+    type: boolean
+    default: true
+    details: Copy all cluster tags to snapshots
+  - field_name: backup_retention_period
+    type: number
+    details: |
+      The number of days (1-35) for which automatic backups are kept.
+      Automated backups cannot be disabled on Aurora.
+      The backup retention period determines the period for which you can perform a point-in-time recovery.
+    default: 1
+    constraints:
+      minimum: 1
+      maximum: 35
+  - <<: *nullable_string
+    field_name: preferred_backup_window
+    details: |
+      The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16".
+      Must not overlap with the maintenance window. If not set, uses the default for the region
+      (see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Managing.Backups.html#Aurora.Managing.Backups.BackupWindow)
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

@@ -33,6 +33,10 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"rds_vpc_security_group_ids":  "",
 		"allow_major_version_upgrade": true,
 		"auto_minor_version_upgrade":  true,
+		"backup_retention_period":     1,
+		"preferred_backup_window":     "23:26-23:56",
+		"copy_tags_to_snapshot":       true,
+		"deletion_protection":         false,
 	}
 
 	BeforeAll(func() {
@@ -83,6 +87,10 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"serverlessv2_scaling_configuration": BeEmpty(),
 				"allow_major_version_upgrade":        BeTrue(),
 				"tags":                               HaveKeyWithValue("key1", "some-mysql-value"),
+				"backup_retention_period":            BeNumerically("==", 1),
+				"preferred_backup_window":            Equal("23:26-23:56"),
+				"copy_tags_to_snapshot":              BeTrue(),
+				"deletion_protection":                BeFalse(),
 			}))
 		})
 	})

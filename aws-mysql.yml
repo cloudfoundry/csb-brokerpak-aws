@@ -231,7 +231,7 @@ provision:
     details: |
       The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16".
       Must not overlap with the maintenance window. If not set, uses the default for the region
-      (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html#USER_WorkingWithAutomatedBackups.BackupWindow)'
+      (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html#USER_WorkingWithAutomatedBackups.BackupWindow)
   - field_name: delete_automated_backups
     type: boolean
     details: Specifies whether to remove automated backups immediately after the DB instance is deleted
