@@ -18,3 +18,4 @@ variable "preferred_backup_window" { type = string }
 variable "copy_tags_to_snapshot" { type = bool }
 variable "require_ssl" { type = bool }
 variable "db_cluster_parameter_group_name" { type = string }
+variable "deletion_protection" { type = bool }

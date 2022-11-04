@@ -36,6 +36,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"backup_retention_period":     1,
 		"preferred_backup_window":     "23:26-23:56",
 		"copy_tags_to_snapshot":       true,
+		"deletion_protection":         false,
 	}
 
 	BeforeAll(func() {
@@ -89,6 +90,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"backup_retention_period":            BeNumerically("==", 1),
 				"preferred_backup_window":            Equal("23:26-23:56"),
 				"copy_tags_to_snapshot":              BeTrue(),
+				"deletion_protection":                BeFalse(),
 			}))
 		})
 	})
