@@ -1,15 +1,15 @@
 output "hostname" { value = var.reader_endpoint ? var.reader_hostname : var.hostname }
-output "username" { value = random_string.username.result }
+output "username" { value = csbmysql_binding_user.new_user.username }
 output "password" {
-  value     = random_password.password.result
+  value     = csbmysql_binding_user.new_user.password
   sensitive = true
 }
 output "database" { value = var.name }
 output "uri" {
   value = format(
     "mysql://%s:%s@%s:%d/%s",
-    random_string.username.result,
-    random_password.password.result,
+    csbmysql_binding_user.new_user.username,
+    csbmysql_binding_user.new_user.password,
     var.hostname,
     var.port,
     var.name,
@@ -23,8 +23,8 @@ output "jdbcUrl" {
     var.reader_endpoint ? var.reader_hostname : var.hostname,
     var.port,
     var.name,
-    random_string.username.result,
-    random_password.password.result,
+    csbmysql_binding_user.new_user.username,
+    csbmysql_binding_user.new_user.password,
   )
   sensitive = true
 }

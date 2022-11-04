@@ -1,6 +1,8 @@
 package acceptance_tests_test
 
 import (
+	"net/http"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
@@ -15,7 +17,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
 			"csb-aws-aurora-mysql",
-			services.WithPlan("default"))
+			services.WithPlan("default"),
+			services.WithParameters(`{"cluster_instances": 2}`))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
@@ -42,8 +45,18 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		got := appWriter.GET(key)
 		Expect(got).To(Equal(value))
 
+		By("getting the value using the writer app using tls false should fail")
+		response := appWriter.GetRawResponse("%s?tls=false", key)
+		defer response.Body.Close()
+		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "TLS is always enabled")
+
 		By("getting the value using the reader app")
 		got = appReader.GET(key)
 		Expect(got).To(Equal(value))
+
+		By("getting the value using the reader app using tls false should fail")
+		response = appReader.GetRawResponse("%s?tls=false", key)
+		defer response.Body.Close()
+		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "TLS is always enabled")
 	})
 })
