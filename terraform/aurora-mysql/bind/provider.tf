@@ -1,6 +1,7 @@
-provider "mysql" {
-  endpoint = format("%s:%d", var.hostname, var.port)
-  username = var.admin_username
+provider "csbmysql" {
+  database = var.name
   password = var.admin_password
-  tls      = false
+  username = var.admin_username
+  port     = var.port
+  host     = var.hostname
 }
