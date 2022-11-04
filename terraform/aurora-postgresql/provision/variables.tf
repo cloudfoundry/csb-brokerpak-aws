@@ -16,3 +16,5 @@ variable "auto_minor_version_upgrade" { type = bool }
 variable "backup_retention_period" { type = number }
 variable "preferred_backup_window" { type = string }
 variable "copy_tags_to_snapshot" { type = bool }
+variable "require_ssl" { type = bool }
+variable "db_cluster_parameter_group_name" { type = string }
