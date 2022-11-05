@@ -13,17 +13,15 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
+var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		// serviceInstance := services.CreateInstance(
-		// 	"csb-aws-aurora-postgresql",
-		// 	services.WithPlan("default"),
-		// 	services.WithParameters(`{"cluster_instances": 2}`),
-		// )
-		// defer serviceInstance.Delete()
-
-		serviceInstance := services.ServiceInstance{Name: "param-group-3"}
+		serviceInstance := services.CreateInstance(
+			"csb-aws-aurora-postgresql",
+			services.WithPlan("default"),
+			services.WithParameters(`{"cluster_instances": 2}`),
+		)
+		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
 		appWriter := apps.Push(apps.WithApp(apps.PostgreSQL))
