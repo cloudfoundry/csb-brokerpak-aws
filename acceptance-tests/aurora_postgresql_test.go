@@ -1,6 +1,9 @@
 package acceptance_tests_test
 
 import (
+	"io/ioutil"
+	"net/http"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
@@ -13,7 +16,11 @@ import (
 var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-aurora-postgresql", services.WithPlan("default"))
+		serviceInstance := services.CreateInstance(
+			"csb-aws-aurora-postgresql",
+			services.WithPlan("default"),
+			services.WithParameters(`{"cluster_instances": 2}`),
+		)
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
@@ -45,6 +52,15 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		By("getting the value using the reader app")
 		got := appReader.GET("%s/%s", schema, key)
 		Expect(got).To(Equal(value))
+
+		By("getting the value using the reader app using NON-tls connections should fail")
+		response := appReader.GetRawResponse("%s/%s?tls=disable", schema, key)
+		defer response.Body.Close()
+		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "force TLS is enabled by default")
+		b, err := ioutil.ReadAll(response.Body)
+		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
+		Expect(string(b)).To(MatchError(ContainSubstring("failed to connect to database")), "force TLS is enabled by default")
+		Expect(string(b)).To(MatchError(ContainSubstring("SQLSTATE 28000")), "postgresql client cannot connect to the postgres server due to invalid TLS")
 
 		By("dropping the schema using the writer app")
 		appWriter.DELETE(schema)

@@ -1,29 +1,33 @@
 package app
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
+
+	"postgresqlapp/internal/connector"
 
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 const (
-	tableName   = "test"
-	keyColumn   = "keyname"
-	valueColumn = "valuedata"
+	tableName     = "test"
+	keyColumn     = "keyname"
+	valueColumn   = "valuedata"
+	tlsQueryParam = "tls"
+	schemaKey     = "schema"
 )
 
-func App(uri string) *mux.Router {
+func App(conn *connector.Connector) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/", aliveness).Methods(http.MethodHead, http.MethodGet)
-	r.HandleFunc("/{schema}", handleCreateSchema(uri)).Methods(http.MethodPut)
-	r.HandleFunc("/{schema}", handleDropSchema(uri)).Methods(http.MethodDelete)
-	r.HandleFunc("/{schema}/{key}", handleSet(uri)).Methods(http.MethodPut)
-	r.HandleFunc("/{schema}/{key}", handleGet(uri)).Methods(http.MethodGet)
+	r.Handle("/{schema}", checkSchemaMiddleware(http.HandlerFunc(handleCreateSchema(conn)))).Methods(http.MethodPut)
+	r.Handle("/{schema}", checkSchemaMiddleware(http.HandlerFunc(handleDropSchema(conn)))).Methods(http.MethodDelete)
+	r.Handle("/{schema}/{key}", checkSchemaMiddleware(http.HandlerFunc(handleSet(conn)))).Methods(http.MethodPut)
+	r.Handle("/{schema}/{key}", checkSchemaMiddleware(http.HandlerFunc(handleGet(conn)))).Methods(http.MethodGet)
 
 	return r
 }
@@ -33,34 +37,16 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func connectReadOnly(uri string) (*sql.DB, error) {
-	db, err := sql.Open("pgx", uri)
-	if err != nil {
-		return nil, fmt.Errorf("%w: failed to connect to database", err)
-	}
+func checkSchemaMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		schema, err := schemaName(r)
+		if err != nil {
+			fail(w, http.StatusInternalServerError, "Schema name error: %s\n", err)
+			return
+		}
 
-	db.SetMaxIdleConns(0)
-
-	return db, nil
-}
-
-func connect(uri string) (*sql.DB, error) {
-	db, err := connectReadOnly(uri)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = db.Exec(fmt.Sprintf(`CREATE TABLE IF NOT EXISTS public.%s (%s VARCHAR(255) NOT NULL, %s VARCHAR(255) NOT NULL)`, tableName, keyColumn, valueColumn))
-	if err != nil {
-		return nil, fmt.Errorf("%w: error creating table", err)
-	}
-
-	_, err = db.Exec(fmt.Sprintf(`GRANT ALL ON TABLE public.%s TO PUBLIC`, tableName))
-	if err != nil {
-		return nil, fmt.Errorf("%w: error granting table permissions", err)
-	}
-
-	return db, nil
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), schemaKey, schema)))
+	})
 }
 
 func schemaName(r *http.Request) (string, error) {

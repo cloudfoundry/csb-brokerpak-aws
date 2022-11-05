@@ -5,25 +5,22 @@ import (
 	"log"
 	"net/http"
 
+	"postgresqlapp/internal/connector"
+
 	"github.com/gorilla/mux"
 )
 
-func handleGet(uri string) func(w http.ResponseWriter, r *http.Request) {
+func handleGet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling get.")
 
-		db, err := connectReadOnly(uri)
+		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
-			fail(w, http.StatusInternalServerError, "failed to connect to database: %e", err)
+			fail(w, http.StatusInternalServerError, "failed to connect to database: %s", err.Error())
 		}
 		defer db.Close()
 
-		schema, err := schemaName(r)
-		if err != nil {
-			fail(w, http.StatusInternalServerError, "Schema name error: %s", err)
-			return
-		}
-
+		schema := r.Context().Value(schemaKey)
 		key, ok := mux.Vars(r)["key"]
 		if !ok {
 			fail(w, http.StatusBadRequest, "Key missing.")
