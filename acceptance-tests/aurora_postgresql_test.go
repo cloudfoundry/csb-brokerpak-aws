@@ -1,7 +1,7 @@
 package acceptance_tests_test
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
@@ -13,15 +13,17 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
+var _ = FDescribe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance(
-			"csb-aws-aurora-postgresql",
-			services.WithPlan("default"),
-			services.WithParameters(`{"cluster_instances": 2}`),
-		)
-		defer serviceInstance.Delete()
+		// serviceInstance := services.CreateInstance(
+		// 	"csb-aws-aurora-postgresql",
+		// 	services.WithPlan("default"),
+		// 	services.WithParameters(`{"cluster_instances": 2}`),
+		// )
+		// defer serviceInstance.Delete()
+
+		serviceInstance := services.ServiceInstance{Name: "param-group-3"}
 
 		By("pushing the unstarted app")
 		appWriter := apps.Push(apps.WithApp(apps.PostgreSQL))
@@ -57,10 +59,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		response := appReader.GetRawResponse("%s/%s?tls=disable", schema, key)
 		defer response.Body.Close()
 		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "force TLS is enabled by default")
-		b, err := ioutil.ReadAll(response.Body)
+		b, err := io.ReadAll(response.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
-		Expect(string(b)).To(MatchError(ContainSubstring("failed to connect to database")), "force TLS is enabled by default")
-		Expect(string(b)).To(MatchError(ContainSubstring("SQLSTATE 28000")), "postgresql client cannot connect to the postgres server due to invalid TLS")
+		Expect(string(b)).To(ContainSubstring("failed to connect to database"), "force TLS is enabled by default")
+		Expect(string(b)).To(ContainSubstring("SQLSTATE 28000"), "postgresql client cannot connect to the postgres server due to invalid TLS")
 
 		By("dropping the schema using the writer app")
 		appWriter.DELETE(schema)
