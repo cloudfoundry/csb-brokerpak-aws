@@ -172,6 +172,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("instance_name", "instance_name", "marmaduke"),
 			Entry("db_name", "db_name", "some-new-name"),
 			Entry("rds_subnet_group", "rds_subnet_group", "some-new-subnet-name"),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 		)
 
 		DescribeTable(
@@ -185,7 +186,6 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("engine_version", "engine_version", "8.0.mysql_aurora.3.02.0"),
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
-			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 			Entry("db_cluster_parameter_group_name", "db_cluster_parameter_group_name", "another-db-parameter-group"),
 			Entry("enable_audit_logging", "enable_audit_logging", true),
 		)
