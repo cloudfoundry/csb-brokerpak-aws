@@ -109,6 +109,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("storage_encrypted", false),
 					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("multi_az", false),
+					HaveKeyWithValue("rds_vpc_security_group_ids", ""),
 					HaveKeyWithValue("allow_major_version_upgrade", true),
 					HaveKeyWithValue("auto_minor_version_upgrade", true),
 					HaveKeyWithValue("maintenance_day", BeNil()),
@@ -145,6 +146,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"storage_encrypted":                     true,
 				"kms_key_id":                            "arn:aws:xxxx",
 				"multi_az":                              true,
+				"rds_vpc_security_group_ids":            "group1,group2",
 				"allow_major_version_upgrade":           false,
 				"auto_minor_version_upgrade":            false,
 				"maintenance_day":                       "Mon",
@@ -180,6 +182,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("storage_encrypted", true),
 					HaveKeyWithValue("kms_key_id", "arn:aws:xxxx"),
 					HaveKeyWithValue("multi_az", true),
+					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_day", "Mon"),
@@ -229,6 +232,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
 			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
 			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 		)
 
 		DescribeTable(

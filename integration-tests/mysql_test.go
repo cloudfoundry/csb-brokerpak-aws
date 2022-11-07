@@ -173,7 +173,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"multi_az":                               true,
 				"instance_class":                         "",
 				"rds_subnet_group":                       "",
-				"rds_vpc_security_group_ids":             "",
+				"rds_vpc_security_group_ids":             "group1,group2",
 				"allow_major_version_upgrade":            false,
 				"auto_minor_version_upgrade":             false,
 				"maintenance_day":                        "Mon",
@@ -217,7 +217,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("multi_az", true),
 					HaveKeyWithValue("instance_class", ""),
 					HaveKeyWithValue("rds_subnet_group", ""),
-					HaveKeyWithValue("rds_vpc_security_group_ids", ""),
+					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_day", "Mon"),
@@ -271,6 +271,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
 			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
 			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 		)
 
 		DescribeTable("should allow updating properties",
