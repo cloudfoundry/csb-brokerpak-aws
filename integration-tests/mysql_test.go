@@ -292,7 +292,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update option_group_name", "option_group_name", "option-group-name"),
 			Entry("update monitoring_interval", "monitoring_interval", 0),
 			Entry("update monitoring_role_arn", "monitoring_role_arn", ""),
-			Entry("update performance_insights_enabled", "performance_insights_enabled": true),
+			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
 			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
 		)
