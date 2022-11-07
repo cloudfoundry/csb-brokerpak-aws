@@ -21,7 +21,7 @@ var customMySQLPlan = map[string]any{
 	"cores":         4,
 	"storage_gb":    100,
 	"metadata": map[string]any{
-		"displayName", "custom-sample (Beta)",
+		"displayName": "custom-sample (Beta)",
 	},
 }
 
@@ -71,42 +71,42 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			},
 			Entry(
 				"invalid region",
-				"region", "-Asia-northeast1},
+				map[string]any{"region": "-Asia-northeast1"},
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"instance name minimum length is 6 characters",
-				"instance_name": stringOfLen(5},
+				map[string]any{"instance_name": stringOfLen(5)},
 				"instance_name: String length must be greater than or equal to 6",
 			),
 			Entry(
 				"instance name maximum length is 98 characters",
-				"instance_name": stringOfLen(99},
+				map[string]any{"instance_name": stringOfLen(99)},
 				"instance_name: String length must be less than or equal to 98",
 			),
 			Entry(
 				"instance name invalid characters",
-				"instance_name", ".aaaaa},
+				map[string]any{"instance_name": ".aaaaa"},
 				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"database name maximum length is 64 characters",
-				"db_name": stringOfLen(65},
+				map[string]any{"db_name": stringOfLen(65)},
 				"db_name: String length must be less than or equal to 64",
 			),
 			Entry(
 				"monitoring_interval maximum value is 60",
-				"monitoring_interval": 6},
+				map[string]any{"monitoring_interval": 61},
 				"monitoring_interval: Must be less than or equal to 60",
 			),
 			Entry(
 				"monitoring_interval minimum value is 0",
-				"monitoring_interval": -},
+				map[string]any{"monitoring_interval": -1},
 				"monitoring_interval: Must be greater than or equal to 0",
 			),
 			Entry(
 				"performance_insights_retention_period minimum value is 7",
-				"performance_insights_retention_period": },
+				map[string]any{"performance_insights_retention_period": 1},
 				"performance_insights_retention_period: Must be greater than or equal to 7",
 			),
 		)

@@ -62,27 +62,27 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			},
 			Entry(
 				"invalid region",
-				"region": "-Asia-northeast1},
+				map[string]any{"region": "-Asia-northeast1"},
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"instance name minimum length is 6 characters",
-				"instance_name": stringOfLen(5},
+				map[string]any{"instance_name": stringOfLen(5)},
 				"instance_name: String length must be greater than or equal to 6",
 			),
 			Entry(
 				"instance name invalid characters",
-				"instance_name": ".aaaaa},
+				map[string]any{"instance_name": ".aaaaa"},
 				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"database name maximum length is 98 characters",
-				"db_name": stringOfLen(99},
+				map[string]any{"db_name": stringOfLen(99)},
 				"db_name: String length must be less than or equal to 64",
 			),
 			Entry(
 				"performance_insights_retention_period minimum value is 7",
-				"performance_insights_retention_period": },
+				map[string]any{"performance_insights_retention_period": 1},
 				"performance_insights_retention_period: Must be greater than or equal to 7",
 			),
 		)
