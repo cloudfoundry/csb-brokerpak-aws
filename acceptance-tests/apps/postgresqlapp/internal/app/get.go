@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"postgresqlapp/internal/connector"
-
 	"github.com/gorilla/mux"
+
+	"postgresqlapp/internal/connector"
 )
 
 func handleGet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Request) {

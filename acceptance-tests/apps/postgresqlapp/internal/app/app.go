@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"regexp"
 
-	"postgresqlapp/internal/connector"
-
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
+
+	"postgresqlapp/internal/connector"
 )
 
 const (
