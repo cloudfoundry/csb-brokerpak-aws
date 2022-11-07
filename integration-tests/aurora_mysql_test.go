@@ -99,23 +99,27 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 				HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 				HaveKeyWithValue("deletion_protection", BeFalse()),
+				HaveKeyWithValue("db_cluster_parameter_group_name", BeEmpty()),
+				HaveKeyWithValue("enable_audit_logging", BeFalse()),
 			))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
-				"instance_name":               "csb-aurora-mysql-fake-name",
-				"cluster_instances":           12,
-				"region":                      "africa-north-4",
-				"db_name":                     "fake-db-name",
-				"serverless_min_capacity":     0.2,
-				"serverless_max_capacity":     100,
-				"engine_version":              "8.0.mysql_aurora.3.02.0",
-				"allow_major_version_upgrade": false,
-				"auto_minor_version_upgrade":  false,
-				"rds_vpc_security_group_ids":  "group1,group2",
-				"rds_subnet_group":            "some-other-subnet",
-				"deletion_protection":         true,
+				"instance_name":                   "csb-aurora-mysql-fake-name",
+				"cluster_instances":               12,
+				"region":                          "africa-north-4",
+				"db_name":                         "fake-db-name",
+				"serverless_min_capacity":         0.2,
+				"serverless_max_capacity":         100,
+				"engine_version":                  "8.0.mysql_aurora.3.02.0",
+				"allow_major_version_upgrade":     false,
+				"auto_minor_version_upgrade":      false,
+				"rds_vpc_security_group_ids":      "group1,group2",
+				"rds_subnet_group":                "some-other-subnet",
+				"deletion_protection":             true,
+				"db_cluster_parameter_group_name": "db-cluster-parameter-group",
+				"enable_audit_logging":            true,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -133,6 +137,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("rds_subnet_group", "some-other-subnet"),
 					HaveKeyWithValue("deletion_protection", true),
+					HaveKeyWithValue("db_cluster_parameter_group_name", "db-cluster-parameter-group"),
+					HaveKeyWithValue("enable_audit_logging", true),
 				),
 			)
 		})
@@ -180,6 +186,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
+			Entry("db_cluster_parameter_group_name", "db_cluster_parameter_group_name", "another-db-parameter-group"),
+			Entry("enable_audit_logging", "enable_audit_logging", true),
 		)
 	})
 })
