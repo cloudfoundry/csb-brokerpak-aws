@@ -194,7 +194,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			}))
 		})
 
-		It("passes the min_capacity, max_capacity and correct instance_class", func() {
+		It("passes the correct engine_version", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
 				"engine_version": Equal("8.0.postgresql_aurora.3.02.0"),
 			}))
