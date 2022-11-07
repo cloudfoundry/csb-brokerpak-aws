@@ -10,7 +10,10 @@ support_url: https://aws.amazon.com/rds/aurora/
 tags: [aws, aurora, postgresql, postgres, beta]
 plan_updateable: true
 provision:
-  plan_inputs: []
+  plan_inputs:
+  - field_name: engine_version
+    type: string
+    details: The Aurora PostgreSQL engine version, e.g. "14.4". Not all features are supported by all versions. Refer to the AWS documentation for more details.
   user_inputs:
   - field_name: instance_name
     type: string
@@ -52,10 +55,6 @@ provision:
   - <<: *nullable_number
     field_name: serverless_max_capacity
     details: The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
-  - field_name: engine_version
-    type: string
-    default: "14.4"
-    details: The Aurora PostgreSQL engine version, e.g. "14.4". Not all features are supported by all versions. Refer to the AWS documentation for more details.
   - field_name: rds_subnet_group
     type: string
     details: AWS RDS subnet group already in existence to use
