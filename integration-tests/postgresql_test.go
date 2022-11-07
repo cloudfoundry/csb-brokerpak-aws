@@ -217,7 +217,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-			err := broker.Update(instanceID, serviceName, "custom-sample", params)
+				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -238,7 +238,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		DescribeTable(
 			"some allowed updates",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{key: value})
+				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).NotTo(HaveOccurred())
 			},
