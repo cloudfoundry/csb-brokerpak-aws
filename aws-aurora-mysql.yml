@@ -71,6 +71,7 @@ provision:
     type: string
     details: Comma delimited list of security group ID's for instance
     default: ""
+    prohibit_update: true
   - field_name: auto_minor_version_upgrade
     type: boolean
     details: Allow minor version upgrades automatically during the maintenance window.

@@ -173,7 +173,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"multi_az":                               true,
 				"instance_class":                         "",
 				"rds_subnet_group":                       "",
-				"rds_vpc_security_group_ids":             "",
+				"rds_vpc_security_group_ids":             "group1,group2",
 				"allow_major_version_upgrade":            false,
 				"auto_minor_version_upgrade":             false,
 				"maintenance_day":                        "Mon",
@@ -217,7 +217,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("multi_az", true),
 					HaveKeyWithValue("instance_class", ""),
 					HaveKeyWithValue("rds_subnet_group", ""),
-					HaveKeyWithValue("rds_vpc_security_group_ids", ""),
+					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_day", "Mon"),
@@ -255,8 +255,8 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
-			func(params map[string]any) {
-				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), params)
+			func(prop string, value any) {
+				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -267,33 +267,34 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
-			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
-			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
-			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
-			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
+			Entry("update region", "region", "no-matter-what-region"),
+			Entry("update db_name", "db_name", "no-matter-what-name"),
+			Entry("update kms_key_id", "kms_key_id", "no-matter-what-key"),
+			Entry("update storage_encrypted", "storage_encrypted", true),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 		)
 
 		DescribeTable("should allow updating properties",
-			func(params map[string]any) {
-				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), params)
+			func(prop string, value any) {
+				err := broker.Update(instanceID, serviceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry("update storage_type", map[string]any{"storage_type": "gp2"}),
-			Entry("update iops", map[string]any{"iops": 1500}),
-			Entry("update storage_autoscale", map[string]any{"storage_autoscale": true}),
-			Entry("update storage_autoscale_limit_gb", map[string]any{"storage_autoscale_limit_gb": 2}),
-			Entry("update deletion_protection", map[string]any{"deletion_protection": false}),
-			Entry("update backup_retention_period", map[string]any{"backup_retention_period": float64(2)}),
-			Entry("update backup_window", map[string]any{"backup_window": "01:02-03:04"}),
-			Entry("update copy_tags_to_snapshot", map[string]any{"copy_tags_to_snapshot": false}),
-			Entry("update delete_automated_backups", map[string]any{"delete_automated_backups": false}),
-			Entry("update option_group_name", map[string]any{"option_group_name": "option-group-name"}),
-			Entry("update monitoring_interval", map[string]any{"monitoring_interval": 0}),
-			Entry("update monitoring_role_arn", map[string]any{"monitoring_role_arn": ""}),
-			Entry("update performance_insights_enabled", map[string]any{"performance_insights_enabled": true}),
-			Entry("update performance_insights_kms_key_id", map[string]any{"performance_insights_kms_key_id": "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"}),
-			Entry("update performance_insights_retention_period", map[string]any{"performance_insights_retention_period": 31}),
+			Entry("update storage_type", "storage_type", "gp2"),
+			Entry("update iops", "iops", 1500),
+			Entry("update storage_autoscale", "storage_autoscale", true),
+			Entry("update storage_autoscale_limit_gb", "storage_autoscale_limit_gb", 2),
+			Entry("update deletion_protection", "deletion_protection", false),
+			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
+			Entry("update backup_window", "backup_window", "01:02-03:04"),
+			Entry("update copy_tags_to_snapshot", "copy_tags_to_snapshot", false),
+			Entry("update delete_automated_backups", "delete_automated_backups", false),
+			Entry("update option_group_name", "option_group_name", "option-group-name"),
+			Entry("update monitoring_interval", "monitoring_interval", 0),
+			Entry("update monitoring_role_arn", "monitoring_role_arn", ""),
+			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
+			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
 		)
 	})
 })

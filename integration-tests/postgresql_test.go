@@ -109,6 +109,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("storage_encrypted", false),
 					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("multi_az", false),
+					HaveKeyWithValue("rds_vpc_security_group_ids", ""),
 					HaveKeyWithValue("allow_major_version_upgrade", true),
 					HaveKeyWithValue("auto_minor_version_upgrade", true),
 					HaveKeyWithValue("maintenance_day", BeNil()),
@@ -145,6 +146,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"storage_encrypted":                     true,
 				"kms_key_id":                            "arn:aws:xxxx",
 				"multi_az":                              true,
+				"rds_vpc_security_group_ids":            "group1,group2",
 				"allow_major_version_upgrade":           false,
 				"auto_minor_version_upgrade":            false,
 				"maintenance_day":                       "Mon",
@@ -180,6 +182,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("storage_encrypted", true),
 					HaveKeyWithValue("kms_key_id", "arn:aws:xxxx"),
 					HaveKeyWithValue("multi_az", true),
+					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
 					HaveKeyWithValue("maintenance_day", "Mon"),
@@ -213,8 +216,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
-			func(params map[string]any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", params)
+			func(prop string, value any) {
+				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -225,16 +228,17 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
-			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
-			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
-			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
-			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
+			Entry("update region", "region", "no-matter-what-region"),
+			Entry("update kms_key_id", "kms_key_id", "no-matter-what-key"),
+			Entry("update db_name", "db_name", "no-matter-what-name"),
+			Entry("update storage_encrypted", "storage_encrypted", true),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 		)
 
 		DescribeTable(
 			"some allowed updates",
-			func(key string, value any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{key: value})
+			func(prop string, value any) {
+				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).NotTo(HaveOccurred())
 			},
