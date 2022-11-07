@@ -20,6 +20,7 @@ var customAuroraPostgresPlan = map[string]any{
 	"metadata": map[string]any{
 		"displayName": "custom-sample",
 	},
+	"engine_version": "8.0.postgresql_aurora.3.02.0",
 }
 
 var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
@@ -111,7 +112,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"cluster_instances":           12,
 				"serverless_min_capacity":     0.2,
 				"serverless_max_capacity":     100,
-				"engine_version":              "8.0.postgresql_aurora.3.02.0",
 				"allow_major_version_upgrade": false,
 				"auto_minor_version_upgrade":  false,
 				"rds_vpc_security_group_ids":  "group1,group2",
@@ -177,7 +177,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("cluster_instances", "cluster_instances", 11),
 			Entry("serverless_min_capacity", "serverless_min_capacity", 1),
 			Entry("serverless_max_capacity", "serverless_max_capacity", 30),
-			Entry("engine_version", "engine_version", "8.0.postgresql_aurora.3.02.0"),
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
