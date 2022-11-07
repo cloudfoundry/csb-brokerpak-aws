@@ -62,27 +62,27 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			},
 			Entry(
 				"invalid region",
-				map[string]any{"region": "-Asia-northeast1"},
+				"region": "-Asia-northeast1},
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"instance name minimum length is 6 characters",
-				map[string]any{"instance_name": stringOfLen(5)},
+				"instance_name": stringOfLen(5},
 				"instance_name: String length must be greater than or equal to 6",
 			),
 			Entry(
 				"instance name invalid characters",
-				map[string]any{"instance_name": ".aaaaa"},
+				"instance_name": ".aaaaa},
 				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"database name maximum length is 98 characters",
-				map[string]any{"db_name": stringOfLen(99)},
+				"db_name": stringOfLen(99},
 				"db_name: String length must be less than or equal to 64",
 			),
 			Entry(
 				"performance_insights_retention_period minimum value is 7",
-				map[string]any{"performance_insights_retention_period": 1},
+				"performance_insights_retention_period": },
 				"performance_insights_retention_period: Must be greater than or equal to 7",
 			),
 		)
@@ -216,8 +216,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
-			func(params map[string]any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", params)
+			func(prop string, value any) {
+			err := broker.Update(instanceID, serviceName, "custom-sample", params)
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -228,16 +228,16 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
-			Entry("update region", map[string]any{"region": "no-matter-what-region"}),
-			Entry("update kms_key_id", map[string]any{"kms_key_id": "no-matter-what-key"}),
-			Entry("update db_name", map[string]any{"db_name": "no-matter-what-name"}),
-			Entry("update storage_encrypted", map[string]any{"storage_encrypted": true}),
+			Entry("update region", "region", "no-matter-what-region"),
+			Entry("update kms_key_id", "kms_key_id", "no-matter-what-key"),
+			Entry("update db_name", "db_name", "no-matter-what-name"),
+			Entry("update storage_encrypted", "storage_encrypted", true),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 		)
 
 		DescribeTable(
 			"some allowed updates",
-			func(key string, value any) {
+			func(prop string, value any) {
 				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{key: value})
 
 				Expect(err).NotTo(HaveOccurred())
