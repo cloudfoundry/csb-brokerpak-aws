@@ -28,7 +28,6 @@ provision:
   - field_name: cores
     type: integer
     details: Deprecated - Minimum number of cores for service instance. Suggest setting `instance_class` property instead.
-    default: 2
     constraints:
       maximum: 64
       minimum: 1
@@ -44,7 +43,6 @@ provision:
     required: true
     type: number
     details: Size of storage volume for service instance.
-    default: 100
     constraints:
       maximum: 4096
       minimum: 5
@@ -114,8 +112,8 @@ provision:
     default: us-west-2
     constraints:
       examples:
-        - us-central1
-        - asia-northeast1
+      - us-central1
+      - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
   - field_name: multi_az
@@ -144,7 +142,7 @@ provision:
   - field_name: rds_vpc_security_group_ids
     type: string
     details: Comma delimited list of security group ID's for instance
-    default: ""    
+    default: ""
     prohibit_update: true
   - field_name: allow_major_version_upgrade
     type: boolean
@@ -338,22 +336,22 @@ bind:
   plan_inputs: []
   user_inputs: []
   computed_inputs:
-    - name: db_name
-      type: string
-      default: ${instance.details["name"]}
-      overwrite: true
-    - name: hostname
-      type: string
-      default: ${instance.details["hostname"]}
-      overwrite: true
-    - name: admin_username
-      type: string
-      default: ${instance.details["username"]}
-      overwrite: true
-    - name: admin_password
-      type: string
-      default: ${instance.details["password"]}
-      overwrite: true
+  - name: db_name
+    type: string
+    default: ${instance.details["name"]}
+    overwrite: true
+  - name: hostname
+    type: string
+    default: ${instance.details["hostname"]}
+    overwrite: true
+  - name: admin_username
+    type: string
+    default: ${instance.details["username"]}
+    overwrite: true
+  - name: admin_password
+    type: string
+    default: ${instance.details["password"]}
+    overwrite: true
   template_refs:
     outputs: terraform/mysql/bind/outputs.tf
     provider: terraform/mysql/bind/provider.tf
@@ -362,34 +360,34 @@ bind:
     main: terraform/mysql/bind/main.tf
     data: terraform/mysql/bind/data.tf
   outputs:
-    - field_name: username
-      type: string
-      details: The username to authenticate to the database instance.
-    - field_name: password
-      type: string
-      details: The password to authenticate to the database instance.
-    - field_name: uri
-      type: string
-      details: The uri to connect to the database instance and database.
-    - field_name: jdbcUrl
-      type: string
-      details: The jdbc url to connect to the database instance and database.
-    - field_name: port
-      type: integer
-      details: The port number of the exposed mysql instance.
+  - field_name: username
+    type: string
+    details: The username to authenticate to the database instance.
+  - field_name: password
+    type: string
+    details: The password to authenticate to the database instance.
+  - field_name: uri
+    type: string
+    details: The uri to connect to the database instance and database.
+  - field_name: jdbcUrl
+    type: string
+    details: The jdbc url to connect to the database instance and database.
+  - field_name: port
+    type: integer
+    details: The port number of the exposed mysql instance.
 examples:
 - name: example
   description: Create an example-plan MySQL instance
   plan_id: 0f3522b2-f040-443b-bc53-4aed25284840
-  provision_params: { "publicly_accessible": true }
+  provision_params: {"publicly_accessible": true}
   bind_params: {}
 - name: disable-upgrades
   description: Create a MySQL instance with disabled upgrades
   plan_id: 0f3522b2-f040-443b-bc53-4aed25284840
-  provision_params: { "allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true }
+  provision_params: {"allow_major_version_upgrade": false, "auto_minor_version_upgrade": false, "publicly_accessible": true}
   bind_params: {}
 - name: with-maintenance-window
   description: Create a MySQL instance with maintenance window
   plan_id: 0f3522b2-f040-443b-bc53-4aed25284840
-  provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true }
+  provision_params: {"maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true}
   bind_params: {}
