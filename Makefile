@@ -195,7 +195,6 @@ clean: ## delete build files
 	- rm -f $(IAAS)-services-*.brokerpak
 	- rm -f ./cloud-service-broker
 	- rm -f ./brokerpak-user-docs.md
-	- rm -rf $(PAK_CACHE)
 
 $(PAK_CACHE):
 	@echo "Folder $(PAK_CACHE) does not exist. Creating it..."
