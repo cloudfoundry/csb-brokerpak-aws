@@ -10,11 +10,12 @@ support_url: https://aws.amazon.com/rds/aurora/
 tags: [aws, aurora, postgresql, postgres, beta]
 plan_updateable: true
 provision:
-  plan_inputs:
+  plan_inputs: []
+  user_inputs:
   - field_name: engine_version
     type: string
     details: The Aurora PostgreSQL engine version, e.g. "14.4". Not all features are supported by all versions. Refer to the AWS documentation for more details.
-  user_inputs:
+    required: true
   - field_name: instance_name
     type: string
     details: Name for the DB cluster
@@ -152,9 +153,6 @@ provision:
   - field_name: port
     type: integer
     details: The port number of the exposed database instance.
-  - field_name: require_ssl
-    type: boolean
-    details: Require that connections use SSL
 bind:
   plan_inputs: []
   user_inputs:

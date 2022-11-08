@@ -13,13 +13,17 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
+var _ = FDescribe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
+		params := map[string]any{
+			"engine_version":    "13.7",
+			"cluster_instances": 2,
+		}
 		serviceInstance := services.CreateInstance(
 			"csb-aws-aurora-postgresql",
 			services.WithPlan("default"),
-			services.WithParameters(`{"cluster_instances": 2}`),
+			services.WithParameters(params),
 		)
 		defer serviceInstance.Delete()
 

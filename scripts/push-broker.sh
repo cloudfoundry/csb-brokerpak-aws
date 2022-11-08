@@ -87,7 +87,7 @@ fi
 echo "    GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS" | jq @json)" >>$cfmf
 
 if [[ -z "$GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS" ]]; then
-  GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS='[{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default", "engine_version": "14.4"}]'
+  GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS='[{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]'
 fi
 echo "    GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS" | jq @json)" >>$cfmf
 
