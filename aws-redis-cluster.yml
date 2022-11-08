@@ -29,8 +29,8 @@ plans:
   description: 'Beta - Redis 6.0 with 1GB cache and 1 node.'
   display_name: "Small (Beta)"
   properties:
-    cache_size: 1   
-    redis_version: "6.0"  
+    cache_size: 1
+    redis_version: "6.0"
     node_count: 1
 - name: medium
   id: df41095a-43e8-4be4-b4d6-ae2d8a35068d
@@ -53,7 +53,7 @@ plans:
   description: 'Beta - Redis 6.0 with 1GB cache and 2 nodes.'
   display_name: "Small HA (Beta)"
   properties:
-    cache_size: 1   
+    cache_size: 1
     redis_version: "6.0"
 - name: medium-ha
   id: a4235008-80f4-4053-924b-defcce17cb63
@@ -78,12 +78,12 @@ provision:
     constraints:
       maximum: 256
       minimum: 1
-      multipleOf: 2    
+      multipleOf: 2
   - field_name: redis_version
     required: true
     type: string
     details: The version for the redis instance.
-    enum: 
+    enum:
       3.2: Redis 3.2
       4.0: Redis 4.0
       5.0: Redis 5.0
@@ -97,15 +97,15 @@ provision:
       maxLength: 40
       minLength: 6
       pattern: ^[a-z][a-z0-9-]+$
-    prohibit_update: true  
+    prohibit_update: true
   - field_name: region
     type: string
     details: The region of AWS.
     default: us-west-2
     constraints:
       examples:
-        - us-central1
-        - asia-northeast1
+      - us-central1
+      - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
   - field_name: node_count
@@ -135,7 +135,7 @@ provision:
   - field_name: elasticache_vpc_security_group_ids
     type: string
     details: Comma delimited list of security group ID's for instance
-    default: ""  
+    default: ""
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -160,7 +160,7 @@ provision:
     details: The TLS port number of the exposed redis instance.
   - field_name: password
     type: string
-    details: The password to authenticate to the redis instance.    
+    details: The password to authenticate to the redis instance.
 bind:
   plan_inputs: []
   user_inputs: []
@@ -191,7 +191,7 @@ examples:
 - name: redis-cache-medium-ha
   description: Medium redis cache in us-east-1 region
   plan_id: a4235008-80f4-4053-924b-defcce17cb63
-  provision_params: { "region": "us-east-1" }
+  provision_params: {"region": "us-east-1"}
   bind_params: {}
 - name: redis-cache-large-ha
   description: Large redis cache
@@ -201,10 +201,10 @@ examples:
 - name: redis-cache-tiny-ha
   description: Tiny redis cache
   plan_id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
-  provision_params: { "node_type":"cache.t2.micro"}
+  provision_params: {"node_type": "cache.t2.micro"}
   bind_params: {}
 - name: redis-cache-three-nodes
   description: Tiny redis cache
   plan_id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
-  provision_params: { "node_count": 3 }
+  provision_params: {"node_count": 3}
   bind_params: {}

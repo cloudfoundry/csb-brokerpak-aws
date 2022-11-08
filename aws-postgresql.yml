@@ -28,7 +28,6 @@ provision:
   - field_name: cores
     type: integer
     details: Deprecated - Minimum number of cores for service instance. Suggest setting `instance_class` property instead.
-    default: 2
     constraints:
       maximum: 64
       minimum: 1
@@ -41,7 +40,6 @@ provision:
     required: true
     type: number
     details: Size of storage volume for service instance.
-    default: 100
     constraints:
       maximum: 4096
       minimum: 5
@@ -115,8 +113,8 @@ provision:
     default: us-west-2
     constraints:
       examples:
-        - us-central1
-        - asia-northeast1
+      - us-central1
+      - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
   - field_name: multi_az
@@ -363,15 +361,15 @@ examples:
 - name: default
   description: Create a default PostgreSQL instance
   plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
-  provision_params: { "publicly_accessible": true, "provider_verify_certificate": false }
+  provision_params: {"publicly_accessible": true, "provider_verify_certificate": false}
   bind_params: {}
 - name: default-with-features
   description: Create a medium multiaz PostgreSQL instance
   plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
-  provision_params: { "publicly_accessible": true, "multi_az": true, "storage_encrypted": true, "provider_verify_certificate": false }
+  provision_params: {"publicly_accessible": true, "multi_az": true, "storage_encrypted": true, "provider_verify_certificate": false}
   bind_params: {}
 - name: default-with-maintenance-window
   description: Create a small PostgreSQL instance with encrypted storage
   plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
-  provision_params: { "maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "provider_verify_certificate": false }
+  provision_params: {"maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "provider_verify_certificate": false}
   bind_params: {}

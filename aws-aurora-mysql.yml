@@ -39,8 +39,8 @@ provision:
     default: us-west-2
     constraints:
       examples:
-        - us-central1
-        - asia-northeast1
+      - us-central1
+      - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
   - <<: &nullable_number
