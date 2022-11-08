@@ -37,6 +37,8 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"preferred_backup_window":     "23:26-23:56",
 		"copy_tags_to_snapshot":       true,
 		"deletion_protection":         false,
+		"monitoring_interval":         0,
+		"monitoring_role_arn":         "",
 	}
 
 	BeforeAll(func() {
@@ -73,6 +75,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"db_subnet_group_name":       Equal("csb-auroramysql-test-p-sn"),
 				"auto_minor_version_upgrade": BeTrue(),
 				"tags":                       HaveKeyWithValue("key1", "some-mysql-value"),
+				"monitoring_interval":        BeNumerically("==", 0),
 			}))
 		})
 
