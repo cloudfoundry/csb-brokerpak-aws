@@ -65,6 +65,7 @@ provision:
     type: string
     details: Comma delimited list of security group ID's for instance
     default: ""
+    prohibit_update: true
   - field_name: allow_major_version_upgrade
     type: boolean
     details: Allow major version upgrades. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible.
