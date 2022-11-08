@@ -20,7 +20,6 @@ var customAuroraPostgresPlan = map[string]any{
 	"metadata": map[string]any{
 		"displayName": "custom-sample",
 	},
-	"engine_version": "8.0.postgresql_aurora.3.02.0",
 }
 
 var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
@@ -86,7 +85,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err := broker.Provision(serviceName, "custom-sample", map[string]any{"engine_version": "13.7"})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -101,6 +100,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
+					HaveKeyWithValue("engine_version", Equal("13.7")),
 				))
 		})
 
@@ -117,6 +117,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"rds_vpc_security_group_ids":  "group1,group2",
 				"rds_subnet_group":            "some-other-subnet",
 				"deletion_protection":         true,
+				"engine_version":              "8.0.postgresql_aurora.3.02.0",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -144,7 +145,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err = broker.Provision(serviceName, "custom-sample", map[string]any{"engine_version": "13.7"})
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -181,6 +182,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 			Entry("deletion_protection", "deletion_protection", true),
+			Entry("engine_version", "engine_version", "8.0.postgresql_aurora.3.02.0"),
 		)
 	})
 })
