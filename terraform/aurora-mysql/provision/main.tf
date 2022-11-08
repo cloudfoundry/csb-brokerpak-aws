@@ -51,7 +51,7 @@ resource "aws_rds_cluster" "cluster" {
   copy_tags_to_snapshot           = var.copy_tags_to_snapshot
   deletion_protection             = var.deletion_protection
   db_cluster_parameter_group_name = var.db_cluster_parameter_group_name
-  enabled_cloudwatch_logs_exports = var.enable_audit_logging ? ["audit"] : []
+  enabled_cloudwatch_logs_exports = var.enable_audit_logging ? ["audit"] : null
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []

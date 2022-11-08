@@ -93,6 +93,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"preferred_backup_window":            Equal("23:26-23:56"),
 				"copy_tags_to_snapshot":              BeTrue(),
 				"deletion_protection":                BeFalse(),
+				"enabled_cloudwatch_logs_exports":    BeNil(),
 			}))
 		})
 	})
