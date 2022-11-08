@@ -27,8 +27,8 @@ resource "random_string" "username" {
 }
 
 resource "random_password" "password" {
-  length  = 41 // This is the limit for Aurora/MySQL, we would prefer longer
-  special = false
+  length           = 41 // This is the limit for Aurora/MySQL, we would prefer longer
+  special          = false
   // https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html#RDS_Limits.Constraints
   override_special = "~_-."
 }
@@ -74,6 +74,8 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   engine_version                        = aws_rds_cluster.cluster.engine_version
   db_subnet_group_name                  = local.subnet_group
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  monitoring_interval                   = var.monitoring_interval
+  monitoring_role_arn                   = var.monitoring_role_arn
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id
   performance_insights_retention_period = var.performance_insights_retention_period
