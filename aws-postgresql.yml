@@ -30,7 +30,7 @@ provision:
     details: Deprecated - Minimum number of cores for service instance. Suggest setting `instance_class` property instead.
     constraints:
       maximum: 64
-      minimum: 1
+      minimum: 2
       multipleOf: 2
   - field_name: postgres_version
     required: true
