@@ -65,15 +65,18 @@ resource "aws_rds_cluster" "cluster" {
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                      = var.cluster_instances
-  identifier                 = "${var.instance_name}-${count.index}"
-  cluster_identifier         = aws_rds_cluster.cluster.id
-  tags                       = var.labels
-  instance_class             = local.serverless ? "db.serverless" : "db.r5.large"
-  engine                     = aws_rds_cluster.cluster.engine
-  engine_version             = aws_rds_cluster.cluster.engine_version
-  db_subnet_group_name       = local.subnet_group
-  auto_minor_version_upgrade = var.auto_minor_version_upgrade
+  count                                 = var.cluster_instances
+  identifier                            = "${var.instance_name}-${count.index}"
+  cluster_identifier                    = aws_rds_cluster.cluster.id
+  tags                                  = var.labels
+  instance_class                        = local.serverless ? "db.serverless" : "db.r5.large"
+  engine                                = aws_rds_cluster.cluster.engine
+  engine_version                        = aws_rds_cluster.cluster.engine_version
+  db_subnet_group_name                  = local.subnet_group
+  auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  performance_insights_enabled          = var.performance_insights_enabled
+  performance_insights_kms_key_id       = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
+  performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention_period : null
 
   lifecycle {
     prevent_destroy = true

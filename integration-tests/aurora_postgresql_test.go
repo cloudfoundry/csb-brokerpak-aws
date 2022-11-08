@@ -82,6 +82,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				map[string]any{"db_name": stringOfLen(65)},
 				"db_name: String length must be less than or equal to 64",
 			),
+			Entry(
+				"performance_insights_retention_period minimum value is 7",
+				map[string]any{"performance_insights_retention_period": 1},
+				"performance_insights_retention_period: Must be greater than or equal to 7",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -100,23 +105,29 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
+					HaveKeyWithValue("performance_insights_enabled", false),
+					HaveKeyWithValue("performance_insights_kms_key_id", ""),
+					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
 				))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
-				"instance_name":               "csb-aurora-postgres-fake-name",
-				"db_name":                     "fake-db-name",
-				"region":                      "africa-north-4",
-				"cluster_instances":           12,
-				"serverless_min_capacity":     0.2,
-				"serverless_max_capacity":     100,
-				"engine_version":              "8.0.postgresql_aurora.3.02.0",
-				"allow_major_version_upgrade": false,
-				"auto_minor_version_upgrade":  false,
-				"rds_vpc_security_group_ids":  "group1,group2",
-				"rds_subnet_group":            "some-other-subnet",
-				"deletion_protection":         true,
+				"instance_name":                         "csb-aurora-postgres-fake-name",
+				"db_name":                               "fake-db-name",
+				"region":                                "africa-north-4",
+				"cluster_instances":                     12,
+				"serverless_min_capacity":               0.2,
+				"serverless_max_capacity":               100,
+				"engine_version":                        "8.0.postgresql_aurora.3.02.0",
+				"allow_major_version_upgrade":           false,
+				"auto_minor_version_upgrade":            false,
+				"rds_vpc_security_group_ids":            "group1,group2",
+				"rds_subnet_group":                      "some-other-subnet",
+				"deletion_protection":                   true,
+				"performance_insights_enabled":          true,
+				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_retention_period": 93,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -134,6 +145,9 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("rds_vpc_security_group_ids", "group1,group2"),
 					HaveKeyWithValue("rds_subnet_group", "some-other-subnet"),
 					HaveKeyWithValue("deletion_protection", true),
+					HaveKeyWithValue("performance_insights_enabled", true),
+					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 93)),
 				),
 			)
 		})
@@ -182,6 +196,9 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("deletion_protection", "deletion_protection", true),
+			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
+			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
 		)
 	})
 })
