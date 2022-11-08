@@ -17,3 +17,5 @@ variable "backup_retention_period" { type = number }
 variable "preferred_backup_window" { type = string }
 variable "copy_tags_to_snapshot" { type = bool }
 variable "deletion_protection" { type = bool }
+variable "monitoring_interval" { type = number }
+variable "monitoring_role_arn" { type = string }
