@@ -21,3 +21,6 @@ variable "db_cluster_parameter_group_name" { type = string }
 variable "deletion_protection" { type = bool }
 variable "monitoring_interval" { type = number }
 variable "monitoring_role_arn" { type = string }
+variable "performance_insights_enabled" { type = bool }
+variable "performance_insights_kms_key_id" { type = string }
+variable "performance_insights_retention_period" { type = number }
