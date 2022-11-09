@@ -34,22 +34,24 @@ resource "random_password" "password" {
 }
 
 resource "aws_rds_cluster" "cluster" {
-  cluster_identifier          = var.instance_name
-  engine                      = "aurora-mysql"
-  engine_version              = var.engine_version
-  database_name               = var.db_name
-  tags                        = var.labels
-  master_username             = random_string.username.result
-  master_password             = random_password.password.result
-  port                        = local.port
-  db_subnet_group_name        = local.subnet_group
-  vpc_security_group_ids      = local.rds_vpc_security_group_ids
-  skip_final_snapshot         = true
-  allow_major_version_upgrade = var.allow_major_version_upgrade
-  backup_retention_period     = var.backup_retention_period
-  preferred_backup_window     = var.preferred_backup_window
-  copy_tags_to_snapshot       = var.copy_tags_to_snapshot
-  deletion_protection         = var.deletion_protection
+  cluster_identifier              = var.instance_name
+  engine                          = "aurora-mysql"
+  engine_version                  = var.engine_version
+  database_name                   = var.db_name
+  tags                            = var.labels
+  master_username                 = random_string.username.result
+  master_password                 = random_password.password.result
+  port                            = local.port
+  db_subnet_group_name            = local.subnet_group
+  vpc_security_group_ids          = local.rds_vpc_security_group_ids
+  skip_final_snapshot             = true
+  allow_major_version_upgrade     = var.allow_major_version_upgrade
+  backup_retention_period         = var.backup_retention_period
+  preferred_backup_window         = var.preferred_backup_window
+  copy_tags_to_snapshot           = var.copy_tags_to_snapshot
+  deletion_protection             = var.deletion_protection
+  db_cluster_parameter_group_name = var.db_cluster_parameter_group_name
+  enabled_cloudwatch_logs_exports = var.enable_audit_logging ? ["audit"] : null
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
