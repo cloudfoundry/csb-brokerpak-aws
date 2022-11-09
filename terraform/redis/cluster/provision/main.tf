@@ -49,7 +49,7 @@ resource "aws_elasticache_replication_group" "redis" {
   description                = format("%s redis", var.instance_name)
   node_type                  = local.node_type
   num_cache_clusters         = var.node_count
-  engine_version       = var.redis_version
+  engine_version             = var.redis_version
   port                       = local.port
   tags                       = var.labels
   security_group_ids         = local.elasticache_vpc_security_group_ids
