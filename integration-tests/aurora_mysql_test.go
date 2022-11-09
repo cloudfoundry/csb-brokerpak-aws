@@ -92,6 +92,11 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				map[string]any{"monitoring_interval": -1},
 				"monitoring_interval: Must be greater than or equal to 0",
 			),
+			Entry(
+				"performance_insights_retention_period minimum value is 7",
+				map[string]any{"performance_insights_retention_period": 1},
+				"performance_insights_retention_period: Must be greater than or equal to 7",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -113,27 +118,33 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("enable_audit_logging", BeFalse()),
 				HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),
 				HaveKeyWithValue("monitoring_role_arn", ""),
+				HaveKeyWithValue("performance_insights_enabled", false),
+				HaveKeyWithValue("performance_insights_kms_key_id", ""),
+				HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
 			))
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
-				"instance_name":                   "csb-aurora-mysql-fake-name",
-				"cluster_instances":               12,
-				"region":                          "africa-north-4",
-				"db_name":                         "fake-db-name",
-				"serverless_min_capacity":         0.2,
-				"serverless_max_capacity":         100,
-				"engine_version":                  "8.0.mysql_aurora.3.02.0",
-				"allow_major_version_upgrade":     false,
-				"auto_minor_version_upgrade":      false,
-				"rds_vpc_security_group_ids":      "group1,group2",
-				"rds_subnet_group":                "some-other-subnet",
-				"deletion_protection":             true,
-				"db_cluster_parameter_group_name": "db-cluster-parameter-group",
-				"enable_audit_logging":            true,
-				"monitoring_interval":             30,
-				"monitoring_role_arn":             "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
+				"instance_name":                         "csb-aurora-mysql-fake-name",
+				"cluster_instances":                     12,
+				"region":                                "africa-north-4",
+				"db_name":                               "fake-db-name",
+				"serverless_min_capacity":               0.2,
+				"serverless_max_capacity":               100,
+				"engine_version":                        "8.0.mysql_aurora.3.02.0",
+				"allow_major_version_upgrade":           false,
+				"auto_minor_version_upgrade":            false,
+				"rds_vpc_security_group_ids":            "group1,group2",
+				"rds_subnet_group":                      "some-other-subnet",
+				"deletion_protection":                   true,
+				"db_cluster_parameter_group_name":       "db-cluster-parameter-group",
+				"enable_audit_logging":                  true,
+				"monitoring_interval":                   30,
+				"monitoring_role_arn":                   "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
+				"performance_insights_enabled":          true,
+				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_retention_period": 93,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -155,6 +166,9 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("enable_audit_logging", true),
 					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 30)),
 					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
+					HaveKeyWithValue("performance_insights_enabled", true),
+					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 93)),
 				),
 			)
 		})
@@ -206,6 +220,9 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("enable_audit_logging", "enable_audit_logging", true),
 			Entry("update monitoring_interval", "monitoring_interval", 0),
 			Entry("update monitoring_role_arn", "monitoring_role_arn", ""),
+			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
+			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
 		)
 	})
 })

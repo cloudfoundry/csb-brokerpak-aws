@@ -143,6 +143,29 @@ provision:
       This property represents the ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
       To read about Enhanced Monitoring metrics see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_Monitoring.OS.html
     default: ""
+  - field_name: performance_insights_enabled
+    type: boolean
+    details: Specifies whether Performance Insights are enabled (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.Overview.html).
+    default: false
+  - field_name: performance_insights_kms_key_id
+    type: string
+    details: |
+      The ARN for the KMS key to encrypt Performance Insights data.
+      When specifying `performance_insights_kms_key_id`, `performance_insights_enabled` needs to be set to true.
+      Once KMS key is set, it can never be changed.
+    default: ""
+  - field_name: performance_insights_retention_period
+    type: number
+    details: |
+      The number of days to retain Performance Insights data.
+      When specifying `performance_insights_retention_period`, `performance_insights_enabled` needs to be set to true.
+      The default is 7 days.
+      The following values are valid: 7, month * 31, where month is a number of months from 1-23, 731.
+      For example, the following values are valid: 93 (3 months * 31), 341 (11 months * 31), 589 (19 months * 31), and 731.
+      If you specify a retention period such as 94, which is not a valid value, RDS issues an error.
+    default: 7
+    constraints:
+      minimum: 7
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
