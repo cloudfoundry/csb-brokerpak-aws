@@ -75,6 +75,8 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   engine_version             = aws_rds_cluster.cluster.engine_version
   db_subnet_group_name       = local.subnet_group
   auto_minor_version_upgrade = var.auto_minor_version_upgrade
+  monitoring_interval        = var.monitoring_interval
+  monitoring_role_arn        = var.monitoring_role_arn
 
   lifecycle {
     prevent_destroy = true

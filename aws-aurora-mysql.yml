@@ -112,6 +112,37 @@ provision:
       The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16".
       Must not overlap with the maintenance window. If not set, uses the default for the region
       (see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Managing.Backups.html#Aurora.Managing.Backups.BackupWindow)
+  - field_name: db_cluster_parameter_group_name
+    type: string
+    default: ""
+    details: |
+      The DB cluster parameter group contains the set of engine configuration parameters that apply throughout the Aurora DB cluster.
+      The DB cluster parameter group also contains default settings for the DB parameter group for the DB instances that make up the cluster.
+  - field_name: enable_audit_logging
+    type: boolean
+    default: false
+    details: |
+      Requires setting db_cluster_parameter_group_name with a pre-created DB cluster parameter group that fulfills requirements for audit log exports. 
+      See AWS Docs for more info: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Auditing.html
+      If set will enable the `audit` cloud_watch_log_export on the cluster.
+  - field_name: monitoring_interval
+    type: number
+    details: |
+      The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
+      To disable collecting Enhanced Monitoring metrics, specify 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
+      A `monitoring_role_arn` value is required if you specify a `monitoring_interval` value other than 0.
+      To read about Enhanced Monitoring metrics see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_Monitoring.OS.html
+    default: 0
+    constraints:
+      maximum: 60
+      minimum: 0
+  - field_name: monitoring_role_arn
+    type: string
+    details: |
+      Enhanced Monitoring requires permission to act on your behalf to send OS metric information to CloudWatch Logs.
+      This property represents the ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
+      To read about Enhanced Monitoring metrics see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/USER_Monitoring.OS.html
+    default: ""
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

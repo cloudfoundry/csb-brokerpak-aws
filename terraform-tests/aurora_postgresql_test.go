@@ -39,6 +39,8 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"require_ssl":                     false,
 		"db_cluster_parameter_group_name": "",
 		"engine_version":                  "8.0.postgresql_aurora.3.02.0",
+		"monitoring_interval":         0,
+		"monitoring_role_arn":         "",
 	}
 
 	BeforeAll(func() {
@@ -76,6 +78,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"db_subnet_group_name":       Equal("csb-aurorapg-test-p-sn"),
 				"auto_minor_version_upgrade": BeTrue(),
 				"tags":                       HaveKeyWithValue("key1", "some-postgres-value"),
+				"monitoring_interval":        BeNumerically("==", 0),
 			}))
 		})
 

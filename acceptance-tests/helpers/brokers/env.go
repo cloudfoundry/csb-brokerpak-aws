@@ -45,6 +45,7 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS", Value: `[{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default", "instance_class": "db.m6i.large", "postgres_version": "11", "storage_gb": 100},{"name":"small","id":"ffc51616-228b-41bd-bed1-d601c18d58f5","description":"PostgreSQL 11, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb": 5, "storage_type": "gp2", "cores": 2, "postgres_version": "11"}]`},
 		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS", Value: `[{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]`},
 		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS", Value: `[{"name":"default","id":"10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719","description":"Default Aurora MySQL plan","display_name":"default"}]`},
+		apps.EnvVar{Name: "GSB_SERVICE_CSB_AWS_MYSQL_PLANS", Value: `[{"name":"default-5.7","id":"ce70e430-5a08-11ed-a801-367dda7ea869","description":"Default MySQL 5.7 plan","display_name":"default-5.7","instance_class": "db.t3.medium","mysql_version": "5.7","storage_gb": 10, "storage_encrypted": false, "multi_az": false, "storage_autoscale": false, "storage_type": "gp2"},{"name":"small","id":"2268ce43-7fd7-48dc-be2f-8611e11fb12e","description":"MySQL v5.7, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb": 5, "storage_type": "gp2", "cores": 2, "mysql_version": "5.7", "storage_encrypted": false, "multi_az": false, "storage_autoscale": false}]`},
 		apps.EnvVar{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
 	)
 
@@ -56,7 +57,5 @@ func (b Broker) releaseEnv() []apps.EnvVar {
 }
 
 func (b Broker) latestEnv() []apps.EnvVar {
-	return []apps.EnvVar{
-		{Name: "GSB_SERVICE_CSB_AWS_MYSQL_PLANS", Value: `[{"name":"default-5.7","id":"ce70e430-5a08-11ed-a801-367dda7ea869","description":"Default MySQL 5.7 plan","display_name":"default-5.7","instance_class": "db.t3.medium","mysql_version": "5.7","storage_gb": 10, "storage_encrypted": false, "multi_az": false, "storage_autoscale": false, "storage_type": "gp2"},{"name":"small","id":"2268ce43-7fd7-48dc-be2f-8611e11fb12e","description":"MySQL v5.7, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb": 5, "storage_type": "gp2", "cores": 2, "mysql_version": "5.7", "storage_encrypted": false, "multi_az": false, "storage_autoscale": false}]`},
-	}
+	return []apps.EnvVar{}
 }
