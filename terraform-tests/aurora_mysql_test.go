@@ -39,8 +39,8 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"deletion_protection":             false,
 		"db_cluster_parameter_group_name": "",
 		"enable_audit_logging":            false,
-		"monitoring_interval":         0,
-		"monitoring_role_arn":         "",
+		"monitoring_interval":             0,
+		"monitoring_role_arn":             "",
 	}
 
 	BeforeAll(func() {

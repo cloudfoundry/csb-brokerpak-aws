@@ -132,8 +132,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"deletion_protection":             true,
 				"db_cluster_parameter_group_name": "db-cluster-parameter-group",
 				"enable_audit_logging":            true,
-				"monitoring_interval":         30,
-				"monitoring_role_arn":         "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
+				"monitoring_interval":             30,
+				"monitoring_role_arn":             "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
