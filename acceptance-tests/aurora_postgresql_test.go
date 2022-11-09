@@ -1,19 +1,30 @@
 package acceptance_tests_test
 
 import (
+	"io"
+	"net/http"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
+var _ = FDescribe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-aurora-postgresql", services.WithPlan("default"))
+		params := map[string]any{
+			"engine_version":    "13.7",
+			"cluster_instances": 2,
+		}
+		serviceInstance := services.CreateInstance(
+			"csb-aws-aurora-postgresql",
+			services.WithPlan("default"),
+			services.WithParameters(params),
+		)
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
@@ -45,6 +56,15 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		By("getting the value using the reader app")
 		got := appReader.GET("%s/%s", schema, key)
 		Expect(got).To(Equal(value))
+
+		By("getting the value using the reader app using NON-tls connections should fail")
+		response := appReader.GetRawResponse("%s/%s?tls=disable", schema, key)
+		defer response.Body.Close()
+		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "force TLS is enabled by default")
+		b, err := io.ReadAll(response.Body)
+		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
+		Expect(string(b)).To(ContainSubstring("failed to connect to database"), "force TLS is enabled by default")
+		Expect(string(b)).To(ContainSubstring("SQLSTATE 28000"), "postgresql client cannot connect to the postgres server due to invalid TLS")
 
 		By("dropping the schema using the writer app")
 		appWriter.DELETE(schema)

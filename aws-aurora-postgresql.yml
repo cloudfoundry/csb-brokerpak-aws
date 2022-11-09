@@ -12,6 +12,10 @@ plan_updateable: true
 provision:
   plan_inputs: []
   user_inputs:
+  - field_name: engine_version
+    type: string
+    details: The Aurora PostgreSQL engine version, e.g. "14.4". Not all features are supported by all versions. Refer to the AWS documentation for more details.
+    required: true
   - field_name: instance_name
     type: string
     details: Name for the DB cluster
@@ -52,12 +56,6 @@ provision:
   - <<: *nullable_number
     field_name: serverless_max_capacity
     details: The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
-  - <<: &nullable_string
-      type: string
-      default: null
-      nullable: true
-    field_name: engine_version
-    details: The Aurora engine version, e.g. "13.7". Not all features are supported by all versions. Refer to the AWS documentation for more details.
   - field_name: rds_subnet_group
     type: string
     details: AWS RDS subnet group already in existence to use
@@ -106,12 +104,25 @@ provision:
     constraints:
       minimum: 1
       maximum: 35
-  - <<: *nullable_string
-    field_name: preferred_backup_window
+  - field_name: preferred_backup_window
+    type: string
+    default: null
+    nullable: true
     details: |
       The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16".
       Must not overlap with the maintenance window. If not set, uses the default for the region
       (see https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Managing.Backups.html#Aurora.Managing.Backups.BackupWindow)
+  - field_name: require_ssl
+    type: boolean
+    details: Require that connections use SSL. Note that if "db_cluster_parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
+    default: true
+  - field_name: db_cluster_parameter_group_name
+    type: string
+    default: ""
+    details: |
+      DB cluster parameter group name. If not set, a DB cluster parameter group is created.
+      The DB cluster parameter group contains the set of engine configuration parameters that apply throughout the Aurora DB cluster.
+      The DB cluster parameter group also contains default settings for the DB parameter group for the DB instances that make up the cluster.
   - field_name: monitoring_interval
     type: number
     details: |

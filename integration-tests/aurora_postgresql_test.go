@@ -95,7 +95,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err := broker.Provision(serviceName, "custom-sample", map[string]any{"engine_version": "13.7"})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -110,6 +110,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
+					HaveKeyWithValue("engine_version", Equal("13.7")),
 					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),
 					HaveKeyWithValue("monitoring_role_arn", ""),
 				))
@@ -123,12 +124,12 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"cluster_instances":           12,
 				"serverless_min_capacity":     0.2,
 				"serverless_max_capacity":     100,
-				"engine_version":              "8.0.postgresql_aurora.3.02.0",
 				"allow_major_version_upgrade": false,
 				"auto_minor_version_upgrade":  false,
 				"rds_vpc_security_group_ids":  "group1,group2",
 				"rds_subnet_group":            "some-other-subnet",
 				"deletion_protection":         true,
+				"engine_version":              "8.0.postgresql_aurora.3.02.0",
 				"monitoring_interval":         30,
 				"monitoring_role_arn":         "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
 			})
@@ -160,7 +161,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err = broker.Provision(serviceName, "custom-sample", map[string]any{"engine_version": "13.7"})
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -194,10 +195,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("cluster_instances", "cluster_instances", 11),
 			Entry("serverless_min_capacity", "serverless_min_capacity", 1),
 			Entry("serverless_max_capacity", "serverless_max_capacity", 30),
-			Entry("engine_version", "engine_version", "8.0.postgresql_aurora.3.02.0"),
 			Entry("allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("deletion_protection", "deletion_protection", true),
+			Entry("engine_version", "engine_version", "8.0.postgresql_aurora.3.02.0"),
 			Entry("update monitoring_interval", "monitoring_interval", 0),
 			Entry("update monitoring_role_arn", "monitoring_role_arn", ""),
 		)
