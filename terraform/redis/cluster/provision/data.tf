@@ -31,13 +31,6 @@ locals {
     256 = "cache.r5.12xlarge"
   }
 
-  parameter_group_names = {
-    "3.2" = "default.redis3.2"
-    "4.0" = "default.redis4.0"
-    "5.0" = "default.redis5.0"
-    "6.0" = "default.redis6.x"
-  }
-
   node_type = length(var.node_type) == 0 ? local.instance_types[var.cache_size] : var.node_type
   port      = 6379
 
