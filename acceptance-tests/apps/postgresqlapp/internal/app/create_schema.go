@@ -4,24 +4,21 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"postgresqlapp/internal/connector"
 )
 
-func handleCreateSchema(uri string) func(w http.ResponseWriter, r *http.Request) {
+func handleCreateSchema(conn *connector.Connector) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling create schema.")
 
-		db, err := connect(uri)
+		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
 			fail(w, http.StatusInternalServerError, "failed to connect to database: %e", err)
 		}
 		defer db.Close()
 
-		schema, err := schemaName(r)
-		if err != nil {
-			fail(w, http.StatusInternalServerError, "Schema name error: %s", err)
-			return
-		}
-
+		schema := r.Context().Value(schemaKey)
 		_, err = db.Exec(fmt.Sprintf(`CREATE SCHEMA %s`, schema))
 		if err != nil {
 			fail(w, http.StatusBadRequest, "Error creating schema: %s", err)
