@@ -13,7 +13,7 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-var _ = FDescribe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
+var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
 		params := map[string]any{
