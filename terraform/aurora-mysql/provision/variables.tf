@@ -19,3 +19,5 @@ variable "copy_tags_to_snapshot" { type = bool }
 variable "deletion_protection" { type = bool }
 variable "enable_audit_logging" { type = bool }
 variable "db_cluster_parameter_group_name" { type = string }
+variable "monitoring_interval" { type = number }
+variable "monitoring_role_arn" { type = string }

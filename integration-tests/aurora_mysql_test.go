@@ -82,6 +82,16 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				map[string]any{"db_name": stringOfLen(65)},
 				"db_name: String length must be less than or equal to 64",
 			),
+			Entry(
+				"monitoring_interval maximum value is 60",
+				map[string]any{"monitoring_interval": 61},
+				"monitoring_interval: Must be less than or equal to 60",
+			),
+			Entry(
+				"monitoring_interval minimum value is 0",
+				map[string]any{"monitoring_interval": -1},
+				"monitoring_interval: Must be greater than or equal to 0",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -101,6 +111,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("deletion_protection", BeFalse()),
 				HaveKeyWithValue("db_cluster_parameter_group_name", BeEmpty()),
 				HaveKeyWithValue("enable_audit_logging", BeFalse()),
+				HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),
+				HaveKeyWithValue("monitoring_role_arn", ""),
 			))
 		})
 
@@ -120,6 +132,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"deletion_protection":             true,
 				"db_cluster_parameter_group_name": "db-cluster-parameter-group",
 				"enable_audit_logging":            true,
+				"monitoring_interval":         30,
+				"monitoring_role_arn":         "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -139,6 +153,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("deletion_protection", true),
 					HaveKeyWithValue("db_cluster_parameter_group_name", "db-cluster-parameter-group"),
 					HaveKeyWithValue("enable_audit_logging", true),
+					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 30)),
+					HaveKeyWithValue("monitoring_role_arn", "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"),
 				),
 			)
 		})
@@ -188,6 +204,8 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("db_cluster_parameter_group_name", "db_cluster_parameter_group_name", "another-db-parameter-group"),
 			Entry("enable_audit_logging", "enable_audit_logging", true),
+			Entry("update monitoring_interval", "monitoring_interval", 0),
+			Entry("update monitoring_role_arn", "monitoring_role_arn", ""),
 		)
 	})
 })

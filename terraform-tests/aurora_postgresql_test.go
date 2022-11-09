@@ -37,6 +37,8 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"preferred_backup_window":     "23:26-23:56",
 		"copy_tags_to_snapshot":       true,
 		"deletion_protection":         false,
+		"monitoring_interval":         0,
+		"monitoring_role_arn":         "",
 	}
 
 	BeforeAll(func() {
@@ -73,6 +75,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"db_subnet_group_name":       Equal("csb-aurorapg-test-p-sn"),
 				"auto_minor_version_upgrade": BeTrue(),
 				"tags":                       HaveKeyWithValue("key1", "some-postgres-value"),
+				"monitoring_interval":        BeNumerically("==", 0),
 			}))
 		})
 
