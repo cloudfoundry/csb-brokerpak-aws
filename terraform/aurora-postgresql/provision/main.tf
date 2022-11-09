@@ -34,22 +34,23 @@ resource "random_password" "password" {
 }
 
 resource "aws_rds_cluster" "cluster" {
-  cluster_identifier          = var.instance_name
-  engine                      = "aurora-postgresql"
-  engine_version              = var.engine_version
-  database_name               = var.db_name
-  tags                        = var.labels
-  master_username             = random_string.username.result
-  master_password             = random_password.password.result
-  port                        = local.port
-  db_subnet_group_name        = local.subnet_group
-  vpc_security_group_ids      = local.rds_vpc_security_group_ids
-  skip_final_snapshot         = true
-  allow_major_version_upgrade = var.allow_major_version_upgrade
-  backup_retention_period     = var.backup_retention_period
-  preferred_backup_window     = var.preferred_backup_window
-  copy_tags_to_snapshot       = var.copy_tags_to_snapshot
-  deletion_protection         = var.deletion_protection
+  cluster_identifier              = var.instance_name
+  engine                          = "aurora-postgresql"
+  engine_version                  = var.engine_version
+  database_name                   = var.db_name
+  tags                            = var.labels
+  master_username                 = random_string.username.result
+  master_password                 = random_password.password.result
+  port                            = local.port
+  db_subnet_group_name            = local.subnet_group
+  vpc_security_group_ids          = local.rds_vpc_security_group_ids
+  skip_final_snapshot             = true
+  allow_major_version_upgrade     = var.allow_major_version_upgrade
+  backup_retention_period         = var.backup_retention_period
+  preferred_backup_window         = var.preferred_backup_window
+  copy_tags_to_snapshot           = var.copy_tags_to_snapshot
+  db_cluster_parameter_group_name = length(var.db_cluster_parameter_group_name) == 0 ? aws_rds_cluster_parameter_group.cluster_parameter_group[0].name : var.db_cluster_parameter_group_name
+  deletion_protection             = var.deletion_protection
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
@@ -82,5 +83,16 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
 
   lifecycle {
     prevent_destroy = true
+  }
+}
+
+resource "aws_rds_cluster_parameter_group" "cluster_parameter_group" {
+  count  = length(var.db_cluster_parameter_group_name) == 0 ? 1 : 0
+  family = format("aurora-postgresql%s", local.major_version)
+
+  parameter {
+    name         = "rds.force_ssl"
+    value        = var.require_ssl ? 1 : 0
+    apply_method = "immediate"
   }
 }

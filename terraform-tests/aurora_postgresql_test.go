@@ -18,27 +18,29 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":                         "csb-aurorapg-test",
-		"db_name":                               "csbdb",
-		"labels":                                map[string]any{"key1": "some-postgres-value"},
-		"region":                                "us-west-2",
-		"aws_access_key_id":                     awsAccessKeyID,
-		"aws_secret_access_key":                 awsSecretAccessKey,
-		"aws_vpc_id":                            awsVPCID,
-		"cluster_instances":                     3,
-		"serverless_min_capacity":               nil,
-		"serverless_max_capacity":               nil,
-		"engine_version":                        nil,
-		"rds_subnet_group":                      "",
-		"rds_vpc_security_group_ids":            "",
-		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            true,
-		"backup_retention_period":               1,
-		"preferred_backup_window":               "23:26-23:56",
-		"copy_tags_to_snapshot":                 true,
-		"deletion_protection":                   false,
-		"monitoring_interval":                   0,
-		"monitoring_role_arn":                   "",
+		"instance_name":                   "csb-aurorapg-test",
+		"db_name":                         "csbdb",
+		"labels":                          map[string]any{"key1": "some-postgres-value"},
+		"region":                          "us-west-2",
+		"aws_access_key_id":               awsAccessKeyID,
+		"aws_secret_access_key":           awsSecretAccessKey,
+		"aws_vpc_id":                      awsVPCID,
+		"cluster_instances":               3,
+		"serverless_min_capacity":         nil,
+		"serverless_max_capacity":         nil,
+		"rds_subnet_group":                "",
+		"rds_vpc_security_group_ids":      "",
+		"allow_major_version_upgrade":     true,
+		"auto_minor_version_upgrade":      true,
+		"backup_retention_period":         1,
+		"preferred_backup_window":         "23:26-23:56",
+		"copy_tags_to_snapshot":           true,
+		"deletion_protection":             false,
+		"require_ssl":                     false,
+		"db_cluster_parameter_group_name": "",
+		"engine_version":                  "8.0.postgresql_aurora.3.02.0",
+		"monitoring_interval":             0,
+		"monitoring_role_arn":             "",
 		"performance_insights_enabled":          false,
 		"performance_insights_kms_key_id":       "",
 		"performance_insights_retention_period": 7,
@@ -55,7 +57,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		})
 
 		It("should create the right resources", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(9))
+			Expect(plan.ResourceChanges).To(HaveLen(10))
 
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 				"aws_rds_cluster_instance",
@@ -67,6 +69,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"aws_security_group_rule",
 				"aws_db_subnet_group",
 				"aws_security_group",
+				"aws_rds_cluster_parameter_group",
 			))
 		})
 
@@ -110,7 +113,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		})
 
 		It("should not create any cluster_instance", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(6))
+			Expect(plan.ResourceChanges).To(HaveLen(7))
 
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 				"aws_rds_cluster",
@@ -119,6 +122,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"aws_security_group_rule",
 				"aws_db_subnet_group",
 				"aws_security_group",
+				"aws_rds_cluster_parameter_group",
 			))
 		})
 
@@ -172,6 +176,48 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		})
 	})
 
+	When("require_ssl is enabled without db_cluster_parameter_group_name", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"require_ssl": true,
+			}))
+		})
+
+		It("should use the auto generated db cluster parameter group name", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster_parameter_group")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"family": ContainSubstring("aurora-postgresql8"),
+					"parameter": ConsistOf(
+						MatchKeys(IgnoreExtras, Keys{
+							"apply_method": Equal("immediate"),
+							"name":         Equal("rds.force_ssl"),
+							"value":        Equal("1"),
+						}),
+					),
+				}),
+			)
+		})
+	})
+
+	When("require_ssl is enabled with aws_rds_cluster_parameter_group", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"require_ssl":                     true,
+				"db_cluster_parameter_group_name": "db-cluster-parameter-group",
+			}))
+		})
+
+		It("should use the db cluster parameter group name passed and not create a new one", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"db_cluster_parameter_group_name": Equal("db-cluster-parameter-group"),
+				}),
+			)
+
+			Expect(ResourceCreationForType(plan, "aws_rds_cluster_parameter_group")).To(BeEmpty())
+		})
+	})
+
 	When("performance insights is enabled", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
@@ -221,7 +267,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			}))
 		})
 
-		It("passes the min_capacity, max_capacity and correct instance_class", func() {
+		It("passes the correct engine_version", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
 				"engine_version": Equal("8.0.postgresql_aurora.3.02.0"),
 			}))
