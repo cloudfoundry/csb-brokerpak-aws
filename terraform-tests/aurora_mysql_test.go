@@ -18,29 +18,32 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":                   "csb-auroramysql-test",
-		"db_name":                         "csbdb",
-		"labels":                          map[string]any{"key1": "some-mysql-value"},
-		"region":                          "us-west-2",
-		"aws_access_key_id":               awsAccessKeyID,
-		"aws_secret_access_key":           awsSecretAccessKey,
-		"aws_vpc_id":                      awsVPCID,
-		"cluster_instances":               3,
-		"serverless_min_capacity":         nil,
-		"serverless_max_capacity":         nil,
-		"engine_version":                  nil,
-		"rds_subnet_group":                "",
-		"rds_vpc_security_group_ids":      "",
-		"allow_major_version_upgrade":     true,
-		"auto_minor_version_upgrade":      true,
-		"backup_retention_period":         1,
-		"preferred_backup_window":         "23:26-23:56",
-		"copy_tags_to_snapshot":           true,
-		"deletion_protection":             false,
-		"db_cluster_parameter_group_name": "",
-		"enable_audit_logging":            false,
-		"monitoring_interval":             0,
-		"monitoring_role_arn":             "",
+		"instance_name":                         "csb-auroramysql-test",
+		"db_name":                               "csbdb",
+		"labels":                                map[string]any{"key1": "some-mysql-value"},
+		"region":                                "us-west-2",
+		"aws_access_key_id":                     awsAccessKeyID,
+		"aws_secret_access_key":                 awsSecretAccessKey,
+		"aws_vpc_id":                            awsVPCID,
+		"cluster_instances":                     3,
+		"serverless_min_capacity":               nil,
+		"serverless_max_capacity":               nil,
+		"engine_version":                        nil,
+		"rds_subnet_group":                      "",
+		"rds_vpc_security_group_ids":            "",
+		"allow_major_version_upgrade":           true,
+		"auto_minor_version_upgrade":            true,
+		"backup_retention_period":               1,
+		"preferred_backup_window":               "23:26-23:56",
+		"copy_tags_to_snapshot":                 true,
+		"deletion_protection":                   false,
+		"db_cluster_parameter_group_name":       "",
+		"enable_audit_logging":                  false,
+		"monitoring_interval":                   0,
+		"monitoring_role_arn":                   "",
+		"performance_insights_enabled":          false,
+		"performance_insights_kms_key_id":       "",
+		"performance_insights_retention_period": 7,
 	}
 
 	BeforeAll(func() {
@@ -71,13 +74,14 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 		It("should create a cluster_instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine":                     Equal("aurora-mysql"),
-				"identifier":                 Equal("csb-auroramysql-test-0"),
-				"instance_class":             Equal("db.r5.large"),
-				"db_subnet_group_name":       Equal("csb-auroramysql-test-p-sn"),
-				"auto_minor_version_upgrade": BeTrue(),
-				"tags":                       HaveKeyWithValue("key1", "some-mysql-value"),
-				"monitoring_interval":        BeNumerically("==", 0),
+				"engine":                       Equal("aurora-mysql"),
+				"identifier":                   Equal("csb-auroramysql-test-0"),
+				"instance_class":               Equal("db.r5.large"),
+				"db_subnet_group_name":         Equal("csb-auroramysql-test-p-sn"),
+				"auto_minor_version_upgrade":   BeTrue(),
+				"tags":                         HaveKeyWithValue("key1", "some-mysql-value"),
+				"monitoring_interval":          BeNumerically("==", 0),
+				"performance_insights_enabled": BeFalse(),
 			}))
 		})
 
@@ -185,6 +189,26 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 					"db_cluster_parameter_group_name": Equal("db-cluster-parameter-group"),
 					"enabled_cloudwatch_logs_exports": ConsistOf("audit"),
 				}))
+		})
+	})
+
+	When("performance insights is enabled", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"performance_insights_enabled":          true,
+				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_retention_period": 7,
+			}))
+		})
+
+		It("should use the ids passed and not create new db subnet group", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"performance_insights_enabled":          BeTrue(),
+					"performance_insights_kms_key_id":       Equal("arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					"performance_insights_retention_period": BeNumerically("==", 7),
+				}),
+			)
 		})
 	})
 
