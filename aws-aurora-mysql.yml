@@ -125,6 +125,18 @@ provision:
       Requires setting db_cluster_parameter_group_name with a pre-created DB cluster parameter group that fulfills requirements for audit log exports. 
       See AWS Docs for more info: https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraMySQL.Auditing.html
       If set will enable the `audit` cloud_watch_log_export on the cluster.
+  - field_name: cloudwatch_log_group_retention_in_days
+    type: number
+    details: |
+      Used in conjunction with `enable_audit_logging`. If provided will set the retention days for the log group containing the RDS audit logs. Defaults to 30 Days.
+    default: 30
+    constraints:
+      minimum: 1
+      maximum: 3653 #10y
+  - field_name: cloudwatch_log_group_kms_key_id
+    type: string
+    default: ""
+    details: Used in conjunction with `enable_audit_logging`. If provided will set the KSM key to use for encrypting the Cloudwatch log group created for the RDS audit logs.
   - field_name: monitoring_interval
     type: number
     details: |

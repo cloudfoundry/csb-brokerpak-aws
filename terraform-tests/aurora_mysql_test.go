@@ -18,32 +18,34 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 	)
 
 	defaultVars := map[string]any{
-		"instance_name":                         "csb-auroramysql-test",
-		"db_name":                               "csbdb",
-		"labels":                                map[string]any{"key1": "some-mysql-value"},
-		"region":                                "us-west-2",
-		"aws_access_key_id":                     awsAccessKeyID,
-		"aws_secret_access_key":                 awsSecretAccessKey,
-		"aws_vpc_id":                            awsVPCID,
-		"cluster_instances":                     3,
-		"serverless_min_capacity":               nil,
-		"serverless_max_capacity":               nil,
-		"engine_version":                        nil,
-		"rds_subnet_group":                      "",
-		"rds_vpc_security_group_ids":            "",
-		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            true,
-		"backup_retention_period":               1,
-		"preferred_backup_window":               "23:26-23:56",
-		"copy_tags_to_snapshot":                 true,
-		"deletion_protection":                   false,
-		"db_cluster_parameter_group_name":       "",
-		"enable_audit_logging":                  false,
-		"monitoring_interval":                   0,
-		"monitoring_role_arn":                   "",
-		"performance_insights_enabled":          false,
-		"performance_insights_kms_key_id":       "",
-		"performance_insights_retention_period": 7,
+		"instance_name":                          "csb-auroramysql-test",
+		"db_name":                                "csbdb",
+		"labels":                                 map[string]any{"key1": "some-mysql-value"},
+		"region":                                 "us-west-2",
+		"aws_access_key_id":                      awsAccessKeyID,
+		"aws_secret_access_key":                  awsSecretAccessKey,
+		"aws_vpc_id":                             awsVPCID,
+		"cluster_instances":                      3,
+		"serverless_min_capacity":                nil,
+		"serverless_max_capacity":                nil,
+		"engine_version":                         nil,
+		"rds_subnet_group":                       "",
+		"rds_vpc_security_group_ids":             "",
+		"allow_major_version_upgrade":            true,
+		"auto_minor_version_upgrade":             true,
+		"backup_retention_period":                1,
+		"preferred_backup_window":                "23:26-23:56",
+		"copy_tags_to_snapshot":                  true,
+		"deletion_protection":                    false,
+		"db_cluster_parameter_group_name":        "",
+		"enable_audit_logging":                   false,
+		"cloudwatch_log_group_retention_in_days": 14,
+		"cloudwatch_log_group_kms_key_id":        "",
+		"monitoring_interval":                    0,
+		"monitoring_role_arn":                    "",
+		"performance_insights_enabled":           false,
+		"performance_insights_kms_key_id":        "",
+		"performance_insights_retention_period":  7,
 	}
 
 	BeforeAll(func() {
@@ -175,7 +177,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		})
 	})
 
-	When("db_cluster_parameter_group_name is passed and enable_audit_logging is enabled", func() {
+	When("enable_audit_logging is enabled", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"db_cluster_parameter_group_name": "db-cluster-parameter-group",
@@ -183,12 +185,18 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			}))
 		})
 
-		It("should use the ids passed and not create new security groups", func() {
+		It("should enable audit logging", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"db_cluster_parameter_group_name": Equal("db-cluster-parameter-group"),
 					"enabled_cloudwatch_logs_exports": ConsistOf("audit"),
 				}))
+		})
+
+		It("should create a aws_cloudwatch_log_group", func() {
+			Expect(plan.ResourceChanges).To(HaveLen(10))
+
+			Expect(ResourceChangesTypes(plan)).To(ContainElement("aws_cloudwatch_log_group"))
 		})
 	})
 
