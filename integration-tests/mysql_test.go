@@ -16,12 +16,12 @@ var customMySQLPlans = []map[string]any{
 var customMySQLPlan = map[string]any{
 	"name":          "custom-sample",
 	"id":            "c2ae1820-8c1a-4cf7-90cf-8340ba5aa0bf",
-	"description":   "Beta - Default MySQL plan",
+	"description":   "Default MySQL plan",
 	"mysql_version": 8,
 	"cores":         4,
 	"storage_gb":    100,
 	"metadata": map[string]any{
-		"displayName": "custom-sample (Beta)",
+		"displayName": "custom-sample",
 	},
 }
 
@@ -43,21 +43,12 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 		service := testframework.FindService(catalog, serviceName)
 		Expect(service.ID).NotTo(BeNil())
 		Expect(service.Name).NotTo(BeNil())
-		Expect(service.Tags).To(ConsistOf("aws", "mysql", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "mysql"))
 		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
 		Expect(service.Metadata.DisplayName).NotTo(BeNil())
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
-			),
-		)
-
-		Expect(service.Plans).To(
-			HaveEach(
-				MatchFields(IgnoreExtras, Fields{
-					"Description": HavePrefix("Beta -"),
-					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
-				}),
 			),
 		)
 	})
