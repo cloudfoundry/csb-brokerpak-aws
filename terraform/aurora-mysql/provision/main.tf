@@ -86,3 +86,15 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
     prevent_destroy = true
   }
 }
+
+resource "aws_cloudwatch_log_group" "this" {
+  for_each = local.log_groups
+  lifecycle {
+    create_before_destroy = true
+  }
+  name              = "/aws/rds/cluster/${var.instance_name}/${each.key}"
+  retention_in_days = var.cloudwatch_log_group_retention_in_days
+  kms_key_id        = var.cloudwatch_log_group_kms_key_id == "" ? null : var.cloudwatch_log_group_kms_key_id
+
+  tags = var.labels
+}
