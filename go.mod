@@ -10,7 +10,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.4.0
 	github.com/onsi/gomega v1.24.0
-	github.com/otiai10/copy v1.7.0
+	github.com/otiai10/copy v1.9.0
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
 	golang.org/x/tools v0.2.0
 	gopkg.in/yaml.v3 v3.0.1
