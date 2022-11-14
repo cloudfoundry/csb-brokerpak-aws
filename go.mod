@@ -12,7 +12,7 @@ require (
 	github.com/onsi/gomega v1.24.1
 	github.com/otiai10/copy v1.9.0
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
-	golang.org/x/tools v0.2.0
+	golang.org/x/tools v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
 	honnef.co/go/tools v0.4.0-0.dev
 )
@@ -91,7 +91,7 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
-	golang.org/x/mod v0.6.0 // indirect
+	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.2.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sys v0.2.0 // indirect
