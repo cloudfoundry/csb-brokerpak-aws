@@ -178,6 +178,13 @@ provision:
     default: 7
     constraints:
       minimum: 7
+  - field_name: instance_class
+    type: string
+    details: |
+      The DB instance class determines the computation and memory capacity of an Amazon Aurora DB instance.
+      Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
+      https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
+    required: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
