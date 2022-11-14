@@ -100,7 +100,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", map[string]any{"engine_version": "13.7"})
+			instanceID, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+				"engine_version": "13.7",
+				"instance_class": "db.r5.large",
+			})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -115,12 +118,13 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
-					HaveKeyWithValue("engine_version", Equal("13.7")),
+					HaveKeyWithValue("engine_version", "13.7"),
 					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),
 					HaveKeyWithValue("monitoring_role_arn", ""),
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+					HaveKeyWithValue("instance_class", "db.r5.large"),
 				))
 		})
 
@@ -143,6 +147,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"performance_insights_enabled":          true,
 				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 93,
+				"instance_class":                        "db.r5.large",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -165,6 +170,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 93)),
+					HaveKeyWithValue("instance_class", "db.r5.large"),
 				),
 			)
 		})
@@ -175,7 +181,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", map[string]any{"engine_version": "13.7"})
+			instanceID, err = broker.Provision(serviceName, "custom-sample", map[string]any{
+				"engine_version": "13.7",
+				"instance_class": "db.r5.large",
+			})
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -218,6 +227,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
 			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
+			Entry("update instance_class", "instance_class", "db.r5.large"),
 		)
 	})
 })
