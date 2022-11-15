@@ -28,7 +28,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"cluster_instances":                      3,
 		"serverless_min_capacity":                nil,
 		"serverless_max_capacity":                nil,
-		"engine_version":                         "8.0.mysql_aurora.3.02.0",
+		"engine_version":                         nil,
 		"rds_subnet_group":                       "",
 		"rds_vpc_security_group_ids":             "",
 		"allow_major_version_upgrade":            true,
@@ -240,6 +240,20 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"instance_class": Equal("db.serverless"),
+			}))
+		})
+	})
+
+	Context("engine_version", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"engine_version": "8.0.mysql_aurora.3.02.0",
+			}))
+		})
+
+		It("passes the min_capacity, max_capacity and correct instance_class", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
+				"engine_version": Equal("8.0.mysql_aurora.3.02.0"),
 			}))
 		})
 	})
