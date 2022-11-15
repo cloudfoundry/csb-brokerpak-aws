@@ -15,10 +15,16 @@ import (
 var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
+
+		params := map[string]any{
+			"cluster_instances": 2,
+			"instance_class":    "db.r5.large",
+		}
+
 		serviceInstance := services.CreateInstance(
 			"csb-aws-aurora-mysql",
 			services.WithPlan("default"),
-			services.WithParameters(`{"cluster_instances": 2}`))
+			services.WithParameters(params))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
