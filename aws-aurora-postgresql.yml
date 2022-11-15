@@ -52,10 +52,18 @@ provision:
       default: null
       nullable: true
     field_name: serverless_min_capacity
-    details: The minimum capacity for the cluster. Must be less than or equal to `serverless_max_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+    details: |
+      The minimum capacity for the cluster. Must be less than or equal to `serverless_max_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+      The `serverless_min_capacity` and `serverless_max_capacity` properties are ineffective without setting the `instance_class` property to a valid value for Aurora Serverless v2.
+      Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
+      https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
   - <<: *nullable_number
     field_name: serverless_max_capacity
-    details: The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+    details: |
+      The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+      The `serverless_min_capacity` and `serverless_max_capacity` properties are ineffective without setting the `instance_class` property to a valid value for Aurora Serverless v2.
+      Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
+      https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
   - field_name: rds_subnet_group
     type: string
     details: AWS RDS subnet group already in existence to use
