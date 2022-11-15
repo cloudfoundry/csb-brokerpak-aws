@@ -48,10 +48,18 @@ provision:
       default: null
       nullable: true
     field_name: serverless_min_capacity
-    details: The minimum capacity for the cluster. Must be less than or equal to `serverless_max_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+    details: |
+      The minimum capacity for the cluster. Must be less than or equal to `serverless_max_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+      The `serverless_min_capacity` and `serverless_max_capacity` properties are ineffective without setting the `instance_class` property to a valid value.
+      Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
+      https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
   - <<: *nullable_number
     field_name: serverless_max_capacity
-    details: The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+    details: |
+      The maximum capacity for the cluster. Must be greater than or equal to `serverless_min_capacity`. Valid capacity values are in a range of 0.5 up to 128 in steps of 0.5.
+      The `serverless_min_capacity` and `serverless_max_capacity` properties are ineffective without setting the `instance_class` property to a valid value for Aurora Serverless v2.
+      Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
+      https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
   - <<: &nullable_string
       type: string
       default: null
@@ -178,6 +186,13 @@ provision:
     default: 7
     constraints:
       minimum: 7
+  - field_name: instance_class
+    type: string
+    details: |
+      The DB instance class determines the computation and memory capacity of an Amazon Aurora DB instance.
+      Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
+      https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
+    required: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

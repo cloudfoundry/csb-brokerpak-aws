@@ -46,6 +46,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"performance_insights_enabled":           false,
 		"performance_insights_kms_key_id":        "",
 		"performance_insights_retention_period":  7,
+		"instance_class":                         "db.r5.large",
 	}
 
 	BeforeAll(func() {
@@ -225,6 +226,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"serverless_min_capacity": 0.5,
 				"serverless_max_capacity": 11.0,
+				"instance_class":          "db.serverless",
 			}))
 		})
 
