@@ -24,6 +24,7 @@ var customAuroraMySQLPlan = map[string]any{
 
 var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 	const serviceName = "csb-aws-aurora-mysql"
+	requiredParams := map[string]any{"instance_class": "db.r5.large"}
 
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
@@ -100,7 +101,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err := broker.Provision(serviceName, "custom-sample", requiredParams)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(SatisfyAll(
@@ -121,6 +122,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("performance_insights_enabled", false),
 				HaveKeyWithValue("performance_insights_kms_key_id", ""),
 				HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+				HaveKeyWithValue("instance_class", "db.r5.large"),
 			))
 		})
 
@@ -145,6 +147,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"performance_insights_enabled":          true,
 				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 93,
+				"instance_class":                        "db.r5.large",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -169,6 +172,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 93)),
+					HaveKeyWithValue("instance_class", "db.r5.large"),
 				),
 			)
 		})
@@ -179,7 +183,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err = broker.Provision(serviceName, "custom-sample", requiredParams)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -223,6 +227,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
 			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
+			Entry("update instance_class", "instance_class", "db.r5.large"),
 		)
 	})
 })
