@@ -193,6 +193,18 @@ provision:
       Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
       https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
     required: true
+  - field_name: storage_encrypted
+    type: boolean
+    default: true
+    details: |
+      Specifies whether a DB cluster is encrypted. The default is true. This parameter cannot be updated.
+    prohibit_update: true
+  - field_name: kms_key_id
+    type: string
+    default: ""
+    prohibit_update: true
+    details: |
+      The ARN for the KMS encryption key. When specifying kms_key_id, storage_encrypted needs to be set to true.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
