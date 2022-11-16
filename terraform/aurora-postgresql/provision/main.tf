@@ -72,7 +72,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   identifier                            = "${var.instance_name}-${count.index}"
   cluster_identifier                    = aws_rds_cluster.cluster.id
   tags                                  = var.labels
-  instance_class                        = local.serverless ? "db.serverless" : "db.r5.large"
+  instance_class                        = var.instance_class
   engine                                = aws_rds_cluster.cluster.engine
   engine_version                        = aws_rds_cluster.cluster.engine_version
   db_subnet_group_name                  = local.subnet_group
