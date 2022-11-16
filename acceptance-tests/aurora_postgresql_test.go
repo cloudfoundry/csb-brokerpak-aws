@@ -19,6 +19,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		params := map[string]any{
 			"engine_version":    "13.7",
 			"cluster_instances": 2,
+			"instance_class":    "db.r5.large",
 		}
 		serviceInstance := services.CreateInstance(
 			"csb-aws-aurora-postgresql",

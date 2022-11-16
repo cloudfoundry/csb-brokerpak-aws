@@ -52,6 +52,8 @@ resource "aws_rds_cluster" "cluster" {
   deletion_protection             = var.deletion_protection
   db_cluster_parameter_group_name = var.db_cluster_parameter_group_name
   enabled_cloudwatch_logs_exports = var.enable_audit_logging ? ["audit"] : null
+  storage_encrypted               = var.storage_encrypted
+  kms_key_id                      = var.kms_key_id
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
@@ -71,7 +73,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   identifier                            = "${var.instance_name}-${count.index}"
   cluster_identifier                    = aws_rds_cluster.cluster.id
   tags                                  = var.labels
-  instance_class                        = local.serverless ? "db.serverless" : "db.r5.large"
+  instance_class                        = var.instance_class
   engine                                = aws_rds_cluster.cluster.engine
   engine_version                        = aws_rds_cluster.cluster.engine_version
   db_subnet_group_name                  = local.subnet_group

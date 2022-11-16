@@ -38,12 +38,15 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"deletion_protection":                   false,
 		"require_ssl":                           false,
 		"db_cluster_parameter_group_name":       "",
-		"engine_version":                        "8.0.postgresql_aurora.3.02.0",
+		"engine_version":                        "14.7",
 		"monitoring_interval":                   0,
 		"monitoring_role_arn":                   "",
 		"performance_insights_enabled":          false,
 		"performance_insights_kms_key_id":       "",
 		"performance_insights_retention_period": 7,
+		"storage_encrypted":                     true,
+		"kms_key_id":                            "",
+		"instance_class":                        "db.r5.large",
 		"preferred_maintenance_end_hour":        nil,
 		"preferred_maintenance_start_hour":      nil,
 		"preferred_maintenance_end_min":         nil,
@@ -106,6 +109,8 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"preferred_backup_window":            Equal("23:26-23:56"),
 				"copy_tags_to_snapshot":              BeTrue(),
 				"deletion_protection":                BeFalse(),
+				"storage_encrypted":                  BeTrue(),
+				"engine_version":                     Equal("14.7"),
 			}))
 		})
 	})
@@ -191,7 +196,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		It("should use the auto generated db cluster parameter group name", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_parameter_group")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"family": ContainSubstring("aurora-postgresql8"),
+					"family": ContainSubstring("aurora-postgresql14"),
 					"parameter": ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
 							"apply_method": Equal("immediate"),
@@ -243,11 +248,28 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		})
 	})
 
+	When("custom key is specified", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"kms_key_id": "arn:aws:kms:us-west-9:123456789012:key/d952c9e0-2b79-47d2-aee8-c92e17cc7cce",
+			}))
+		})
+
+		It("should use the key on the cluster", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"kms_key_id": Equal("arn:aws:kms:us-west-9:123456789012:key/d952c9e0-2b79-47d2-aee8-c92e17cc7cce"),
+				}))
+		})
+
+	})
+
 	Context("serverless", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"serverless_min_capacity": 0.5,
 				"serverless_max_capacity": 11.0,
+				"instance_class":          "db.serverless",
 			}))
 		})
 
