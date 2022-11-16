@@ -51,6 +51,8 @@ resource "aws_rds_cluster" "cluster" {
   copy_tags_to_snapshot           = var.copy_tags_to_snapshot
   db_cluster_parameter_group_name = length(var.db_cluster_parameter_group_name) == 0 ? aws_rds_cluster_parameter_group.cluster_parameter_group[0].name : var.db_cluster_parameter_group_name
   deletion_protection             = var.deletion_protection
+  storage_encrypted               = var.storage_encrypted
+  kms_key_id                      = var.kms_key_id
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
