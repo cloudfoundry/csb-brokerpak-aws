@@ -121,6 +121,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+					HaveKeyWithValue("preferred_maintenance_day", BeNil()),
+					HaveKeyWithValue("preferred_maintenance_start_hour", BeNil()),
+					HaveKeyWithValue("preferred_maintenance_start_min", BeNil()),
+					HaveKeyWithValue("preferred_maintenance_end_hour", BeNil()),
+					HaveKeyWithValue("preferred_maintenance_end_min", BeNil()),
 				))
 		})
 
@@ -143,6 +148,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"performance_insights_enabled":          true,
 				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 93,
+				"preferred_maintenance_day":             "Mon",
+				"preferred_maintenance_start_hour":      "03",
+				"preferred_maintenance_start_min":       "45",
+				"preferred_maintenance_end_hour":        "10",
+				"preferred_maintenance_end_min":         "15",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -165,6 +175,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 93)),
+					HaveKeyWithValue("preferred_maintenance_day", "Mon"),
+					HaveKeyWithValue("preferred_maintenance_start_hour", "03"),
+					HaveKeyWithValue("preferred_maintenance_start_min", "45"),
+					HaveKeyWithValue("preferred_maintenance_end_hour", "10"),
+					HaveKeyWithValue("preferred_maintenance_end_min", "15"),
 				),
 			)
 		})
