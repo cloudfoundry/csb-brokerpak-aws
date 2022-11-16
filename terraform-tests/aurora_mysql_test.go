@@ -46,6 +46,9 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"performance_insights_enabled":           false,
 		"performance_insights_kms_key_id":        "",
 		"performance_insights_retention_period":  7,
+		"instance_class":                         "db.r5.large",
+		"storage_encrypted":                      true,
+		"kms_key_id":                             "",
 		"preferred_maintenance_end_hour":         nil,
 		"preferred_maintenance_start_hour":       nil,
 		"preferred_maintenance_end_min":          nil,
@@ -108,6 +111,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"copy_tags_to_snapshot":              BeTrue(),
 				"deletion_protection":                BeFalse(),
 				"enabled_cloudwatch_logs_exports":    BeNil(),
+				"storage_encrypted":                  BeTrue(),
 			}))
 		})
 	})
@@ -225,11 +229,28 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		})
 	})
 
+	When("custom key is specified", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"kms_key_id": "arn:aws:kms:us-west-9:123456789012:key/900dd091-2b79-47d2-aee8-c92e17cc7cce",
+			}))
+		})
+
+		It("should use the key on the cluster", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"kms_key_id": Equal("arn:aws:kms:us-west-9:123456789012:key/900dd091-2b79-47d2-aee8-c92e17cc7cce"),
+				}))
+		})
+
+	})
+
 	Context("serverless", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"serverless_min_capacity": 0.5,
 				"serverless_max_capacity": 11.0,
+				"instance_class":          "db.serverless",
 			}))
 		})
 

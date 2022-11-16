@@ -24,3 +24,6 @@ variable "monitoring_role_arn" { type = string }
 variable "performance_insights_enabled" { type = bool }
 variable "performance_insights_kms_key_id" { type = string }
 variable "performance_insights_retention_period" { type = number }
+variable "storage_encrypted" { type = bool }
+variable "kms_key_id" { type = string }
+variable "instance_class" { type = string }
