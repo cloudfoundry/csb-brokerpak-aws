@@ -52,6 +52,8 @@ resource "aws_rds_cluster" "cluster" {
   deletion_protection             = var.deletion_protection
   db_cluster_parameter_group_name = var.db_cluster_parameter_group_name
   enabled_cloudwatch_logs_exports = var.enable_audit_logging ? ["audit"] : null
+  storage_encrypted               = var.storage_encrypted
+  kms_key_id                      = var.kms_key_id
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
