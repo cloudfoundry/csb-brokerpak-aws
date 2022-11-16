@@ -38,7 +38,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"deletion_protection":                   false,
 		"require_ssl":                           false,
 		"db_cluster_parameter_group_name":       "",
-		"engine_version":                        "8.0.postgresql_aurora.3.02.0",
+		"engine_version":                        "14.7",
 		"monitoring_interval":                   0,
 		"monitoring_role_arn":                   "",
 		"performance_insights_enabled":          false,
@@ -102,7 +102,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"preferred_backup_window":            Equal("23:26-23:56"),
 				"copy_tags_to_snapshot":              BeTrue(),
 				"deletion_protection":                BeFalse(),
-				"engine_version":                     Equal("8.0.postgresql_aurora.3.02.0"),
+				"engine_version":                     Equal("14.7"),
 			}))
 		})
 	})
@@ -188,7 +188,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		It("should use the auto generated db cluster parameter group name", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_parameter_group")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"family": ContainSubstring("aurora-postgresql8"),
+					"family": ContainSubstring("aurora-postgresql14"),
 					"parameter": ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
 							"apply_method": Equal("immediate"),
