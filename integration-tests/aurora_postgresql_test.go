@@ -121,6 +121,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+					HaveKeyWithValue("storage_encrypted", true),
+					HaveKeyWithValue("kms_key_id", ""),
 				))
 		})
 
@@ -143,6 +145,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"performance_insights_enabled":          true,
 				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 93,
+				"storage_encrypted":                     false,
+				"kms_key_id":                            "arn:aws:kms:us-south-10:123456789012:key/face1945-7581-4bf6-b311-39594be3dce5",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -165,6 +169,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 93)),
+					HaveKeyWithValue("storage_encrypted", false),
+					HaveKeyWithValue("kms_key_id", "arn:aws:kms:us-south-10:123456789012:key/face1945-7581-4bf6-b311-39594be3dce5"),
 				),
 			)
 		})
@@ -199,6 +205,8 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("db_name", "db_name", "someNewName"),
 			Entry("rds_subnet_group", "rds_subnet_group", "some-new-subnet-name"),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
+			Entry("storage_encrypted", "storage_encrypted", false),
+			Entry("kms_key_id", "kms_key_id", "arn:aws:kms:eu-north-42:741085209630:key/a2c0ffee-cab0-4617-a28e-cabba9e06193"),
 		)
 
 		DescribeTable(
