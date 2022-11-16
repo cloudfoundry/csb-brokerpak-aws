@@ -27,3 +27,5 @@ variable "performance_insights_retention_period" { type = number }
 variable "cloudwatch_log_group_retention_in_days" { type = number }
 variable "cloudwatch_log_group_kms_key_id" { type = string }
 variable "instance_class" { type = string }
+variable "storage_encrypted" { type = bool }
+variable "kms_key_id" { type = string }
