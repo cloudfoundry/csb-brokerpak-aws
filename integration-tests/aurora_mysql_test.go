@@ -125,6 +125,11 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("instance_class", "db.r5.large"),
 				HaveKeyWithValue("storage_encrypted", true),
 				HaveKeyWithValue("kms_key_id", ""),
+				HaveKeyWithValue("preferred_maintenance_day", BeNil()),
+				HaveKeyWithValue("preferred_maintenance_start_hour", BeNil()),
+				HaveKeyWithValue("preferred_maintenance_start_min", BeNil()),
+				HaveKeyWithValue("preferred_maintenance_end_hour", BeNil()),
+				HaveKeyWithValue("preferred_maintenance_end_min", BeNil()),
 			))
 		})
 
@@ -152,6 +157,11 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"instance_class":                        "db.r5.large",
 				"storage_encrypted":                     false,
 				"kms_key_id":                            "arn:aws:kms:us-south-10:123456789012:key/cadd1e42-7581-4bf6-b311-ba0babc0ffee",
+				"preferred_maintenance_day":             "Mon",
+				"preferred_maintenance_start_hour":      "03",
+				"preferred_maintenance_start_min":       "45",
+				"preferred_maintenance_end_hour":        "10",
+				"preferred_maintenance_end_min":         "15",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -179,6 +189,11 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("instance_class", "db.r5.large"),
 					HaveKeyWithValue("storage_encrypted", false),
 					HaveKeyWithValue("kms_key_id", "arn:aws:kms:us-south-10:123456789012:key/cadd1e42-7581-4bf6-b311-ba0babc0ffee"),
+					HaveKeyWithValue("preferred_maintenance_day", "Mon"),
+					HaveKeyWithValue("preferred_maintenance_start_hour", "03"),
+					HaveKeyWithValue("preferred_maintenance_start_min", "45"),
+					HaveKeyWithValue("preferred_maintenance_end_hour", "10"),
+					HaveKeyWithValue("preferred_maintenance_end_min", "15"),
 				),
 			)
 		})
