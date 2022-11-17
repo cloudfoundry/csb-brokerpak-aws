@@ -47,6 +47,11 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"storage_encrypted":                     true,
 		"kms_key_id":                            "",
 		"instance_class":                        "db.r5.large",
+		"preferred_maintenance_end_hour":        nil,
+		"preferred_maintenance_start_hour":      nil,
+		"preferred_maintenance_end_min":         nil,
+		"preferred_maintenance_start_min":       nil,
+		"preferred_maintenance_day":             nil,
 	}
 
 	BeforeAll(func() {
@@ -279,6 +284,59 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"instance_class": Equal("db.serverless"),
 			}))
+		})
+	})
+
+	Context("engine_version", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"engine_version": "8.0.postgresql_aurora.3.02.0",
+			}))
+		})
+
+		It("passes the correct engine_version", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
+				"engine_version": Equal("8.0.postgresql_aurora.3.02.0"),
+			}))
+		})
+	})
+
+	Context("preferred_maintenance_window", func() {
+		When("no window is set", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
+			})
+			It("should not be passed", func() {
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(Not(HaveKey("preferred_maintenance_window")))
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(Not(HaveKey("preferred_maintenance_window")))
+			})
+		})
+
+		When("preferred maintenance window specified with all values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"preferred_maintenance_day":        "Mon",
+					"preferred_maintenance_start_hour": "01",
+					"preferred_maintenance_end_hour":   "02",
+					"preferred_maintenance_start_min":  "03",
+					"preferred_maintenance_end_min":    "04",
+				}))
+			})
+
+			It("should pass the correct window", func() {
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"preferred_maintenance_window": Equal("mon:01:03-mon:02:04"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"preferred_maintenance_window": Equal("mon:01:03-mon:02:04"),
+					}),
+				)
+			})
+
 		})
 	})
 })

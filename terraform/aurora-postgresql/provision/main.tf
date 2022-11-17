@@ -53,6 +53,7 @@ resource "aws_rds_cluster" "cluster" {
   deletion_protection             = var.deletion_protection
   storage_encrypted               = var.storage_encrypted
   kms_key_id                      = var.kms_key_id
+  preferred_maintenance_window    = local.preferred_maintenance_window
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
@@ -82,6 +83,7 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
   performance_insights_retention_period = var.performance_insights_enabled ? var.performance_insights_retention_period : null
+  preferred_maintenance_window          = local.preferred_maintenance_window
 
   lifecycle {
     prevent_destroy = true
