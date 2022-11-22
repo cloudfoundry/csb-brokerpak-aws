@@ -18,7 +18,7 @@
 applications:
 - name: ((app))
   command: ./cloud-service-broker serve
-  memory: 1G
+  memory: 2G
   disk_quota: 2G
   buildpacks: 
   - binary_buildpack
