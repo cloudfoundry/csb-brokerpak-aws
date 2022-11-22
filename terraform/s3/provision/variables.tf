@@ -28,7 +28,7 @@ variable "pab_restrict_public_buckets" { type = bool }
 # Resource aws_s3_bucket_server_side_encryption_configuration
 variable "sse_default_kms_key_id" { type = string }
 variable "sse_default_algorithm" { type = string }
-variable "sse_bucket_key_enabled" { type = string }
+variable "sse_bucket_key_enabled" { type = bool }
 
 # Resource aws_s3_bucket_object_lock_configuration
 variable "ol_configuration_default_retention_enabled" { type = bool }
