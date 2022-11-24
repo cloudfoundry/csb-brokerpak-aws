@@ -83,6 +83,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"db_name: String length must be less than or equal to 64",
 			),
 			Entry(
+				"database name invalid characters",
+				map[string]any{"db_name": ".aaaaa"},
+				"db_name: Does not match pattern '^[a-z][a-z0-9]+$'",
+			),
+			Entry(
 				"monitoring_interval maximum value is 60",
 				map[string]any{"monitoring_interval": 61},
 				"monitoring_interval: Must be less than or equal to 60",
@@ -138,7 +143,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
 				"instance_name":                         "csb-aurora-postgres-fake-name",
-				"db_name":                               "fake-db-name",
+				"db_name":                               "fakedbname",
 				"region":                                "africa-north-4",
 				"cluster_instances":                     12,
 				"serverless_min_capacity":               0.2,
@@ -168,7 +173,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("instance_name", "csb-aurora-postgres-fake-name"),
-					HaveKeyWithValue("db_name", "fake-db-name"),
+					HaveKeyWithValue("db_name", "fakedbname"),
 					HaveKeyWithValue("region", "africa-north-4"),
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 12)),
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
