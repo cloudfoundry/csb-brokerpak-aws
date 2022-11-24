@@ -86,7 +86,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			Entry(
 				"database name invalid characters",
 				map[string]any{"db_name": "-aaaaa"},
-				"db_name: Does not match pattern '^[a-z][a-z0-9]+$'",
+				"db_name: Does not match pattern '^[a-z][a-z0-9_]+$'",
 			),
 			Entry(
 				"monitoring_interval maximum value is 60",
