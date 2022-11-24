@@ -84,6 +84,11 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"db_name: String length must be less than or equal to 64",
 			),
 			Entry(
+				"database name invalid characters",
+				map[string]any{"db_name": "-aaaaa"},
+				"db_name: Does not match pattern '^[a-z][a-z0-9_]+$'",
+			),
+			Entry(
 				"monitoring_interval maximum value is 60",
 				map[string]any{"monitoring_interval": 61},
 				"monitoring_interval: Must be less than or equal to 60",
@@ -138,7 +143,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"instance_name":                         "csb-aurora-mysql-fake-name",
 				"cluster_instances":                     12,
 				"region":                                "africa-north-4",
-				"db_name":                               "fake-db-name",
+				"db_name":                               "fakedbname",
 				"serverless_min_capacity":               0.2,
 				"serverless_max_capacity":               100,
 				"engine_version":                        "8.0.mysql_aurora.3.02.0",
@@ -169,7 +174,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("instance_name", "csb-aurora-mysql-fake-name"),
 					HaveKeyWithValue("cluster_instances", BeNumerically("==", 12)),
-					HaveKeyWithValue("db_name", "fake-db-name"),
+					HaveKeyWithValue("db_name", "fakedbname"),
 					HaveKeyWithValue("region", "africa-north-4"),
 					HaveKeyWithValue("serverless_min_capacity", BeNumerically("==", 0.2)),
 					HaveKeyWithValue("serverless_max_capacity", BeNumerically("==", 100)),
@@ -225,7 +230,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 			},
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
-			Entry("db_name", "db_name", "some-new-name"),
+			Entry("db_name", "db_name", "someNewName"),
 			Entry("rds_subnet_group", "rds_subnet_group", "some-new-subnet-name"),
 			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
 			Entry("storage_encrypted", "storage_encrypted", false),

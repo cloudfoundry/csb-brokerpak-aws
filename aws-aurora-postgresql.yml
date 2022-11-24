@@ -35,7 +35,7 @@ provision:
     default: csbdb
     constraints:
       maxLength: 64
-      pattern: ^[a-z][a-z0-9-]+$
+      pattern: ^[a-z][a-z0-9_]+$
     prohibit_update: true
   - field_name: region
     type: string
