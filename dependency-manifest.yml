@@ -34,9 +34,9 @@ dependencies:
       source: https://github.com/hashicorp/terraform/archive/v1.1.9.zip
       source_sha256: 98e4d48e2703cff237d64a865bffba56dec597d72e40e8c978e1beccbe49c27b
     - name: terraform-provider-aws
-      version: 4.40.0
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.40.0.zip
-      source_sha256: 1553c73102ac905c689dae562b90e5fa74af3ec2ab4978218e44e618ce48482f
+      version: 4.41.0
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.41.0.zip
+      source_sha256: 8e11ef486ba918798bbb95ce6b264ab7040680bd9bf65f672a38e1cce1da50d1
     - name: terraform-provider-csbmysql
       version: 1.0.0
       source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.0.0.zip
@@ -50,9 +50,9 @@ dependencies:
       source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
       source_sha256: 8cd135baba86b5568f7685152201b3f73300aa1fe455c6873da05bff1418b707
     - name: terraform-provider-postgresql
-      version: 1.17.1
-      source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.17.1.zip
-      source_sha256: c5ec457d9d5c56235c7ab943bb0f4404e2c7831141acea74b1f0da359dd25b06
+      version: 1.18.0
+      source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.18.0.zip
+      source_sha256: 725087cf0d0d6a4b03c91e17cc45e2544cf4af61117ca22b13082e45de595871
     - name: terraform-provider-random
       version: 3.4.3
       source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.4.3.zip
