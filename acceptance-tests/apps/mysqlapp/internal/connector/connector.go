@@ -32,7 +32,7 @@ func New() (*Connector, error) {
 	switch serviceTag {
 	case "mysql":
 		return ReadCSBMySQL(serviceCred)
-	case "aws-rds-mysql":
+	case "aws-rds-mysql", "aws-rds-aurora":
 		return ReadLegacyMySQL(serviceCred)
 	}
 
@@ -53,6 +53,11 @@ func findService() (string, cfenv.Service, error) {
 		},
 		func() (string, []cfenv.Service, error) {
 			serviceLabel := "aws-rds-mysql"
+			srv, err := app.Services.WithLabel(serviceLabel)
+			return serviceLabel, srv, err
+		},
+		func() (string, []cfenv.Service, error) {
+			serviceLabel := "aws-rds-aurora"
 			srv, err := app.Services.WithLabel(serviceLabel)
 			return serviceLabel, srv, err
 		},
