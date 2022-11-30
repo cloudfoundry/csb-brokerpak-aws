@@ -11,7 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = FDescribe("Aurora MySQL data migration", Label("aurora-mysql-migration"), func() {
+var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"), func() {
 	It("can migrate data from the previous broker to the CSB", func() {
 
 		By("creating a legacy service instance with the previous broker to serve as source")
