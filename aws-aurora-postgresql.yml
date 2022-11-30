@@ -1,13 +1,13 @@
 version: 1
 name: csb-aws-aurora-postgresql
 id: 36203e40-2945-11ed-8980-eb81bd131a02
-description: Beta - Amazon Aurora for PostgreSQL
-display_name: Amazon Aurora for PostgreSQL (Beta)
+description: Amazon Aurora for PostgreSQL
+display_name: Amazon Aurora for PostgreSQL
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/rds/aurora/
-tags: [aws, aurora, postgresql, postgres, beta]
+tags: [aws, aurora, postgresql, postgres]
 plan_updateable: true
 provision:
   plan_inputs: []

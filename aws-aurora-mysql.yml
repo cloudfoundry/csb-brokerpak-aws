@@ -1,13 +1,13 @@
 version: 1
 name: csb-aws-aurora-mysql
 id: 7446e75e-2a09-11ed-8816-23072dae39dc
-description: Beta - Amazon Aurora for MySQL
-display_name: Amazon Aurora for MySQL (Beta)
+description: Amazon Aurora for MySQL
+display_name: Amazon Aurora for MySQL
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/rds/aurora/
-tags: [aws, aurora, mysql, beta]
+tags: [aws, aurora, mysql]
 plan_updateable: true
 provision:
   plan_inputs: []
