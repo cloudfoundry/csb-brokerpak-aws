@@ -14,11 +14,13 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
-			serviceBroker := brokers.Create(
+			options := []brokers.Option{
 				brokers.WithPrefix("csb-postgresql"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
-			)
+			}
+
+			serviceBroker := brokers.Create(append(options, extraEnvOptions...)...)
 			defer serviceBroker.Delete()
 
 			By("creating a service")
