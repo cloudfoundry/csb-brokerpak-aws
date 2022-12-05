@@ -78,7 +78,7 @@ func WithReleaseEnv() Option {
 	}
 }
 
-func WithLegacyMySqlEnvFor140() Option {
+func WithLegacyMySQLEnvFor140() Option {
 	return func(b *Broker) {
 		if brokerpaks.DetectBrokerpakV140(b.dir) {
 			b.envExtras = append(b.envExtras, b.legacyMysqlEnv()...)

@@ -1,3 +1,4 @@
+// Package brokerpaks manages brokerpak metadata
 package brokerpaks
 
 import (

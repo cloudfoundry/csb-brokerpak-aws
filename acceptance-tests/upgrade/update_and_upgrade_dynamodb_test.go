@@ -19,7 +19,7 @@ var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb", "upgrade"), func() {
 				brokers.WithPrefix("csb-aws-dynamodb"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
-				brokers.WithLegacyMySqlEnvFor140(),
+				brokers.WithLegacyMySQLEnvFor140(),
 			)
 			defer serviceBroker.Delete()
 
