@@ -9,6 +9,7 @@ import (
 	"github.com/onsi/gomega"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/brokerpaks"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 )
@@ -77,9 +78,11 @@ func WithReleaseEnv() Option {
 	}
 }
 
-func WithLegacyMysqlEnv() Option {
+func WithLegacyMySqlEnvFor140() Option {
 	return func(b *Broker) {
-		b.envExtras = append(b.envExtras, b.legacyMysqlEnv()...)
+		if brokerpaks.DetectBrokerpakV140(b.dir) {
+			b.envExtras = append(b.envExtras, b.legacyMysqlEnv()...)
+		}
 	}
 }
 

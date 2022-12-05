@@ -14,13 +14,12 @@ var _ = Describe("UpgradeMySQLTest", Label("mysql", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
-			options := []brokers.Option{
+			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-aws-mysql"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
-			}
-
-			serviceBroker := brokers.Create(append(options, extraEnvOptions...)...)
+				brokers.WithLegacyMySqlEnvFor140(),
+			)
 			defer serviceBroker.Delete()
 
 			By("creating a service")
