@@ -114,7 +114,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"storage_type": Equal("io1"),
-						"iops":         Equal(float64(3000)),
+						"iops":         BeNumerically("==", 3000),
 					}))
 			})
 		})
@@ -126,12 +126,13 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 				}))
 			})
 
-			It("iops should be null", func() {
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"storage_type": Equal("gp2"),
-						"iops":         BeNil(),
-					}))
+			It("iops should not be set", func() {
+				instanceData := AfterValuesForType(plan, "aws_db_instance")
+				Expect(instanceData).To(MatchKeys(IgnoreExtras, Keys{
+					"storage_type": Equal("gp2"),
+				}))
+
+				Expect("iops").NotTo(BeKeyOf(instanceData))
 			})
 		})
 
