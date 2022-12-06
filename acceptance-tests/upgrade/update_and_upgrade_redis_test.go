@@ -2,6 +2,7 @@ package upgrade_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/brokerpaks"
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
@@ -13,11 +14,16 @@ import (
 var _ = Describe("Redis", Label("redis"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
+			if brokerpaks.DetectBrokerpakV140(releasedBuildDir) {
+				Skip("Brokerpak 1.4.0 and earlier no longer can create AWS Redis service instances")
+			}
+
 			By("pushing latest released broker version")
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-aws-redis"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
+				brokers.WithLegacyMySQLEnvFor140(),
 			)
 			defer serviceBroker.Delete()
 
