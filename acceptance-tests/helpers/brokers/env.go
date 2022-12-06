@@ -59,3 +59,9 @@ func (b Broker) releaseEnv() []apps.EnvVar {
 func (b Broker) latestEnv() []apps.EnvVar {
 	return []apps.EnvVar{}
 }
+
+func (b Broker) legacyMysqlEnv() []apps.EnvVar {
+	return []apps.EnvVar{
+		{Name: "GSB_SERVICE_CSB_AWS_MYSQL_PLANS", Value: `[{"name":"default-5.7","id":"e4de6336-7750-4f6c-b0da-5b5c725ae3f2","cores":2,"description":"Default MySQL 5.7 plan","display_name":"default-5.7","instance_class": "db.t3.medium","mysql_version": "5.7","storage_gb": 10, "storage_encrypted": false, "multi_az": false, "storage_autoscale": false, "storage_type": "gp2"}]`},
+	}
+}

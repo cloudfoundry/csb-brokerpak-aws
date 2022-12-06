@@ -14,10 +14,12 @@ var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
+
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-aws-dynamodb"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
+				brokers.WithLegacyMySQLEnvFor140(),
 			)
 			defer serviceBroker.Delete()
 

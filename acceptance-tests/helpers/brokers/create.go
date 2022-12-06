@@ -1,15 +1,17 @@
 package brokers
 
 import (
-	"csbbrokerpakaws/acceptance-tests/helpers/apps"
-	"csbbrokerpakaws/acceptance-tests/helpers/cf"
-	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/onsi/gomega"
+
+	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/brokerpaks"
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
+	"csbbrokerpakaws/acceptance-tests/helpers/random"
 )
 
 type Option func(broker *Broker)
@@ -73,6 +75,14 @@ func WithEnv(env ...apps.EnvVar) Option {
 func WithReleaseEnv() Option {
 	return func(b *Broker) {
 		b.envExtras = append(b.envExtras, b.releaseEnv()...)
+	}
+}
+
+func WithLegacyMySQLEnvFor140() Option {
+	return func(b *Broker) {
+		if brokerpaks.DetectBrokerpakV140(b.dir) {
+			b.envExtras = append(b.envExtras, b.legacyMysqlEnv()...)
+		}
 	}
 }
 

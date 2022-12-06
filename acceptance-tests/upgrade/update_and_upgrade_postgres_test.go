@@ -18,6 +18,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 				brokers.WithPrefix("csb-postgresql"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
+				brokers.WithLegacyMySQLEnvFor140(),
 			)
 			defer serviceBroker.Delete()
 
