@@ -17,8 +17,20 @@ type Endpoint struct {
 	region string
 }
 
-func CreateEndpoint(endpointType EndpointType, username, password, server, dbname, region, engine string, port int) *Endpoint {
-	id := random.Name()
+type CreateEndpointParams struct {
+	EndpointType    EndpointType
+	EnvironmentName string
+	Username        string
+	Password        string
+	Server          string
+	DatabaseName    string
+	Region          string
+	Engine          string
+	Port            int
+}
+
+func CreateEndpoint(params CreateEndpointParams) *Endpoint {
+	id := random.Name(random.WithPrefix(params.EnvironmentName))
 
 	var receiver struct {
 		ARN string `jsonry:"Endpoint.EndpointArn"`
@@ -29,19 +41,19 @@ func CreateEndpoint(endpointType EndpointType, username, password, server, dbnam
 		"dms",
 		"create-endpoint",
 		"--endpoint-identifier", id,
-		"--endpoint-type", string(endpointType),
-		"--engine-name", engine,
-		"--username", username,
-		"--password", password,
-		"--port", fmt.Sprintf("%d", port),
-		"--server-name", server,
-		"--database-name", dbname,
-		"--region", region,
+		"--endpoint-type", string(params.EndpointType),
+		"--engine-name", params.Engine,
+		"--username", params.Username,
+		"--password", params.Password,
+		"--port", fmt.Sprintf("%d", params.Port),
+		"--server-name", params.Server,
+		"--database-name", params.DatabaseName,
+		"--region", params.Region,
 	)
 
 	return &Endpoint{
 		arn:    receiver.ARN,
-		region: region,
+		region: params.Region,
 	}
 }
 

@@ -61,7 +61,17 @@ var _ = Describe("PostgreSQL data migration", Label("postgresql-migration"), fun
 			Port     int    `mapstructure:"port"`
 		}
 		Expect(mapstructure.Decode(sourceCreds, &sourceReceiver)).NotTo(HaveOccurred())
-		sourceEndpoint := dms.CreateEndpoint(dms.Source, sourceReceiver.Username, sourceReceiver.Password, sourceReceiver.Server, sourceReceiver.DBName, metadata.Region, "postgres", sourceReceiver.Port)
+		sourceEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
+			EndpointType:    dms.Source,
+			EnvironmentName: metadata.Name,
+			Username:        sourceReceiver.Username,
+			Password:        sourceReceiver.Password,
+			Server:          sourceReceiver.Server,
+			DatabaseName:    sourceReceiver.DBName,
+			Region:          metadata.Region,
+			Engine:          "postgres",
+			Port:            sourceReceiver.Port,
+		})
 		defer sourceEndpoint.Cleanup()
 
 		By("creating a DMS target endpoint")
@@ -75,7 +85,17 @@ var _ = Describe("PostgreSQL data migration", Label("postgresql-migration"), fun
 			Port     int    `json:"port"`
 		}
 		targetKey.Get(&targetReceiver)
-		targetEndpoint := dms.CreateEndpoint(dms.Target, targetReceiver.Username, targetReceiver.Password, targetReceiver.Server, targetReceiver.DBName, metadata.Region, "postgres", targetReceiver.Port)
+		targetEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
+			EndpointType:    dms.Target,
+			EnvironmentName: metadata.Name,
+			Username:        targetReceiver.Username,
+			Password:        targetReceiver.Password,
+			Server:          targetReceiver.Server,
+			DatabaseName:    targetReceiver.DBName,
+			Region:          metadata.Region,
+			Engine:          "postgres",
+			Port:            targetReceiver.Port,
+		})
 		defer targetEndpoint.Cleanup()
 
 		By("running the replication task")
