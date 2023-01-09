@@ -9,13 +9,25 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+const (
+	auroraMySQLServiceID                  = "7446e75e-2a09-11ed-8816-23072dae39dc"
+	auroraMySQLServiceName                = "csb-aws-aurora-mysql"
+	auroraMySQLServiceDescription         = "Amazon Aurora for MySQL"
+	auroraMySQLServiceDisplayName         = "Amazon Aurora for MySQL"
+	auroraMySQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html"
+	auroraMySQLServiceSupportURL          = "https://aws.amazon.com/rds/aurora/"
+	auroraMySQLServiceProviderDisplayName = "VMware"
+	auroraMySQLCustomPlanName             = "custom-sample"
+	auroraMySQLCustomPlanID               = "10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719"
+)
+
 var customAuroraMySQLPlans = []map[string]any{
 	customAuroraMySQLPlan,
 }
 
 var customAuroraMySQLPlan = map[string]any{
-	"name":        "custom-sample",
-	"id":          "10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719",
+	"name":        auroraMySQLCustomPlanName,
+	"id":          auroraMySQLCustomPlanID,
 	"description": "Default Aurora MySQL plan",
 	"metadata": map[string]any{
 		"displayName": "custom-sample",
@@ -23,7 +35,6 @@ var customAuroraMySQLPlan = map[string]any{
 }
 
 var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
-	const serviceName = "csb-aws-aurora-mysql"
 	requiredParams := map[string]any{"instance_class": "db.r5.large"}
 
 	BeforeEach(func() {
@@ -38,15 +49,21 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		service := testframework.FindService(catalog, serviceName)
-		Expect(service.ID).NotTo(BeNil())
-		Expect(service.Name).NotTo(BeNil())
+		service := testframework.FindService(catalog, auroraMySQLServiceName)
+		Expect(service.ID).To(Equal(auroraMySQLServiceID))
+		Expect(service.Description).To(Equal(auroraMySQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "mysql", "aurora"))
-		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
-		Expect(service.Metadata.DisplayName).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).To(Equal(auroraMySQLServiceDisplayName))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(auroraMySQLServiceDocumentationURL))
+		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
+		Expect(service.Metadata.SupportUrl).To(Equal(auroraMySQLServiceSupportURL))
+		Expect(service.Metadata.ProviderDisplayName).To(Equal(auroraMySQLServiceProviderDisplayName))
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
+				MatchFields(IgnoreExtras, Fields{
+					ID:   Equal(auroraMySQLCustomPlanID),
+					Name: Equal(auroraMySQLCustomPlanName),
+				}),
 			),
 		)
 	})
@@ -54,7 +71,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("should check property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(serviceName, "custom-sample", params)
+				_, err := broker.Provision(auroraMySQLServiceName, "custom-sample", params)
 
 				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 			},
@@ -106,7 +123,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", requiredParams)
+			instanceID, err := broker.Provision(auroraMySQLServiceName, "custom-sample", requiredParams)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(SatisfyAll(
@@ -139,7 +156,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		})
 
 		It("should allow properties to be set on provision", func() {
-			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+			_, err := broker.Provision(auroraMySQLServiceName, "custom-sample", map[string]any{
 				"instance_name":                         "csb-aurora-mysql-fake-name",
 				"cluster_instances":                     12,
 				"region":                                "africa-north-4",
@@ -209,7 +226,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", requiredParams)
+			instanceID, err = broker.Provision(auroraMySQLServiceName, "custom-sample", requiredParams)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -217,7 +234,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		DescribeTable(
 			"preventing updates with `prohibit_update` as it can force resource replacement or re-creation",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
+				err := broker.Update(instanceID, auroraMySQLServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -240,7 +257,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		DescribeTable(
 			"allowed updates",
 			func(prop string, value any) {
-				Expect(broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})).To(Succeed())
+				Expect(broker.Update(instanceID, auroraMySQLServiceName, "custom-sample", map[string]any{prop: value})).To(Succeed())
 			},
 			Entry("cluster_instances", "cluster_instances", 11),
 			Entry("serverless_min_capacity", "serverless_min_capacity", 1),

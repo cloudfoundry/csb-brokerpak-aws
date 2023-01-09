@@ -9,13 +9,25 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+const (
+	auroraPostgreSQLServiceID                  = "36203e40-2945-11ed-8980-eb81bd131a02"
+	auroraPostgreSQLServiceName                = "csb-aws-aurora-postgresql"
+	auroraPostgreSQLServiceDescription         = "Amazon Aurora for PostgreSQL"
+	auroraPostgreSQLServiceDisplayName         = "Amazon Aurora for PostgreSQL"
+	auroraPostgreSQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html"
+	auroraPostgreSQLServiceSupportURL          = "https://aws.amazon.com/rds/aurora/"
+	auroraPostgreSQLServiceProviderDisplayName = "VMware"
+	auroraPostgreSQLCustomPlanName             = "custom-sample"
+	auroraPostgreSQLCustomPlanID               = "d20c5cf2-29e1-11ed-93da-1f3a67a06903"
+)
+
 var customAuroraPostgresPlans = []map[string]any{
 	customAuroraPostgresPlan,
 }
 
 var customAuroraPostgresPlan = map[string]any{
-	"name":        "custom-sample",
-	"id":          "d20c5cf2-29e1-11ed-93da-1f3a67a06903",
+	"name":        auroraPostgreSQLCustomPlanName,
+	"id":          auroraPostgreSQLCustomPlanID,
 	"description": "Default Aurora Postgres plan",
 	"metadata": map[string]any{
 		"displayName": "custom-sample",
@@ -23,8 +35,6 @@ var customAuroraPostgresPlan = map[string]any{
 }
 
 var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
-	const serviceName = "csb-aws-aurora-postgresql"
-
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -37,15 +47,21 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		service := testframework.FindService(catalog, serviceName)
-		Expect(service.ID).NotTo(BeNil())
-		Expect(service.Name).NotTo(BeNil())
+		service := testframework.FindService(catalog, auroraPostgreSQLServiceName)
+		Expect(service.ID).To(Equal(auroraPostgreSQLServiceID))
+		Expect(service.Description).To(Equal(auroraPostgreSQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "postgres", "postgresql", "aurora"))
-		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
-		Expect(service.Metadata.DisplayName).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).To(Equal(auroraPostgreSQLServiceDisplayName))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(auroraPostgreSQLServiceDocumentationURL))
+		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
+		Expect(service.Metadata.SupportUrl).To(Equal(auroraPostgreSQLServiceSupportURL))
+		Expect(service.Metadata.ProviderDisplayName).To(Equal(auroraPostgreSQLServiceProviderDisplayName))
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
+				MatchFields(IgnoreExtras, Fields{
+					ID:   Equal(auroraPostgreSQLCustomPlanID),
+					Name: Equal(auroraPostgreSQLCustomPlanName),
+				}),
 			),
 		)
 	})
@@ -53,7 +69,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("should check property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(serviceName, "custom-sample", params)
+				_, err := broker.Provision(auroraPostgreSQLServiceName, "custom-sample", params)
 
 				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 			},
@@ -105,7 +121,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+			instanceID, err := broker.Provision(auroraPostgreSQLServiceName, "custom-sample", map[string]any{
 				"engine_version": "13.7",
 				"instance_class": "db.r5.large",
 			})
@@ -141,7 +157,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		})
 
 		It("should allow properties to be set on provision", func() {
-			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+			_, err := broker.Provision(auroraPostgreSQLServiceName, "custom-sample", map[string]any{
 				"instance_name":                         "csb-aurora-postgres-fake-name",
 				"db_name":                               "fakedbname",
 				"region":                                "africa-north-4",
@@ -207,7 +223,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", map[string]any{
+			instanceID, err = broker.Provision(auroraPostgreSQLServiceName, "custom-sample", map[string]any{
 				"engine_version": "13.7",
 				"instance_class": "db.r5.large",
 			})
@@ -218,7 +234,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		DescribeTable(
 			"preventing updates with `prohibit_update` as it can force resource replacement or re-creation",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
+				err := broker.Update(instanceID, auroraPostgreSQLServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -241,7 +257,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		DescribeTable(
 			"allowed updates",
 			func(prop string, value any) {
-				Expect(broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})).To(Succeed())
+				Expect(broker.Update(instanceID, auroraPostgreSQLServiceName, "custom-sample", map[string]any{prop: value})).To(Succeed())
 			},
 			Entry("cluster_instances", "cluster_instances", 11),
 			Entry("serverless_min_capacity", "serverless_min_capacity", 1),

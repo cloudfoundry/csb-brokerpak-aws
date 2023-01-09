@@ -9,13 +9,25 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+const (
+	postgreSQLServiceID                  = "fa6334bc-5314-4b63-8a74-c0e4b638c950"
+	postgreSQLServiceName                = "csb-aws-postgresql"
+	postgreSQLServiceDescription         = "CSB Amazon RDS for PostgreSQL"
+	postgreSQLServiceDisplayName         = "CSB Amazon RDS for PostgreSQL"
+	postgreSQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-postgres.html"
+	postgreSQLServiceSupportURL          = "https://aws.amazon.com/rds/postgresql/"
+	postgreSQLServiceProviderDisplayName = "VMware"
+	postgreSQLCustomPlanName             = "custom-sample"
+	postgreSQLCustomPlanID               = "de7dbcee-1c8d-11ed-9904-5f435c1e2316"
+)
+
 var customPostgresPlans = []map[string]any{
 	customPostgresPlan,
 }
 
 var customPostgresPlan = map[string]any{
-	"name":        "custom-sample",
-	"id":          "de7dbcee-1c8d-11ed-9904-5f435c1e2316",
+	"name":        postgreSQLCustomPlanName,
+	"id":          postgreSQLCustomPlanID,
 	"description": "Default Postgres plan",
 	"metadata": map[string]any{
 		"displayName": "custom-sample",
@@ -26,8 +38,6 @@ var customPostgresPlan = map[string]any{
 }
 
 var _ = Describe("Postgresql", Label("Postgresql"), func() {
-	const serviceName = "csb-aws-postgresql"
-
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -40,15 +50,21 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		service := testframework.FindService(catalog, serviceName)
-		Expect(service.ID).NotTo(BeNil())
-		Expect(service.Name).NotTo(BeNil())
+		service := testframework.FindService(catalog, postgreSQLServiceName)
+		Expect(service.ID).To(Equal(postgreSQLServiceID))
+		Expect(service.Description).To(Equal(postgreSQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "postgres", "postgresql"))
-		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
-		Expect(service.Metadata.DisplayName).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).To(Equal(postgreSQLServiceDisplayName))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(postgreSQLServiceDocumentationURL))
+		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
+		Expect(service.Metadata.SupportUrl).To(Equal(postgreSQLServiceSupportURL))
+		Expect(service.Metadata.ProviderDisplayName).To(Equal(postgreSQLServiceProviderDisplayName))
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-sample")}),
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal(postgreSQLCustomPlanName),
+					ID:   Equal(postgreSQLCustomPlanID),
+				}),
 			),
 		)
 	})
@@ -56,7 +72,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(serviceName, "custom-sample", params)
+				_, err := broker.Provision(postgreSQLServiceName, "custom-sample", params)
 
 				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 			},
@@ -88,7 +104,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err := broker.Provision(postgreSQLServiceName, "custom-sample", nil)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -132,7 +148,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		})
 
 		It("should allow properties to be set on provision", func() {
-			_, err := broker.Provision(serviceName, "custom-sample", map[string]any{
+			_, err := broker.Provision(postgreSQLServiceName, "custom-sample", map[string]any{
 				"require_ssl":                           true,
 				"storage_type":                          "gp2",
 				"provider_verify_certificate":           false,
@@ -210,14 +226,14 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(serviceName, "custom-sample", nil)
+			instanceID, err = broker.Provision(postgreSQLServiceName, "custom-sample", nil)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
+				err := broker.Update(instanceID, postgreSQLServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -238,7 +254,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		DescribeTable(
 			"some allowed updates",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, serviceName, "custom-sample", map[string]any{prop: value})
+				err := broker.Update(instanceID, postgreSQLServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).NotTo(HaveOccurred())
 			},
