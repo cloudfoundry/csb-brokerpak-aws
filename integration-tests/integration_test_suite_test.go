@@ -18,6 +18,8 @@ func TestIntegrationTests(t *testing.T) {
 const (
 	awsSecretAccessKey = "aws-secret-access-key"
 	awsAccessKeyID     = "aws-access-key-id"
+	Name               = "Name"
+	ID                 = "ID"
 )
 
 var (

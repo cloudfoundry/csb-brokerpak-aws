@@ -9,14 +9,28 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+const (
+	s3ServiceID                  = "ffe28d48-c235-4e07-9c51-ddff5699e48c"
+	s3ServiceName                = "csb-aws-s3-bucket"
+	s3ServiceDescription         = "CSB AWS S3 Bucket"
+	s3ServiceDisplayName         = "CSB AWS S3 Bucket"
+	s3ServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-s3.html"
+	s3ServiceSupportURL          = "https://aws.amazon.com/s3/"
+	s3ServiceProviderDisplayName = "VMware"
+	s3CustomPlanName             = "custom-sample"
+	s3CustomPlanID               = "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc3"
+	s3CustomPlanWithACLName      = "custom-plan-with-acl"
+	s3CustomPlanWithACLID        = "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc4"
+)
+
 var customS3Plans = []map[string]any{
 	customS3Plan,
 	customS3PlanWithACL,
 }
 
 var customS3Plan = map[string]any{
-	"name":        "custom-plan",
-	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc3",
+	"name":        s3CustomPlanName,
+	"id":          s3CustomPlanID,
 	"description": "custom S3 plan defined by customer",
 	"metadata": map[string]any{
 		"displayName": "custom S3 service",
@@ -24,9 +38,9 @@ var customS3Plan = map[string]any{
 }
 
 var customS3PlanWithACL = map[string]any{
-	"name":        "custom-plan-with-acl",
+	"name":        s3CustomPlanWithACLName,
 	"acl":         "private",
-	"id":          "9dfa265e-1c4d-40c6-ade6-b341ffd6ccc4",
+	"id":          s3CustomPlanWithACLID,
 	"description": "custom S3 plan defined by customer specifying acl",
 	"metadata": map[string]any{
 		"displayName": "custom S3 service with acl",
@@ -34,7 +48,6 @@ var customS3PlanWithACL = map[string]any{
 }
 
 var _ = Describe("S3", Label("s3"), func() {
-	const s3ServiceName = "csb-aws-s3-bucket"
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -48,15 +61,24 @@ var _ = Describe("S3", Label("s3"), func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		service := testframework.FindService(catalog, s3ServiceName)
-		Expect(service.ID).NotTo(BeNil())
-		Expect(service.Name).NotTo(BeNil())
+		Expect(service.ID).To(Equal(s3ServiceID))
+		Expect(service.Description).To(Equal(s3ServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "s3"))
-		Expect(service.Metadata.ImageUrl).NotTo(BeNil())
-		Expect(service.Metadata.DisplayName).NotTo(BeNil())
+		Expect(service.Metadata.DisplayName).To(Equal(s3ServiceDisplayName))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(s3ServiceDocumentationURL))
+		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
+		Expect(service.Metadata.SupportUrl).To(Equal(s3ServiceSupportURL))
+		Expect(service.Metadata.ProviderDisplayName).To(Equal(s3ServiceProviderDisplayName))
 		Expect(service.Plans).To(
 			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan")}),
-				MatchFields(IgnoreExtras, Fields{"Name": Equal("custom-plan-with-acl")}),
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal(s3CustomPlanName),
+					ID:   Equal(s3CustomPlanID),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal(s3CustomPlanWithACLName),
+					ID:   Equal(s3CustomPlanWithACLID),
+				}),
 			),
 		)
 	})
