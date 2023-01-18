@@ -8,11 +8,12 @@ import (
 type AppCode string
 
 const (
-	MySQL      AppCode = "mysqlapp"
-	PostgreSQL AppCode = "postgresqlapp"
-	Redis      AppCode = "redisapp"
-	S3         AppCode = "s3app"
-	DynamoDB   AppCode = "dynamodbapp"
+	MySQL               AppCode = "mysqlapp"
+	PostgreSQL          AppCode = "postgresqlapp"
+	Redis               AppCode = "redisapp"
+	S3                  AppCode = "s3app"
+	DynamoDB            AppCode = "dynamodbapp"
+	JDBCTestAppPostgres AppCode = "jdbctestapp/jdbctestapp-postgres-1.0.0.jar"
 )
 
 func (a AppCode) Dir() string {
@@ -28,5 +29,10 @@ func (a AppCode) Dir() string {
 }
 
 func WithApp(app AppCode) Option {
-	return WithPreBuild(app.Dir())
+	switch app {
+	case JDBCTestAppPostgres:
+		return WithDir(app.Dir())
+	default:
+		return WithPreBuild(app.Dir())
+	}
 }
