@@ -31,7 +31,7 @@ output "uri" {
 output "port" { value = local.port }
 output "jdbcUrl" {
   value = format(
-    "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026sslMode=VERIFY_CA",
+    "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSsl=true",
     var.hostname,
     local.port,
     var.db_name,

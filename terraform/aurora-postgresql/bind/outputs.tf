@@ -18,12 +18,13 @@ output "uri" {
 output "port" { value = var.port }
 output "jdbcUrl" {
   value = format(
-    "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026ssl=true",
+    "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026ssl=true\u0026sslfactory=org.postgresql.ssl.DefaultJavaSSLFactory%s",
     var.reader_endpoint ? var.reader_hostname : var.hostname,
     var.port,
     var.name,
     csbpg_binding_user.new_user.username,
     csbpg_binding_user.new_user.password,
+    var.reader_endpoint ? "\u0026readOnly=true" : ""
   )
   sensitive = true
 }

@@ -1,0 +1,9 @@
+---
+applications:
+- name: jdbctestapp-mysql
+  path: apps/jdbctestapp/jdbctestapp-mysql-1.0.0.jar
+  buildpacks:
+  - java_buildpack_offline
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 17.+ } }'
+    JBP_CONFIG_SPRING_AUTO_RECONFIGURATION: '{ enabled: false }'

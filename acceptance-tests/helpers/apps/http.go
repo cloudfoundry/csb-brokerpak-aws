@@ -37,6 +37,19 @@ func (a *App) PUT(data, format string, s ...any) {
 	Expect(response).To(HaveHTTPStatus(http.StatusCreated, http.StatusOK))
 }
 
+func (a *App) POST(data, format string, s ...any) *http.Response {
+	url := a.urlf(format, s...)
+	fmt.Fprintf(GinkgoWriter, "HTTP POST: %s\n", url)
+	fmt.Fprintf(GinkgoWriter, "Sending data: %s\n", data)
+	request, err := http.NewRequest(http.MethodPost, url, strings.NewReader(data))
+	Expect(err).NotTo(HaveOccurred())
+	request.Header.Set("Content-Type", "application/json")
+	response, err := http.DefaultClient.Do(request)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(response).To(HaveHTTPStatus(http.StatusCreated, http.StatusOK))
+	return response
+}
+
 func (a *App) DELETE(format string, s ...any) {
 	url := a.urlf(format, s...)
 	fmt.Fprintf(GinkgoWriter, "HTTP DELETE: %s\n", url)
