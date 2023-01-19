@@ -3,8 +3,6 @@ package acceptance_tests_test
 import (
 	"encoding/json"
 	"io"
-	"os"
-	"path"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -17,7 +15,7 @@ import (
 )
 
 var _ = Describe("PostgreSQL", Label("postgresql"), func() {
-	It("can be accessed by an app", Label("JDBC"), func() {
+	It("can be accessed by an app", Label("JDBC-p"), func() {
 		var (
 			userIn, userOut jdbcapp.AppResponseUser
 			sslInfo         jdbcapp.PostgresSSLInfo
@@ -28,11 +26,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app")
-		testExecutable, err := os.Executable()
-		Expect(err).NotTo(HaveOccurred())
-
-		testPath := path.Dir(testExecutable)
-		appManifest := path.Join(testPath, "apps", "jdbctestapp", "manifest.yml")
+		appManifest := jdbcapp.ManifestFor(jdbcapp.PostgreSQL)
 		appOne := apps.Push(apps.WithApp(apps.JDBCTestAppPostgres), apps.WithManifest(appManifest))
 		appTwo := apps.Push(apps.WithApp(apps.JDBCTestAppPostgres), apps.WithManifest(appManifest))
 		defer apps.Delete(appOne, appTwo)

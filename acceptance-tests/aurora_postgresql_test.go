@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
-	"path"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -18,7 +16,7 @@ import (
 )
 
 var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
-	It("can be accessed by an app", Label("JDBC"), func() {
+	It("can be accessed by an app", Label("JDBC-p"), func() {
 		var (
 			userIn, userOut jdbcapp.AppResponseUser
 			sslInfo         jdbcapp.PostgresSSLInfo
@@ -38,11 +36,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted apps")
-		testExecutable, err := os.Executable()
-		Expect(err).NotTo(HaveOccurred())
-
-		testPath := path.Dir(testExecutable)
-		manifest := path.Join(testPath, "apps", "jdbctestapp", "manifest.yml")
+		manifest := jdbcapp.ManifestFor(jdbcapp.PostgreSQL)
 		appWriter := apps.Push(apps.WithApp(apps.JDBCTestAppPostgres), apps.WithManifest(manifest))
 		appReader := apps.Push(apps.WithApp(apps.JDBCTestAppPostgres), apps.WithManifest(manifest))
 		defer apps.Delete(appWriter, appReader)
