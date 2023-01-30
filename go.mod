@@ -8,7 +8,7 @@ require (
 	github.com/cloudfoundry/cloud-service-broker v0.15.0
 	github.com/hashicorp/terraform-json v0.14.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/onsi/ginkgo/v2 v2.7.0
+	github.com/onsi/ginkgo/v2 v2.8.0
 	github.com/onsi/gomega v1.25.0
 	github.com/otiai10/copy v1.9.0
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
