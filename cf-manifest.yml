@@ -19,7 +19,7 @@ applications:
 - name: ((app))
   command: ./cloud-service-broker serve
   memory: 2G
-  disk_quota: 3G
+  disk_quota: 2G
   buildpacks: 
   - binary_buildpack
   random-route: true
