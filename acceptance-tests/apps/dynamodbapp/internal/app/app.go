@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/gorilla/mux"
 )
 
-func App(creds appcreds.DynamoDBService) *mux.Router {
+func App(creds appcreds.DynamoDBService) http.HandlerFunc {
 	cfg, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithCredentialsProvider(
@@ -33,13 +33,20 @@ func App(creds appcreds.DynamoDBService) *mux.Router {
 	}
 
 	client := dynamodb.NewFromConfig(cfg)
-	r := mux.NewRouter()
 
-	r.HandleFunc("/", aliveness).Methods(http.MethodHead, http.MethodGet)
-	r.HandleFunc("/{key}", handleSet(client, creds)).Methods(http.MethodPut)
-	r.HandleFunc("/{key}", handleGet(client, creds)).Methods(http.MethodGet)
-
-	return r
+	return func(w http.ResponseWriter, r *http.Request) {
+		key := strings.Trim(r.URL.Path, "/")
+		switch r.Method {
+		case http.MethodHead:
+			aliveness(w, r)
+		case http.MethodGet:
+			handleGet(w, r, key, client, creds)
+		case http.MethodPut:
+			handleSet(w, r, key, client, creds)
+		default:
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		}
+	}
 }
 
 func aliveness(w http.ResponseWriter, r *http.Request) {

@@ -6,15 +6,15 @@ import (
 	"log"
 	"net/http"
 	appcreds "s3app/internal/credentials"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/gorilla/mux"
 )
 
-func App(creds appcreds.S3Service) *mux.Router {
+func App(creds appcreds.S3Service) http.HandlerFunc {
 	cfg, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithCredentialsProvider(
@@ -34,14 +34,21 @@ func App(creds appcreds.S3Service) *mux.Router {
 
 	client := s3.NewFromConfig(cfg)
 
-	r := mux.NewRouter()
-
-	r.HandleFunc("/", aliveness).Methods(http.MethodHead, http.MethodGet)
-	r.HandleFunc("/{file_name}", handleUpload(client, creds)).Methods(http.MethodPut)
-	r.HandleFunc("/{file_name}", handleDownload(client, creds)).Methods(http.MethodGet)
-	r.HandleFunc("/{file_name}", handleDelete(client, creds)).Methods(http.MethodDelete)
-
-	return r
+	return func(w http.ResponseWriter, r *http.Request) {
+		filename := strings.Trim(r.URL.Path, "/")
+		switch r.Method {
+		case http.MethodHead:
+			aliveness(w, r)
+		case http.MethodPut:
+			handleUpload(w, r, filename, client, creds)
+		case http.MethodGet:
+			handleDownload(w, r, filename, client, creds)
+		case http.MethodDelete:
+			handleDelete(w, r, filename, client, creds)
+		default:
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		}
+	}
 }
 
 func aliveness(w http.ResponseWriter, r *http.Request) {
