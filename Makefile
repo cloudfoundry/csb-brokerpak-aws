@@ -7,7 +7,7 @@ help: ## list Makefile targets
 
 ###### Setup ##################################################################
 IAAS=aws
-GO-VERSION = 1.20
+GO-VERSION = 1.20.1
 GO-VER = go$(GO-VERSION)
 CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
 CSB_RELEASE_VERSION := $(CSB_VERSION) # this doesnt work well if we did make latest-csb.
