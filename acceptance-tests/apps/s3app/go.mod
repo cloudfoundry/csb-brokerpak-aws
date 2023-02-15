@@ -8,7 +8,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.12
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.2
 	github.com/cloudfoundry-community/go-cfenv v1.18.0
-	github.com/gorilla/mux v1.8.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
