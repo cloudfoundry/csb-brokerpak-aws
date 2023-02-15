@@ -1,41 +1,28 @@
 package app
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/gorilla/mux"
 )
 
-func handleSet(client *redis.Client) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Handling set.")
+func handleSet(w http.ResponseWriter, r *http.Request, key string, client *redis.Client) {
+	log.Println("Handling set.")
 
-		key, ok := mux.Vars(r)["key"]
-		if !ok {
-			log.Println("Key missing.")
-			http.Error(w, "Key missing.", http.StatusBadRequest)
-			return
-		}
-
-		rawValue, err := io.ReadAll(r.Body)
-		if err != nil {
-			log.Printf("Error parsing value: %s", err)
-			http.Error(w, "Failed to parse value.", http.StatusBadRequest)
-			return
-		}
-
-		value := string(rawValue)
-		if err := client.Set(r.Context(), key, value, 0).Err(); err != nil {
-			log.Printf("Error setting key %q to value %q: %s", key, value, err)
-			http.Error(w, fmt.Sprintf("Failed to set value: %s", err), http.StatusFailedDependency)
-			return
-		}
-
-		w.WriteHeader(http.StatusCreated)
-		log.Printf("Key %q set to value %q.", key, value)
+	rawValue, err := io.ReadAll(r.Body)
+	if err != nil {
+		fail(w, http.StatusBadRequest, "Error parsing value: %s", err)
+		return
 	}
+
+	value := string(rawValue)
+	if err := client.Set(r.Context(), key, value, 0).Err(); err != nil {
+		fail(w, http.StatusFailedDependency, "Failed to set value: %s", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	log.Printf("Key %q set to value %q.", key, value)
 }

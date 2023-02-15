@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"mysqlapp/internal/connector"
-
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -17,13 +16,20 @@ const (
 	tlsQueryParam = "tls"
 )
 
-func App(conn *connector.Connector) *mux.Router {
-	r := mux.NewRouter()
-	r.HandleFunc("/", aliveness).Methods("HEAD", "GET")
-	r.HandleFunc("/{key}", handleSet(conn)).Methods("PUT")
-	r.HandleFunc("/{key}", handleGet(conn)).Methods("GET")
-
-	return r
+func App(conn *connector.Connector) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		key := strings.Trim(r.URL.Path, "/")
+		switch r.Method {
+		case http.MethodHead:
+			aliveness(w, r)
+		case http.MethodGet:
+			handleGet(w, r, key, conn)
+		case http.MethodPut:
+			handleSet(w, r, key, conn)
+		default:
+			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		}
+	}
 }
 
 func aliveness(w http.ResponseWriter, r *http.Request) {
