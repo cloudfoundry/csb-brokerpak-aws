@@ -103,26 +103,40 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				map[string]any{"instance_name": ".aaaaa"},
 				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
-			Entry(
-				"cache_size cannot be changed",
-				map[string]any{"cache_size": "3"},
-				"plan defined properties cannot be changed",
-			),
-			Entry(
-				"redis_version cannot be changed",
-				map[string]any{"redis_version": "4.0"},
-				"plan defined properties cannot be changed",
-			),
-			Entry(
-				"node_count cannot be changed",
-				map[string]any{"node_count": "5"},
-				"plan defined properties cannot be changed",
-			),
-			Entry(
-				"labels can't be provided at provisioning time",
-				map[string]any{"labels": stringOfLen(99)},
-				"additional properties are not allowed",
-			),
+		)
+
+		DescribeTable(
+			"should prevent modifying `plan defined properties`",
+			func(prop string, value any) {
+				_, err := broker.Provision(redisServiceName, "small", map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"plan defined properties cannot be changed",
+					),
+				))
+
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
+			},
+			Entry("cache_size", "cache_size", 9),
+			Entry("node_count", "node_count", 5),
+			Entry("redis_version", "redis_version", "4.0"),
+		)
+
+		DescribeTable(
+			"should disallow `user_input` properties with the same name as some `computed_input` for clarity",
+			func(prop string, value any) {
+				_, err := broker.Provision(redisServiceName, "small", map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"additional properties are not allowed",
+					),
+				))
+
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
+			},
+			Entry("labels", "labels", "a-valid-list-of-labels"),
 		)
 
 		DescribeTable("currently doesn't provide validations constraints for some properties",
@@ -154,7 +168,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					//HaveKeyWithValue("instance_name", instanceID),
+					HaveKey("instance_name"),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
@@ -242,7 +256,9 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
+			Entry("cache_size", "cache_size", 9),
 			Entry("node_count", "node_count", 3),
+			Entry("redis_version", "redis_version", "4.0"),
 		)
 
 		DescribeTable(
