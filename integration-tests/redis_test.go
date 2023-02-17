@@ -78,10 +78,116 @@ var _ = Describe("Redis", Label("Redis"), func() {
 	})
 
 	Describe("provisioning", func() {
-		It("should check region constraints", func() {
-			_, err := broker.Provision(redisServiceName, "small", map[string]any{"region": "-Asia-northeast1"})
+		DescribeTable("should check property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(redisServiceName, "small", params)
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+			Entry(
+				"instance name minimum length is 6 characters",
+				map[string]any{"instance_name": stringOfLen(5)},
+				"instance_name: String length must be greater than or equal to 6",
+			),
+			Entry(
+				"instance name maximum length is 40 characters",
+				map[string]any{"instance_name": stringOfLen(41)},
+				"instance_name: String length must be less than or equal to 40",
+			),
+			Entry(
+				"instance name invalid characters",
+				map[string]any{"instance_name": ".aaaaa"},
+				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+		)
 
-			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
+		DescribeTable(
+			"should prevent modifying `plan defined properties`",
+			func(prop string, value any) {
+				_, err := broker.Provision(redisServiceName, "small", map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"plan defined properties cannot be changed",
+					),
+				))
+
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
+			},
+			Entry("cache_size", "cache_size", 9),
+			Entry("node_count", "node_count", 5),
+			Entry("redis_version", "redis_version", "4.0"),
+		)
+
+		DescribeTable(
+			"should disallow `user_input` properties with the same name as some `computed_input` for clarity",
+			func(prop string, value any) {
+				_, err := broker.Provision(redisServiceName, "small", map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"additional properties are not allowed",
+					),
+				))
+
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
+			},
+			Entry("labels", "labels", "a-valid-list-of-labels"),
+		)
+
+		It("should provision a plan", func() {
+			instanceID, err := broker.Provision(redisServiceName, "small", map[string]any{})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKey("instance_name"),
+					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
+					HaveKeyWithValue("node_count", BeNumerically("==", 1)),
+					HaveKeyWithValue("redis_version", "6.0"),
+					HaveKeyWithValue("aws_vpc_id", BeEmpty()),
+					HaveKeyWithValue("node_type", BeEmpty()),
+					HaveKeyWithValue("elasticache_subnet_group", BeEmpty()),
+					HaveKeyWithValue("elasticache_vpc_security_group_ids", BeEmpty()),
+					HaveKeyWithValue("aws_access_key_id", "aws-access-key-id"),
+					HaveKeyWithValue("aws_secret_access_key", "aws-secret-access-key"),
+				))
+		})
+
+		It("should allow properties to be set on provision", func() {
+			_, err := broker.Provision(redisServiceName, "small", map[string]any{
+				"instance_name":                      "some-valid-instance-name",
+				"region":                             "some-valid-region",
+				"aws_vpc_id":                         "some-valid-aws-vpc-id",
+				"node_type":                          "some-valid-node-type",
+				"elasticache_subnet_group":           "some-valid-elasticache-subnet-group",
+				"elasticache_vpc_security_group_ids": "some-valid-elasticache-vpc-security-group-ids",
+				"aws_access_key_id":                  "some-valid-aws-access-key-id",
+				"aws_secret_access_key":              "some-valid-aws-secret-access-key",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("node_count", BeNumerically("==", 1)),
+					HaveKeyWithValue("redis_version", "6.0"),
+					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
+					HaveKeyWithValue("instance_name", "some-valid-instance-name"),
+					HaveKeyWithValue("region", "some-valid-region"),
+					HaveKeyWithValue("aws_vpc_id", "some-valid-aws-vpc-id"),
+					HaveKeyWithValue("node_type", "some-valid-node-type"),
+					HaveKeyWithValue("elasticache_subnet_group", "some-valid-elasticache-subnet-group"),
+					HaveKeyWithValue("elasticache_vpc_security_group_ids", "some-valid-elasticache-vpc-security-group-ids"),
+					HaveKeyWithValue("aws_access_key_id", "some-valid-aws-access-key-id"),
+					HaveKeyWithValue("aws_secret_access_key", "some-valid-aws-secret-access-key"),
+				),
+			)
 		})
 	})
 
@@ -95,17 +201,55 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		It("should prevent updating region because it is flagged as `prohibit_update` and it can result in the recreation of the service instance and lost data", func() {
-			err := broker.Update(instanceID, redisServiceName, "small", map[string]any{"region": "no-matter-what-region"})
+		DescribeTable(
+			"preventing updates with `prohibit_update` as it can force resource replacement or re-creation",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, redisServiceName, "small", map[string]any{prop: value})
 
-			Expect(err).To(MatchError(
-				ContainSubstring(
-					"attempt to update parameter that may result in service instance re-creation and data loss",
-				),
-			))
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
 
-			const initialProvisionInvocation = 1
-			Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
-		})
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("region", "region", "any-valid-value"),
+			Entry("instance_name", "instance_name", "any-valid-instance-name"),
+		)
+
+		DescribeTable(
+			"preventing updates for `plan defined properties` by design",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, redisServiceName, "small", map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"plan defined properties cannot be changed",
+					),
+				))
+
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("cache_size", "cache_size", 9),
+			Entry("node_count", "node_count", 3),
+			Entry("redis_version", "redis_version", "4.0"),
+		)
+
+		DescribeTable(
+			"allowed updates",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, redisServiceName, "small", map[string]any{prop: value})
+				Expect(err).ToNot(HaveOccurred())
+			},
+			Entry("aws_access_key_id", "aws_access_key_id", "any-valid-aws-access-key-id"),
+			Entry("aws_secret_access_key", "aws_secret_access_key", "any-valid-aws-secret-access-key"),
+			Entry("aws_vpc_id", "aws_vpc_id", "any-valid-aws-vpc-id"),
+			Entry("node_type", "node_type", "any-valid-node-type"),
+			Entry("elasticache_subnet_group", "elasticache_subnet_group", "any-valid-elasticache-subnet-group"),
+			Entry("elasticache_vpc_security_group_ids", "elasticache_vpc_security_group_ids", "any-valid-elasticache-vpc-security-group-ids"),
+		)
 	})
 })
