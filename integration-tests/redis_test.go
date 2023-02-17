@@ -95,7 +95,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			),
 			Entry(
 				"instance name maximum length is 40 characters",
-				map[string]any{"instance_name": stringOfLen(99)},
+				map[string]any{"instance_name": stringOfLen(41)},
 				"instance_name: String length must be less than or equal to 40",
 			),
 			Entry(
@@ -137,29 +137,6 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(0))
 			},
 			Entry("labels", "labels", "a-valid-list-of-labels"),
-		)
-
-		DescribeTable("currently doesn't provide validations constraints for some properties",
-			func(params map[string]any) {
-				_, err := broker.Provision(redisServiceName, "small", params)
-				Expect(err).NotTo(HaveOccurred())
-			},
-			Entry(
-				"aws_vpc_id is never validated by the brokerpak logic",
-				map[string]any{"aws_vpc_id": stringOfLen(99)},
-			),
-			Entry(
-				"node_type is never validated by the brokerpak logic",
-				map[string]any{"node_type": stringOfLen(99)},
-			),
-			Entry(
-				"elasticache_subnet_group currently is never validated by the brokerpak logic",
-				map[string]any{"elasticache_subnet_group": stringOfLen(99)},
-			),
-			Entry(
-				"elasticache_vpc_security_group_ids is never validated by the brokerpak logic",
-				map[string]any{"elasticache_vpc_security_group_ids": stringOfLen(99)},
-			),
 		)
 
 		It("should provision a plan", func() {
