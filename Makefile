@@ -17,18 +17,10 @@ GO_OK := $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; ec
 DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
 
 ####### broker environment variables
-PAK_CACHE=/tmp/.pak-cache
-BROKERPAK_UPDATES_ENABLED := true
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
 PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 10000)
 GSB_PROVISION_DEFAULTS := $(or $(GSB_PROVISION_DEFAULTS), {"aws_vpc_id": "$(AWS_PAS_VPC_ID)"})
-GSB_COMPATIBILITY_ENABLE_BETA_SERVICES := $(or $(GSB_COMPATIBILITY_ENABLE_BETA_SERVICES), true)
-export GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS = [{"name":"default","id":"f64891b4-5021-4742-9871-dfe1a9051302","description":"Default S3 plan","display_name":"default"}]
-export GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS = [{"name":"default","id":"de7dbcee-1c8d-11ed-9904-5f435c1e2316","description":"Default Postgres plan","display_name":"default","instance_class": "db.m6i.large","postgres_version": "14.2","storage_gb": 100}]
-export GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS = [{"name":"default","id":"d20c5cf2-29e1-11ed-93da-1f3a67a06903","description":"Default Aurora Postgres plan","display_name":"default"}]
-export GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS = [{"name":"default","id":"10b2bd92-2a0b-11ed-b70f-c7c5cf3bb719","description":"Default Aurora MySQL plan","display_name":"default"}]
-export GSB_SERVICE_CSB_AWS_MYSQL_PLANS = [{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class": "db.m6i.large","mysql_version": "8.0","storage_gb": 100}]
 
 ifeq ($(GO_OK), 0)  # use local go binary
 GO=go
@@ -41,7 +33,7 @@ BROKER_GO_OPTS=PORT=8080 \
 				SECURITY_USER_PASSWORD=$(SECURITY_USER_PASSWORD) \
 				AWS_ACCESS_KEY_ID='$(AWS_ACCESS_KEY_ID)' \
 				AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
-				PAK_BUILD_CACHE_PATH=$(PAK_CACHE) \
+				PAK_BUILD_CACHE_PATH=$(PAK_BUILD_CACHE_PATH) \
 				GSB_PROVISION_DEFAULTS='$(GSB_PROVISION_DEFAULTS)' \
 				GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS='$(GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS)' \
 				GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS='$(GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS)' \
@@ -55,7 +47,7 @@ RUN_CSB=$(BROKER_GO_OPTS) go run github.com/cloudfoundry/cloud-service-broker
 LDFLAGS="-X github.com/cloudfoundry/cloud-service-broker/utils.Version=$(CSB_VERSION)"
 GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker"
 else ifeq ($(DOCKER_OK), 0)
-BROKER_DOCKER_OPTS=--rm -v $(PAK_CACHE):$(PAK_CACHE) -v $(PWD):/brokerpak -w /brokerpak --network=host  \
+BROKER_DOCKER_OPTS=--rm -v $(PAK_BUILD_CACHE_PATH):$(PAK_BUILD_CACHE_PATH) -v $(PWD):/brokerpak -w /brokerpak --network=host  \
     -p 8080:8080 \
 		-e SECURITY_USER_NAME \
 		-e SECURITY_USER_PASSWORD \
@@ -63,7 +55,7 @@ BROKER_DOCKER_OPTS=--rm -v $(PAK_CACHE):$(PAK_CACHE) -v $(PWD):/brokerpak -w /br
 		-e AWS_SECRET_ACCESS_KEY \
 		-e "DB_TYPE=sqlite3" \
 		-e "DB_PATH=/tmp/csb-db" \
-		-e PAK_BUILD_CACHE_PATH=$(PAK_CACHE) \
+		-e PAK_BUILD_CACHE_PATH=$(PAK_BUILD_CACHE_PATH) \
 		-e GSB_PROVISION_DEFAULTS \
 		-e GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS \
 		-e GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS \
@@ -78,7 +70,7 @@ RUN_CSB=docker run $(BROKER_DOCKER_OPTS) $(CSB_DOCKER_IMAGE)
 # path inside the container
 PAK_PATH=/brokerpak
 
-GO_DOCKER_OPTS=--rm -v $(PAK_CACHE):$(PAK_CACHE) -v $(PWD):/brokerpak -w /brokerpak --network=host
+GO_DOCKER_OPTS=--rm -v $(PAK_BUILD_CACHE_PATH):$(PAK_BUILD_CACHE_PATH) -v $(PWD):/brokerpak -w /brokerpak --network=host
 GO=docker run $(GO_DOCKER_OPTS) golang:latest go
 GOFMT=docker run $(GO_DOCKER_OPTS) golang:latest gofmt
 
@@ -102,7 +94,7 @@ endif
 .PHONY: build
 build: deps-go-binary $(IAAS)-services-*.brokerpak ## build brokerpak
 
-$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf | $(PAK_CACHE)
+$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf | $(PAK_BUILD_CACHE_PATH)
 	$(RUN_CSB) pak build
 
 ###### Run ###################################################################
@@ -196,8 +188,8 @@ clean: ## delete build files
 	- rm -f ./cloud-service-broker
 	- rm -f ./brokerpak-user-docs.md
 
-$(PAK_CACHE):
-	@echo "Folder $(PAK_CACHE) does not exist. Creating it..."
+$(PAK_BUILD_CACHE_PATH):
+	@echo "Folder $(PAK_BUILD_CACHE_PATH) does not exist. Creating it..."
 	mkdir -p $@
 
 .PHONY: latest-csb
