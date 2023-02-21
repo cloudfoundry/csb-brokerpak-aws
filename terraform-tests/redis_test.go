@@ -124,7 +124,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			}))
 		})
 
-		It("should not create any cluster_instance", func() {
+		It("should not create any subnet_group", func() {
 			Expect(plan.ResourceChanges).To(HaveLen(4))
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 				"aws_elasticache_replication_group",
