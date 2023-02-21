@@ -57,7 +57,9 @@ func (b Broker) releaseEnv() []apps.EnvVar {
 }
 
 func (b Broker) latestEnv() []apps.EnvVar {
-	return []apps.EnvVar{}
+	return []apps.EnvVar{
+		{Name: "GSB_SERVICE_CSB_AWS_REDIS_PLANS", Value: `[{"name":"default", "id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","cache_size":2,"redis_version":"6.x","node_count":2}]`},
+	}
 }
 
 func (b Broker) legacyMysqlEnv() []apps.EnvVar {
