@@ -43,20 +43,12 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should create the right resources", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(5))
-
-			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-				"aws_elasticache_replication_group",
-				"random_password",
-				"aws_security_group",
-				"aws_elasticache_subnet_group",
-				"aws_security_group_rule",
-			))
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(getExpectedResources()))
 		})
 
 		It("should create a aws_elasticache_replication_group with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
-				MatchKeys(AllowDuplicates, Keys{
+				MatchAllKeys(Keys{
 					"replication_group_id":       Equal("csb-redis-test"),
 					"description":                Equal("csb-redis-test redis"),
 					"node_type":                  Equal("cache.t3.medium"),
@@ -99,21 +91,15 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should not create any security groups or rules", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(3))
-			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-				"aws_elasticache_replication_group",
-				"random_password",
-				"aws_elasticache_subnet_group",
-			))
+			nosecuriryGroupsOrRules := Filter(getExpectedResources(), "aws_security_group", "aws_security_group_rule")
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(nosecuriryGroupsOrRules))
 		})
 
-		It("should use the ids passed and not create new security groups or rules", func() {
+		It("should use the elasticache_vpc_security_group_ids passed as the security_group_ids", func() {
 			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"security_group_ids": ConsistOf("group1", "group2", "group3"),
 				}))
-			Expect(ResourceCreationForType(plan, "aws_security_group")).To(BeEmpty())
-			Expect(ResourceCreationForType(plan, "aws_security_group_rule")).To(BeEmpty())
 		})
 	})
 
@@ -124,22 +110,16 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			}))
 		})
 
-		It("should not create any subnet_group", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(4))
-			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-				"aws_elasticache_replication_group",
-				"random_password",
-				"aws_security_group",
-				"aws_security_group_rule",
-			))
+		It("should not create any subnet group", func() {
+			noSubnetGroup := Filter(getExpectedResources(), "aws_elasticache_subnet_group")
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(noSubnetGroup))
 		})
 
-		It("should use the ids passed and not create new redis subnet group", func() {
+		It("should use the elasticache_subnet_group passed as the subnet_group_name", func() {
 			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"subnet_group_name": Equal("some-other-group"),
 				}))
-			Expect(ResourceCreationForType(plan, "aws_elasticache_subnet_group")).To(BeEmpty())
 		})
 	})
 
@@ -187,3 +167,15 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 	})
 })
+
+func getExpectedResources() []string {
+	// This tries to be equivalent to a constant slice.
+	// if it was a variable it could be changed accidentally.
+	return []string{
+		"aws_elasticache_replication_group",
+		"random_password",
+		"aws_security_group",
+		"aws_elasticache_subnet_group",
+		"aws_security_group_rule",
+	}
+}
