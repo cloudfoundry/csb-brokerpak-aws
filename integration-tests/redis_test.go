@@ -15,7 +15,25 @@ const (
 	redisServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html"
 	redisServiceSupportURL          = "https://aws.amazon.com/redis/"
 	redisServiceProviderDisplayName = "VMware"
+	redisCustomPlanName             = "custom-sample"
+	redisCustomPlanID               = "c7f64994-a1d9-4e1f-9491-9d8e56bbf146"
 )
+
+var customRedisPlans = []map[string]any{
+	customRedisPlan,
+}
+
+var customRedisPlan = map[string]any{
+	"name":          redisCustomPlanName,
+	"id":            redisCustomPlanID,
+	"description":   "Beta - Default Redis plan",
+	"cache_size":    2,
+	"redis_version": "6.x",
+	"node_count":    2,
+	"metadata": map[string]any{
+		"displayName": "custom-sample (Beta)",
+	},
+}
 
 var _ = Describe("Redis", Label("Redis"), func() {
 	BeforeEach(func() {
@@ -42,28 +60,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("small"),
-					ID:   Equal("ad963fcd-19f7-4b79-8e6d-645756e84f7a"),
-				}),
-				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("medium"),
-					ID:   Equal("df41095a-43e8-4be4-b4d6-ae2d8a35068d"),
-				}),
-				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("large"),
-					ID:   Equal("da4dc49c-a64f-4d2a-8490-5e456cbb0577"),
-				}),
-				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("small-ha"),
-					ID:   Equal("70544df7-0ac4-4580-ba51-c1fbdd6fdfd0"),
-				}),
-				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("medium-ha"),
-					ID:   Equal("a4235008-80f4-4053-924b-defcce17cb63"),
-				}),
-				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("large-ha"),
-					ID:   Equal("f26cda6f-d4b4-473a-966c-32d238f723ef"),
+					Name: Equal("custom-sample"),
+					ID:   Equal("c7f64994-a1d9-4e1f-9491-9d8e56bbf146"),
 				}),
 			),
 		)
@@ -80,7 +78,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("should check property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(redisServiceName, "small", params)
+				_, err := broker.Provision(redisServiceName, "custom-sample", params)
 				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 			},
 			Entry(
@@ -108,7 +106,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		DescribeTable(
 			"should prevent modifying `plan defined properties`",
 			func(prop string, value any) {
-				_, err := broker.Provision(redisServiceName, "small", map[string]any{prop: value})
+				_, err := broker.Provision(redisServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -126,7 +124,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		DescribeTable(
 			"should disallow `user_input` properties with the same name as some `computed_input` for clarity",
 			func(prop string, value any) {
-				_, err := broker.Provision(redisServiceName, "small", map[string]any{prop: value})
+				_, err := broker.Provision(redisServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -140,7 +138,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(redisServiceName, "small", map[string]any{})
+			instanceID, err := broker.Provision(redisServiceName, "custom-sample", map[string]any{})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -149,8 +147,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
 					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
-					HaveKeyWithValue("node_count", BeNumerically("==", 1)),
-					HaveKeyWithValue("redis_version", "6.0"),
+					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
+					HaveKeyWithValue("redis_version", "6.x"),
 					HaveKeyWithValue("aws_vpc_id", BeEmpty()),
 					HaveKeyWithValue("node_type", BeEmpty()),
 					HaveKeyWithValue("elasticache_subnet_group", BeEmpty()),
@@ -161,7 +159,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		})
 
 		It("should allow properties to be set on provision", func() {
-			_, err := broker.Provision(redisServiceName, "small", map[string]any{
+			_, err := broker.Provision(redisServiceName, "custom-sample", map[string]any{
 				"instance_name":                      "some-valid-instance-name",
 				"region":                             "some-valid-region",
 				"aws_vpc_id":                         "some-valid-aws-vpc-id",
@@ -175,8 +173,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
-					HaveKeyWithValue("node_count", BeNumerically("==", 1)),
-					HaveKeyWithValue("redis_version", "6.0"),
+					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
+					HaveKeyWithValue("redis_version", "6.x"),
 					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
 					HaveKeyWithValue("instance_name", "some-valid-instance-name"),
 					HaveKeyWithValue("region", "some-valid-region"),
@@ -196,7 +194,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(redisServiceName, "small", nil)
+			instanceID, err = broker.Provision(redisServiceName, "custom-sample", nil)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -204,7 +202,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		DescribeTable(
 			"preventing updates with `prohibit_update` as it can force resource replacement or re-creation",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, redisServiceName, "small", map[string]any{prop: value})
+				err := broker.Update(instanceID, redisServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -222,7 +220,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		DescribeTable(
 			"preventing updates for `plan defined properties` by design",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, redisServiceName, "small", map[string]any{prop: value})
+				err := broker.Update(instanceID, redisServiceName, "custom-sample", map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -241,7 +239,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		DescribeTable(
 			"allowed updates",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, redisServiceName, "small", map[string]any{prop: value})
+				err := broker.Update(instanceID, redisServiceName, "custom-sample", map[string]any{prop: value})
 				Expect(err).ToNot(HaveOccurred())
 			},
 			Entry("aws_access_key_id", "aws_access_key_id", "any-valid-aws-access-key-id"),

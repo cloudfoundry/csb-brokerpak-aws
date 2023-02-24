@@ -23,52 +23,6 @@ provider_display_name: VMware
 support_url: https://aws.amazon.com/redis/
 tags: [aws, redis, beta]
 plan_updateable: true
-plans:
-- name: small
-  id: ad963fcd-19f7-4b79-8e6d-645756e84f7a
-  description: 'Beta - Redis 6.0 with 1GB cache and 1 node.'
-  display_name: "Small (Beta)"
-  properties:
-    cache_size: 2
-    redis_version: "6.0"
-    node_count: 1
-- name: medium
-  id: df41095a-43e8-4be4-b4d6-ae2d8a35068d
-  description: 'Beta - Redis 6.0 with at least 4GB cache and 1 node.'
-  display_name: "Medium (Beta)"
-  properties:
-    cache_size: 4
-    redis_version: "6.0"
-    node_count: 1
-- name: large
-  id: da4dc49c-a64f-4d2a-8490-5e456cbb0577
-  description: 'Beta - Redis 6.0 with at least 16 GB cache and 1 node.'
-  display_name: "Large (Beta)"
-  properties:
-    cache_size: 16
-    redis_version: "6.0"
-    node_count: 1
-- name: small-ha
-  id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
-  description: 'Beta - Redis 6.0 with 1GB cache and 2 nodes.'
-  display_name: "Small HA (Beta)"
-  properties:
-    cache_size: 2
-    redis_version: "6.0"
-- name: medium-ha
-  id: a4235008-80f4-4053-924b-defcce17cb63
-  description: 'Beta - Redis 6.0 with at least 4GB cache and 2 nodes.'
-  display_name: "Medium HA (Beta)"
-  properties:
-    cache_size: 4
-    redis_version: "6.0"
-- name: large-ha
-  id: f26cda6f-d4b4-473a-966c-32d238f723ef
-  description: 'Beta - Redis 6.0 with at least 16 GB cache and 2 nodes.'
-  display_name: "Large HA (Beta)"
-  properties:
-    cache_size: 16
-    redis_version: "6.0"
 provision:
   plan_inputs:
   - field_name: cache_size
@@ -163,43 +117,23 @@ bind:
   template: ''
   outputs: []
 examples:
-- name: redis-cache-small
-  description: Small redis cache
-  plan_id: ad963fcd-19f7-4b79-8e6d-645756e84f7a
+- name: example
+  description: Create an example-plan Redis instance
+  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {}
   bind_params: {}
-- name: redis-cache-medium
-  description: Medium redis cache
-  plan_id: df41095a-43e8-4be4-b4d6-ae2d8a35068d
-  provision_params: {}
-  bind_params: {}
-- name: redis-cache-large
-  description: Large redis cache
-  plan_id: da4dc49c-a64f-4d2a-8490-5e456cbb0577
-  provision_params: {}
-  bind_params: {}
-- name: redis-cache-small-ha
-  description: Small redis cache
-  plan_id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
-  provision_params: {}
-  bind_params: {}
-- name: redis-cache-medium-ha
-  description: Medium redis cache in us-east-1 region
-  plan_id: a4235008-80f4-4053-924b-defcce17cb63
+- name: with-custom-region
+  description: Create a Redis instance with a custom region
+  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {"region": "us-east-1"}
   bind_params: {}
-- name: redis-cache-large-ha
-  description: Large redis cache
-  plan_id: f26cda6f-d4b4-473a-966c-32d238f723ef
-  provision_params: {}
-  bind_params: {}
-- name: redis-cache-tiny-ha
-  description: Tiny redis cache
-  plan_id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
+- name: with-custom-node_type
+  description: Create a Redis instance with a custom node_type
+  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {"node_type": "cache.t2.micro"}
   bind_params: {}
-- name: redis-cache-three-nodes
-  description: Tiny redis cache
-  plan_id: 70544df7-0ac4-4580-ba51-c1fbdd6fdfd0
+- name: with-custom-node_count
+  description: Create a Redis instance with a custom node_count
+  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {"node_count": 3}
   bind_params: {}

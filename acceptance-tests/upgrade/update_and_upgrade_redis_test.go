@@ -65,7 +65,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("updating the instance plan")
-			serviceInstance.Update(services.WithPlan("medium"))
+			serviceInstance.Update(services.WithPlan("default"))
 
 			By("getting the value using the second app")
 			Expect(appTwo.GET(key)).To(Equal(value))
