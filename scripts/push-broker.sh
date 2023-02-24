@@ -106,6 +106,12 @@ if [[ -z "$GSB_SERVICE_CSB_AWS_MYSQL_PLANS" ]]; then
 fi
 echo "    GSB_SERVICE_CSB_AWS_MYSQL_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_MYSQL_PLANS" | jq @json)" >>$cfmf
 
+if [[ -z "$GSB_SERVICE_CSB_AWS_REDIS_PLANS" ]]; then
+  echo "Missing GSB_SERVICE_CSB_AWS_REDIS_PLANS variable"
+  exit 1
+fi
+echo "    GSB_SERVICE_CSB_AWS_REDIS_PLANS: $(echo "$GSB_SERVICE_CSB_AWS_REDIS_PLANS" | jq @json)" >>$cfmf
+
 cf push --no-start -f "${cfmf}" --var app=${APP_NAME}
 
 if [[ -z ${MSYQL_INSTANCE} ]]; then
