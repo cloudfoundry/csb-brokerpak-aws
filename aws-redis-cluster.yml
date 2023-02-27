@@ -132,8 +132,3 @@ examples:
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {"node_type": "cache.t2.micro"}
   bind_params: {}
-- name: with-custom-node_count
-  description: Create a Redis instance with a custom node_count
-  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
-  provision_params: {"node_count": 3}
-  bind_params: {}
