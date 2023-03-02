@@ -60,6 +60,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"subnet_group_name":          Equal("csb-redis-test-p-sn"),
 					"transit_encryption_enabled": BeTrue(),
 					"automatic_failover_enabled": BeFalse(),
+					"apply_immediately":          BeTrue(),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
