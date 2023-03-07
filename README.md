@@ -57,11 +57,8 @@ The make targets will use this version by default.
 Services definitions declare examples for each plan they provide. Those examples are then run through the whole cycle of `provision`, `bind`, `unbind`, and `delete` when running
 
 ```
-terminal 1
->> make run
-
-terminal 2
->> make run-examples
+$ make examples       # Lists example tests
+$ make run-examples   # Runs example tests
 ```
 
 ## Acceptance tests
