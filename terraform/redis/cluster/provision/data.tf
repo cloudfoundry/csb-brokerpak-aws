@@ -19,6 +19,10 @@ data "aws_vpc" "vpc" {
 
 locals {
   instance_types = {
+    // The now deprecated property cache_size has a new default value of -1
+    // which we are mapping to the empty string. This way we minimise code changes
+    // while still can detect when node_type ends up being empty or unspecified
+    -1 = ""
     // https://aws.amazon.com/elasticache/pricing
     1   = "cache.t2.small"
     2   = "cache.t3.medium"

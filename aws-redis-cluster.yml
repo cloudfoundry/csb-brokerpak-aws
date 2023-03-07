@@ -26,13 +26,8 @@ plan_updateable: true
 provision:
   plan_inputs:
   - field_name: cache_size
-    required: true
     type: integer
-    details: Cache size in GB
-    constraints:
-      maximum: 256
-      minimum: 2
-      multipleOf: 2
+    details: Deprecated - Cache size in GB. Use `node_type` property instead.
   user_inputs:
   - field_name: redis_version
     required: true
@@ -79,7 +74,7 @@ provision:
     default: ""
   - field_name: node_type
     type: string
-    details: AWS Elasticache node type (see https://aws.amazon.com/elasticache/pricing) Will be computed from cache_size if empty.
+    details: AWS Elasticache node type (see https://aws.amazon.com/elasticache/pricing)
     default: ""
   - field_name: elasticache_subnet_group
     type: string
@@ -100,6 +95,10 @@ provision:
     default: ""
     prohibit_update: true
   computed_inputs:
+  - name: cache_size
+    default: -1
+    overwrite: false
+    type: integer
   - name: labels
     default: ${json.marshal(request.default_labels)}
     overwrite: true
@@ -143,6 +142,6 @@ examples:
   bind_params: {}
 - name: with-custom-node_type
   description: Create a Redis instance with a custom node_type
-  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
+  plan_id: 2deb6c13-7ea1-4bad-a519-0ac9600e9a29
   provision_params: {"node_type": "cache.t2.micro"}
   bind_params: {}

@@ -21,16 +21,41 @@ const (
 
 var customRedisPlans = []map[string]any{
 	customRedisPlan,
+	redisPlanWithFlexibleNodeType,
+	deprecatedCacheSizePlan,
 }
 
 var customRedisPlan = map[string]any{
 	"name":        redisCustomPlanName,
 	"id":          redisCustomPlanID,
 	"description": "Beta - Default Redis plan",
-	"cache_size":  2,
+	"node_type":   "cache.t3.medium",
 	"node_count":  2,
 	"metadata": map[string]any{
 		"displayName": "custom-sample (Beta)",
+	},
+}
+
+var redisPlanWithFlexibleNodeType = map[string]any{
+	"name":          "flexible-nodetype-sample",
+	"id":            "2deb6c13-7ea1-4bad-a519-0ac9600e9a29",
+	"description":   "Beta - An example of a Redis plan for which node_type can be specified at provision time.",
+	"redis_version": "6.x",
+	"node_count":    2,
+	"metadata": map[string]any{
+		"displayName": "flexible-nodetype-sample (Beta)",
+	},
+}
+
+var deprecatedCacheSizePlan = map[string]any{
+	"name":          "deprecated-cachesize-sample",
+	"id":            "eeae19c8-00c1-442d-b423-a377684b70df",
+	"description":   "Beta - Redis plan with deprecated cache_size",
+	"cache_size":    2,
+	"redis_version": "6.x",
+	"node_count":    2,
+	"metadata": map[string]any{
+		"displayName": "deprecated-cachesize-sample (Beta)",
 	},
 }
 
@@ -61,6 +86,14 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				MatchFields(IgnoreExtras, Fields{
 					Name: Equal(redisCustomPlanName),
 					ID:   Equal("c7f64994-a1d9-4e1f-9491-9d8e56bbf146"),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal("deprecated-cachesize-sample"),
+					ID:   Equal("eeae19c8-00c1-442d-b423-a377684b70df"),
+				}),
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal("flexible-nodetype-sample"),
+					ID:   Equal("2deb6c13-7ea1-4bad-a519-0ac9600e9a29"),
 				}),
 			),
 		)
@@ -103,7 +136,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		)
 
 		It("should prevent modifying `plan defined properties`", func() {
-			_, err := broker.Provision(redisServiceName, redisCustomPlanName, map[string]any{"cache_size": 9})
+			_, err := broker.Provision(redisServiceName, redisCustomPlanName, map[string]any{"node_count": 3})
 
 			Expect(err).To(MatchError(
 				ContainSubstring(
@@ -130,6 +163,32 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("labels", "labels", "a-valid-list-of-labels"),
 		)
 
+		It("should prevent passing the deprecated property `cache_size` as user input", func() {
+			_, err := broker.Provision(redisServiceName, "custom-sample", map[string]any{"cache_size": 2})
+			Expect(err).To(MatchError(ContainSubstring("additional properties are not allowed: cache_size")))
+		})
+
+		It("should keeping working as before for existing customers relying on `cache_size` property", func() {
+			_, err := broker.Provision(redisServiceName, "deprecated-cachesize-sample", map[string]any{})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
+				))
+		})
+
+		It("should keeping working as before for existing customers relying on `cache_size` property and per-instance `node_type`", func() {
+			_, err := broker.Provision(redisServiceName, "deprecated-cachesize-sample", map[string]any{"node_type": "cache.t2.micro"})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
+					HaveKeyWithValue("node_type", "cache.t2.micro"),
+				))
+		})
+
 		It("should provision a plan", func() {
 			instanceID, err := broker.Provision(redisServiceName, redisCustomPlanName, map[string]any{"redis_version": "6.x"})
 			Expect(err).NotTo(HaveOccurred())
@@ -139,11 +198,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKey("instance_name"),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
-					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
+					HaveKeyWithValue("cache_size", BeNumerically("==", -1)),
 					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
 					HaveKeyWithValue("redis_version", "6.x"),
 					HaveKeyWithValue("aws_vpc_id", BeEmpty()),
-					HaveKeyWithValue("node_type", BeEmpty()),
+					HaveKeyWithValue("node_type", "cache.t3.medium"),
 					HaveKeyWithValue("elasticache_subnet_group", BeEmpty()),
 					HaveKeyWithValue("elasticache_vpc_security_group_ids", BeEmpty()),
 					HaveKeyWithValue("aws_access_key_id", "aws-access-key-id"),
@@ -159,7 +218,6 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"instance_name":                      "some-valid-instance-name",
 				"region":                             "some-valid-region",
 				"aws_vpc_id":                         "some-valid-aws-vpc-id",
-				"node_type":                          "some-valid-node-type",
 				"elasticache_subnet_group":           "some-valid-elasticache-subnet-group",
 				"elasticache_vpc_security_group_ids": "some-valid-elasticache-vpc-security-group-ids",
 				"aws_access_key_id":                  "some-valid-aws-access-key-id",
@@ -173,11 +231,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
 					HaveKeyWithValue("redis_version", "6.x"),
-					HaveKeyWithValue("cache_size", BeNumerically("==", 2)),
+					HaveKeyWithValue("cache_size", BeNumerically("==", -1)),
 					HaveKeyWithValue("instance_name", "some-valid-instance-name"),
 					HaveKeyWithValue("region", "some-valid-region"),
 					HaveKeyWithValue("aws_vpc_id", "some-valid-aws-vpc-id"),
-					HaveKeyWithValue("node_type", "some-valid-node-type"),
+					HaveKeyWithValue("node_type", "cache.t3.medium"),
 					HaveKeyWithValue("elasticache_subnet_group", "some-valid-elasticache-subnet-group"),
 					HaveKeyWithValue("elasticache_vpc_security_group_ids", "some-valid-elasticache-vpc-security-group-ids"),
 					HaveKeyWithValue("aws_access_key_id", "some-valid-aws-access-key-id"),
@@ -220,7 +278,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {
-			err := broker.Update(instanceID, redisServiceName, redisCustomPlanName, map[string]any{"cache_size": 9})
+			err := broker.Update(instanceID, redisServiceName, redisCustomPlanName, map[string]any{"node_type": "cache.t2.micro"})
 
 			Expect(err).To(MatchError(
 				ContainSubstring(
@@ -241,10 +299,21 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("aws_access_key_id", "aws_access_key_id", "any-valid-aws-access-key-id"),
 			Entry("aws_secret_access_key", "aws_secret_access_key", "any-valid-aws-secret-access-key"),
 			Entry("aws_vpc_id", "aws_vpc_id", "any-valid-aws-vpc-id"),
-			Entry("node_type", "node_type", "any-valid-node-type"),
 			Entry("elasticache_subnet_group", "elasticache_subnet_group", "any-valid-elasticache-subnet-group"),
 			Entry("elasticache_vpc_security_group_ids", "elasticache_vpc_security_group_ids", "any-valid-elasticache-vpc-security-group-ids"),
 			Entry("redis_version", "redis_version", "7.x"),
 		)
+
+	})
+
+	Describe("updating node_type for instances of plans which don't specify a fixed node_type", func() {
+
+		It("should allow updating node_type when not enforced by the plan definition", func() {
+			instanceID, err := broker.Provision(redisServiceName, "flexible-nodetype-sample", map[string]any{"node_type": "cache.t3.medium"})
+			Expect(err).ToNot(HaveOccurred())
+
+			err = broker.Update(instanceID, redisServiceName, "flexible-nodetype-sample", map[string]any{"node_type": "cache.t2.micro"})
+			Expect(err).ToNot(HaveOccurred())
+		})
 	})
 })

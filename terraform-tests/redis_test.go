@@ -18,7 +18,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	)
 
 	defaultVars := map[string]any{
-		"cache_size":                         2,
+		"cache_size":                         -1,
 		"redis_version":                      "6.0",
 		"instance_name":                      "csb-redis-test",
 		"labels":                             map[string]any{"key1": "some-redis-value"},
@@ -41,7 +41,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 
 	Context("with Default values", func() {
 		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"node_type": "cache.t3.medium"}))
 		})
 
 		It("should create the right resources", func() {
