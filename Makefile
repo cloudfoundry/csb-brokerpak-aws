@@ -117,14 +117,14 @@ brokerpak-user-docs.md: *.yml
 
 .PHONY: examples
 examples: ## display available examples
-	 $(RUN_CSB) client examples
+	 $(RUN_CSB) examples
 
 ###### run-examples ###################################################################
 PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 10000)
 
 .PHONY: run-examples
-run-examples: ## run examples in yml files. Runs examples for all services by default. Set service_name and example_name to run all examples for a specific service or an specific example.
-	$(RUN_CSB) client run-examples --service-name="$(service_name)" --example-name="$(example_name)" -j $(PARALLEL_JOB_COUNT)
+run-examples: ## run examples in yml files. Runs examples for all services by default. Set service_name and/or example_name.
+	$(RUN_CSB) run-examples --service-name="$(service_name)" --example-name="$(example_name)"
 
 ###### test ###################################################################
 
