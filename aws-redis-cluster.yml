@@ -33,11 +33,15 @@ provision:
       maximum: 256
       minimum: 2
       multipleOf: 2
+  user_inputs:
   - field_name: redis_version
     required: true
     type: string
-    details: The version for the redis instance.
-  user_inputs:
+    details: |
+      The version for the redis instance.
+      For more information about upgrading engine versions, see
+      https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/VersionManagement.html.
+      The downgrade of the version is not allowed as it involves the recreation of the instance.
   - field_name: instance_name
     type: string
     details: Name for your instance
