@@ -89,6 +89,16 @@ provision:
     type: string
     details: Comma delimited list of security group ID's for instance
     default: ""
+  - field_name: at_rest_encryption_enabled
+    type: boolean
+    details: Whether to enable encryption at rest.
+    default: true
+    prohibit_update: true
+  - field_name: kms_key_id
+    type: string
+    details: The ARN of the key to use if encrypting at rest. Defaults to AWS managed key.
+    default: ""
+    prohibit_update: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

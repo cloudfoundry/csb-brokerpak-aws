@@ -30,6 +30,8 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"aws_access_key_id":                  awsAccessKeyID,
 		"aws_secret_access_key":              awsSecretAccessKey,
 		"aws_vpc_id":                         awsVPCID,
+		"at_rest_encryption_enabled":         true,
+		"kms_key_id":                         "fake-encryption-at-rest-key",
 	}
 
 	BeforeAll(func() {
@@ -61,6 +63,8 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"transit_encryption_enabled": BeTrue(),
 					"automatic_failover_enabled": BeFalse(),
 					"apply_immediately":          BeTrue(),
+					"at_rest_encryption_enabled": BeTrue(),
+					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
@@ -73,7 +77,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"final_snapshot_identifier":   BeNil(),
 					"log_delivery_configuration":  BeAssignableToTypeOf([]any{}),
 					"availability_zones":          BeNil(),
-					"kms_key_id":                  BeNil(),
 					"multi_az_enabled":            BeAssignableToTypeOf(false),
 					"preferred_cache_cluster_azs": BeNil(),
 					"snapshot_arns":               BeNil(),
@@ -81,7 +84,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"user_group_ids":              BeNil(),
 				}))
 		})
-
 	})
 
 	When("elasticache_vpc_security_group_ids is passed", func() {
