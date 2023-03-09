@@ -209,6 +209,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("aws_secret_access_key", "aws-secret-access-key"),
 					HaveKeyWithValue("at_rest_encryption_enabled", BeTrue()),
 					HaveKeyWithValue("kms_key_id", ""),
+					HaveKeyWithValue("maintenance_day", BeNil()),
+					HaveKeyWithValue("maintenance_start_hour", BeNil()),
+					HaveKeyWithValue("maintenance_start_min", BeNil()),
+					HaveKeyWithValue("maintenance_end_hour", BeNil()),
+					HaveKeyWithValue("maintenance_end_min", BeNil()),
 				))
 		})
 
@@ -224,6 +229,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"aws_secret_access_key":              "some-valid-aws-secret-access-key",
 				"at_rest_encryption_enabled":         false,
 				"kms_key_id":                         "fake-encryption-at-rest-key",
+				"maintenance_day":                    "Mon",
+				"maintenance_start_hour":             "03",
+				"maintenance_start_min":              "45",
+				"maintenance_end_hour":               "10",
+				"maintenance_end_min":                "15",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -242,6 +252,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("aws_secret_access_key", "some-valid-aws-secret-access-key"),
 					HaveKeyWithValue("at_rest_encryption_enabled", BeFalse()),
 					HaveKeyWithValue("kms_key_id", "fake-encryption-at-rest-key"),
+					HaveKeyWithValue("maintenance_day", "Mon"),
+					HaveKeyWithValue("maintenance_start_hour", "03"),
+					HaveKeyWithValue("maintenance_start_min", "45"),
+					HaveKeyWithValue("maintenance_end_hour", "10"),
+					HaveKeyWithValue("maintenance_end_min", "15"),
 				),
 			)
 		})
