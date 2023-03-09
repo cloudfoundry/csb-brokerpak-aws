@@ -76,6 +76,11 @@ provision:
     type: string
     details: AWS Elasticache node type (see https://aws.amazon.com/elasticache/pricing)
     default: ""
+    # `node_type` is required by the provider but we can't specify it as such
+    # in this manifest because we need to support passing `cache_size` without
+    # any `node_type` for backward compatibility. If `node_type` isn't specified
+    # in the plan nor at rovisioning time, provisioning will throw this error:
+    # "node_type" is required unless "global_replication_group_id"
   - field_name: elasticache_subnet_group
     type: string
     details: AWS Elasticache subnet group already in existence to use
