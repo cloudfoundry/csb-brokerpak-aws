@@ -37,6 +37,23 @@ locals {
   subnet_group = length(var.elasticache_subnet_group) > 0 ? var.elasticache_subnet_group : aws_elasticache_subnet_group.subnet_group[0].name
 
   elasticache_vpc_security_group_ids = length(var.elasticache_vpc_security_group_ids) == 0 ? [aws_security_group.sg[0].id] : split(",", var.elasticache_vpc_security_group_ids)
+
+  is_maintenance_window_blank = length(compact([
+    var.maintenance_day,
+    var.maintenance_start_hour,
+    var.maintenance_end_hour,
+    var.maintenance_start_min,
+    var.maintenance_end_min
+  ])) == 0
+
+  maintenance_window = local.is_maintenance_window_blank ? null : format("%s:%s:%s-%s:%s:%s",
+    var.maintenance_day,
+    var.maintenance_start_hour,
+    var.maintenance_start_min,
+    var.maintenance_day,
+    var.maintenance_end_hour,
+    var.maintenance_end_min
+  )
 }
 
 data "aws_subnets" "all" {
