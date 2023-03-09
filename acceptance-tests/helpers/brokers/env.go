@@ -11,7 +11,7 @@ import (
 
 const (
 	PlansRedisVar    = "GSB_SERVICE_CSB_AWS_REDIS_PLANS"
-	defaultRedisPlan = `[{"name":"default","id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","cache_size":2,"redis_version":"7.0"}]`
+	defaultRedisPlan = `[{"name":"default","id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","node_type":"cache.t3.medium","redis_version":"7.0"}]`
 )
 
 func (b Broker) env() []apps.EnvVar {
