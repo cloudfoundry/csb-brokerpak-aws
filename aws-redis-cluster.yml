@@ -27,7 +27,7 @@ provision:
   plan_inputs:
   - field_name: cache_size
     type: integer
-    details: Deprecated - Cache size in GB. Use `node_type` property instead.
+    details: Deprecated. Use `node_type` instead - Cache size in GB.
   user_inputs:
   - field_name: redis_version
     required: true
@@ -95,10 +95,6 @@ provision:
     default: ""
     prohibit_update: true
   computed_inputs:
-  - name: cache_size
-    default: -1
-    overwrite: false
-    type: integer
   - name: labels
     default: ${json.marshal(request.default_labels)}
     overwrite: true

@@ -198,7 +198,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKey("instance_name"),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
 					HaveKeyWithValue("region", "us-west-2"),
-					HaveKeyWithValue("cache_size", BeNumerically("==", -1)),
+					HaveKeyWithValue("cache_size", BeNil()),
 					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
 					HaveKeyWithValue("redis_version", "6.x"),
 					HaveKeyWithValue("aws_vpc_id", BeEmpty()),
@@ -231,7 +231,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
 					HaveKeyWithValue("redis_version", "6.x"),
-					HaveKeyWithValue("cache_size", BeNumerically("==", -1)),
+					HaveKeyWithValue("cache_size", BeNil()),
 					HaveKeyWithValue("instance_name", "some-valid-instance-name"),
 					HaveKeyWithValue("region", "some-valid-region"),
 					HaveKeyWithValue("aws_vpc_id", "some-valid-aws-vpc-id"),
