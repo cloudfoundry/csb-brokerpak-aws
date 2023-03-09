@@ -56,7 +56,10 @@ var _ = Describe("Redis", Label("redis"), func() {
 			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("pushing the development version of the broker")
-			serviceBroker.UpdateBroker(developmentBuildDir)
+			serviceBroker.UpdateBroker(developmentBuildDir, apps.EnvVar{
+				Name:  brokers.PlansRedisVar, // at_rest_encryption_enabled=false for upgrade
+				Value: `[{"name":"default","id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","cache_size":2,"node_count":2,"redis_version":"7.0","at_rest_encryption_enabled":false}]`,
+			})
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()

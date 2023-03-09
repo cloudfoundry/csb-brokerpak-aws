@@ -57,6 +57,8 @@ resource "aws_elasticache_replication_group" "redis" {
   transit_encryption_enabled = true
   auth_token                 = random_password.auth_token.result
   apply_immediately          = true
+  at_rest_encryption_enabled = var.at_rest_encryption_enabled
+  kms_key_id                 = var.kms_key_id
 
   lifecycle {
     prevent_destroy = true
