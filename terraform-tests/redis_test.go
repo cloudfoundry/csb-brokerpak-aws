@@ -18,11 +18,11 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	)
 
 	defaultVars := map[string]any{
-		"cache_size":                         2,
+		"cache_size":                         nil,
 		"redis_version":                      "6.0",
 		"instance_name":                      "csb-redis-test",
 		"labels":                             map[string]any{"key1": "some-redis-value"},
-		"node_type":                          "",
+		"node_type":                          "cache.t3.medium",
 		"node_count":                         1,
 		"elasticache_subnet_group":           "",
 		"elasticache_vpc_security_group_ids": "",
