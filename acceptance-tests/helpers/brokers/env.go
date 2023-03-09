@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	plansRedisVar    = "GSB_SERVICE_CSB_AWS_REDIS_PLANS"
+	PlansRedisVar    = "GSB_SERVICE_CSB_AWS_REDIS_PLANS"
 	defaultRedisPlan = `[{"name":"default", "id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","cache_size":2,"node_count":2,"redis_version": "7.0"}]`
 )
 
@@ -63,7 +63,7 @@ func (b Broker) releaseEnv() []apps.EnvVar {
 
 func (b Broker) latestEnv() []apps.EnvVar {
 	return []apps.EnvVar{
-		{Name: plansRedisVar, Value: defaultRedisPlan},
+		{Name: PlansRedisVar, Value: defaultRedisPlan},
 	}
 }
 
