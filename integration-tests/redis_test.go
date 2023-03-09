@@ -148,6 +148,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("elasticache_vpc_security_group_ids", BeEmpty()),
 					HaveKeyWithValue("aws_access_key_id", "aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "aws-secret-access-key"),
+					HaveKeyWithValue("at_rest_encryption_enabled", BeTrue()),
+					HaveKeyWithValue("kms_key_id", ""),
 				))
 		})
 
@@ -162,6 +164,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"elasticache_vpc_security_group_ids": "some-valid-elasticache-vpc-security-group-ids",
 				"aws_access_key_id":                  "some-valid-aws-access-key-id",
 				"aws_secret_access_key":              "some-valid-aws-secret-access-key",
+				"at_rest_encryption_enabled":         false,
+				"kms_key_id":                         "fake-encryption-at-rest-key",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -178,6 +182,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("elasticache_vpc_security_group_ids", "some-valid-elasticache-vpc-security-group-ids"),
 					HaveKeyWithValue("aws_access_key_id", "some-valid-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "some-valid-aws-secret-access-key"),
+					HaveKeyWithValue("at_rest_encryption_enabled", BeFalse()),
+					HaveKeyWithValue("kms_key_id", "fake-encryption-at-rest-key"),
 				),
 			)
 		})
@@ -209,6 +215,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			},
 			Entry("region", "region", "any-valid-value"),
 			Entry("instance_name", "instance_name", "any-valid-instance-name"),
+			Entry("at_rest_encryption_enabled", "at_rest_encryption_enabled", false),
+			Entry("kms_key_id", "kms_key_id", "fake-encryption-at-rest-key"),
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {

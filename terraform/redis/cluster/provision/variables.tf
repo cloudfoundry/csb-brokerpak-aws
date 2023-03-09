@@ -21,3 +21,5 @@ variable "node_type" { type = string }
 variable "node_count" { type = number }
 variable "elasticache_subnet_group" { type = string }
 variable "elasticache_vpc_security_group_ids" { type = string }
+variable "at_rest_encryption_enabled" { type = bool }
+variable "kms_key_id" { type = string }

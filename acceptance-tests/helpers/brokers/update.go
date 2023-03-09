@@ -5,8 +5,8 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 )
 
-func (b *Broker) UpdateBroker(dir string) {
-	WithEnv(b.latestEnv()...)(b)
+func (b *Broker) UpdateBroker(dir string, env ...apps.EnvVar) {
+	WithEnv(append(b.latestEnv(), env...)...)(b)
 
 	b.app.Push(
 		apps.WithName(b.Name),
