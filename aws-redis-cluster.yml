@@ -26,13 +26,8 @@ plan_updateable: true
 provision:
   plan_inputs:
   - field_name: cache_size
-    required: true
     type: integer
-    details: Cache size in GB
-    constraints:
-      maximum: 256
-      minimum: 2
-      multipleOf: 2
+    details: Deprecated. Use `node_type` instead - Cache size in GB.
   user_inputs:
   - field_name: redis_version
     required: true
@@ -79,8 +74,13 @@ provision:
     default: ""
   - field_name: node_type
     type: string
-    details: AWS Elasticache node type (see https://aws.amazon.com/elasticache/pricing) Will be computed from cache_size if empty.
+    details: AWS Elasticache node type (see https://aws.amazon.com/elasticache/pricing)
     default: ""
+    # `node_type` is required by the provider but we can't specify it as such
+    # in this manifest because we need to support passing `cache_size` without
+    # any `node_type` for backward compatibility. If `node_type` isn't specified
+    # in the plan nor at rovisioning time, provisioning will throw this error:
+    # "node_type" is required unless "global_replication_group_id"
   - field_name: elasticache_subnet_group
     type: string
     details: AWS Elasticache subnet group already in existence to use
@@ -99,6 +99,65 @@ provision:
     details: The ARN of the key to use if encrypting at rest. Defaults to AWS managed key.
     default: ""
     prohibit_update: true
+  - <<: &nullable_string
+      type: string
+      default: null
+      nullable: true
+    field_name: maintenance_day
+    details: The preferred maintenance day
+    enum:
+      Sun: Sunday
+      Mon: Monday
+      Tue: Tuesday
+      Wed: Wednesday
+      Thu: Thursday
+      Fri: Friday
+      Sat: Saturday
+  - <<: *nullable_string
+    field_name: maintenance_start_hour
+    details: The preferred maintenance start hour
+    enum: &hour_enum
+      "00": 12 am
+      "01": 1 am
+      "02": 2 am
+      "03": 3 am
+      "04": 4 am
+      "05": 5 am
+      "06": 6 am
+      "07": 7 am
+      "08": 8 am
+      "09": 9 am
+      "10": 10 am
+      "11": 11 am
+      "12": 12 pm
+      "13": 1 pm
+      "14": 2 pm
+      "15": 3 pm
+      "16": 4 pm
+      "17": 5 pm
+      "18": 6 pm
+      "19": 7 pm
+      "20": 8 pm
+      "21": 9 pm
+      "22": 10 pm
+      "23": 11 pm
+  - <<: *nullable_string
+    field_name: maintenance_start_min
+    type: string
+    details: The preferred maintenance start minute
+    enum: &minute_enum
+      "00": Top of the hour
+      "15": 15 minutes
+      "30": 30 minutes
+      "45": 45 minutes
+  - <<: *nullable_string
+    field_name: maintenance_end_hour
+    details: The preferred maintenance end hour
+    enum: *hour_enum
+  - <<: *nullable_string
+    field_name: maintenance_end_min
+    details: The preferred maintenance end minute
+    enum: *minute_enum
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -143,6 +202,6 @@ examples:
   bind_params: {}
 - name: with-custom-node_type
   description: Create a Redis instance with a custom node_type
-  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
+  plan_id: 2deb6c13-7ea1-4bad-a519-0ac9600e9a29
   provision_params: {"node_type": "cache.t2.micro"}
   bind_params: {}

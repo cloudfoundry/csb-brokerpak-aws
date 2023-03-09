@@ -18,11 +18,11 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	)
 
 	defaultVars := map[string]any{
-		"cache_size":                         2,
+		"cache_size":                         nil,
 		"redis_version":                      "6.0",
 		"instance_name":                      "csb-redis-test",
 		"labels":                             map[string]any{"key1": "some-redis-value"},
-		"node_type":                          "",
+		"node_type":                          "cache.t3.medium",
 		"node_count":                         1,
 		"elasticache_subnet_group":           "",
 		"elasticache_vpc_security_group_ids": "",
@@ -32,6 +32,11 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"aws_vpc_id":                         awsVPCID,
 		"at_rest_encryption_enabled":         true,
 		"kms_key_id":                         "fake-encryption-at-rest-key",
+		"maintenance_end_hour":               nil,
+		"maintenance_start_hour":             nil,
+		"maintenance_end_min":                nil,
+		"maintenance_start_min":              nil,
+		"maintenance_day":                    nil,
 	}
 
 	BeforeAll(func() {
@@ -168,6 +173,38 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 				"engine_version": Equal("5.0.6"),
 			}))
 		})
+	})
+
+	Context("maintenance_window", func() {
+		When("no window is set", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
+			})
+			It("should not be passed", func() {
+				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(Not(HaveKey("maintenance_window")))
+			})
+		})
+
+		When("maintainance window specified with all values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"maintenance_day":        "Mon",
+					"maintenance_start_hour": "01",
+					"maintenance_end_hour":   "02",
+					"maintenance_start_min":  "03",
+					"maintenance_end_min":    "04",
+				}))
+			})
+
+			It("should pass the correct window", func() {
+				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"maintenance_window": Equal("mon:01:03-mon:02:04"),
+					}))
+			})
+
+		})
+
 	})
 })
 
