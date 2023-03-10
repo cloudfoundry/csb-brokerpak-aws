@@ -76,10 +76,10 @@ provision:
     type: string
     details: AWS Elasticache node type (see https://aws.amazon.com/elasticache/pricing)
     default: ""
-    # `node_type` is required by the provider but we can't specify it as such
+    # `node_type` is required by the provider, but we can't specify it as such
     # in this manifest because we need to support passing `cache_size` without
     # any `node_type` for backward compatibility. If `node_type` isn't specified
-    # in the plan nor at rovisioning time, provisioning will throw this error:
+    # in the plan nor at provisioning time, provisioning will throw this error:
     # "node_type" is required unless "global_replication_group_id"
   - field_name: elasticache_subnet_group
     type: string
@@ -93,6 +93,16 @@ provision:
     type: boolean
     details: Whether to enable encryption at rest.
     default: true
+    prohibit_update: true
+  - field_name: data_tiering_enabled
+    type: boolean
+    details: |
+      Enables data tiering. Data tiering is only supported for replication groups using the r6gd node type.
+      This parameter must be set to true when using `r6gd` nodes.
+      Not all versions of Redis support this feature. Check supported versions.
+      For more information about Node Types and supported versions see
+      https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/CacheNodes.SupportedTypes.html
+    default: false
     prohibit_update: true
   - field_name: kms_key_id
     type: string
