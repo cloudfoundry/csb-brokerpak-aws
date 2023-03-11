@@ -214,6 +214,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_start_min", BeNil()),
 					HaveKeyWithValue("maintenance_end_hour", BeNil()),
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
+					HaveKeyWithValue("multi_az_enabled", BeTrue()),
 				))
 		})
 
@@ -234,6 +235,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"maintenance_start_min":              "45",
 				"maintenance_end_hour":               "10",
 				"maintenance_end_min":                "15",
+				"multi_az_enabled":                   false,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -257,6 +259,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_start_min", "45"),
 					HaveKeyWithValue("maintenance_end_hour", "10"),
 					HaveKeyWithValue("maintenance_end_min", "15"),
+					HaveKeyWithValue("multi_az_enabled", BeFalse()),
 				),
 			)
 		})

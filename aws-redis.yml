@@ -94,6 +94,10 @@ provision:
     details: Whether to enable encryption at rest.
     default: true
     prohibit_update: true
+  - field_name: multi_az_enabled
+    type: boolean
+    details: Whether to enable Multi-AZ Support for the replication group. If true, `node_count` must be greater than 2.
+    default: true
   - field_name: kms_key_id
     type: string
     details: The ARN of the key to use if encrypting at rest. Defaults to AWS managed key.

@@ -23,7 +23,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"instance_name":                      "csb-redis-test",
 		"labels":                             map[string]any{"key1": "some-redis-value"},
 		"node_type":                          "cache.t3.medium",
-		"node_count":                         1,
+		"node_count":                         2,
 		"elasticache_subnet_group":           "",
 		"elasticache_vpc_security_group_ids": "",
 		"region":                             "us-west-2",
@@ -37,6 +37,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"maintenance_end_min":                nil,
 		"maintenance_start_min":              nil,
 		"maintenance_day":                    nil,
+		"multi_az_enabled":                   true,
 	}
 
 	BeforeAll(func() {
@@ -59,14 +60,14 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"replication_group_id":       Equal("csb-redis-test"),
 					"description":                Equal("csb-redis-test redis"),
 					"node_type":                  Equal("cache.t3.medium"),
-					"num_cache_clusters":         BeNumerically("==", 1),
+					"num_cache_clusters":         BeNumerically("==", 2),
 					"engine":                     Equal("redis"),
 					"engine_version":             Equal("6.0"),
 					"port":                       BeNumerically("==", 6379),
 					"tags":                       HaveKeyWithValue("key1", "some-redis-value"),
 					"subnet_group_name":          Equal("csb-redis-test-p-sn"),
 					"transit_encryption_enabled": BeTrue(),
-					"automatic_failover_enabled": BeFalse(),
+					"automatic_failover_enabled": BeTrue(),
 					"apply_immediately":          BeTrue(),
 					"at_rest_encryption_enabled": BeTrue(),
 					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),

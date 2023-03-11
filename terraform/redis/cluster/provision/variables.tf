@@ -28,3 +28,4 @@ variable "maintenance_start_hour" { type = string }
 variable "maintenance_start_min" { type = string }
 variable "maintenance_end_hour" { type = string }
 variable "maintenance_end_min" { type = string }
+variable "multi_az_enabled" { type = bool }
