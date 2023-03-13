@@ -49,7 +49,7 @@ provision:
     details: Type of storage to be used. One of "standard" (magnetic), "gp2" (general purpose SSD), or "io1" (provisioned IOPS SSD).
     default: "io1"
   - field_name: iops
-    type: number
+    type: integer
     details: The amount of provisioned IOPS. In order for this property to take effect, `storage_type` must be set to `io1`.
     default: 3000
   - field_name: require_ssl
@@ -65,7 +65,7 @@ provision:
     default: false
     details: Enable storage autoscaling up to storage_autoscale_limit_gb if true
   - field_name: storage_autoscale_limit_gb
-    type: number
+    type: integer
     details: Max storage size if storage_autoscale is true
     default: 0
   - field_name: storage_encrypted
@@ -216,7 +216,7 @@ provision:
     details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
     default: false
   - field_name: backup_retention_period
-    type: number
+    type: integer
     details: The number of days (1-35) for which automatic backups are kept. Set the value to 0 to disable automated backups. An outage occurs if you change the backup retention period from 0 to a nonzero value or vice versa. This applies to both Single-AZ and Multi-AZ DB instances.
     default: 7
   - <<: *nullable_string
@@ -231,7 +231,7 @@ provision:
     details: Copy all instance tags to snapshots
     default: true
   - field_name: monitoring_interval
-    type: number
+    type: integer
     details: |
       The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance.
       To disable collecting Enhanced Monitoring metrics, specify 0. Valid Values: 0, 1, 5, 10, 15, 30, 60.
@@ -260,7 +260,7 @@ provision:
       Once KMS key is set, it can never be changed.
     default: ""
   - field_name: performance_insights_retention_period
-    type: number
+    type: integer
     details: |
       The number of days to retain Performance Insights data.
       When specifying `performance_insights_retention_period`, `performance_insights_enabled` needs to be set to true.
