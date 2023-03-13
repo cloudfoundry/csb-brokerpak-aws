@@ -36,8 +36,8 @@ terraform_binaries:
   source: https://github.com/hashicorp/terraform/archive/v1.1.9.zip
   default: true
 - name: terraform-provider-aws
-  version: 4.57.1
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.57.1.zip
+  version: 4.58.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.58.0.zip
 - name: terraform-provider-random
   version: 3.4.3
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.4.3.zip
@@ -64,7 +64,7 @@ env_config_mapping:
   AWS_SECRET_ACCESS_KEY: aws.secret_access_key
 service_definitions:
 - aws-mysql.yml
-- aws-redis-cluster.yml
+- aws-redis.yml
 - aws-postgresql.yml
 - aws-s3-bucket.yml
 - aws-dynamodb.yml

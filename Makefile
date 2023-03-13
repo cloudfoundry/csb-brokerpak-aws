@@ -19,7 +19,6 @@ DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
 ####### broker environment variables
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
-PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 10000)
 GSB_PROVISION_DEFAULTS := $(or $(GSB_PROVISION_DEFAULTS), {"aws_vpc_id": "$(AWS_PAS_VPC_ID)"})
 
 ifeq ($(GO_OK), 0)  # use local go binary
@@ -120,8 +119,6 @@ examples: ## display available examples
 	 $(RUN_CSB) examples
 
 ###### run-examples ###################################################################
-PARALLEL_JOB_COUNT := $(or $(PARALLEL_JOB_COUNT), 10000)
-
 .PHONY: run-examples
 run-examples: ## run examples in yml files. Runs examples for all services by default. Set service_name and/or example_name.
 	$(RUN_CSB) run-examples --service-name="$(service_name)" --example-name="$(example_name)"
