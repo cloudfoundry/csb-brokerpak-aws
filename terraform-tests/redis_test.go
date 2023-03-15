@@ -3,6 +3,8 @@ package terraformtests
 import (
 	"path"
 
+	"github.com/onsi/gomega/gbytes"
+
 	. "csbbrokerpakaws/terraform-tests/helpers"
 
 	tfjson "github.com/hashicorp/terraform-json"
@@ -204,6 +206,21 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					}))
 			})
 
+		})
+
+	})
+
+	Context("multi_az_enabled", func() {
+		When("invalid combination", func() {
+			It("should not be passed", func() {
+				vars := buildVars(defaultVars, map[string]any{"node_count": 1, "multi_az_enabled": true})
+				session, err := FailPlan(terraformProvisionDir, vars)
+
+				Expect(session.ExitCode()).NotTo(Equal(0), "Terraform plan should return and error upon exit")
+				Expect(session.Err).To(gbytes.Say("automatic_failover_enabled must be true if multi_az_enabled is true"))
+
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
 
 	})
