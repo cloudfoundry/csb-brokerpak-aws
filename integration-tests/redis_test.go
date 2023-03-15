@@ -219,6 +219,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_end_hour", BeNil()),
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
 					HaveKeyWithValue("data_tiering_enabled", BeFalse()),
+					HaveKeyWithValue("automatic_failover_enabled", BeTrue()),
 				))
 		})
 
@@ -239,6 +240,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"maintenance_start_min":              "45",
 				"maintenance_end_hour":               "10",
 				"maintenance_end_min":                "15",
+				"automatic_failover_enabled":         false,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -262,6 +264,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_start_min", "45"),
 					HaveKeyWithValue("maintenance_end_hour", "10"),
 					HaveKeyWithValue("maintenance_end_min", "15"),
+					HaveKeyWithValue("automatic_failover_enabled", BeFalse()),
 				),
 			)
 		})
@@ -338,6 +341,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("elasticache_subnet_group", "elasticache_subnet_group", "any-valid-elasticache-subnet-group"),
 			Entry("elasticache_vpc_security_group_ids", "elasticache_vpc_security_group_ids", "any-valid-elasticache-vpc-security-group-ids"),
 			Entry("redis_version", "redis_version", "7.x"),
+			Entry("automatic_failover_enabled", "automatic_failover_enabled", false),
 		)
 
 	})

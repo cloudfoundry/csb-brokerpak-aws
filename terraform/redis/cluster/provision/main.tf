@@ -44,7 +44,7 @@ resource "random_password" "auth_token" {
 }
 
 resource "aws_elasticache_replication_group" "redis" {
-  automatic_failover_enabled = var.node_count > 1
+  automatic_failover_enabled = var.automatic_failover_enabled
   replication_group_id       = var.instance_name
   description                = format("%s redis", var.instance_name)
   node_type                  = local.node_type

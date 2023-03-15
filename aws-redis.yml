@@ -109,6 +109,12 @@ provision:
     details: The ARN of the key to use if encrypting at rest. Defaults to AWS managed key.
     default: ""
     prohibit_update: true
+  - field_name: automatic_failover_enabled
+    type: boolean
+    details: Automatically promote replica to primary if the existing primary fails. If enabled, node_count must be greater than 1.
+    default: true
+    required: false
+    prohibit_update: false
   - <<: &nullable_string
       type: string
       default: null
@@ -209,6 +215,12 @@ examples:
   description: Create a Redis instance with a custom region
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {"region": "us-east-1"}
+  bind_params: {}
+- name: invalid-automatic-failover
+  description: Try to set automatic_failover_enabled with node_count < 2
+  expected_error: When using automatic failover, there must be at least 2 cache clusters in the replication group
+  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
+  provision_params: {"node_count": 1, "automatic_failover_enabled": true}
   bind_params: {}
 - name: with-custom-node_type
   description: Create a Redis instance with a custom node_type

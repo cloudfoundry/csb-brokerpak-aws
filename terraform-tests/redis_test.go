@@ -38,6 +38,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"maintenance_start_min":              nil,
 		"maintenance_day":                    nil,
 		"data_tiering_enabled":               false,
+		"automatic_failover_enabled":         false,
 	}
 
 	BeforeAll(func() {
@@ -144,21 +145,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"node_type": Equal("cache.t2.micro"),
-				}))
-		})
-	})
-
-	When("node_count is greater than 1", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"node_count": 2,
-			}))
-		})
-
-		It("automatic_failover_enabled should be set to true", func() {
-			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"automatic_failover_enabled": BeTrue(),
 				}))
 		})
 	})
