@@ -8,16 +8,16 @@ import (
 )
 
 const (
-	dynamoDBServiceID                  = "bf1db66a-1316-11eb-b959-e73b704ea230"
-	dynamoDBServiceName                = "csb-aws-dynamodb"
-	dynamoDBServiceDescription         = "Beta - CSB Amazon DynamoDB"
-	dynamoDBServiceDisplayName         = "CSB Amazon DynamoDB (Beta)"
-	dynamoDBServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-dynamodb.html"
-	dynamoDBServiceSupportURL          = "https://aws.amazon.com/dynamodb/"
-	dynamoDBServiceProviderDisplayName = "VMware"
+	dynamoDBTableServiceID                  = "bf1db66a-1316-11eb-b959-e73b704ea230"
+	dynamoDBTableServiceName                = "csb-aws-dynamodb-table"
+	dynamoDBTableServiceDescription         = "Beta - CSB Amazon DynamoDB Table"
+	dynamoDBTableServiceDisplayName         = "CSB Amazon DynamoDB Table (Beta)"
+	dynamoDBTableServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-dynamodb.html"
+	dynamoDBTableServiceSupportURL          = "https://aws.amazon.com/dynamodb/"
+	dynamoDBTableServiceProviderDisplayName = "VMware"
 )
 
-var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
+var _ = Describe("DynamoDB Table", Label("DynamoDB Table"), func() {
 	var attributes map[string]any
 
 	BeforeEach(func() {
@@ -49,15 +49,15 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		service := testframework.FindService(catalog, dynamoDBServiceName)
-		Expect(service.ID).To(Equal(dynamoDBServiceID))
-		Expect(service.Description).To(Equal(dynamoDBServiceDescription))
-		Expect(service.Tags).To(ConsistOf("aws", "dynamodb", "beta"))
-		Expect(service.Metadata.DisplayName).To(Equal(dynamoDBServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(dynamoDBServiceDocumentationURL))
+		service := testframework.FindService(catalog, dynamoDBTableServiceName)
+		Expect(service.ID).To(Equal(dynamoDBTableServiceID))
+		Expect(service.Description).To(Equal(dynamoDBTableServiceDescription))
+		Expect(service.Tags).To(ConsistOf("aws", "dynamodb", "dynamodb-table", "beta"))
+		Expect(service.Metadata.DisplayName).To(Equal(dynamoDBTableServiceDisplayName))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(dynamoDBTableServiceDocumentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
-		Expect(service.Metadata.SupportUrl).To(Equal(dynamoDBServiceSupportURL))
-		Expect(service.Metadata.ProviderDisplayName).To(Equal(dynamoDBServiceProviderDisplayName))
+		Expect(service.Metadata.SupportUrl).To(Equal(dynamoDBTableServiceSupportURL))
+		Expect(service.Metadata.ProviderDisplayName).To(Equal(dynamoDBTableServiceProviderDisplayName))
 		Expect(service.Plans).To(
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{
@@ -79,7 +79,7 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 	Describe("provisioning", func() {
 		It("should check region constraints", func() {
 			attributes["region"] = "-Asia-northeast1"
-			_, err := broker.Provision(dynamoDBServiceName, "ondemand", attributes)
+			_, err := broker.Provision(dynamoDBTableServiceName, "ondemand", attributes)
 
 			Expect(err).To(MatchError(ContainSubstring("region: Does not match pattern '^[a-z][a-z0-9-]+$'")))
 		})
@@ -90,13 +90,13 @@ var _ = Describe("DynamoDB", Label("DynamoDB"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(dynamoDBServiceName, "ondemand", attributes)
+			instanceID, err = broker.Provision(dynamoDBTableServiceName, "ondemand", attributes)
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should prevent updating region because it is flagged as `prohibit_update` and it can result in the recreation of the service instance and lost data", func() {
-			err := broker.Update(instanceID, dynamoDBServiceName, "ondemand", map[string]any{"region": "no-matter-what-region"})
+			err := broker.Update(instanceID, dynamoDBTableServiceName, "ondemand", map[string]any{"region": "no-matter-what-region"})
 
 			Expect(err).To(MatchError(
 				ContainSubstring(
