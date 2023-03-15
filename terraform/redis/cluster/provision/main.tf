@@ -60,6 +60,7 @@ resource "aws_elasticache_replication_group" "redis" {
   at_rest_encryption_enabled = var.at_rest_encryption_enabled
   kms_key_id                 = var.kms_key_id
   maintenance_window         = local.maintenance_window
+  data_tiering_enabled       = var.data_tiering_enabled
 
   lifecycle {
     prevent_destroy = true

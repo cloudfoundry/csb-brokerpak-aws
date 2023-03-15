@@ -37,6 +37,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"maintenance_end_min":                nil,
 		"maintenance_start_min":              nil,
 		"maintenance_day":                    nil,
+		"data_tiering_enabled":               false,
 	}
 
 	BeforeAll(func() {
@@ -87,6 +88,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"snapshot_arns":               BeNil(),
 					"tags_all":                    BeAssignableToTypeOf(map[string]any{}),
 					"user_group_ids":              BeNil(),
+					"data_tiering_enabled":        BeFalse(),
 				}))
 		})
 	})

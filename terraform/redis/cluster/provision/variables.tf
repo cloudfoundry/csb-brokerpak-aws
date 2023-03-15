@@ -28,3 +28,4 @@ variable "maintenance_start_hour" { type = string }
 variable "maintenance_start_min" { type = string }
 variable "maintenance_end_hour" { type = string }
 variable "maintenance_end_min" { type = string }
+variable "data_tiering_enabled" { type = bool }
