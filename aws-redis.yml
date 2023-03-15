@@ -96,7 +96,7 @@ provision:
     prohibit_update: true
   - field_name: multi_az_enabled
     type: boolean
-    details: Whether to enable Multi-AZ Support for the replication group. If true, `node_count` must be greater than 2.
+    details: Whether to enable Multi-AZ Support for the replication group. If true, `node_count` must be greater than 1.
     default: true
   - field_name: kms_key_id
     type: string
