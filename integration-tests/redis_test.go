@@ -8,15 +8,19 @@ import (
 )
 
 const (
-	redisServiceID                  = "e9c11b1b-0caa-45c9-b9b2-592939c9a5a6"
-	redisServiceName                = "csb-aws-redis"
-	redisServiceDescription         = "Beta - CSB Amazon ElastiCache for Redis - multinode with automatic failover"
-	redisServiceDisplayName         = "CSB Amazon ElastiCache for Redis (Beta)"
-	redisServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html"
-	redisServiceSupportURL          = "https://aws.amazon.com/redis/"
-	redisServiceProviderDisplayName = "VMware"
-	redisCustomPlanName             = "custom-sample"
-	redisCustomPlanID               = "c7f64994-a1d9-4e1f-9491-9d8e56bbf146"
+	redisServiceID                        = "e9c11b1b-0caa-45c9-b9b2-592939c9a5a6"
+	redisServiceName                      = "csb-aws-redis"
+	redisServiceDescription               = "Beta - CSB Amazon ElastiCache for Redis - multinode with automatic failover"
+	redisServiceDisplayName               = "CSB Amazon ElastiCache for Redis (Beta)"
+	redisServiceDocumentationURL          = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html"
+	redisServiceSupportURL                = "https://aws.amazon.com/redis/"
+	redisServiceProviderDisplayName       = "VMware"
+	redisCustomPlanName                   = "custom-sample"
+	redisCustomPlanID                     = "c7f64994-a1d9-4e1f-9491-9d8e56bbf146"
+	deprecatedCacheSizePlanName           = "deprecated-cachesize-sample"
+	deprecatedCacheSizePlanID             = "eeae19c8-00c1-442d-b423-a377684b70df"
+	redisPlanWithFlexibleNodeTypePlanName = "flexible-nodetype-sample"
+	redisPlanWithFlexibleNodeTypePlanID   = "2deb6c13-7ea1-4bad-a519-0ac9600e9a29"
 )
 
 var customRedisPlans = []map[string]any{
@@ -37,8 +41,8 @@ var customRedisPlan = map[string]any{
 }
 
 var redisPlanWithFlexibleNodeType = map[string]any{
-	"name":          "flexible-nodetype-sample",
-	"id":            "2deb6c13-7ea1-4bad-a519-0ac9600e9a29",
+	"name":          redisPlanWithFlexibleNodeTypePlanName,
+	"id":            redisPlanWithFlexibleNodeTypePlanID,
 	"description":   "Beta - An example of a Redis plan for which node_type can be specified at provision time.",
 	"redis_version": "6.x",
 	"node_count":    2,
@@ -48,8 +52,8 @@ var redisPlanWithFlexibleNodeType = map[string]any{
 }
 
 var deprecatedCacheSizePlan = map[string]any{
-	"name":          "deprecated-cachesize-sample",
-	"id":            "eeae19c8-00c1-442d-b423-a377684b70df",
+	"name":          deprecatedCacheSizePlanName,
+	"id":            deprecatedCacheSizePlanID,
 	"description":   "Beta - Redis plan with deprecated cache_size",
 	"cache_size":    2,
 	"redis_version": "6.x",
@@ -88,12 +92,12 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					ID:   Equal("c7f64994-a1d9-4e1f-9491-9d8e56bbf146"),
 				}),
 				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("deprecated-cachesize-sample"),
-					ID:   Equal("eeae19c8-00c1-442d-b423-a377684b70df"),
+					Name: Equal(deprecatedCacheSizePlanName),
+					ID:   Equal(deprecatedCacheSizePlanID),
 				}),
 				MatchFields(IgnoreExtras, Fields{
-					Name: Equal("flexible-nodetype-sample"),
-					ID:   Equal("2deb6c13-7ea1-4bad-a519-0ac9600e9a29"),
+					Name: Equal(redisPlanWithFlexibleNodeTypePlanName),
+					ID:   Equal(redisPlanWithFlexibleNodeTypePlanID),
 				}),
 			),
 		)
@@ -164,12 +168,12 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		)
 
 		It("should prevent passing the deprecated property `cache_size` as user input", func() {
-			_, err := broker.Provision(redisServiceName, "custom-sample", map[string]any{"cache_size": 2})
+			_, err := broker.Provision(redisServiceName, redisCustomPlanName, map[string]any{"cache_size": 2})
 			Expect(err).To(MatchError(ContainSubstring("additional properties are not allowed: cache_size")))
 		})
 
 		It("should keeping working as before for existing customers relying on `cache_size` property", func() {
-			_, err := broker.Provision(redisServiceName, "deprecated-cachesize-sample", map[string]any{})
+			_, err := broker.Provision(redisServiceName, deprecatedCacheSizePlanName, map[string]any{})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -179,7 +183,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		})
 
 		It("should keeping working as before for existing customers relying on `cache_size` property and per-instance `node_type`", func() {
-			_, err := broker.Provision(redisServiceName, "deprecated-cachesize-sample", map[string]any{"node_type": "cache.t2.micro"})
+			_, err := broker.Provision(redisServiceName, deprecatedCacheSizePlanName, map[string]any{"node_type": "cache.t2.micro"})
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -214,6 +218,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_start_min", BeNil()),
 					HaveKeyWithValue("maintenance_end_hour", BeNil()),
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
+					HaveKeyWithValue("data_tiering_enabled", BeFalse()),
 					HaveKeyWithValue("multi_az_enabled", BeTrue()),
 				))
 		})
@@ -263,6 +268,21 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				),
 			)
 		})
+
+		It("`data_tiering_enabled` must be set to true when using `r6gd` nodes when provisioning", func() {
+			_, err := broker.Provision(redisServiceName, redisPlanWithFlexibleNodeTypePlanName, map[string]any{
+				"node_type":            "cache.r6gd.xlarge",
+				"data_tiering_enabled": true,
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("node_type", "cache.r6gd.xlarge"),
+					HaveKeyWithValue("data_tiering_enabled", true),
+				),
+			)
+		})
 	})
 
 	Describe("updating instance", func() {
@@ -293,6 +313,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("instance_name", "instance_name", "any-valid-instance-name"),
 			Entry("at_rest_encryption_enabled", "at_rest_encryption_enabled", false),
 			Entry("kms_key_id", "kms_key_id", "fake-encryption-at-rest-key"),
+			Entry("data_tiering_enabled", "data_tiering_enabled", true),
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {
