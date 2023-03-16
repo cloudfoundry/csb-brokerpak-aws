@@ -1,15 +1,13 @@
 package terraformtests
 
 import (
-	"path"
-
-	"github.com/onsi/gomega/gbytes"
-
 	. "csbbrokerpakaws/terraform-tests/helpers"
+	"path"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
 )
 
@@ -42,6 +40,8 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"data_tiering_enabled":               false,
 		"automatic_failover_enabled":         false,
 		"multi_az_enabled":                   true,
+		"backup_retention_limit":             12,
+		"final_backup_identifier":            "tortoise",
 	}
 
 	BeforeAll(func() {
@@ -75,6 +75,8 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"apply_immediately":          BeTrue(),
 					"at_rest_encryption_enabled": BeTrue(),
 					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),
+					"snapshot_retention_limit":   BeNumerically("==", 12),
+					"final_snapshot_identifier":  Equal("tortoise"),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
@@ -82,9 +84,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					// will help us stay up-to-date with the provider's latest improvements.
 					"notification_topic_arn":      BeNil(),
 					"snapshot_name":               BeNil(),
-					"snapshot_retention_limit":    BeNil(),
 					"timeouts":                    BeNil(),
-					"final_snapshot_identifier":   BeNil(),
 					"log_delivery_configuration":  BeAssignableToTypeOf([]any{}),
 					"availability_zones":          BeNil(),
 					"multi_az_enabled":            BeAssignableToTypeOf(false),

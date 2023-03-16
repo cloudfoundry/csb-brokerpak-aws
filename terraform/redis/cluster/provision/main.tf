@@ -62,6 +62,8 @@ resource "aws_elasticache_replication_group" "redis" {
   kms_key_id                 = var.kms_key_id
   maintenance_window         = local.maintenance_window
   data_tiering_enabled       = var.data_tiering_enabled
+  snapshot_retention_limit   = var.backup_retention_limit
+  final_snapshot_identifier  = var.final_backup_identifier
 
   lifecycle {
     prevent_destroy = true

@@ -221,6 +221,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("data_tiering_enabled", BeFalse()),
 					HaveKeyWithValue("automatic_failover_enabled", BeTrue()),
 					HaveKeyWithValue("multi_az_enabled", BeTrue()),
+					HaveKeyWithValue("backup_retention_limit", BeNumerically("==", 1)),
+					HaveKeyWithValue("final_backup_identifier", BeNil()),
 				))
 		})
 
@@ -243,6 +245,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"maintenance_end_min":                "15",
 				"automatic_failover_enabled":         false,
 				"multi_az_enabled":                   false,
+				"backup_retention_limit":             32,
+				"final_backup_identifier":            "tortoise",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -345,6 +349,8 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("elasticache_vpc_security_group_ids", "elasticache_vpc_security_group_ids", "any-valid-elasticache-vpc-security-group-ids"),
 			Entry("redis_version", "redis_version", "7.x"),
 			Entry("automatic_failover_enabled", "automatic_failover_enabled", false),
+			Entry("backup_retention_limit", "backup_retention_limit", 12),
+			Entry("final_backup_identifier", "final_backup_identifier", "tank"),
 		)
 
 	})
