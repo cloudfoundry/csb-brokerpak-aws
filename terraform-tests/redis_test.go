@@ -1,13 +1,13 @@
 package terraformtests
 
 import (
-	"path"
-
 	. "csbbrokerpakaws/terraform-tests/helpers"
+	"path"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
 )
 
@@ -23,7 +23,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"instance_name":                      "csb-redis-test",
 		"labels":                             map[string]any{"key1": "some-redis-value"},
 		"node_type":                          "cache.t3.medium",
-		"node_count":                         1,
+		"node_count":                         2,
 		"elasticache_subnet_group":           "",
 		"elasticache_vpc_security_group_ids": "",
 		"region":                             "us-west-2",
@@ -37,6 +37,10 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"maintenance_end_min":                nil,
 		"maintenance_start_min":              nil,
 		"maintenance_day":                    nil,
+		"data_tiering_enabled":               false,
+		"multi_az_enabled":                   true,
+		"backup_retention_limit":             12,
+		"final_backup_identifier":            "tortoise",
 	}
 
 	BeforeAll(func() {
@@ -59,17 +63,19 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"replication_group_id":       Equal("csb-redis-test"),
 					"description":                Equal("csb-redis-test redis"),
 					"node_type":                  Equal("cache.t3.medium"),
-					"num_cache_clusters":         BeNumerically("==", 1),
+					"num_cache_clusters":         BeNumerically("==", 2),
 					"engine":                     Equal("redis"),
 					"engine_version":             Equal("6.0"),
 					"port":                       BeNumerically("==", 6379),
 					"tags":                       HaveKeyWithValue("key1", "some-redis-value"),
 					"subnet_group_name":          Equal("csb-redis-test-p-sn"),
 					"transit_encryption_enabled": BeTrue(),
-					"automatic_failover_enabled": BeFalse(),
+					"automatic_failover_enabled": BeTrue(),
 					"apply_immediately":          BeTrue(),
 					"at_rest_encryption_enabled": BeTrue(),
 					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),
+					"snapshot_retention_limit":   BeNumerically("==", 12),
+					"final_snapshot_identifier":  Equal("tortoise"),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
@@ -77,9 +83,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					// will help us stay up-to-date with the provider's latest improvements.
 					"notification_topic_arn":      BeNil(),
 					"snapshot_name":               BeNil(),
-					"snapshot_retention_limit":    BeNil(),
 					"timeouts":                    BeNil(),
-					"final_snapshot_identifier":   BeNil(),
 					"log_delivery_configuration":  BeAssignableToTypeOf([]any{}),
 					"availability_zones":          BeNil(),
 					"multi_az_enabled":            BeAssignableToTypeOf(false),
@@ -87,6 +91,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"snapshot_arns":               BeNil(),
 					"tags_all":                    BeAssignableToTypeOf(map[string]any{}),
 					"user_group_ids":              BeNil(),
+					"data_tiering_enabled":        BeFalse(),
 				}))
 		})
 	})
@@ -203,6 +208,21 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					}))
 			})
 
+		})
+
+	})
+
+	Context("multi_az_enabled", func() {
+		When("invalid combination", func() {
+			It("should not be passed", func() {
+				vars := buildVars(defaultVars, map[string]any{"node_count": 1, "multi_az_enabled": true})
+				session, err := FailPlan(terraformProvisionDir, vars)
+
+				Expect(session.ExitCode()).NotTo(Equal(0), "Terraform plan should return and error upon exit")
+				Expect(session.Err).To(gbytes.Say("automatic_failover_enabled must be true if multi_az_enabled is true"))
+
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
 
 	})

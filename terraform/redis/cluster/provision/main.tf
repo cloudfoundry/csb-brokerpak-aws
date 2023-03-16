@@ -45,6 +45,7 @@ resource "random_password" "auth_token" {
 
 resource "aws_elasticache_replication_group" "redis" {
   automatic_failover_enabled = var.node_count > 1
+  multi_az_enabled           = var.multi_az_enabled
   replication_group_id       = var.instance_name
   description                = format("%s redis", var.instance_name)
   node_type                  = local.node_type
@@ -60,6 +61,9 @@ resource "aws_elasticache_replication_group" "redis" {
   at_rest_encryption_enabled = var.at_rest_encryption_enabled
   kms_key_id                 = var.kms_key_id
   maintenance_window         = local.maintenance_window
+  data_tiering_enabled       = var.data_tiering_enabled
+  snapshot_retention_limit   = var.backup_retention_limit
+  final_snapshot_identifier  = var.final_backup_identifier
 
   lifecycle {
     prevent_destroy = true
