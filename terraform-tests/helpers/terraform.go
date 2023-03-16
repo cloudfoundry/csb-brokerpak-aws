@@ -17,9 +17,33 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	defaultTimeout = 35 * time.Minute
+)
+
 func Init(dir string) {
 	command := exec.Command("terraform", "-chdir="+dir, "init")
 	CommandStart(command)
+}
+
+func FailPlan(dir string, vars map[string]any) (*gexec.Session, error) {
+	tfvarsPath := path.Join(dir, "terraform.tfvars.json")
+	writeTFVarsFile(vars, tfvarsPath)
+	defer os.Remove(tfvarsPath)
+
+	tmpFile, err := os.CreateTemp(dir, "test-tf-plan")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile.Name())
+
+	session, err := gexec.Start(terraformPlanCMD(dir, path.Base(tmpFile.Name())), GinkgoWriter, GinkgoWriter)
+	if err != nil {
+		return session, err
+	}
+
+	session = session.Wait(defaultTimeout)
+	return session, nil
 }
 
 func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
@@ -29,7 +53,7 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 
 	tmpFile, _ := os.CreateTemp(dir, "test-tf-plan")
 	defer os.Remove(tmpFile.Name())
-	createPlan(dir, path.Base(tmpFile.Name()))
+	CommandStart(terraformPlanCMD(dir, path.Base(tmpFile.Name())))
 
 	jsonPlan := decodePlan(dir, path.Base(tmpFile.Name()))
 
@@ -39,8 +63,8 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 	return plan
 }
 
-func createPlan(dir, planFile string) {
-	CommandStart(exec.Command("terraform", "-chdir="+dir, "plan", "-refresh=false", fmt.Sprintf("-out=%s", planFile)))
+func terraformPlanCMD(dir string, planFile string) *exec.Cmd {
+	return exec.Command("terraform", "-chdir="+dir, "plan", "-refresh=false", fmt.Sprintf("-out=%s", planFile))
 }
 
 func decodePlan(dir, planFile string) []byte {
@@ -52,7 +76,7 @@ func decodePlan(dir, planFile string) []byte {
 func CommandStart(command *exec.Cmd) *gexec.Session {
 	session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
-	Eventually(session, 35*time.Minute).Should(gexec.Exit(0))
+	Eventually(session, defaultTimeout).Should(gexec.Exit(0))
 	return session
 }
 
