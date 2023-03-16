@@ -172,6 +172,18 @@ provision:
     field_name: maintenance_end_min
     details: The preferred maintenance end minute
     enum: *minute_enum
+  - field_name: backup_retention_limit
+    type: integer
+    default: 1
+    details: |
+      Number of days for which ElastiCache will retain automatic cache cluster snapshots before deleting them.
+      If set to zero (0), backups are turned off.
+  - <<: *nullable_string
+    field_name: final_backup_identifier
+    details: |
+      The name of the final node group (shard) snapshot.
+      ElastiCache creates the snapshot from the primary node in the cluster.
+      If omitted, no final snapshot will be made.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
