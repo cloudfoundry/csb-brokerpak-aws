@@ -3,6 +3,8 @@ package terraformtests
 import (
 	"path"
 
+	"github.com/onsi/gomega/gbytes"
+
 	. "csbbrokerpakaws/terraform-tests/helpers"
 
 	tfjson "github.com/hashicorp/terraform-json"
@@ -23,7 +25,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"instance_name":                      "csb-redis-test",
 		"labels":                             map[string]any{"key1": "some-redis-value"},
 		"node_type":                          "cache.t3.medium",
-		"node_count":                         1,
+		"node_count":                         2,
 		"elasticache_subnet_group":           "",
 		"elasticache_vpc_security_group_ids": "",
 		"region":                             "us-west-2",
@@ -39,6 +41,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"maintenance_day":                    nil,
 		"data_tiering_enabled":               false,
 		"automatic_failover_enabled":         false,
+		"multi_az_enabled":                   true,
 	}
 
 	BeforeAll(func() {
@@ -61,14 +64,14 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"replication_group_id":       Equal("csb-redis-test"),
 					"description":                Equal("csb-redis-test redis"),
 					"node_type":                  Equal("cache.t3.medium"),
-					"num_cache_clusters":         BeNumerically("==", 1),
+					"num_cache_clusters":         BeNumerically("==", 2),
 					"engine":                     Equal("redis"),
 					"engine_version":             Equal("6.0"),
 					"port":                       BeNumerically("==", 6379),
 					"tags":                       HaveKeyWithValue("key1", "some-redis-value"),
 					"subnet_group_name":          Equal("csb-redis-test-p-sn"),
 					"transit_encryption_enabled": BeTrue(),
-					"automatic_failover_enabled": BeFalse(),
+					"automatic_failover_enabled": BeTrue(),
 					"apply_immediately":          BeTrue(),
 					"at_rest_encryption_enabled": BeTrue(),
 					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),
@@ -191,6 +194,21 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					}))
 			})
 
+		})
+
+	})
+
+	Context("multi_az_enabled", func() {
+		When("invalid combination", func() {
+			It("should not be passed", func() {
+				vars := buildVars(defaultVars, map[string]any{"node_count": 1, "multi_az_enabled": true})
+				session, err := FailPlan(terraformProvisionDir, vars)
+
+				Expect(session.ExitCode()).NotTo(Equal(0), "Terraform plan should return and error upon exit")
+				Expect(session.Err).To(gbytes.Say("automatic_failover_enabled must be true if multi_az_enabled is true"))
+
+				Expect(err).NotTo(HaveOccurred())
+			})
 		})
 
 	})
