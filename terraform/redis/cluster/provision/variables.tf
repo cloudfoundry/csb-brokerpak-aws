@@ -33,3 +33,7 @@ variable "multi_az_enabled" { type = bool }
 variable "backup_retention_limit" { type = number }
 variable "final_backup_identifier" { type = string }
 variable "backup_name" { type = string }
+variable "backup_start_hour" { type = string }
+variable "backup_start_min" { type = string }
+variable "backup_end_hour" { type = string }
+variable "backup_end_min" { type = string }
