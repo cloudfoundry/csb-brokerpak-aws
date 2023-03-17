@@ -222,6 +222,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("multi_az_enabled", BeTrue()),
 					HaveKeyWithValue("backup_retention_limit", BeNumerically("==", 1)),
 					HaveKeyWithValue("final_backup_identifier", BeNil()),
+					HaveKeyWithValue("backup_name", Equal("")),
 				))
 		})
 
@@ -245,6 +246,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"multi_az_enabled":                   false,
 				"backup_retention_limit":             32,
 				"final_backup_identifier":            "tortoise",
+				"backup_name":                        "turtle",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -269,6 +271,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_end_hour", "10"),
 					HaveKeyWithValue("maintenance_end_min", "15"),
 					HaveKeyWithValue("multi_az_enabled", BeFalse()),
+					HaveKeyWithValue("backup_name", "turtle"),
 				),
 			)
 		})
@@ -318,6 +321,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("at_rest_encryption_enabled", "at_rest_encryption_enabled", false),
 			Entry("kms_key_id", "kms_key_id", "fake-encryption-at-rest-key"),
 			Entry("data_tiering_enabled", "data_tiering_enabled", true),
+			Entry("backup_name", "backup_name", "turtle"),
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {

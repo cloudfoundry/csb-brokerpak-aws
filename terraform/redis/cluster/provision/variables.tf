@@ -32,3 +32,4 @@ variable "data_tiering_enabled" { type = bool }
 variable "multi_az_enabled" { type = bool }
 variable "backup_retention_limit" { type = number }
 variable "final_backup_identifier" { type = string }
+variable "backup_name" { type = string }
