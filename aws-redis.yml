@@ -184,6 +184,11 @@ provision:
       The name of the final node group (shard) snapshot.
       ElastiCache creates the snapshot from the primary node in the cluster.
       If omitted, no final snapshot will be made.
+  - field_name: backup_name
+    type: string
+    prohibit_update: true
+    default: ""
+    details: The name of an existing snapshot to be restored into this new instance
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
