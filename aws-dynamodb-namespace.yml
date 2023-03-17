@@ -1,0 +1,56 @@
+# Copyright 2023 VMware, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http:#www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+version: 1
+name: csb-aws-dynamodb-namespace
+id: 07d06aeb-f87a-4e06-90ae-0b07a8c21a02
+description: CSB Amazon DynamoDB Namespace
+display_name: CSB Amazon DynamoDB Namespace
+image_url: file://service-images/csb.png
+documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.5/csb-aws/GUID-reference-aws-dynamodb-namespace.html
+provider_display_name: VMware
+support_url: https://aws.amazon.com/dynamodb/
+tags: [aws, dynamodb, namespace]
+plan_updateable: true
+plans:
+- name: default
+  id: 73b55e9a-4cdd-4d6f-81bd-c34d5c27a086
+  description: "A DynamoDB Namespace"
+  display_name: "dynamodb namespace"
+provision:
+  template_refs:
+    outputs: terraform/dynamodb-namespace/provision/outputs.tf
+    variables: terraform/dynamodb-namespace/provision/variables.tf
+  computed_inputs:
+  - name: prefix
+    type: string
+    details: Prefix for the DynamoDB table names
+    default: csb-${request.instance_id}
+  - name: region
+    type: string
+    details: Region for the DynamoDB tables
+    default: ${region}
+  outputs:
+  - field_name: prefix
+    type: string
+    details: Prefix for the DynamoDB table names
+  - field_name: region
+    type: string
+    details: Region for the DynamoDB tables
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs: []
+  template_refs: {}
+  outputs: []
