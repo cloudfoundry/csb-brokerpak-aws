@@ -54,6 +54,20 @@ locals {
     var.maintenance_end_hour,
     var.maintenance_end_min
   )
+
+  is_backup_window_blank = length(compact([
+    var.backup_start_hour,
+    var.backup_end_hour,
+    var.backup_start_min,
+    var.backup_end_min
+  ])) == 0
+
+  backup_window = local.is_backup_window_blank ? null : format("%s:%s-%s:%s",
+    var.backup_start_hour,
+    var.backup_start_min,
+    var.backup_end_hour,
+    var.backup_end_min
+  )
 }
 
 data "aws_subnets" "all" {
