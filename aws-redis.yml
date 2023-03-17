@@ -224,15 +224,15 @@ examples:
 - name: example
   description: Create an example-plan Redis instance
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
-  provision_params: {}
+  provision_params: {"multi_az_enabled": false}
   bind_params: {}
 - name: with-custom-region
   description: Create a Redis instance with a custom region
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
-  provision_params: {"region": "us-east-1"}
+  provision_params: {"region": "us-east-1", "multi_az_enabled": false}
   bind_params: {}
 - name: with-custom-node_type
   description: Create a Redis instance with a custom node_type
   plan_id: 2deb6c13-7ea1-4bad-a519-0ac9600e9a29
-  provision_params: {"node_type": "cache.t2.micro"}
+  provision_params: {"node_type": "cache.t2.micro", "multi_az_enabled": false}
   bind_params: {}
