@@ -49,6 +49,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"backup_start_hour":                  nil,
 		"backup_end_min":                     nil,
 		"backup_start_min":                   nil,
+		"parameter_group_name":               "fake-param-group-name",
 	}
 
 	BeforeAll(func() {
@@ -86,6 +87,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"final_snapshot_identifier":  Equal("tortoise"),
 					"snapshot_name":              Equal("turtle"),
 					"auto_minor_version_upgrade": Equal("false"), // yes, a string. Provider quirk.
+					"parameter_group_name":       Equal("fake-param-group-name"),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
