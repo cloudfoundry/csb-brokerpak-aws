@@ -137,6 +137,51 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				map[string]any{"instance_name": ".aaaaa"},
 				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
+			Entry(
+				"maintenance_day invalid day",
+				map[string]any{"maintenance_day": "San"},
+				`maintenance_day must be one of the following: null, \"Fri\", \"Mon\", \"Sat\", \"Sun\", \"Thu\", \"Tue\", \"Wed\"`,
+			),
+			Entry(
+				"maintenance_start_hour invalid hour",
+				map[string]any{"maintenance_start_hour": "31"},
+				`maintenance_start_hour must be one of the following: \"00\", \"01\", \"02\", \"03\", \"04\", \"05\", \"06\", \"07\", \"08\", \"09\", \"10\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\", \"18\", \"19\", \"20\", \"21\", \"22\", \"23\", null"`,
+			),
+			Entry(
+				"maintenance_start_min invalid minute",
+				map[string]any{"maintenance_start_min": "12"},
+				`maintenance_start_min must be one of the following: \"00\", \"15\", \"30\", \"45\", null`,
+			),
+			Entry(
+				"maintenance_end_hour invalid hour",
+				map[string]any{"maintenance_end_hour": "31"},
+				`maintenance_end_hour must be one of the following: \"00\", \"01\", \"02\", \"03\", \"04\", \"05\", \"06\", \"07\", \"08\", \"09\", \"10\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\", \"18\", \"19\", \"20\", \"21\", \"22\", \"23\", null"`,
+			),
+			Entry(
+				"maintenance_end_min invalid minute",
+				map[string]any{"maintenance_end_min": "12"},
+				`maintenance_end_min must be one of the following: \"00\", \"15\", \"30\", \"45\", null`,
+			),
+			Entry(
+				"backup_start_hour invalid hour",
+				map[string]any{"backup_start_hour": "31"},
+				`backup_start_hour must be one of the following: \"00\", \"01\", \"02\", \"03\", \"04\", \"05\", \"06\", \"07\", \"08\", \"09\", \"10\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\", \"18\", \"19\", \"20\", \"21\", \"22\", \"23\", null"`,
+			),
+			Entry(
+				"backup_start_min invalid minute",
+				map[string]any{"backup_start_min": "12"},
+				`backup_start_min must be one of the following: \"00\", \"15\", \"30\", \"45\", null`,
+			),
+			Entry(
+				"backup_end_hour invalid hour",
+				map[string]any{"backup_end_hour": "31"},
+				`backup_end_hour must be one of the following: \"00\", \"01\", \"02\", \"03\", \"04\", \"05\", \"06\", \"07\", \"08\", \"09\", \"10\", \"11\", \"12\", \"13\", \"14\", \"15\", \"16\", \"17\", \"18\", \"19\", \"20\", \"21\", \"22\", \"23\", null"`,
+			),
+			Entry(
+				"backup_end_min invalid minute",
+				map[string]any{"backup_end_min": "12"},
+				`backup_end_min must be one of the following: \"00\", \"15\", \"30\", \"45\", null`,
+			),
 		)
 
 		It("should prevent modifying `plan defined properties`", func() {
@@ -223,6 +268,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("multi_az_enabled", BeTrue()),
 					HaveKeyWithValue("backup_retention_limit", BeNumerically("==", 1)),
 					HaveKeyWithValue("final_backup_identifier", BeNil()),
+					HaveKeyWithValue("backup_name", Equal("")),
+					HaveKeyWithValue("backup_start_hour", BeNil()),
+					HaveKeyWithValue("backup_start_min", BeNil()),
+					HaveKeyWithValue("backup_end_hour", BeNil()),
+					HaveKeyWithValue("backup_end_min", BeNil()),
 				))
 		})
 
@@ -247,6 +297,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"multi_az_enabled":                   false,
 				"backup_retention_limit":             32,
 				"final_backup_identifier":            "tortoise",
+				"backup_name":                        "turtle",
+				"backup_start_hour":                  "04",
+				"backup_start_min":                   "15",
+				"backup_end_hour":                    "11",
+				"backup_end_min":                     "30",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -272,6 +327,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("maintenance_end_min", "15"),
 					HaveKeyWithValue("automatic_failover_enabled", BeFalse()),
 					HaveKeyWithValue("multi_az_enabled", BeFalse()),
+					HaveKeyWithValue("backup_name", "turtle"),
+					HaveKeyWithValue("backup_start_hour", "04"),
+					HaveKeyWithValue("backup_start_min", "15"),
+					HaveKeyWithValue("backup_end_hour", "11"),
+					HaveKeyWithValue("backup_end_min", "30"),
 				),
 			)
 		})
@@ -321,6 +381,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("at_rest_encryption_enabled", "at_rest_encryption_enabled", false),
 			Entry("kms_key_id", "kms_key_id", "fake-encryption-at-rest-key"),
 			Entry("data_tiering_enabled", "data_tiering_enabled", true),
+			Entry("backup_name", "backup_name", "turtle"),
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {
@@ -351,12 +412,19 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("automatic_failover_enabled", "automatic_failover_enabled", false),
 			Entry("backup_retention_limit", "backup_retention_limit", 12),
 			Entry("final_backup_identifier", "final_backup_identifier", "tank"),
+			Entry("maintenance_day", "maintenance_day", "Wed"),
+			Entry("maintenance_start_hour", "maintenance_start_hour", "05"),
+			Entry("maintenance_start_min", "maintenance_start_min", "30"),
+			Entry("maintenance_end_hour", "maintenance_end_hour", "05"),
+			Entry("maintenance_end_min", "maintenance_end_min", "30"),
+			Entry("backup_start_hour", "backup_start_hour", "05"),
+			Entry("backup_start_min", "backup_start_min", "30"),
+			Entry("backup_end_hour", "backup_end_hour", "05"),
+			Entry("backup_end_min", "backup_end_min", "30"),
 		)
-
 	})
 
 	Describe("updating node_type for instances of plans which don't specify a fixed node_type", func() {
-
 		It("should allow updating node_type when not enforced by the plan definition", func() {
 			instanceID, err := broker.Provision(redisServiceName, "flexible-nodetype-sample", map[string]any{"node_type": "cache.t3.medium"})
 			Expect(err).ToNot(HaveOccurred())

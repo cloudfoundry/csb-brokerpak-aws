@@ -64,6 +64,8 @@ resource "aws_elasticache_replication_group" "redis" {
   data_tiering_enabled       = var.data_tiering_enabled
   snapshot_retention_limit   = var.backup_retention_limit
   final_snapshot_identifier  = var.final_backup_identifier
+  snapshot_name              = var.backup_name
+  snapshot_window            = local.backup_window
 
   lifecycle {
     prevent_destroy = true

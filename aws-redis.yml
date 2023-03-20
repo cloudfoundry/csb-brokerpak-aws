@@ -176,6 +176,23 @@ provision:
     field_name: maintenance_end_min
     details: The preferred maintenance end minute
     enum: *minute_enum
+  - <<: *nullable_string
+    field_name: backup_start_hour
+    details: The preferred backup start hour
+    enum: *hour_enum
+  - <<: *nullable_string
+    field_name: backup_start_min
+    type: string
+    details: The preferred backup start minute
+    enum: *minute_enum
+  - <<: *nullable_string
+    field_name: backup_end_hour
+    details: The preferred backup end hour
+    enum: *hour_enum
+  - <<: *nullable_string
+    field_name: backup_end_min
+    details: The preferred backup end minute
+    enum: *minute_enum
   - field_name: backup_retention_limit
     type: integer
     default: 1
@@ -188,6 +205,11 @@ provision:
       The name of the final node group (shard) snapshot.
       ElastiCache creates the snapshot from the primary node in the cluster.
       If omitted, no final snapshot will be made.
+  - field_name: backup_name
+    type: string
+    prohibit_update: true
+    default: ""
+    details: The name of an existing snapshot to be restored into this new instance
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -223,15 +245,15 @@ examples:
 - name: example
   description: Create an example-plan Redis instance
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
-  provision_params: {}
+  provision_params: {"multi_az_enabled": false}
   bind_params: {}
 - name: with-custom-region
   description: Create a Redis instance with a custom region
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
-  provision_params: {"region": "us-east-1"}
+  provision_params: {"region": "us-east-1", "multi_az_enabled": false}
   bind_params: {}
 - name: with-custom-node_type
   description: Create a Redis instance with a custom node_type
   plan_id: 2deb6c13-7ea1-4bad-a519-0ac9600e9a29
-  provision_params: {"node_type": "cache.t2.micro"}
+  provision_params: {"node_type": "cache.t2.micro", "multi_az_enabled": false}
   bind_params: {}

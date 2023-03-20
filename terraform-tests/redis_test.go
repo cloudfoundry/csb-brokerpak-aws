@@ -42,6 +42,11 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"multi_az_enabled":                   true,
 		"backup_retention_limit":             12,
 		"final_backup_identifier":            "tortoise",
+		"backup_name":                        "turtle",
+		"backup_end_hour":                    nil,
+		"backup_start_hour":                  nil,
+		"backup_end_min":                     nil,
+		"backup_start_min":                   nil,
 	}
 
 	BeforeAll(func() {
@@ -77,13 +82,13 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),
 					"snapshot_retention_limit":   BeNumerically("==", 12),
 					"final_snapshot_identifier":  Equal("tortoise"),
+					"snapshot_name":              Equal("turtle"),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
 					// If a new version adds new properties we will know immediately which
 					// will help us stay up-to-date with the provider's latest improvements.
 					"notification_topic_arn":      BeNil(),
-					"snapshot_name":               BeNil(),
 					"timeouts":                    BeNil(),
 					"log_delivery_configuration":  BeAssignableToTypeOf([]any{}),
 					"availability_zones":          BeNil(),
@@ -171,12 +176,13 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
+
 			It("should not be passed", func() {
 				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(Not(HaveKey("maintenance_window")))
 			})
 		})
 
-		When("maintainance window specified with all values", func() {
+		When("maintenance window specified with all values", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"maintenance_day":        "Mon",
@@ -193,9 +199,37 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 						"maintenance_window": Equal("mon:01:03-mon:02:04"),
 					}))
 			})
+		})
+	})
 
+	Context("backup_window", func() {
+		When("no window is set", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
+			})
+
+			It("should not be passed", func() {
+				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(Not(HaveKey("backup_window")))
+			})
 		})
 
+		When("backup window specified with all values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"backup_start_hour": "01",
+					"backup_end_hour":   "02",
+					"backup_start_min":  "03",
+					"backup_end_min":    "04",
+				}))
+			})
+
+			It("should pass the correct window", func() {
+				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"snapshot_window": Equal("01:03-02:04"),
+					}))
+			})
+		})
 	})
 
 	Context("multi_az_enabled", func() {
