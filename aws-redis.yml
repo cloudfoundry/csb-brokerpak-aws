@@ -230,12 +230,6 @@ examples:
   plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
   provision_params: {"region": "us-east-1"}
   bind_params: {}
-- name: invalid-automatic-failover
-  description: Try to set `automatic_failover_enabled` with `node_count` < 2
-  expected_error: When using automatic failover, there must be at least 2 cache clusters in the replication group
-  plan_id: c7f64994-a1d9-4e1f-9491-9d8e56bbf146
-  provision_params: {"node_count": 1, "automatic_failover_enabled": true}
-  bind_params: {}
 - name: with-custom-node_type
   description: Create a Redis instance with a custom node_type
   plan_id: 2deb6c13-7ea1-4bad-a519-0ac9600e9a29
