@@ -38,7 +38,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"maintenance_start_min":              nil,
 		"maintenance_day":                    nil,
 		"data_tiering_enabled":               false,
-		"automatic_failover_enabled":         false,
+		"automatic_failover_enabled":         true,
 		"multi_az_enabled":                   true,
 		"backup_retention_limit":             12,
 		"final_backup_identifier":            "tortoise",
@@ -235,7 +235,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	Context("multi_az_enabled", func() {
 		When("invalid combination", func() {
 			It("should not be passed", func() {
-				vars := buildVars(defaultVars, map[string]any{"node_count": 1, "multi_az_enabled": true})
+				vars := buildVars(defaultVars, map[string]any{"node_count": 1, "multi_az_enabled": true, "automatic_failover_enabled": false})
 				session, err := FailPlan(terraformProvisionDir, vars)
 
 				Expect(session.ExitCode()).NotTo(Equal(0), "Terraform plan should return and error upon exit")

@@ -11,8 +11,8 @@ import (
 
 const (
 	plansRedisVar              = "GSB_SERVICE_CSB_AWS_REDIS_PLANS"
-	defaultRedisPlanForUpgrade = `{"name":"default","id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","node_type":"cache.t3.medium","redis_version":"7.0", "at_rest_encryption_enabled": false, "multi_az_enabled": false}`
-	oldRedisPlanForUpgrade     = `{"name": "small", "id": "ad963fcd-19f7-4b79-8e6d-645756e84f7a","description": "Beta - Redis 6.0 with 1GB cache and 1 node.","cache_size": 2,"redis_version": "6.0","node_count": 1,"at_rest_encryption_enabled": false, "multi_az_enabled": false}`
+	defaultRedisPlanForUpgrade = `{"name":"default","id":"c7f64994-a1d9-4e1f-9491-9d8e56bbf146","description":"Default Redis plan","display_name":"default","node_type":"cache.t3.medium","redis_version":"7.0", "at_rest_encryption_enabled": false, "multi_az_enabled": false, "automatic_failover_enabled": false}`
+	oldRedisPlanForUpgrade     = `{"name": "small", "id": "ad963fcd-19f7-4b79-8e6d-645756e84f7a","description": "Beta - Redis 6.0 with 1GB cache and 1 node.","cache_size": 2,"redis_version": "6.0","node_count": 1,"at_rest_encryption_enabled": false, "multi_az_enabled": false, "automatic_failover_enabled": false}`
 )
 
 func (b Broker) env() []apps.EnvVar {
