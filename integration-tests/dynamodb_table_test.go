@@ -45,7 +45,7 @@ var _ = Describe("DynamoDB Table", Label("DynamoDB Table"), func() {
 		Expect(mockTerraform.Reset()).To(Succeed())
 	})
 
-	It("should publish AWS dynamodb in the catalog", func() {
+	It("should publish the service in the catalog", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
