@@ -10,7 +10,7 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb-table", "upgrade"), func() {
+var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
