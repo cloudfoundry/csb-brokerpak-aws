@@ -235,12 +235,22 @@ provision:
   - field_name: password
     type: string
     details: The password to authenticate to the redis instance.
+  - field_name: reader_endpoint
+    type: string
+    details: Address used by clients to read from the service. It splits incoming connections between all read replicas.
 bind:
   plan_inputs: []
   user_inputs: []
-  computed_inputs: []
+  computed_inputs:
+  - name: reader_endpoint
+    type: string
+    default: ${instance.details["reader_endpoint"]}
+    overwrite: true
   template: ''
-  outputs: []
+  outputs:
+  - field_name: reader_endpoint
+    type: string
+    details: Address used by clients to read from the service. It splits incoming connections between all read replicas.
 examples:
 - name: example
   description: Create an example-plan Redis instance
