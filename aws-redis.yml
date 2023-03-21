@@ -113,6 +113,10 @@ provision:
     details: The ARN of the key to use if encrypting at rest. Defaults to AWS managed key.
     default: ""
     prohibit_update: true
+  - field_name: automatic_failover_enabled
+    type: boolean
+    details: Automatically promote replica to primary if the existing primary fails. If enabled, node_count must be greater than 1.
+    default: true
   - <<: &nullable_string
       type: string
       default: null
