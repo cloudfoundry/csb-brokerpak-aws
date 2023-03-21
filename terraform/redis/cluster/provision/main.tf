@@ -67,6 +67,10 @@ resource "aws_elasticache_replication_group" "redis" {
   snapshot_name              = var.backup_name
   snapshot_window            = local.backup_window
 
+  // automatic upgrades are problematic because during the next update
+  // Terraform detects engine_version difference attempts to re-create
+  auto_minor_version_upgrade = false
+
   lifecycle {
     prevent_destroy = true
   }
