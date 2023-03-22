@@ -10,13 +10,13 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb", "upgrade"), func() {
+var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
 
 			serviceBroker := brokers.Create(
-				brokers.WithPrefix("csb-aws-dynamodb"),
+				brokers.WithPrefix("csb-aws-dynamodb-table"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(),
 				brokers.WithLegacyMySQLEnvFor140(),
@@ -26,7 +26,7 @@ var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb", "upgrade"), func() {
 			By("creating a service instance")
 			tableName := random.Name(random.WithPrefix("csb", "dynamodb"))
 			serviceInstance := services.CreateInstance(
-				"csb-aws-dynamodb",
+				"csb-aws-dynamodb", // old service offering name
 				services.WithPlan("ondemand"),
 				services.WithParameters(config(tableName)),
 				services.WithBroker(serviceBroker),
@@ -34,11 +34,11 @@ var _ = Describe("UpgradeDynamoDBTest", Label("dynamodb", "upgrade"), func() {
 			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
-			appOne := apps.Push(apps.WithApp(apps.DynamoDB))
-			appTwo := apps.Push(apps.WithApp(apps.DynamoDB))
+			appOne := apps.Push(apps.WithApp(apps.DynamoDBTable))
+			appTwo := apps.Push(apps.WithApp(apps.DynamoDBTable))
 			defer apps.Delete(appOne, appTwo)
 
-			By("binding the apps to the DynamoDB service instance")
+			By("binding the apps to the DynamoDB Table service instance")
 			bindingOne := serviceInstance.Bind(appOne)
 			bindingTwo := serviceInstance.Bind(appTwo)
 

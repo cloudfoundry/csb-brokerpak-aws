@@ -72,7 +72,7 @@ service_definitions:
 - aws-redis.yml
 - aws-postgresql.yml
 - aws-s3-bucket.yml
-- aws-dynamodb.yml
+- aws-dynamodb-table.yml
 - aws-dynamodb-namespace.yml
 - aws-aurora-postgresql.yml
 - aws-aurora-mysql.yml

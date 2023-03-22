@@ -31,7 +31,7 @@ updates:
     day: "saturday"
     time: "06:00"
 - package-ecosystem: gomod
-  directory: "/acceptance-tests/apps/dynamodbapp"
+  directory: "/acceptance-tests/apps/dynamodbtableapp"
   schedule:
     interval: "weekly"
     day: "saturday"

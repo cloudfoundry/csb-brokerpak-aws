@@ -9,22 +9,22 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("DynamoDB", Label("dynamodb"), func() {
+var _ = Describe("DynamoDB Table", Label("dynamodb-table"), func() {
 	It("can be accessed by an app", func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
-			"csb-aws-dynamodb",
+			"csb-aws-dynamodb-table",
 			services.WithPlan("ondemand"),
 			services.WithParameters(config()),
 		)
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := apps.Push(apps.WithApp(apps.DynamoDB))
-		appTwo := apps.Push(apps.WithApp(apps.DynamoDB))
+		appOne := apps.Push(apps.WithApp(apps.DynamoDBTable))
+		appTwo := apps.Push(apps.WithApp(apps.DynamoDBTable))
 		defer apps.Delete(appOne, appTwo)
 
-		By("binding the apps to the DynamoDB service instance")
+		By("binding the apps to the DynamoDB Table service instance")
 		binding := serviceInstance.Bind(appOne)
 		serviceInstance.Bind(appTwo)
 

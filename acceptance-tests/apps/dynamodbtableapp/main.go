@@ -1,8 +1,8 @@
 package main
 
 import (
-	"dynamodbapp/internal/app"
-	"dynamodbapp/internal/credentials"
+	"dynamodbtableapp/internal/app"
+	"dynamodbtableapp/internal/credentials"
 	"fmt"
 	"log"
 	"net/http"
