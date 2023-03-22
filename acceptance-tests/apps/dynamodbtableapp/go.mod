@@ -1,4 +1,4 @@
-module dynamodbapp
+module dynamodbtableapp
 
 go 1.20
 

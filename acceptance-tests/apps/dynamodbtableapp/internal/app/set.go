@@ -1,7 +1,7 @@
 package app
 
 import (
-	"dynamodbapp/internal/credentials"
+	"dynamodbtableapp/internal/credentials"
 	"io"
 	"log"
 	"net/http"
