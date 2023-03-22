@@ -219,6 +219,14 @@ provision:
       When updating the redis_version it may be necessary to update the parameter_group_name too.
       For more information about parameter groups, see
       https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/ParameterGroups.Redis.html
+  - field_name: preferred_azs
+    type: array
+    prohibit_update: true
+    default: []
+    details: |
+      List of EC2 availability zones in which the nodes will be created.
+      The first item in the list will be the primary node.
+      Number of entries must equal to node_count.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
