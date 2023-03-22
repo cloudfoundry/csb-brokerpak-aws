@@ -12,6 +12,8 @@ import (
 )
 
 var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
+	const resource = "aws_elasticache_replication_group"
+
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -64,7 +66,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should create a aws_elasticache_replication_group with the right values", func() {
-			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+			Expect(AfterValuesForType(plan, resource)).To(
 				MatchAllKeys(Keys{
 					"replication_group_id":       Equal("csb-redis-test"),
 					"description":                Equal("csb-redis-test redis"),
@@ -83,6 +85,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"snapshot_retention_limit":   BeNumerically("==", 12),
 					"final_snapshot_identifier":  Equal("tortoise"),
 					"snapshot_name":              Equal("turtle"),
+					"auto_minor_version_upgrade": Equal("false"), // yes, a string. Provider quirk.
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
@@ -115,7 +118,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should use the elasticache_vpc_security_group_ids passed as the security_group_ids", func() {
-			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+			Expect(AfterValuesForType(plan, resource)).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"security_group_ids": ConsistOf("group1", "group2", "group3"),
 				}))
@@ -135,7 +138,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should use the elasticache_subnet_group passed as the subnet_group_name", func() {
-			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+			Expect(AfterValuesForType(plan, resource)).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"subnet_group_name": Equal("some-other-group"),
 				}))
@@ -150,7 +153,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should ignore cache_size and create a aws_elasticache_replication_group with that node_type", func() {
-			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+			Expect(AfterValuesForType(plan, resource)).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"node_type": Equal("cache.t2.micro"),
 				}))
@@ -165,7 +168,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 
 		It("should create a aws_elasticache_replication_group with that engine_version", func() {
-			Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(MatchKeys(IgnoreExtras, Keys{
+			Expect(AfterValuesForType(plan, resource)).To(MatchKeys(IgnoreExtras, Keys{
 				"engine_version": Equal("5.0.6"),
 			}))
 		})
@@ -178,7 +181,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			})
 
 			It("should not be passed", func() {
-				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(Not(HaveKey("maintenance_window")))
+				Expect(AfterValuesForType(plan, resource)).To(Not(HaveKey("maintenance_window")))
 			})
 		})
 
@@ -194,7 +197,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			})
 
 			It("should pass the correct window", func() {
-				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+				Expect(AfterValuesForType(plan, resource)).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"maintenance_window": Equal("mon:01:03-mon:02:04"),
 					}))
@@ -209,7 +212,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			})
 
 			It("should not be passed", func() {
-				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(Not(HaveKey("backup_window")))
+				Expect(AfterValuesForType(plan, resource)).To(Not(HaveKey("backup_window")))
 			})
 		})
 
@@ -224,7 +227,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			})
 
 			It("should pass the correct window", func() {
-				Expect(AfterValuesForType(plan, "aws_elasticache_replication_group")).To(
+				Expect(AfterValuesForType(plan, resource)).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"snapshot_window": Equal("01:03-02:04"),
 					}))
@@ -244,7 +247,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 				Expect(err).NotTo(HaveOccurred())
 			})
 		})
-
 	})
 })
 
