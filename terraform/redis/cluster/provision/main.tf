@@ -66,6 +66,7 @@ resource "aws_elasticache_replication_group" "redis" {
   final_snapshot_identifier  = var.final_backup_identifier
   snapshot_name              = var.backup_name
   snapshot_window            = local.backup_window
+  parameter_group_name       = var.parameter_group_name
 
   // automatic upgrades are problematic because during the next update
   // Terraform detects engine_version difference attempts to re-create
