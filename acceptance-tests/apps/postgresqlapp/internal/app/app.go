@@ -1,16 +1,14 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"postgresqlapp/internal/connector"
 	"regexp"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	_ "github.com/jackc/pgx/v4/stdlib"
-
-	"postgresqlapp/internal/connector"
 )
 
 const (
@@ -18,16 +16,15 @@ const (
 	keyColumn     = "keyname"
 	valueColumn   = "valuedata"
 	tlsQueryParam = "tls"
-	schemaKey     = "schema"
 )
 
-func App(conn *connector.Connector) *mux.Router {
-	r := mux.NewRouter()
-	r.HandleFunc("/", aliveness).Methods(http.MethodHead, http.MethodGet)
-	r.Handle("/{schema}", checkSchemaMiddleware(http.HandlerFunc(handleCreateSchema(conn)))).Methods(http.MethodPut)
-	r.Handle("/{schema}", checkSchemaMiddleware(http.HandlerFunc(handleDropSchema(conn)))).Methods(http.MethodDelete)
-	r.Handle("/{schema}/{key}", checkSchemaMiddleware(http.HandlerFunc(handleSet(conn)))).Methods(http.MethodPut)
-	r.Handle("/{schema}/{key}", checkSchemaMiddleware(http.HandlerFunc(handleGet(conn)))).Methods(http.MethodGet)
+func App(conn *connector.Connector) http.Handler {
+	r := chi.NewRouter()
+	r.Head("/", aliveness)
+	r.Put("/{schema}", handleCreateSchema(conn))
+	r.Delete("/{schema}", handleDropSchema(conn))
+	r.Put("/{schema}/{key}", handleSet(conn))
+	r.Get("/{schema}/{key}", handleGet(conn))
 
 	return r
 }
@@ -37,28 +34,14 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func checkSchemaMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		schema, err := schemaName(r)
-		if err != nil {
-			fail(w, http.StatusInternalServerError, "Schema name error: %s\n", err)
-			return
-		}
-
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), schemaKey, schema)))
-	})
-}
-
 func schemaName(r *http.Request) (string, error) {
-	schema, ok := mux.Vars(r)["schema"]
+	schema := chi.URLParam(r, "schema")
 
 	switch {
-	case !ok:
-		return "", fmt.Errorf("schema missing")
+	case schema == "":
+		return "", fmt.Errorf("schema must be supplied")
 	case len(schema) > 50:
 		return "", fmt.Errorf("schema name too long")
-	case len(schema) == 0:
-		return "", fmt.Errorf("schema name cannot be zero length")
 	case !regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString(schema):
 		return "", fmt.Errorf("schema name contains invalid characters")
 	default:
