@@ -268,11 +268,12 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("multi_az_enabled", BeTrue()),
 					HaveKeyWithValue("backup_retention_limit", BeNumerically("==", 1)),
 					HaveKeyWithValue("final_backup_identifier", BeNil()),
-					HaveKeyWithValue("backup_name", Equal("")),
+					HaveKeyWithValue("backup_name", ""),
 					HaveKeyWithValue("backup_start_hour", BeNil()),
 					HaveKeyWithValue("backup_start_min", BeNil()),
 					HaveKeyWithValue("backup_end_hour", BeNil()),
 					HaveKeyWithValue("backup_end_min", BeNil()),
+					HaveKeyWithValue("parameter_group_name", ""),
 				))
 		})
 
@@ -302,6 +303,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"backup_start_min":                   "15",
 				"backup_end_hour":                    "11",
 				"backup_end_min":                     "30",
+				"parameter_group_name":               "fake-param-group-name",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -332,6 +334,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("backup_start_min", "15"),
 					HaveKeyWithValue("backup_end_hour", "11"),
 					HaveKeyWithValue("backup_end_min", "30"),
+					HaveKeyWithValue("parameter_group_name", "fake-param-group-name"),
 				),
 			)
 		})
@@ -421,6 +424,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("backup_start_min", "backup_start_min", "30"),
 			Entry("backup_end_hour", "backup_end_hour", "05"),
 			Entry("backup_end_min", "backup_end_min", "30"),
+			Entry("parameter_group_name", "parameter_group_name", "fake-param-group-name"),
 		)
 	})
 
