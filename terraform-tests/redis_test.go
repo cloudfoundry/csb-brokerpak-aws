@@ -50,6 +50,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"backup_end_min":                     nil,
 		"backup_start_min":                   nil,
 		"parameter_group_name":               "fake-param-group-name",
+		"preferred_azs":                      nil,
 	}
 
 	BeforeAll(func() {
@@ -69,40 +70,40 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		It("should create a aws_elasticache_replication_group with the right values", func() {
 			Expect(AfterValuesForType(plan, resource)).To(
 				MatchAllKeys(Keys{
-					"replication_group_id":       Equal("csb-redis-test"),
-					"description":                Equal("csb-redis-test redis"),
-					"node_type":                  Equal("cache.t3.medium"),
-					"num_cache_clusters":         BeNumerically("==", 2),
-					"engine":                     Equal("redis"),
-					"engine_version":             Equal("6.0"),
-					"port":                       BeNumerically("==", 6379),
-					"tags":                       HaveKeyWithValue("key1", "some-redis-value"),
-					"subnet_group_name":          Equal("csb-redis-test-p-sn"),
-					"transit_encryption_enabled": BeTrue(),
-					"automatic_failover_enabled": BeTrue(),
-					"apply_immediately":          BeTrue(),
-					"at_rest_encryption_enabled": BeTrue(),
-					"kms_key_id":                 Equal("fake-encryption-at-rest-key"),
-					"snapshot_retention_limit":   BeNumerically("==", 12),
-					"final_snapshot_identifier":  Equal("tortoise"),
-					"snapshot_name":              Equal("turtle"),
-					"auto_minor_version_upgrade": Equal("false"), // yes, a string. Provider quirk.
-					"parameter_group_name":       Equal("fake-param-group-name"),
+					"replication_group_id":        Equal("csb-redis-test"),
+					"description":                 Equal("csb-redis-test redis"),
+					"node_type":                   Equal("cache.t3.medium"),
+					"num_cache_clusters":          BeNumerically("==", 2),
+					"engine":                      Equal("redis"),
+					"engine_version":              Equal("6.0"),
+					"port":                        BeNumerically("==", 6379),
+					"tags":                        HaveKeyWithValue("key1", "some-redis-value"),
+					"subnet_group_name":           Equal("csb-redis-test-p-sn"),
+					"transit_encryption_enabled":  BeTrue(),
+					"automatic_failover_enabled":  BeTrue(),
+					"apply_immediately":           BeTrue(),
+					"at_rest_encryption_enabled":  BeTrue(),
+					"kms_key_id":                  Equal("fake-encryption-at-rest-key"),
+					"snapshot_retention_limit":    BeNumerically("==", 12),
+					"final_snapshot_identifier":   Equal("tortoise"),
+					"snapshot_name":               Equal("turtle"),
+					"auto_minor_version_upgrade":  Equal("false"), // yes, a string. Provider quirk.
+					"parameter_group_name":        Equal("fake-param-group-name"),
+					"preferred_cache_cluster_azs": BeNil(),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
 					// If a new version adds new properties we will know immediately which
 					// will help us stay up-to-date with the provider's latest improvements.
-					"notification_topic_arn":      BeNil(),
-					"timeouts":                    BeNil(),
-					"log_delivery_configuration":  BeAssignableToTypeOf([]any{}),
-					"availability_zones":          BeNil(),
-					"multi_az_enabled":            BeAssignableToTypeOf(false),
-					"preferred_cache_cluster_azs": BeNil(),
-					"snapshot_arns":               BeNil(),
-					"tags_all":                    BeAssignableToTypeOf(map[string]any{}),
-					"user_group_ids":              BeNil(),
-					"data_tiering_enabled":        BeFalse(),
+					"notification_topic_arn":     BeNil(),
+					"timeouts":                   BeNil(),
+					"log_delivery_configuration": BeAssignableToTypeOf([]any{}),
+					"availability_zones":         BeNil(),
+					"multi_az_enabled":           BeAssignableToTypeOf(false),
+					"snapshot_arns":              BeNil(),
+					"tags_all":                   BeAssignableToTypeOf(map[string]any{}),
+					"user_group_ids":             BeNil(),
+					"data_tiering_enabled":       BeFalse(),
 				}))
 		})
 	})
@@ -250,6 +251,21 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			})
 		})
 	})
+
+	Context("preferred_azs are passed", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"preferred_azs": []string{"fake-az1", "fake-az2"},
+			}))
+		})
+
+		It("should create a aws_elasticache_replication_group with that engine_version", func() {
+			Expect(AfterValuesForType(plan, resource)).To(MatchKeys(IgnoreExtras, Keys{
+				"preferred_cache_cluster_azs": ConsistOf("fake-az1", "fake-az2"),
+			}))
+		})
+	})
+
 })
 
 func getExpectedResources() []string {

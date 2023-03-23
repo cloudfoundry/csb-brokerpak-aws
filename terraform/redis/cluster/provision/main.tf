@@ -44,29 +44,30 @@ resource "random_password" "auth_token" {
 }
 
 resource "aws_elasticache_replication_group" "redis" {
-  automatic_failover_enabled = var.automatic_failover_enabled
-  multi_az_enabled           = var.multi_az_enabled
-  replication_group_id       = var.instance_name
-  description                = format("%s redis", var.instance_name)
-  node_type                  = local.node_type
-  num_cache_clusters         = var.node_count
-  engine_version             = var.redis_version
-  port                       = local.port
-  tags                       = var.labels
-  security_group_ids         = local.elasticache_vpc_security_group_ids
-  subnet_group_name          = local.subnet_group
-  transit_encryption_enabled = true
-  auth_token                 = random_password.auth_token.result
-  apply_immediately          = true
-  at_rest_encryption_enabled = var.at_rest_encryption_enabled
-  kms_key_id                 = var.kms_key_id
-  maintenance_window         = local.maintenance_window
-  data_tiering_enabled       = var.data_tiering_enabled
-  snapshot_retention_limit   = var.backup_retention_limit
-  final_snapshot_identifier  = var.final_backup_identifier
-  snapshot_name              = var.backup_name
-  snapshot_window            = local.backup_window
-  parameter_group_name       = var.parameter_group_name
+  automatic_failover_enabled  = var.automatic_failover_enabled
+  multi_az_enabled            = var.multi_az_enabled
+  replication_group_id        = var.instance_name
+  description                 = format("%s redis", var.instance_name)
+  node_type                   = local.node_type
+  num_cache_clusters          = var.node_count
+  engine_version              = var.redis_version
+  port                        = local.port
+  tags                        = var.labels
+  security_group_ids          = local.elasticache_vpc_security_group_ids
+  subnet_group_name           = local.subnet_group
+  transit_encryption_enabled  = true
+  auth_token                  = random_password.auth_token.result
+  apply_immediately           = true
+  at_rest_encryption_enabled  = var.at_rest_encryption_enabled
+  kms_key_id                  = var.kms_key_id
+  maintenance_window          = local.maintenance_window
+  data_tiering_enabled        = var.data_tiering_enabled
+  snapshot_retention_limit    = var.backup_retention_limit
+  final_snapshot_identifier   = var.final_backup_identifier
+  snapshot_name               = var.backup_name
+  snapshot_window             = local.backup_window
+  parameter_group_name        = var.parameter_group_name
+  preferred_cache_cluster_azs = var.preferred_azs
 
   // automatic upgrades are problematic because during the next update
   // Terraform detects engine_version difference attempts to re-create
