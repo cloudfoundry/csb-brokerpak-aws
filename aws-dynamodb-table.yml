@@ -13,15 +13,15 @@
 # limitations under the License.
 ---
 version: 1
-name: csb-aws-dynamodb
+name: csb-aws-dynamodb-table
 id: bf1db66a-1316-11eb-b959-e73b704ea230
-description: Beta - CSB Amazon DynamoDB
-display_name: CSB Amazon DynamoDB (Beta)
+description: Beta - CSB Amazon DynamoDB Table
+display_name: CSB Amazon DynamoDB Table (Beta)
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-dynamodb.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/dynamodb/
-tags: [aws, dynamodb, beta]
+tags: [aws, dynamodb, dynamodb-table, beta]
 plan_updateable: true
 plans:
 - name: ondemand
@@ -138,11 +138,11 @@ provision:
     overwrite: true
     type: string
   template_refs:
-    main: terraform/dynamodb/provision/main.tf
-    outputs: terraform/dynamodb/provision/outputs.tf
-    provider: terraform/dynamodb/provision/provider.tf
-    versions: terraform/dynamodb/provision/versions.tf
-    variables: terraform/dynamodb/provision/variables.tf
+    main: terraform/dynamodb-table/provision/main.tf
+    outputs: terraform/dynamodb-table/provision/outputs.tf
+    provider: terraform/dynamodb-table/provision/provider.tf
+    versions: terraform/dynamodb-table/provision/versions.tf
+    variables: terraform/dynamodb-table/provision/variables.tf
   outputs:
   - field_name: dynamodb_table_arn
     type: string
@@ -189,12 +189,12 @@ bind:
     overwrite: true
     type: string
   template_refs:
-    data: terraform/dynamodb/bind/data.tf
-    main: terraform/dynamodb/bind/main.tf
-    outputs: terraform/dynamodb/bind/outputs.tf
-    provider: terraform/dynamodb/bind/provider.tf
-    versions: terraform/dynamodb/bind/versions.tf
-    variables: terraform/dynamodb/bind/variables.tf
+    data: terraform/dynamodb-table/bind/data.tf
+    main: terraform/dynamodb-table/bind/main.tf
+    outputs: terraform/dynamodb-table/bind/outputs.tf
+    provider: terraform/dynamodb-table/bind/provider.tf
+    versions: terraform/dynamodb-table/bind/versions.tf
+    variables: terraform/dynamodb-table/bind/variables.tf
   outputs:
   - field_name: dynamodb_table_arn
     type: string

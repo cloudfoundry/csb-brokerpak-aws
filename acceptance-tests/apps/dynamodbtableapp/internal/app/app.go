@@ -2,7 +2,7 @@ package app
 
 import (
 	"context"
-	appcreds "dynamodbapp/internal/credentials"
+	appcreds "dynamodbtableapp/internal/credentials"
 	"fmt"
 	"log"
 	"net/http"
