@@ -216,6 +216,9 @@ provision:
     details: |
       Name of the parameter group to associate with this instance.
       If unset or empty, the default cache parameter group for the specified engine is used.
+      When updating the redis_version it may be necessary to update the parameter_group_name too.
+      For more information about parameter groups, see
+      https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/ParameterGroups.Redis.html
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
