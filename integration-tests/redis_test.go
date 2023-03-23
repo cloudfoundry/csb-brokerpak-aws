@@ -274,6 +274,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("backup_end_hour", BeNil()),
 					HaveKeyWithValue("backup_end_min", BeNil()),
 					HaveKeyWithValue("parameter_group_name", ""),
+					HaveKeyWithValue("preferred_azs", BeEmpty()),
 				))
 		})
 
@@ -304,6 +305,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"backup_end_hour":                    "11",
 				"backup_end_min":                     "30",
 				"parameter_group_name":               "fake-param-group-name",
+				"preferred_azs":                      []string{"fake-az1", "fake-az2"},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -335,6 +337,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("backup_end_hour", "11"),
 					HaveKeyWithValue("backup_end_min", "30"),
 					HaveKeyWithValue("parameter_group_name", "fake-param-group-name"),
+					HaveKeyWithValue("preferred_azs", ConsistOf("fake-az1", "fake-az2")),
 				),
 			)
 		})
@@ -385,6 +388,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("kms_key_id", "kms_key_id", "fake-encryption-at-rest-key"),
 			Entry("data_tiering_enabled", "data_tiering_enabled", true),
 			Entry("backup_name", "backup_name", "turtle"),
+			Entry("preferred_azs", "preferred_azs", []string{"fake-az1", "fake-az2"}),
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {
