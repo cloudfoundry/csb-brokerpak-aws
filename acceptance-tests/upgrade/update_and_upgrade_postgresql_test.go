@@ -17,15 +17,14 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-postgresql"),
 				brokers.WithSourceDir(releasedBuildDir),
-				brokers.WithReleaseEnv(),
-				brokers.WithLegacyMySQLEnvFor140(),
+				brokers.WithReleaseEnv(releasedBuildDir),
 			)
 			defer serviceBroker.Delete()
 
 			By("creating a service")
 			serviceInstance := services.CreateInstance(
 				"csb-aws-postgresql",
-				services.WithPlan("small"),
+				services.WithPlan("default"),
 				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
