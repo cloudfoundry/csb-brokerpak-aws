@@ -8,8 +8,8 @@ require (
 	github.com/cloudfoundry/cloud-service-broker v0.17.5
 	github.com/hashicorp/terraform-json v0.16.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/onsi/ginkgo/v2 v2.9.1
-	github.com/onsi/gomega v1.27.4
+	github.com/onsi/ginkgo/v2 v2.9.2
+	github.com/onsi/gomega v1.27.5
 	github.com/otiai10/copy v1.9.0
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
 	golang.org/x/tools v0.7.0
@@ -37,7 +37,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
+	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
