@@ -5,28 +5,32 @@ import (
 	"io"
 	"log"
 	"net/http"
-
-	"github.com/gorilla/mux"
-
 	"postgresqlapp/internal/connector"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func handleSet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling set.")
 
+		schema, err := schemaName(r)
+		if err != nil {
+			fail(w, http.StatusBadRequest, "schema name error: %s", err)
+			return
+		}
+
+		key := chi.URLParam(r, "key")
+		if key == "" {
+			fail(w, http.StatusBadRequest, "key must be supplied")
+			return
+		}
+
 		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
 			fail(w, http.StatusInternalServerError, "failed to connect to database: %e", err)
 		}
 		defer db.Close()
-
-		schema := r.Context().Value(schemaKey)
-		key, ok := mux.Vars(r)["key"]
-		if !ok {
-			fail(w, http.StatusBadRequest, "Key missing.")
-			return
-		}
 
 		rawValue, err := io.ReadAll(r.Body)
 		if err != nil {

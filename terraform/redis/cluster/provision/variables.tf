@@ -38,3 +38,5 @@ variable "backup_start_hour" { type = string }
 variable "backup_start_min" { type = string }
 variable "backup_end_hour" { type = string }
 variable "backup_end_min" { type = string }
+variable "parameter_group_name" { type = string }
+variable "preferred_azs" { type = list(string) }
