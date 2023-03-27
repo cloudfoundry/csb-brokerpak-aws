@@ -1,13 +1,14 @@
 package app
 
 import (
-	"dynamodbtableapp/internal/credentials"
 	"log"
 	"net/http"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+
+	"dynamodbtableapp/internal/credentials"
 )
 
 func handleGet(w http.ResponseWriter, r *http.Request, key string, client *dynamodb.Client, creds credentials.DynamoDBService) {
