@@ -22,3 +22,4 @@ output "tls_port" { value = local.port }
 output "status" {
   value = format("created cache %s (id: %s)", aws_elasticache_replication_group.redis.primary_endpoint_address, aws_elasticache_replication_group.redis.id)
 }
+output "reader_endpoint" { value = aws_elasticache_replication_group.redis.reader_endpoint_address }
