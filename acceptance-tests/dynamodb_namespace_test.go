@@ -49,9 +49,9 @@ var _ = Describe("DynamoDB Namespace", Label("dynamodb-namespace"), func() {
 		createTablePayload := fmt.Sprintf(`{"table_name": "%s"}`, tableName)
 		response := appOne.POST(createTablePayload, "/tables")
 		Expect(response).To(HaveHTTPStatus(http.StatusAccepted))
-		defer func(appOne *apps.App, s ...any) {
-			_, _ = appOne.DELETEResponse("/tables/%s", s)
-		}(appOne, tableName)
+		defer func() {
+			_, _ = appOne.DELETEResponse("/tables/%s", tableName)
+		}()
 
 		By("storing a value in the created table")
 		valuePayload := random.Name(random.WithPrefix("dynamodb-namespace-value"))
