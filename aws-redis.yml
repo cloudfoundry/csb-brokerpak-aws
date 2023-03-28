@@ -15,13 +15,13 @@
 version: 1
 name: csb-aws-redis
 id: e9c11b1b-0caa-45c9-b9b2-592939c9a5a6
-description: Beta - CSB Amazon ElastiCache for Redis - multinode with automatic failover
-display_name: CSB Amazon ElastiCache for Redis (Beta)
+description: CSB Amazon ElastiCache for Redis - multinode with automatic failover
+display_name: CSB Amazon ElastiCache for Redis
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/redis/
-tags: [aws, redis, beta]
+tags: [aws, redis]
 plan_updateable: true
 provision:
   plan_inputs:
@@ -214,9 +214,10 @@ provision:
     type: string
     default: ""
     details: |
-      Name of the parameter group to associate with this instance.
-      If unset or empty, the default cache parameter group for the specified engine is used.
-      When updating the redis_version it may be necessary to update the parameter_group_name too.
+      Name of the custom parameter group to associate with this instance.
+      If unset or empty, the default parameter group for the specified redis_version is used.
+      If this parameter is in use, make sure that it is updated to an appropriate value
+      when updating the redis_version.
       For more information about parameter groups, see
       https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/ParameterGroups.Redis.html
   - field_name: preferred_azs

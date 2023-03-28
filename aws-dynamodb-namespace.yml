@@ -51,6 +51,32 @@ provision:
 bind:
   plan_inputs: []
   user_inputs: []
-  computed_inputs: []
-  template_refs: {}
-  outputs: []
+  computed_inputs:
+  - name: aws_access_key_id
+    type: string
+    default: ${config("aws.access_key_id")}
+  - name: aws_secret_access_key
+    type: string
+    default: ${config("aws.secret_access_key")}
+  - name: user_name
+    default: csb-${request.binding_id}
+    type: string
+  - name: prefix
+    type: string
+    default: ${instance.details["prefix"]}
+  - name: region
+    type: string
+    default: ${instance.details["region"]}
+  template_refs:
+    data: terraform/dynamodb-namespace/bind/data.tf
+    main: terraform/dynamodb-namespace/bind/main.tf
+    outputs: terraform/dynamodb-namespace/bind/outputs.tf
+    provider: terraform/dynamodb-namespace/bind/provider.tf
+    variables: terraform/dynamodb-namespace/bind/variables.tf
+  outputs:
+  - field_name: access_key_id
+    type: string
+    details: Access key ID for the IAM user with full access to tables in the namespace
+  - field_name: secret_access_key
+    type: string
+    details: Secret Access key for the IAM user with full access to tables in the namespace
