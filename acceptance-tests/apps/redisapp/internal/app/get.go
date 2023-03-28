@@ -45,7 +45,7 @@ func handleGet(creds credentials.Credentials, primary bool) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Value %q retrived from key %q.", value, key)
+		log.Printf("Value %q retrieved from key %q.", value, key)
 	}
 }
 
