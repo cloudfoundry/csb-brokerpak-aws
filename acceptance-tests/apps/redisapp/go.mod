@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/cloudfoundry-community/go-cfenv v1.18.0
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/mitchellh/mapstructure v1.5.0
 )
