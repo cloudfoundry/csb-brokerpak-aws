@@ -10,8 +10,8 @@ import (
 const (
 	redisServiceID                        = "e9c11b1b-0caa-45c9-b9b2-592939c9a5a6"
 	redisServiceName                      = "csb-aws-redis"
-	redisServiceDescription               = "Beta - CSB Amazon ElastiCache for Redis - multinode with automatic failover"
-	redisServiceDisplayName               = "CSB Amazon ElastiCache for Redis (Beta)"
+	redisServiceDescription               = "CSB Amazon ElastiCache for Redis - multinode with automatic failover"
+	redisServiceDisplayName               = "CSB Amazon ElastiCache for Redis"
 	redisServiceDocumentationURL          = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html"
 	redisServiceSupportURL                = "https://aws.amazon.com/redis/"
 	redisServiceProviderDisplayName       = "VMware"
@@ -32,34 +32,34 @@ var customRedisPlans = []map[string]any{
 var customRedisPlan = map[string]any{
 	"name":        redisCustomPlanName,
 	"id":          redisCustomPlanID,
-	"description": "Beta - Default Redis plan",
+	"description": "Default Redis plan",
 	"node_type":   "cache.t3.medium",
 	"node_count":  2,
 	"metadata": map[string]any{
-		"displayName": "custom-sample (Beta)",
+		"displayName": "custom-sample",
 	},
 }
 
 var redisPlanWithFlexibleNodeType = map[string]any{
 	"name":          redisPlanWithFlexibleNodeTypePlanName,
 	"id":            redisPlanWithFlexibleNodeTypePlanID,
-	"description":   "Beta - An example of a Redis plan for which node_type can be specified at provision time.",
+	"description":   "An example of a Redis plan for which node_type can be specified at provision time.",
 	"redis_version": "6.x",
 	"node_count":    2,
 	"metadata": map[string]any{
-		"displayName": "flexible-nodetype-sample (Beta)",
+		"displayName": "flexible-nodetype-sample",
 	},
 }
 
 var deprecatedCacheSizePlan = map[string]any{
 	"name":          deprecatedCacheSizePlanName,
 	"id":            deprecatedCacheSizePlanID,
-	"description":   "Beta - Redis plan with deprecated cache_size",
+	"description":   "Redis plan with deprecated cache_size",
 	"cache_size":    2,
 	"redis_version": "6.x",
 	"node_count":    2,
 	"metadata": map[string]any{
-		"displayName": "deprecated-cachesize-sample (Beta)",
+		"displayName": "deprecated-cachesize-sample",
 	},
 }
 
@@ -79,7 +79,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		service := testframework.FindService(catalog, redisServiceName)
 		Expect(service.ID).To(Equal(redisServiceID))
 		Expect(service.Description).To(Equal(redisServiceDescription))
-		Expect(service.Tags).To(ConsistOf("aws", "redis", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "redis"))
 		Expect(service.Metadata.DisplayName).To(Equal(redisServiceDisplayName))
 		Expect(service.Metadata.DocumentationUrl).To(Equal(redisServiceDocumentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
@@ -98,14 +98,6 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				MatchFields(IgnoreExtras, Fields{
 					Name: Equal(redisPlanWithFlexibleNodeTypePlanName),
 					ID:   Equal(redisPlanWithFlexibleNodeTypePlanID),
-				}),
-			),
-		)
-		Expect(service.Plans).To(
-			HaveEach(
-				MatchFields(IgnoreExtras, Fields{
-					"Description": HavePrefix("Beta -"),
-					"Metadata":    PointTo(MatchFields(IgnoreExtras, Fields{"DisplayName": HaveSuffix("(Beta)")})),
 				}),
 			),
 		)
