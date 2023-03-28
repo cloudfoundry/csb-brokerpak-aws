@@ -4,27 +4,20 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
+	"redisapp/internal/credentials"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/go-chi/chi/v5"
 )
 
-func App(options *redis.Options) http.HandlerFunc {
-	client := redis.NewClient(options)
+func App(creds credentials.Credentials) http.Handler {
+	r := chi.NewRouter()
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		key := strings.Trim(r.URL.Path, "/")
-		switch r.Method {
-		case http.MethodHead:
-			aliveness(w, r)
-		case http.MethodGet:
-			handleGet(w, r, key, client)
-		case http.MethodPut:
-			handleSet(w, r, key, client)
-		default:
-			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		}
-	}
+	r.Head("/", aliveness)
+	r.Put("/primary/{key}", handleSet(creds))
+	r.Get("/primary/{key}", handleGet(creds, primaryNode))
+	r.Get("/replica/{key}", handleGet(creds, replicaNode))
+
+	return r
 }
 
 func aliveness(w http.ResponseWriter, r *http.Request) {
