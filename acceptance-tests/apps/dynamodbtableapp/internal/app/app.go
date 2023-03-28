@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	appcreds "dynamodbtableapp/internal/credentials"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+
+	appcreds "dynamodbtableapp/internal/credentials"
 )
 
 func App(creds appcreds.DynamoDBService) http.HandlerFunc {
@@ -49,7 +50,7 @@ func App(creds appcreds.DynamoDBService) http.HandlerFunc {
 	}
 }
 
-func aliveness(w http.ResponseWriter, r *http.Request) {
+func aliveness(w http.ResponseWriter, _ *http.Request) {
 	log.Printf("Handled aliveness test.")
 	w.WriteHeader(http.StatusNoContent)
 }

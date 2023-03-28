@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"os"
 
-	"dynamodbtableapp/internal/app"
-	"dynamodbtableapp/internal/credentials"
+	"dynamodbnsapp/internal/app"
+	"dynamodbnsapp/internal/credentials"
 )
 
 func main() {
@@ -19,13 +19,13 @@ func main() {
 		panic(err)
 	}
 
-	port := port()
+	port := appPort()
 	log.Printf("Listening on port: %s", port)
-	http.Handle("/", app.App(creds))
-	_ = http.ListenAndServe(port, nil)
+	appRouter := app.App(creds)
+	_ = http.ListenAndServe(port, appRouter)
 }
 
-func port() string {
+func appPort() string {
 	if port := os.Getenv("PORT"); port != "" {
 		return fmt.Sprintf(":%s", port)
 	}

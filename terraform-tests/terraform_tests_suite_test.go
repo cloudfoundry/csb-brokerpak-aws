@@ -2,6 +2,7 @@ package terraformtests
 
 import (
 	"os"
+	"regexp"
 	"testing"
 
 	"golang.org/x/exp/maps"
@@ -22,6 +23,7 @@ var (
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	awsAccessKeyID     = os.Getenv("AWS_ACCESS_KEY_ID")
 	awsVPCID           = "vpc-72464617"
+	awsRegion          = getAWSRegion()
 )
 
 var _ = BeforeSuite(func() {
@@ -34,4 +36,22 @@ func buildVars(defaults, overrides map[string]any) map[string]any {
 	maps.Copy(result, defaults)
 	maps.Copy(result, overrides)
 	return result
+}
+
+func getAWSRegion() string {
+	envRegion := os.Getenv("AWS_DEFAULT_REGION")
+	if envRegion != "" {
+		return envRegion
+	}
+
+	return getAWSRegionFromCSBDefaults()
+}
+
+func getAWSRegionFromCSBDefaults() string {
+	r := regexp.MustCompile(`"region":\s*"([a-z0-9-]+)"`)
+	matches := r.FindStringSubmatch(os.Getenv("GSB_PROVISION_DEFAULTS"))
+	if matches != nil {
+		return matches[1]
+	}
+	return ""
 }
