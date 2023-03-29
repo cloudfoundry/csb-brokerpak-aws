@@ -73,7 +73,51 @@ resource "aws_elasticache_replication_group" "redis" {
   // Terraform detects engine_version difference attempts to re-create
   auto_minor_version_upgrade = false
 
+   dynamic "log_delivery_configuration" {
+     for_each = var.logs_slow_log_enabled ? [null] : []
+     content {
+       destination      = aws_cloudwatch_log_group.slow_log[0].name
+       destination_type = "cloudwatch-logs"
+       log_format       = "json"
+       log_type         = "slow-log"
+     }
+  }
+
+  dynamic "log_delivery_configuration" {
+    for_each = var.logs_engine_log_enabled ? [null] : []
+    content {
+      destination      = aws_cloudwatch_log_group.engine_log[0].name
+      destination_type = "cloudwatch-logs"
+      log_format       = "json"
+      log_type         = "engine-log"
+    }
+  }
+
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_cloudwatch_log_group" "engine_log" {
+  count = var.logs_engine_log_enabled ? 1 : 0
+  lifecycle {
+    create_before_destroy = true
+  }
+  name              = "/aws/elasticache/cluster/${var.instance_name}/engine-log"
+  retention_in_days = var.logs_engine_log_loggroup_retention_in_days
+  kms_key_id        = var.logs_engine_log_loggroup_kms_key_id == "" ? null : var.logs_engine_log_loggroup_kms_key_id
+
+  tags = var.labels
+}
+
+resource "aws_cloudwatch_log_group" "slow_log" {
+  count = var.logs_slow_log_enabled ? 1 : 0
+  lifecycle {
+    create_before_destroy = true
+  }
+  name              = "/aws/elasticache/cluster/${var.instance_name}/slow-log"
+  retention_in_days = var.logs_slow_log_loggroup_retention_in_days
+  kms_key_id        = var.logs_slow_log_loggroup_kms_key_id == "" ? null : var.logs_slow_log_loggroup_kms_key_id
+
+  tags = var.labels
 }

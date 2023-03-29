@@ -20,37 +20,43 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	)
 
 	defaultVars := map[string]any{
-		"cache_size":                         nil,
-		"redis_version":                      "6.0",
-		"instance_name":                      "csb-redis-test",
-		"labels":                             map[string]any{"key1": "some-redis-value"},
-		"node_type":                          "cache.t3.medium",
-		"node_count":                         2,
-		"elasticache_subnet_group":           "",
-		"elasticache_vpc_security_group_ids": "",
-		"region":                             "us-west-2",
-		"aws_access_key_id":                  awsAccessKeyID,
-		"aws_secret_access_key":              awsSecretAccessKey,
-		"aws_vpc_id":                         awsVPCID,
-		"at_rest_encryption_enabled":         true,
-		"kms_key_id":                         "fake-encryption-at-rest-key",
-		"maintenance_end_hour":               nil,
-		"maintenance_start_hour":             nil,
-		"maintenance_end_min":                nil,
-		"maintenance_start_min":              nil,
-		"maintenance_day":                    nil,
-		"data_tiering_enabled":               false,
-		"automatic_failover_enabled":         true,
-		"multi_az_enabled":                   true,
-		"backup_retention_limit":             12,
-		"final_backup_identifier":            "tortoise",
-		"backup_name":                        "turtle",
-		"backup_end_hour":                    nil,
-		"backup_start_hour":                  nil,
-		"backup_end_min":                     nil,
-		"backup_start_min":                   nil,
-		"parameter_group_name":               "fake-param-group-name",
-		"preferred_azs":                      nil,
+		"cache_size":                                 nil,
+		"redis_version":                              "6.0",
+		"instance_name":                              "csb-redis-test",
+		"labels":                                     map[string]any{"key1": "some-redis-value"},
+		"node_type":                                  "cache.t3.medium",
+		"node_count":                                 2,
+		"elasticache_subnet_group":                   "",
+		"elasticache_vpc_security_group_ids":         "",
+		"region":                                     "us-west-2",
+		"aws_access_key_id":                          awsAccessKeyID,
+		"aws_secret_access_key":                      awsSecretAccessKey,
+		"aws_vpc_id":                                 awsVPCID,
+		"at_rest_encryption_enabled":                 true,
+		"kms_key_id":                                 "fake-encryption-at-rest-key",
+		"maintenance_end_hour":                       nil,
+		"maintenance_start_hour":                     nil,
+		"maintenance_end_min":                        nil,
+		"maintenance_start_min":                      nil,
+		"maintenance_day":                            nil,
+		"data_tiering_enabled":                       false,
+		"automatic_failover_enabled":                 true,
+		"multi_az_enabled":                           true,
+		"backup_retention_limit":                     12,
+		"final_backup_identifier":                    "tortoise",
+		"backup_name":                                "turtle",
+		"backup_end_hour":                            nil,
+		"backup_start_hour":                          nil,
+		"backup_end_min":                             nil,
+		"backup_start_min":                           nil,
+		"parameter_group_name":                       "fake-param-group-name",
+		"preferred_azs":                              nil,
+		"logs_slow_log_loggroup_kms_key_id":          "",
+		"logs_slow_log_loggroup_retention_in_days":   0,
+		"logs_slow_log_enabled":                      false,
+		"logs_engine_log_loggroup_kms_key_id":        "",
+		"logs_engine_log_loggroup_retention_in_days": 0,
+		"logs_engine_log_enabled":                    false,
 	}
 
 	BeforeAll(func() {
@@ -266,6 +272,143 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 	})
 
+	Context("slow_log is enabled", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"logs_slow_log_loggroup_kms_key_id":        "",
+				"logs_slow_log_loggroup_retention_in_days": 0,
+				"logs_slow_log_enabled":                    true,
+			}))
+		})
+
+		It("should create a log group for slow log", func() {
+			expectedResources := []string{"aws_cloudwatch_log_group"}
+			expectedResources = append(expectedResources, getExpectedResources()...)
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(expectedResources))
+		})
+
+		It("should assign that log group to the replication group", func() {
+			Expect(AfterValuesForType(plan, resource)).To(MatchKeys(IgnoreExtras, Keys{
+				"log_delivery_configuration": ConsistOf(MatchAllKeys(Keys{
+					"destination":      Equal("/aws/elasticache/cluster/csb-redis-test/slow-log"),
+					"destination_type": Equal("cloudwatch-logs"),
+					"log_format":       Equal("json"),
+					"log_type":         Equal("slow-log"),
+				})),
+			}))
+		})
+
+		Context("slow_log loggroup configuration", func() {
+			kmsKeyId := ""
+			retentionInDays := 0
+			JustBeforeEach(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"logs_slow_log_loggroup_kms_key_id":        kmsKeyId,
+					"logs_slow_log_loggroup_retention_in_days": retentionInDays,
+					"logs_slow_log_enabled":                    true,
+				}))
+			})
+
+			It("should configure the log group with default values", func() {
+				slowLogResource := "aws_cloudwatch_log_group"
+				Expect(AfterValuesForType(plan, slowLogResource)).To(MatchKeys(IgnoreExtras, Keys{
+					"name":              Equal("/aws/elasticache/cluster/csb-redis-test/slow-log"),
+					"retention_in_days": BeNumerically("==", retentionInDays),
+					"kms_key_id":        BeNil(),
+					"skip_destroy":      BeFalse(),
+					"tags":              HaveKeyWithValue("key1", "some-redis-value"),
+				}))
+			})
+
+			Context("providing explicit values", func() {
+				BeforeEach(func() {
+					kmsKeyId = "test-kms-key"
+					retentionInDays = 180
+				})
+
+				It("should configure the passed values", func() {
+					slowLogResource := "aws_cloudwatch_log_group"
+					Expect(AfterValuesForType(plan, slowLogResource)).To(MatchKeys(IgnoreExtras, Keys{
+						"name":              Equal("/aws/elasticache/cluster/csb-redis-test/slow-log"),
+						"retention_in_days": BeNumerically("==", retentionInDays),
+						"kms_key_id":        Equal(kmsKeyId),
+						"skip_destroy":      BeFalse(),
+						"tags":              HaveKeyWithValue("key1", "some-redis-value"),
+					}))
+				})
+			})
+		})
+
+	})
+
+	Context("engine_log is enabled", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"logs_engine_log_loggroup_kms_key_id":        "",
+				"logs_engine_log_loggroup_retention_in_days": 0,
+				"logs_engine_log_enabled":                    true,
+			}))
+		})
+
+		It("should create a log group for engine log", func() {
+			expectedResources := []string{"aws_cloudwatch_log_group"}
+			expectedResources = append(expectedResources, getExpectedResources()...)
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(expectedResources))
+		})
+
+		It("should assign that log group to the replication group", func() {
+			Expect(AfterValuesForType(plan, resource)).To(MatchKeys(IgnoreExtras, Keys{
+				"log_delivery_configuration": ConsistOf(MatchAllKeys(Keys{
+					"destination":      Equal("/aws/elasticache/cluster/csb-redis-test/engine-log"),
+					"destination_type": Equal("cloudwatch-logs"),
+					"log_format":       Equal("json"),
+					"log_type":         Equal("engine-log"),
+				})),
+			}))
+		})
+
+		Context("engine_log loggroup configuration", func() {
+			kmsKeyId := ""
+			retentionInDays := 0
+			JustBeforeEach(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"logs_engine_log_loggroup_kms_key_id":        kmsKeyId,
+					"logs_engine_log_loggroup_retention_in_days": retentionInDays,
+					"logs_engine_log_enabled":                    true,
+				}))
+			})
+
+			It("should configure the log group with default values", func() {
+				engineLogResource := "aws_cloudwatch_log_group"
+				Expect(AfterValuesForType(plan, engineLogResource)).To(MatchKeys(IgnoreExtras, Keys{
+					"name":              Equal("/aws/elasticache/cluster/csb-redis-test/engine-log"),
+					"retention_in_days": BeNumerically("==", retentionInDays),
+					"kms_key_id":        BeNil(),
+					"skip_destroy":      BeFalse(),
+					"tags":              HaveKeyWithValue("key1", "some-redis-value"),
+				}))
+			})
+
+			Context("providing explicit values", func() {
+				BeforeEach(func() {
+					kmsKeyId = "test-kms-key"
+					retentionInDays = 180
+				})
+
+				It("should configure the passed values", func() {
+					engineLogResource := "aws_cloudwatch_log_group"
+					Expect(AfterValuesForType(plan, engineLogResource)).To(MatchKeys(IgnoreExtras, Keys{
+						"name":              Equal("/aws/elasticache/cluster/csb-redis-test/engine-log"),
+						"retention_in_days": BeNumerically("==", retentionInDays),
+						"kms_key_id":        Equal(kmsKeyId),
+						"skip_destroy":      BeFalse(),
+						"tags":              HaveKeyWithValue("key1", "some-redis-value"),
+					}))
+				})
+			})
+		})
+
+	})
 })
 
 func getExpectedResources() []string {
