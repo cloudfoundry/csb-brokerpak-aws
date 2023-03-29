@@ -381,6 +381,9 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("data_tiering_enabled", "data_tiering_enabled", true),
 			Entry("backup_name", "backup_name", "turtle"),
 			Entry("preferred_azs", "preferred_azs", []string{"fake-az1", "fake-az2"}),
+			Entry("aws_vpc_id", "aws_vpc_id", "any-valid-aws-vpc-id"),
+			Entry("elasticache_subnet_group", "elasticache_subnet_group", "any-valid-elasticache-subnet-group"),
+			Entry("elasticache_vpc_security_group_ids", "elasticache_vpc_security_group_ids", "any-valid-elasticache-vpc-security-group-ids"),
 		)
 
 		It("preventing updates for `plan defined properties` by design", func() {
@@ -404,9 +407,6 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			},
 			Entry("aws_access_key_id", "aws_access_key_id", "any-valid-aws-access-key-id"),
 			Entry("aws_secret_access_key", "aws_secret_access_key", "any-valid-aws-secret-access-key"),
-			Entry("aws_vpc_id", "aws_vpc_id", "any-valid-aws-vpc-id"),
-			Entry("elasticache_subnet_group", "elasticache_subnet_group", "any-valid-elasticache-subnet-group"),
-			Entry("elasticache_vpc_security_group_ids", "elasticache_vpc_security_group_ids", "any-valid-elasticache-vpc-security-group-ids"),
 			Entry("redis_version", "redis_version", "7.x"),
 			Entry("automatic_failover_enabled", "automatic_failover_enabled", false),
 			Entry("backup_retention_limit", "backup_retention_limit", 12),
