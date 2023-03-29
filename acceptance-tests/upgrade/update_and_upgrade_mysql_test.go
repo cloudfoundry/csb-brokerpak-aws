@@ -14,11 +14,18 @@ var _ = Describe("UpgradeMySQLTest", Label("mysql", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			By("pushing latest released broker version")
+			const (
+				mysql57Plans = `[{"name":"default-5.7","id":"ce70e430-5a08-11ed-a801-367dda7ea869","description":"DefaultMySQL 5.7 plan","display_name":"default-5.7","instance_class":"db.t3.medium","mysql_version":"5.7","storage_gb":10,"storage_encrypted":false,"multi_az":false,"storage_autoscale":false,"storage_type":"gp2"},{"name":"small","id":"2268ce43-7fd7-48dc-be2f-8611e11fb12e","description":"MySQLv5.7, minimum 2 cores, minimum 4GB ram, 5GB storage","display_name":"small","storage_gb":5,"storage_type":"gp2","cores":2,"mysql_version":"5.7","storage_encrypted":false,"multi_az":false,"storage_autoscale":false}]`
+				plansVar     = `GSB_SERVICE_CSB_AWS_MYSQL_PLANS`
+			)
+
+			customPlans := apps.EnvVar{Name: plansVar, Value: mysql57Plans}
+
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-aws-mysql"),
 				brokers.WithSourceDir(releasedBuildDir),
-				brokers.WithReleaseEnv(),
-				brokers.WithLegacyMySQLEnvFor140(),
+				brokers.WithReleaseEnv(releasedBuildDir),
+				brokers.WithEnv(customPlans),
 			)
 			defer serviceBroker.Delete()
 
@@ -50,7 +57,7 @@ var _ = Describe("UpgradeMySQLTest", Label("mysql", "upgrade"), func() {
 			Expect(appTwo.GET(key)).To(Equal(value))
 
 			By("pushing the development version of the broker")
-			serviceBroker.UpdateBroker(developmentBuildDir)
+			serviceBroker.UpdateBroker(developmentBuildDir, customPlans)
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()

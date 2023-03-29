@@ -18,8 +18,7 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			serviceBroker := brokers.Create(
 				brokers.WithPrefix("csb-aws-dynamodb-table"),
 				brokers.WithSourceDir(releasedBuildDir),
-				brokers.WithReleaseEnv(),
-				brokers.WithLegacyMySQLEnvFor140(),
+				brokers.WithReleaseEnv(releasedBuildDir),
 			)
 			defer serviceBroker.Delete()
 
