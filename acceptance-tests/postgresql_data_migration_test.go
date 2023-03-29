@@ -109,7 +109,7 @@ var _ = Describe("PostgreSQL data migration", Label("postgresql-migration"), fun
 		defer targetApp.Delete()
 		targetServiceInstance.Bind(targetApp)
 		targetApp.Start()
-		got := targetApp.GET("%s/%s", schema, key)
+		got := targetApp.GET("%s/%s", schema, key).String()
 		Expect(got).To(Equal(value))
 	})
 })

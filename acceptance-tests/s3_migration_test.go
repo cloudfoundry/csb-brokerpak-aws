@@ -64,8 +64,8 @@ var _ = Describe("S3 Migration", Label("s3-migration"), func() {
 		apps.Restart(appOne)
 
 		By("checking existing data can be accessed using the new S3 instance")
-		Expect(appOne.GET(filename1)).To(Equal(fileContent1))
-		Expect(appOne.GET(filename2)).To(Equal(fileContent2))
+		Expect(appOne.GET(filename1).String()).To(Equal(fileContent1))
+		Expect(appOne.GET(filename2).String()).To(Equal(fileContent2))
 
 		By("deleting the file from bucket using the second app")
 		appOne.DELETE(filename1)
