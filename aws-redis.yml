@@ -213,11 +213,16 @@ provision:
   - field_name: parameter_group_name
     type: string
     default: ""
+    # You can't unset this property by setting it to null or "" because the provider will look
+    # for a parameter group called "". If you set it back to the default value (redis5.0 for example)
+    # and then upgrade, it will be automatically updated to an appropriate value in AWS. We shouldn't rely
+    # on this incidental behavior as it's not documented and the provider implementation may change.
     details: |
       Name of the custom parameter group to associate with this instance.
-      If unset or empty, the default parameter group for the specified redis_version is used.
-      If this parameter is in use, make sure that it is updated to an appropriate value
-      when updating the redis_version.
+      If left unset, the default parameter group for the specified redis_version is used.
+      Once the parameter had been set, make sure that it is updated to an appropriate value
+      when updating the redis_version. To set to default, specify the name of the default
+      parameter group for the Redis version, for example `default.redis6.x`.
       For more information about parameter groups, see
       https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/ParameterGroups.Redis.html
   - field_name: preferred_azs
