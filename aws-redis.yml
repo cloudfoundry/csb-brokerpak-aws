@@ -233,6 +233,7 @@ provision:
       List of EC2 availability zones in which the nodes will be created.
       The first item in the list will be the primary node.
       Number of entries must equal to node_count.
+      If this property is set, the node_count will become immutable.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
