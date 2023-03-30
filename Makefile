@@ -95,7 +95,7 @@ endif
 .PHONY: build
 build: deps-go-binary $(IAAS)-services-*.brokerpak ## build brokerpak
 
-$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf | $(PAK_BUILD_CACHE_PATH)
+$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf providers/terraform-provider-csbdynamodbns/cloudfoundry.org/cloud-service-broker/csbdynamodbns | $(PAK_BUILD_CACHE_PATH)
 	$(RUN_CSB) pak build
 
 ###### Run ###################################################################
@@ -129,12 +129,17 @@ run-examples: ## run examples in yml files. Runs examples for all services by de
 test: lint run-integration-tests ## run the tests
 
 .PHONY: run-integration-tests
-run-integration-tests: ## run integration tests for this brokerpak
+run-integration-tests: run-provider-tests ## run integration tests for this brokerpak
 	cd ./integration-tests && go run github.com/onsi/ginkgo/v2/ginkgo -r .
 
 .PHONY: run-terraform-tests
 run-terraform-tests: ## run terraform tests for this brokerpak
 	cd ./terraform-tests && go run github.com/onsi/ginkgo/v2/ginkgo -r .
+
+.PHONY: run-provider-tests
+run-provider-tests:  ## run the integration tests associated with providers
+	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
+
 
 ###### info ###################################################################
 
@@ -186,6 +191,7 @@ clean: ## delete build files
 	- rm -f $(IAAS)-services-*.brokerpak
 	- rm -f ./cloud-service-broker
 	- rm -f ./brokerpak-user-docs.md
+	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) clean
 
 $(PAK_BUILD_CACHE_PATH):
 	@echo "Folder $(PAK_BUILD_CACHE_PATH) does not exist. Creating it..."
@@ -235,3 +241,6 @@ format: ## format the source
 	${GOFMT} -s -e -l -w .
 	${GO} run golang.org/x/tools/cmd/goimports -l -w .
 	terraform fmt --recursive
+
+providers/terraform-provider-csbdynamodbns/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
+	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build

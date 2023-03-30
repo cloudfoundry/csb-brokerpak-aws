@@ -29,9 +29,8 @@ plans:
   description: "A DynamoDB Namespace"
   display_name: "dynamodb namespace"
 provision:
-  template_refs:
-    outputs: terraform/dynamodb-namespace/provision/outputs.tf
-    variables: terraform/dynamodb-namespace/provision/variables.tf
+  plan_inputs: []
+  user_inputs: []
   computed_inputs:
   - name: prefix
     type: string
@@ -41,6 +40,12 @@ provision:
     type: string
     details: Region for the DynamoDB tables
     default: ${region}
+  - name: aws_access_key_id
+    type: string
+    default: ${config("aws.access_key_id")}
+  - name: aws_secret_access_key
+    type: string
+    default: ${config("aws.secret_access_key")}
   outputs:
   - field_name: prefix
     type: string
@@ -48,6 +53,13 @@ provision:
   - field_name: region
     type: string
     details: Region for the DynamoDB tables
+  template_refs:
+    data: terraform/dynamodb-namespace/provision/data.tf
+    main: terraform/dynamodb-namespace/provision/main.tf
+    outputs: terraform/dynamodb-namespace/provision/outputs.tf
+    provider: terraform/dynamodb-namespace/provision/provider.tf
+    variables: terraform/dynamodb-namespace/provision/variables.tf
+    versions: terraform/dynamodb-namespace/provision/versions.tf
 bind:
   plan_inputs: []
   user_inputs: []
@@ -67,12 +79,6 @@ bind:
   - name: region
     type: string
     default: ${instance.details["region"]}
-  template_refs:
-    data: terraform/dynamodb-namespace/bind/data.tf
-    main: terraform/dynamodb-namespace/bind/main.tf
-    outputs: terraform/dynamodb-namespace/bind/outputs.tf
-    provider: terraform/dynamodb-namespace/bind/provider.tf
-    variables: terraform/dynamodb-namespace/bind/variables.tf
   outputs:
   - field_name: access_key_id
     type: string
@@ -80,3 +86,10 @@ bind:
   - field_name: secret_access_key
     type: string
     details: Secret Access key for the IAM user with full access to tables in the namespace
+  template_refs:
+    data: terraform/dynamodb-namespace/bind/data.tf
+    main: terraform/dynamodb-namespace/bind/main.tf
+    outputs: terraform/dynamodb-namespace/bind/outputs.tf
+    provider: terraform/dynamodb-namespace/bind/provider.tf
+    variables: terraform/dynamodb-namespace/bind/variables.tf
+    versions: terraform/dynamodb-namespace/bind/versions.tf
