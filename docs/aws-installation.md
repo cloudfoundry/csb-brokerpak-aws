@@ -93,6 +93,8 @@ The AWS account represented by the access key needs the following permission pol
         "rds:DeleteDBSubnetGroup",
         "rds:DescribeDBClusters",
         "rds:DescribeDBInstances",
+        "rds:DescribeDBParameters",
+        "rds:DescribeDBParameterGroups",
         "rds:DescribeDBSnapshots",
         "rds:DescribeDBSubnetGroups",
         "rds:ListTagsForResource",
