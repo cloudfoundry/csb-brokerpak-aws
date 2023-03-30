@@ -57,7 +57,7 @@ var _ = Describe("Resource dynamodbns_maintenance", func() {
 			_, err = client.ListTables(context.TODO(), nil)
 			g.Expect(err).NotTo(HaveOccurred())
 
-		}).WithTimeout(10 * time.Second).WithPolling(time.Second).Should(Succeed())
+		}).WithTimeout(30 * time.Second).WithPolling(time.Second).Should(Succeed())
 
 		tableNames := []string{
 			"one",
