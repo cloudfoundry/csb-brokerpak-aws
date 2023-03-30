@@ -73,14 +73,14 @@ resource "aws_elasticache_replication_group" "redis" {
   // Terraform detects engine_version difference attempts to re-create
   auto_minor_version_upgrade = false
 
-   dynamic "log_delivery_configuration" {
-     for_each = var.logs_slow_log_enabled ? [null] : []
-     content {
-       destination      = aws_cloudwatch_log_group.slow_log[0].name
-       destination_type = "cloudwatch-logs"
-       log_format       = "json"
-       log_type         = "slow-log"
-     }
+  dynamic "log_delivery_configuration" {
+    for_each = var.logs_slow_log_enabled ? [null] : []
+    content {
+      destination      = aws_cloudwatch_log_group.slow_log[0].name
+      destination_type = "cloudwatch-logs"
+      log_format       = "json"
+      log_type         = "slow-log"
+    }
   }
 
   dynamic "log_delivery_configuration" {
