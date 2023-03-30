@@ -273,17 +273,17 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	})
 
 	Context("slow_log is enabled", func() {
-		var kmsKeyId string
+		var kmsKeyID string
 		var retentionInDays int
 
 		BeforeEach(func() {
-			kmsKeyId = ""
+			kmsKeyID = ""
 			retentionInDays = 0
 		})
 
 		JustBeforeEach(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"logs_slow_log_loggroup_kms_key_id":        kmsKeyId,
+				"logs_slow_log_loggroup_kms_key_id":        kmsKeyID,
 				"logs_slow_log_loggroup_retention_in_days": retentionInDays,
 				"logs_slow_log_enabled":                    true,
 			}))
@@ -320,7 +320,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 
 		Context("slow_log loggroup custom configuration", func() {
 			BeforeEach(func() {
-				kmsKeyId = "test-kms-key"
+				kmsKeyID = "test-kms-key"
 				retentionInDays = 180
 			})
 
@@ -329,7 +329,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 				Expect(AfterValuesForType(plan, slowLogResource)).To(MatchKeys(IgnoreExtras, Keys{
 					"name":              Equal("/aws/elasticache/cluster/csb-redis-test/slow-log"),
 					"retention_in_days": BeNumerically("==", retentionInDays),
-					"kms_key_id":        Equal(kmsKeyId),
+					"kms_key_id":        Equal(kmsKeyID),
 					"skip_destroy":      BeFalse(),
 					"tags":              HaveKeyWithValue("key1", "some-redis-value"),
 				}))
@@ -338,17 +338,17 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	})
 
 	Context("engine_log is enabled", func() {
-		var kmsKeyId string
+		var kmsKeyID string
 		var retentionInDays int
 
 		BeforeEach(func() {
-			kmsKeyId = ""
+			kmsKeyID = ""
 			retentionInDays = 0
 		})
 
 		JustBeforeEach(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"logs_engine_log_loggroup_kms_key_id":        kmsKeyId,
+				"logs_engine_log_loggroup_kms_key_id":        kmsKeyID,
 				"logs_engine_log_loggroup_retention_in_days": retentionInDays,
 				"logs_engine_log_enabled":                    true,
 			}))
@@ -384,7 +384,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 
 		Context("engine loggroup custom coonfiguration", func() {
 			BeforeEach(func() {
-				kmsKeyId = "test-kms-key-2"
+				kmsKeyID = "test-kms-key-2"
 				retentionInDays = 5
 			})
 
