@@ -104,9 +104,11 @@ provision:
   - field_name: write_capacity
     type: number
     details: The number of write units for this table. If the billing_mode is PROVISIONED, this field should be greater than 0
+    default: 0
   - field_name: read_capacity
     type: number
     details: The number of read units for this table. If the billing_mode is PROVISIONED, this field should be greater than 0
+    default: 0
   - field_name: region
     type: string
     details: The region of AWS.
@@ -126,6 +128,7 @@ provision:
     details: AWS secret key
     default: ${config("aws.secret_access_key")}
   - field_name: aws_vpc_id
+    type: string
     details: VPC ID for instance
     default: ""
   computed_inputs:
