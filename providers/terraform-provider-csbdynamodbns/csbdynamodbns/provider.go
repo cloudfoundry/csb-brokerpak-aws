@@ -3,6 +3,8 @@ package csbdynamodbns
 
 import (
 	"context"
+	"net/url"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -13,6 +15,8 @@ const (
 	dynamoDBPrefixKey    = "prefix"
 	customEndpointURLKey = "custom_endpoint_url"
 )
+
+var identifierRegexp = regexp.MustCompile(`^[\w_.-]{1,64}$`)
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
@@ -38,15 +42,53 @@ func Provider() *schema.Provider {
 }
 
 func providerConfigure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
-	var diags diag.Diagnostics
-	var settings = &dynamoDBNamespaceSettings{
-		region: d.Get(awsRegionKey).(string),
-		prefix: d.Get(dynamoDBPrefixKey).(string),
+	var (
+		diags             diag.Diagnostics
+		region            string
+		prefix            string
+		customEndpointURL string
+	)
+
+	for _, f := range []func() diag.Diagnostics{
+		func() (dg diag.Diagnostics) {
+			region, dg = getIdentifier(d, awsRegionKey)
+			return
+		},
+		func() (dg diag.Diagnostics) {
+			prefix, dg = getIdentifier(d, dynamoDBPrefixKey)
+			return
+		},
+		func() diag.Diagnostics {
+			if customURL, ok := d.GetOk(customEndpointURLKey); ok {
+				uri, err := url.ParseRequestURI(customURL.(string))
+				if err != nil {
+					return diag.FromErr(err)
+				}
+				customEndpointURL = uri.String()
+			}
+			return nil
+		},
+	} {
+		if dg := f(); dg != nil {
+			return nil, dg
+		}
 	}
 
-	if customEndpointURL, ok := d.GetOk(customEndpointURLKey); ok {
-		settings.customEndpointURL = customEndpointURL.(string)
+	var settings = &dynamoDBNamespaceSettings{
+		region:            region,
+		prefix:            prefix,
+		customEndpointURL: customEndpointURL,
 	}
 
 	return settings, diags
+}
+
+func getIdentifier(d *schema.ResourceData, key string) (string, diag.Diagnostics) {
+	// We rely on Terraform to supply the correct types, and it's ok panic if this contract is broken
+	s := d.Get(key).(string)
+	if !identifierRegexp.MatchString(s) {
+		return "", diag.Errorf("invalid value %q for identifier %q, validation expression is: %s", s, key, identifierRegexp.String())
+	}
+
+	return s, nil
 }
