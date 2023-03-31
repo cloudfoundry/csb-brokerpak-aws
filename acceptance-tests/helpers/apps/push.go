@@ -3,7 +3,6 @@ package apps
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
-	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -55,7 +54,7 @@ func (a *App) Push(opts ...Option) {
 	checkSuccess(session.ExitCode(), a.Name)
 
 	if session.ExitCode() != 0 {
-		fmt.Fprintf(GinkgoWriter, "FAILED to push app. Getting logs...")
+		GinkgoWriter.Printf("FAILED to push app. Getting logs...")
 		cf.Run("logs", a.Name, "--recent")
 		Fail("App failed to push")
 	}

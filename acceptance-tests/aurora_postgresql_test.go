@@ -1,7 +1,6 @@
 package acceptance_tests_test
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 
@@ -52,13 +51,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		By("creating an entry using the writer app")
 		value := random.Hexadecimal()
-		response := appWriter.POST("", "?name=%s", value)
-
-		responseBody, err := io.ReadAll(response.Body)
-		Expect(err).NotTo(HaveOccurred())
-
-		err = json.Unmarshal(responseBody, &userIn)
-		Expect(err).NotTo(HaveOccurred())
+		appWriter.POST("", "?name=%s", value).ParseInto(&userIn)
 
 		By("binding the reader app to the reader endpoint")
 		serviceInstance.Bind(appReader, services.WithBindParameters(map[string]any{"reader_endpoint": true}))
@@ -67,16 +60,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		apps.Start(appReader)
 
 		By("getting the entry using the reader app")
-		got := appReader.GET("%d", userIn.ID)
-
-		err = json.Unmarshal([]byte(got), &userOut)
-		Expect(err).NotTo(HaveOccurred())
+		appReader.GET("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 		By("verifying the DB connection utilises TLS")
-		got = appWriter.GET("postgres-ssl")
-		err = json.Unmarshal([]byte(got), &sslInfo)
-		Expect(err).NotTo(HaveOccurred())
+		appWriter.GET("postgres-ssl").ParseInto(&sslInfo)
 
 		Expect(sslInfo.SSL).To(BeTrue())
 		Expect(sslInfo.Cipher).NotTo(BeEmpty())
@@ -94,13 +82,13 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		schema, key, value := "newschema", "key", "value"
 		golangApp.PUT("", schema)
 		golangApp.PUT(value, "%s/%s", schema, key)
-		got = golangApp.GET("%s/%s", schema, key)
+		got := golangApp.GET("%s/%s", schema, key).String()
 		Expect(got).To(Equal(value))
 
 		By("verifying that non-TLS connections should fail")
-		response = golangApp.GetRawResponse("%s/%s?tls=disable", schema, key)
+		response := golangApp.GETResponse("%s/%s?tls=disable", schema, key)
 		defer response.Body.Close()
-		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "force TLS is enabled by default")
+		Expect(response).To(HaveHTTPStatus(http.StatusInternalServerError), "force TLS is enabled by default")
 		b, err := io.ReadAll(response.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
 		Expect(string(b)).To(ContainSubstring("failed to connect to database"), "force TLS is enabled by default")

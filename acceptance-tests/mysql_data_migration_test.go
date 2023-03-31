@@ -111,6 +111,6 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 		apps.Restart(app)
 
 		By("checking that the data is available in the target CSB created database")
-		Expect(app.GET(key)).To(Equal(value))
+		Expect(app.GET(key).String()).To(Equal(value))
 	})
 })

@@ -39,7 +39,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		appOne.PUT(fileContent, filename)
 
 		By("downloading the file using the second app")
-		got := appTwo.GET(filename)
+		got := appTwo.GET(filename).String()
 		Expect(got).To(Equal(fileContent))
 
 		By("deleting the file from bucket using the second app")

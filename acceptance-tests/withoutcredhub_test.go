@@ -49,7 +49,7 @@ var _ = Describe("Without CredHub", Label("withoutcredhub"), func() {
 		app.PUT(fileContent, filename)
 
 		By("downloading the file")
-		got := app.GET(filename)
+		got := app.GET(filename).String()
 		Expect(got).To(Equal(fileContent))
 
 		By("deleting the file from bucket")

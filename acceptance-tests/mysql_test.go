@@ -1,7 +1,6 @@
 package acceptance_tests_test
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
@@ -48,28 +47,18 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 
 		By("creating an entry using the first app")
 		value := random.Hexadecimal()
-		response := appOne.POST("", "?name=%s", value)
-		responseBody, err := io.ReadAll(response.Body)
-		Expect(err).NotTo(HaveOccurred())
-		err = json.Unmarshal(responseBody, &userIn)
-		Expect(err).NotTo(HaveOccurred())
+		appOne.POST("", "?name=%s", value).ParseInto(&userIn)
 
 		By("binding and starting the second app")
 		serviceInstance.Bind(appTwo)
 		apps.Start(appTwo)
 
 		By("getting the entry using the second app")
-		got := appTwo.GET("%d", userIn.ID)
-
-		err = json.Unmarshal([]byte(got), &userOut)
-		Expect(err).NotTo(HaveOccurred())
+		appTwo.GET("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 		By("verifying the DB connection utilises TLS")
-		got = appOne.GET("mysql-ssl")
-		err = json.Unmarshal([]byte(got), &sslInfo)
-		Expect(err).NotTo(HaveOccurred())
-
+		appOne.GET("mysql-ssl").ParseInto(&sslInfo)
 		Expect(strings.ToLower(sslInfo.VariableName)).To(Equal("ssl_cipher"))
 		Expect(sslInfo.Value).NotTo(BeEmpty())
 
@@ -82,15 +71,16 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		apps.Start(golangApp)
 
 		By("verifying interactions with TLS enabled")
-		key, value := "key", "value"
+		const key = "key"
+		value = "value"
 		golangApp.PUT(value, key)
-		got = golangApp.GET(key)
+		got := golangApp.GET(key).String()
 		Expect(got).To(Equal(value))
 
 		By("verifying that non-TLS connections should fail")
-		response = golangApp.GetRawResponse("%s?tls=false", key)
+		response := golangApp.GETResponse("%s?tls=false", key)
 		defer response.Body.Close()
-		Expect(response.StatusCode).To(Equal(http.StatusInternalServerError), "force TLS is enabled by default")
+		Expect(response).To(HaveHTTPStatus(http.StatusInternalServerError), "force TLS is enabled by default")
 		b, err := io.ReadAll(response.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
 		Expect(string(b)).To(ContainSubstring("error connecting to database: failed to verify the connection"), "force TLS is enabled by default")

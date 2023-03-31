@@ -36,11 +36,11 @@ var _ = Describe("Redis", Label("redis"), func() {
 		appOne.PUT(value, "/primary/%s", key)
 
 		By("getting the value using the second app")
-		got := appTwo.GET("/primary/%s", key)
+		got := appTwo.GET("/primary/%s", key).String()
 		Expect(got).To(Equal(value))
 
 		By("getting the value using the reader endpoint")
-		got2 := appTwo.GET("/replica/%s", key)
+		got2 := appTwo.GET("/replica/%s", key).String()
 		Expect(got2).To(Equal(value))
 	})
 })

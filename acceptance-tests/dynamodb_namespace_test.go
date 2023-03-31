@@ -1,10 +1,9 @@
 package acceptance_tests_test
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -14,7 +13,7 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-type valueResponseType struct {
+type dynamoDBValueResponseType struct {
 	PK      int    `json:"pk"`
 	Sorting string `json:"sorting"`
 	Value   string `json:"value"`
@@ -46,50 +45,42 @@ var _ = Describe("DynamoDB Namespace", Label("dynamodb-namespace"), func() {
 
 		By("creating a table using the prefix")
 		tableName := fmt.Sprintf("csb-%s-%s", serviceInstance.GUID(), random.Hexadecimal())
-		createTablePayload := fmt.Sprintf(`{"table_name": "%s"}`, tableName)
-		response := appOne.POST(createTablePayload, "/tables")
-		Expect(response).To(HaveHTTPStatus(http.StatusAccepted))
-		defer func() {
-			_, _ = appOne.DELETEResponse("/tables/%s", tableName)
-		}()
+		createTablePayload := map[string]string{"table_name": tableName}
+		appOne.POST(createTablePayload, "/tables")
 
 		By("storing a value in the created table")
 		valuePayload := random.Name(random.WithPrefix("dynamodb-namespace-value"))
 		valueSortKey := random.Name(random.WithPrefix("sort-key"))
-		postBody, getBody := &valueResponseType{}, &valueResponseType{}
 
 		// Table is reported as existing as soon as it is created,
-		//  however, trying to create a value in it immediately results in a 404 error
+		// however, trying to create a value in it immediately results in a 404 error
+		var postBody dynamoDBValueResponseType
 		Eventually(func(g Gomega) {
-			response, err := appOne.POSTResponse(valuePayload, "/tables/%s/values/%s", tableName, valueSortKey)
-			g.Expect(err).NotTo(HaveOccurred())
-			g.Expect(response).To(HaveHTTPStatus(http.StatusCreated))
-			bodyAsBytes, err := io.ReadAll(response.Body)
-			g.Expect(err).NotTo(HaveOccurred())
-			err = json.Unmarshal(bodyAsBytes, postBody)
-			g.Expect(err).NotTo(HaveOccurred())
-			g.Expect(postBody.Value).To(Equal(valuePayload))
-			g.Expect(postBody.Sorting).To(Equal(valueSortKey))
-			g.Expect(postBody.PK).To(BeNumerically(">", 0))
-		}, "5m").Should(Succeed())
+			postResponse := appOne.POSTResponse(valuePayload, "/tables/%s/values/%s", tableName, valueSortKey)
+			g.Expect(postResponse).To(HaveHTTPStatus(http.StatusCreated))
+			defer postResponse.Body.Close()
+			apps.NewPayload(postResponse).ParseInto(&postBody)
+		}).WithTimeout(5 * time.Minute).WithPolling(time.Second).Should(Succeed())
+
+		Expect(postBody.Value).To(Equal(valuePayload))
+		Expect(postBody.Sorting).To(Equal(valueSortKey))
+		Expect(postBody.PK).To(BeNumerically(">", 0))
 
 		By("checking the table presence using the second app")
 		appTwo.GET("/tables/%s", tableName)
 
 		By("reading the value using the second app")
-		valueResponse := appTwo.GET("/tables/%s/values/%s/%d", tableName, valueSortKey, postBody.PK)
-		err := json.Unmarshal([]byte(valueResponse), getBody)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(*getBody).To(Equal(*postBody))
+		var getBody dynamoDBValueResponseType
+		appTwo.GET("/tables/%s/values/%s/%d", tableName, valueSortKey, postBody.PK).ParseInto(&getBody)
+		Expect(getBody).To(Equal(postBody))
 
 		By("destroying the table using the second app")
 		appTwo.DELETE("/tables/%s", tableName)
 
 		By("ensuring the table is gone eventually")
 		Eventually(func(g Gomega) {
-			getResponse, err := appTwo.GETResponse("/tables/%s", tableName)
-			g.Expect(err).NotTo(HaveOccurred())
+			getResponse := appTwo.GETResponse("/tables/%s", tableName)
 			g.Expect(getResponse).To(HaveHTTPStatus(http.StatusNotFound))
-		}, "5m").Should(Succeed())
+		}).WithTimeout(5 * time.Minute).WithPolling(time.Second).Should(Succeed())
 	})
 })
