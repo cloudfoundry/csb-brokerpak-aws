@@ -51,7 +51,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			appOne.PUT(valueOne, "%s/%s", schema, keyOne)
 
 			By("getting the value using the second app")
-			got := appTwo.GET("%s/%s", schema, keyOne)
+			got := appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
 			By("pushing the development version of the broker")
@@ -61,14 +61,14 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			serviceInstance.Upgrade()
 
 			By("checking previously written data still accessible")
-			got = appTwo.GET("%s/%s", schema, keyOne)
+			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
 			By("updating the instance plan")
 			serviceInstance.Update(services.WithPlan("default"))
 
 			By("checking previously written data still accessible")
-			got = appTwo.GET("%s/%s", schema, keyOne)
+			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
 			By("deleting bindings created before the upgrade")
@@ -81,7 +81,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			apps.Restage(appOne, appTwo)
 
 			By("checking previously written data still accessible")
-			got = appTwo.GET("%s/%s", schema, keyOne)
+			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
 			By("checking data can still be written and read")
@@ -89,7 +89,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			valueTwo := random.Hexadecimal()
 			appOne.PUT(valueTwo, "%s/%s", schema, keyTwo)
 
-			got = appTwo.GET("%s/%s", schema, keyTwo)
+			got = appTwo.GET("%s/%s", schema, keyTwo).String()
 			Expect(got).To(Equal(valueTwo))
 		})
 	})
