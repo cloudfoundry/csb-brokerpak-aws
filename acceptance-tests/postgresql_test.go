@@ -1,9 +1,6 @@
 package acceptance_tests_test
 
 import (
-	"encoding/json"
-	"io"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -42,28 +39,18 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 
 		By("creating an entry using the first app")
 		value := random.Hexadecimal()
-		response := appOne.POST("", "?name=%s", value)
-		responseBody, err := io.ReadAll(response.Body)
-		Expect(err).NotTo(HaveOccurred())
-		err = json.Unmarshal(responseBody, &userIn)
-		Expect(err).NotTo(HaveOccurred())
+		appOne.POST("", "?name=%s", value).ParseInto(&userIn)
 
 		By("binding and starting the second app")
 		serviceInstance.Bind(appTwo)
 		apps.Start(appTwo)
 
 		By("getting the entry using the second app")
-		got := appTwo.GET("%d", userIn.ID)
-
-		err = json.Unmarshal([]byte(got), &userOut)
-		Expect(err).NotTo(HaveOccurred())
+		appTwo.GET("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 		By("verifying the DB connection utilises TLS")
-		got = appOne.GET("postgres-ssl")
-		err = json.Unmarshal([]byte(got), &sslInfo)
-		Expect(err).NotTo(HaveOccurred())
-
+		appOne.GET("postgres-ssl").ParseInto(&sslInfo)
 		Expect(sslInfo.SSL).To(BeTrue())
 		Expect(sslInfo.Cipher).NotTo(BeEmpty())
 		Expect(sslInfo.Bits).To(BeNumerically(">=", 256))

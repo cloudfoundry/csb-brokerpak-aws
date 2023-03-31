@@ -50,7 +50,7 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			appOne.PUT(value, key)
 
 			By("getting the value using the second app")
-			got := appTwo.GET(key)
+			got := appTwo.GET(key).String()
 			Expect(got).To(Equal(value))
 
 			By("pushing the development version of the broker")
@@ -60,13 +60,13 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			serviceInstance.Upgrade()
 
 			By("getting the value using the second app")
-			Expect(appTwo.GET(key)).To(Equal(value))
+			Expect(appTwo.GET(key).String()).To(Equal(value))
 
 			By("updating the instance plan")
 			serviceInstance.Update(services.WithParameters(updatedConfig(tableName)))
 
 			By("getting the value using the second app")
-			Expect(appTwo.GET(key)).To(Equal(value))
+			Expect(appTwo.GET(key).String()).To(Equal(value))
 
 			By("deleting bindings created before the upgrade")
 			bindingOne.Unbind()
@@ -78,13 +78,13 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			apps.Restage(appOne, appTwo)
 
 			By("getting the value using the second app")
-			Expect(appTwo.GET(key)).To(Equal(value))
+			Expect(appTwo.GET(key).String()).To(Equal(value))
 
 			By("checking data can still be written and read")
 			keyTwo := random.Hexadecimal()
 			valueTwo := random.Hexadecimal()
 			appOne.PUT(valueTwo, keyTwo)
-			Expect(appTwo.GET(keyTwo)).To(Equal(valueTwo))
+			Expect(appTwo.GET(keyTwo).String()).To(Equal(valueTwo))
 		})
 	})
 })

@@ -237,6 +237,52 @@ provision:
       The first item in the list will be the primary node.
       Number of entries must equal to node_count.
       If this property is set, the node_count will become immutable.
+  - field_name: logs_slow_log_enabled
+    type: boolean
+    default: false
+    details: |
+      Enable the streaming of Redis Slow Log to CloudWatch. Slow Log is supported for Redis replication groups using version 6.0 onward.
+  - field_name: logs_slow_log_loggroup_retention_in_days
+    type: number
+    default: 0
+    details: |
+      Specifies the number of days you want to retain log events in the specified log group. 
+      If 0 is specified, the events in the log group are always retained and never expire.
+      When specifying `logs_slow_log_loggroup_retention_in_days`, `logs_slow_log_enabled` needs to be set to true.
+      For more information, see
+      https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html#API_PutRetentionPolicy_RequestSyntax
+  - field_name: logs_slow_log_loggroup_kms_key_id
+    type: string
+    default: ""
+    details: |
+      The ARN for the KMS key to encrypt Slow logs CloudWatch logs.
+      When specifying `logs_slow_log_loggroup_kms_key_id`, `logs_slow_log_enabled` needs to be set to true.
+      If omitted, CloudWatch default encryption will apply.
+      For information on CloudWatch log data encryption and how to configure a KMS key, see 
+      https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
+  - field_name: logs_engine_log_enabled
+    type: boolean
+    default: false
+    details: |
+      Enable the streaming of Redis Engine logs to CloudWatch. Engine Log is supported for Redis replication groups using version 6.2 onward.
+  - field_name: logs_engine_log_loggroup_retention_in_days
+    type: number
+    default: 0
+    details: |
+      Specifies the number of days you want to retain log events in the specified log group. 
+      If 0 is specified, the events in the log group are always retained and never expire.
+      When specifying `logs_engine_log_loggroup_retention_in_days`, `logs_engine_log_enabled` needs to be set to true.
+      For more information, see
+      https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutRetentionPolicy.html#API_PutRetentionPolicy_RequestSyntax
+  - field_name: logs_engine_log_loggroup_kms_key_id
+    type: string
+    default: ""
+    details: |
+      The ARN for the KMS key to encrypt Engine Log CloudWatch logs.
+      When specifying `logs_engine_log_loggroup_kms_key_id`, `logs_engine_log_enabled` needs to be set to true.
+      If omitted, CloudWatch default encryption will apply.
+      For information on CloudWatch log data encryption and how to configure a KMS key, see 
+      https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/encrypt-log-data-kms.html
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -283,7 +329,7 @@ examples:
   provision_params: {"region": "us-east-1", "multi_az_enabled": false}
   bind_params: {}
 - name: with-custom-node_type
-  description: Create a Redis instance with a custom node_type
+  description: Create a Redis instance with a custom node_type and slow logs enabled
   plan_id: 2deb6c13-7ea1-4bad-a519-0ac9600e9a29
-  provision_params: {"node_type": "cache.t2.micro", "multi_az_enabled": false}
+  provision_params: {"node_type": "cache.t2.micro", "multi_az_enabled": false, "logs_slow_log_enabled": true}
   bind_params: {}
