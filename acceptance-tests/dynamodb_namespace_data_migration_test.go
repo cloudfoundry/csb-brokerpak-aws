@@ -24,7 +24,7 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 		)
 		defer legacyServiceInstance.Delete()
 
-		By("creating a service CSB instance")
+		By("creating a service CSB service instance")
 		csbServiceInstance := services.CreateInstance(
 			"csb-aws-dynamodb-namespace",
 			services.WithPlan("default"),
