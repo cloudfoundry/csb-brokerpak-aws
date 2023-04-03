@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"reflect"
 
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -20,6 +21,8 @@ func NewPayload(response *http.Response) Payload {
 type Payload string
 
 func (p Payload) ParseInto(receiver any) {
+	GinkgoHelper()
+
 	Expect(reflect.ValueOf(receiver).Kind()).To(Equal(reflect.Ptr), "must pass a pointer to the receiver")
 	Expect(json.Unmarshal([]byte(p), receiver)).To(Succeed())
 }
