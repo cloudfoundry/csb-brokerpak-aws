@@ -129,6 +129,7 @@ provision:
     details: AWS secret key
     default: ${config("aws.secret_access_key")}
   - field_name: aws_vpc_id
+    type: string
     details: VPC ID for instance
     default: ""
   - field_name: instance_class
