@@ -19,13 +19,19 @@ func Read() (DynamoDBNamespaceService, error) {
 	if err != nil {
 		return DynamoDBNamespaceService{}, fmt.Errorf("error reading app env: %w", err)
 	}
-	svs, err := app.Services.WithTag("namespace")
-	if err != nil {
-		return DynamoDBNamespaceService{}, fmt.Errorf("error reading DynamoDB Namespace service details: %w", err)
-	}
 
+	if svs, err := app.Services.WithTag("namespace"); err == nil {
+		return parseCredentials(svs[0].Credentials)
+	}
+	if svs, err := app.Services.WithLabel("aws-dynamodb"); err == nil {
+		return parseCredentials(svs[0].Credentials)
+	}
+	return DynamoDBNamespaceService{}, fmt.Errorf("could not find service with tag 'namespace' or label 'aws-dynamodb'")
+}
+
+func parseCredentials(input map[string]any) (DynamoDBNamespaceService, error) {
 	var r DynamoDBNamespaceService
-	if err := mapstructure.Decode(svs[0].Credentials, &r); err != nil {
+	if err := mapstructure.Decode(input, &r); err != nil {
 		return DynamoDBNamespaceService{}, fmt.Errorf("failed to decode credentials: %w", err)
 	}
 
