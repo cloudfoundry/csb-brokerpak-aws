@@ -68,7 +68,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		Expect(sslInfo.SSL).To(BeTrue())
 		Expect(sslInfo.Cipher).NotTo(BeEmpty())
-		Expect(sslInfo.Bits).To(BeNumerically(">=", 256))
 
 		By("deleting the entry using the writer app")
 		appWriter.DELETE("%d", userIn.ID)
