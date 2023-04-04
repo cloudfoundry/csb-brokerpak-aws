@@ -15,7 +15,19 @@ type dynamoDBNamespaceSettings struct {
 	customEndpointURL string
 }
 
-func (d *dynamoDBNamespaceSettings) GetClient(ctx context.Context, keyID, secretKey string) (*dynamodb.Client, error) {
+//counterfeiter:generate -header csbdynamodbnsfakes/header.txt . DynamoDBConfig
+type DynamoDBConfig interface {
+	GetClient(ctx context.Context, keyID, secretKey string) (DynamoDBClient, error)
+	GetPrefix() string
+}
+
+var _ DynamoDBConfig = &dynamoDBNamespaceSettings{}
+
+func (d *dynamoDBNamespaceSettings) GetPrefix() string {
+	return d.prefix
+}
+
+func (d *dynamoDBNamespaceSettings) GetClient(ctx context.Context, keyID, secretKey string) (DynamoDBClient, error) {
 	optFns := []func(options *config.LoadOptions) error{
 		config.WithRegion(d.region),
 	}

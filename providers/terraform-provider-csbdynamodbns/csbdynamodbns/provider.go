@@ -36,7 +36,7 @@ func Provider() *schema.Provider {
 		},
 		ConfigureContextFunc: providerConfigure,
 		ResourcesMap: map[string]*schema.Resource{
-			"csbdynamodbns_instance": resourceDynamoDBNSInstance(),
+			"csbdynamodbns_instance": ResourceDynamoDBNSInstance(),
 		},
 	}
 }

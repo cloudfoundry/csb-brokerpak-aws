@@ -10,8 +10,10 @@ require (
 	github.com/aws/smithy-go v1.13.5
 	github.com/cloudfoundry/cloud-service-broker v0.17.5
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.26.1
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.5
+	github.com/pborman/uuid v1.2.1
 	golang.org/x/tools v0.7.0
 	honnef.co/go/tools v0.4.3
 )
@@ -36,6 +38,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-checkpoint v0.5.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect

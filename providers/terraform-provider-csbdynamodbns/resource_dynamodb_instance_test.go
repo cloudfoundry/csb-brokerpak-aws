@@ -18,6 +18,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
+	"github.com/pborman/uuid"
 
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
 )
@@ -34,7 +35,7 @@ var _ = Describe("Resource dynamodbns_maintenance", func() {
 
 		port = freeport.Must()
 		localDynamoDBURL = fmt.Sprintf("http://localhost:%d", port)
-		prefix = "csb-0d493f5d-24b4-4e49-8417-90abd3c0c1c0"
+		prefix = fmt.Sprintf("csb-%s-", uuid.New())
 
 		cmd := exec.Command("docker", "run",
 			"-p", fmt.Sprintf("%d:8000", port),
@@ -63,9 +64,9 @@ var _ = Describe("Resource dynamodbns_maintenance", func() {
 			"one",
 			"two",
 			"three",
-			fmt.Sprintf("%s-one", prefix),
-			fmt.Sprintf("%s-two", prefix),
-			fmt.Sprintf("%s-three", prefix),
+			fmt.Sprintf("%sone", prefix),
+			fmt.Sprintf("%stwo", prefix),
+			fmt.Sprintf("%sthree", prefix),
 		}
 		for _, name := range tableNames {
 			input := &dynamodb.CreateTableInput{
@@ -102,22 +103,23 @@ var _ = Describe("Resource dynamodbns_maintenance", func() {
 
 	It("should clean up", func() {
 		tfBody := fmt.Sprintf(`provider "csbdynamodbns" {
-		 region              = "us-west-2"
-		 prefix              = "%s"
-		 custom_endpoint_url = "%s"
-		}
-		
-		resource "csbdynamodbns_instance" "service_instance" {
-		 access_key_id     = "fake-key-id"
-		 secret_access_key = "fake-secret-key"
-		}
+  region              = "us-west-2"
+  prefix              = "%s"
+  custom_endpoint_url = "%s"
+}
+
+resource "csbdynamodbns_instance" "service_instance" {
+  access_key_id     = "fake-key-id"
+  secret_access_key = "fake-secret-key"
+}
 		`, prefix, localDynamoDBURL)
 		applyHCL(tfBody, func(state *terraform.State) error {
 			By("checking that only non-prefixed tables remain")
-
-			tables, err := client.ListTables(context.TODO(), nil)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(tables.TableNames).To(HaveLen(3))
+			Eventually(func(g Gomega) {
+				tables, err := client.ListTables(context.TODO(), nil)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(tables.TableNames).To(HaveLen(3))
+			}).WithTimeout(5 * time.Minute).WithPolling(5 * time.Second).Should(Succeed())
 			return nil
 		})
 	})

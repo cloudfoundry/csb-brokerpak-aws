@@ -6,24 +6,33 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/smithy-go/ptr"
-	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 const (
-	awsAccessKeyIDKey     = "access_key_id"
-	awsSecretAccessKeyKey = "secret_access_key"
+	AwsAccessKeyIDKey     = "access_key_id"
+	AwsSecretAccessKeyKey = "secret_access_key"
 )
 
-func resourceDynamoDBNSInstance() *schema.Resource {
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+
+//counterfeiter:generate -header csbdynamodbnsfakes/header.txt . DynamoDBClient
+type DynamoDBClient interface {
+	dynamodb.ListTablesAPIClient
+	DeleteTable(context.Context, *dynamodb.DeleteTableInput, ...func(options *dynamodb.Options)) (*dynamodb.DeleteTableOutput, error)
+}
+
+var _ DynamoDBClient = &dynamodb.Client{}
+
+func ResourceDynamoDBNSInstance() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			awsAccessKeyIDKey: {
+			AwsAccessKeyIDKey: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			awsSecretAccessKeyKey: {
+			AwsSecretAccessKeyKey: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
@@ -31,44 +40,45 @@ func resourceDynamoDBNSInstance() *schema.Resource {
 		CreateContext: setResourceID,
 		UpdateContext: setResourceID,
 		ReadContext:   setResourceID,
-		DeleteContext: resourceDynamoDBMaintenanceDelete,
+		DeleteContext: ResourceDynamoDBMaintenanceDelete,
 		Description:   "Handles DynamoDB namespace housekeeping",
 	}
 }
 
-func setResourceID(_ context.Context, d *schema.ResourceData, _ any) diag.Diagnostics {
-	keyID := d.Get(awsAccessKeyIDKey).(string)
-	d.SetId(keyID)
+func setResourceID(_ context.Context, data *schema.ResourceData, _ any) diag.Diagnostics {
+	keyID := data.Get(AwsAccessKeyIDKey).(string)
+	data.SetId(keyID)
 	return nil
 }
 
-func resourceDynamoDBMaintenanceDelete(ctx context.Context, d *schema.ResourceData, m any) diag.Diagnostics {
-	settings := m.(*dynamoDBNamespaceSettings)
-	client, err := settings.GetClient(ctx, d.Get(awsAccessKeyIDKey).(string), d.Get(awsSecretAccessKeyKey).(string))
+func ResourceDynamoDBMaintenanceDelete(ctx context.Context, data *schema.ResourceData, config any) diag.Diagnostics {
+	settings := config.(DynamoDBConfig)
+	client, err := settings.GetClient(ctx, data.Get(AwsAccessKeyIDKey).(string), data.Get(AwsSecretAccessKeyKey).(string))
 	if err != nil {
 		return diag.FromErr(err)
 	}
 	paginator := dynamodb.NewListTablesPaginator(client, &dynamodb.ListTablesInput{}, func(o *dynamodb.ListTablesPaginatorOptions) {
-		// This should not even be a setting
 		o.StopOnDuplicateToken = true
 	})
+
+	d := diag.Diagnostics{}
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 		if err != nil {
-			return diag.FromErr(err)
+			// We have to return immediately in order to avoid an infinite loop
+			return append(d, diag.Diagnostic{Severity: diag.Error, Summary: err.Error()})
 		}
-		var multiErr *multierror.Error
 		for _, tableName := range page.TableNames {
-			if strings.HasPrefix(tableName, settings.prefix) {
+			if strings.HasPrefix(tableName, settings.GetPrefix()) {
 				_, err := client.DeleteTable(ctx, &dynamodb.DeleteTableInput{TableName: ptr.String(tableName)})
 				if err != nil {
-					multiErr = multierror.Append(multiErr, err)
+					d = append(d, diag.Diagnostic{Severity: diag.Error, Summary: err.Error()})
 				}
 			}
 		}
-		if multiErr != nil {
-			return diag.FromErr(multiErr)
-		}
+	}
+	if len(d) > 0 {
+		return d
 	}
 	return nil
 }

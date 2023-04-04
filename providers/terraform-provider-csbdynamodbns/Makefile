@@ -60,8 +60,12 @@ fmt: ## format the code
 	go run golang.org/x/tools/cmd/goimports -l -w .
 
 .PHONY: ginkgo
-ginkgo: ## run the tests with Ginkgo
-	go run github.com/onsi/ginkgo/v2/ginkgo -r -v
+ginkgo: generate ## run the tests with Ginkgo
+	go run github.com/onsi/ginkgo/v2/ginkgo -r
+
+.PHONY: generate
+generate: ## generate test fakes
+	pushd csbdynamodbns; go generate; popd
 
 .PHONY: version
 version:
