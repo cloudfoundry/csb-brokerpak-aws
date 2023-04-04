@@ -65,7 +65,7 @@ ginkgo: generate ## run the tests with Ginkgo
 
 .PHONY: generate
 generate: ## generate test fakes
-	pushd csbdynamodbns; go generate; popd
+	cd csbdynamodbns; go generate; cd ..
 
 .PHONY: version
 version:
