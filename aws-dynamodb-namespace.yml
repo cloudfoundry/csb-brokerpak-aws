@@ -36,7 +36,7 @@ provision:
   - name: prefix
     type: string
     details: Prefix for the DynamoDB table names
-    default: csb-${request.instance_id}
+    default: "csb-${request.instance_id}-"
   - name: region
     type: string
     details: Region for the DynamoDB tables

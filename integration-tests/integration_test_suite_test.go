@@ -20,6 +20,7 @@ const (
 	awsAccessKeyID     = "aws-access-key-id"
 	Name               = "Name"
 	ID                 = "ID"
+	fakeRegion         = "fake-region"
 )
 
 var (
@@ -46,6 +47,7 @@ var _ = BeforeSuite(func() {
 		"AWS_SECRET_ACCESS_KEY=" + awsSecretAccessKey,
 		"CSB_LISTENER_HOST=localhost",
 		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES=true",
+		"GSB_PROVISION_DEFAULTS=" + marshall(map[string]string{"region": fakeRegion}),
 	})).To(Succeed())
 })
 

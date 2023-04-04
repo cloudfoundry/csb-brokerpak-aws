@@ -22,7 +22,7 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 			terraformProvisionDir = path.Join(workingDir, "dynamodb-namespace/provision")
 			defaultVars = map[string]any{
 				"region": "fake-region",
-				"prefix": "csb-fake-5368-489c-9f18-b53140316fb2",
+				"prefix": "csb-fake-5368-489c-9f18-b53140316fb2-",
 			}
 			Init(terraformProvisionDir)
 		})
@@ -40,7 +40,7 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 				Expect(plan.OutputChanges).To(HaveKeyWithValue("region", BeAssignableToTypeOf(&tfjson.Change{})))
 				Expect(plan.OutputChanges).To(HaveKeyWithValue("prefix", BeAssignableToTypeOf(&tfjson.Change{})))
 				Expect(plan.OutputChanges["region"].After).To(Equal("fake-region"))
-				Expect(plan.OutputChanges["prefix"].After).To(Equal("csb-fake-5368-489c-9f18-b53140316fb2"))
+				Expect(plan.OutputChanges["prefix"].After).To(Equal("csb-fake-5368-489c-9f18-b53140316fb2-"))
 			})
 		})
 	})
@@ -50,7 +50,7 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 			terraformProvisionDir = path.Join(workingDir, "dynamodb-namespace/bind")
 			defaultVars = map[string]any{
 				"user_name":             "fake-user-name",
-				"prefix":                "csb-fake-5368-489c-9f18-b53140316fb2",
+				"prefix":                "csb-fake-5368-489c-9f18-b53140316fb2-",
 				"region":                "us-west-1",
 				"aws_access_key_id":     awsAccessKeyID,
 				"aws_secret_access_key": awsSecretAccessKey,

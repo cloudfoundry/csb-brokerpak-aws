@@ -135,7 +135,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-mysql-%s", instanceID)),
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("publicly_accessible", false),
-					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("multi_az", true),
 					HaveKeyWithValue("instance_class", ""),
 					HaveKeyWithValue("rds_subnet_group", ""),

@@ -238,7 +238,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				SatisfyAll(
 					HaveKey("instance_name"),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
-					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("cache_size", BeNil()),
 					HaveKeyWithValue("node_count", BeNumerically("==", 2)),
 					HaveKeyWithValue("redis_version", "6.x"),
