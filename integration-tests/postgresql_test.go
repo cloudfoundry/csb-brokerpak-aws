@@ -121,7 +121,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-postgresql-%s", instanceID)),
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("publicly_accessible", false),
-					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("storage_encrypted", false),
 					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("multi_az", false),
