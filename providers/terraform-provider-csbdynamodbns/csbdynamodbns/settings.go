@@ -52,6 +52,14 @@ func (d *dynamoDBNamespaceSettings) GetClient(ctx context.Context, keyID, secret
 					},
 				),
 			),
+			config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
+				Value: aws.Credentials{
+					AccessKeyID:     "dummy",
+					SecretAccessKey: "dummy",
+					SessionToken:    "dummy",
+					Source:          "Hard-coded credentials; the values are irrelevant",
+				},
+			}),
 		)
 	}
 	cfg, err := config.LoadDefaultConfig(ctx, optFns...)
