@@ -93,7 +93,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("bucket_name", "csb-"+instanceID),
 					HaveKeyWithValue("enable_versioning", false),
 					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
-					HaveKeyWithValue("region", "us-west-2"),
+					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("acl", BeNil()),
 					HaveKeyWithValue("ol_enabled", false),
 					HaveKeyWithValue("ol_configuration_default_retention_enabled", BeNil()),
