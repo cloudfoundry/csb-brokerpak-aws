@@ -148,7 +148,7 @@ run-provider-tests:  ## run the integration tests associated with providers
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
 
 custom.tfrc:
-	echo "provider_installation {\n  filesystem_mirror {\n    path = "'"'"$(PWD)/providers/build"'"'"\n    include = ["'"'"cloudfoundry.org/*/*"'"'"]\n  }\n  direct {\n    exclude = ["'"'"cloudfoundry.org/*/*"'"'"]\n  }\n}" > $@
+	sed "s#BROKERPAK_PATH#$(PWD)#" custom.tfrc.template > $@
 
 ###### info ###################################################################
 
