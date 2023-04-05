@@ -35,22 +35,22 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 			})
 
 			It("should create the housekeeping resources", func() {
-				type resourceId struct {
+				type resourceID struct {
 					Type string
 					Name string
 				}
-				var changeList []resourceId
+				var changeList []resourceID
 
 				changes := plan.ResourceChanges
 				for _, change := range changes {
-					changeList = append(changeList, resourceId{Type: change.Type, Name: change.Name})
+					changeList = append(changeList, resourceID{Type: change.Type, Name: change.Name})
 				}
 
 				Expect(changeList).To(ConsistOf(
-					resourceId{Name: "housekeeping_user", Type: "aws_iam_user"},
-					resourceId{Name: "housekeeping_policy", Type: "aws_iam_user_policy"},
-					resourceId{Name: "housekeeping_user_key", Type: "aws_iam_access_key"},
-					resourceId{Name: "housekeeping", Type: "csbdynamodbns_instance"},
+					resourceID{Name: "housekeeping_user", Type: "aws_iam_user"},
+					resourceID{Name: "housekeeping_policy", Type: "aws_iam_user_policy"},
+					resourceID{Name: "housekeeping_user_key", Type: "aws_iam_access_key"},
+					resourceID{Name: "housekeeping", Type: "csbdynamodbns_instance"},
 				))
 			})
 
