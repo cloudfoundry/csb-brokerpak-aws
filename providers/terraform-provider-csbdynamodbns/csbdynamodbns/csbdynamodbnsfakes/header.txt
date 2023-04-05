@@ -1,0 +1,1 @@
+//lint:file-ignore ST1000 auto-generated
