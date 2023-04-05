@@ -7,7 +7,6 @@ import (
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
 )
 
@@ -244,20 +243,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("multi_az_enabled", func() {
-		When("invalid combination", func() {
-			It("should not be passed", func() {
-				vars := buildVars(defaultVars, map[string]any{"node_count": 1, "multi_az_enabled": true, "automatic_failover_enabled": false})
-				session, err := FailPlan(terraformProvisionDir, vars)
-
-				Expect(session.ExitCode()).NotTo(Equal(0), "Terraform plan should return and error upon exit")
-				Expect(session.Err).To(gbytes.Say("automatic_failover_enabled must be true if multi_az_enabled is true"))
-
-				Expect(err).NotTo(HaveOccurred())
-			})
-		})
-	})
-
 	Context("preferred_azs are passed", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
@@ -398,6 +383,21 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"tags":              HaveKeyWithValue("key1", "some-redis-value"),
 				}))
 			})
+		})
+	})
+
+	Context("node_count is 1", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"node_count": 1,
+			}))
+		})
+
+		It("sets `automatic_failover_enabled` and `multi_az_enabled` to false", func() {
+			Expect(AfterValuesForType(plan, resource)).To(MatchKeys(IgnoreExtras, Keys{
+				"automatic_failover_enabled": BeFalse(),
+				"multi_az_enabled":           BeFalse(),
+			}))
 		})
 	})
 })
