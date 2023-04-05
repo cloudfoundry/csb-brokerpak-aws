@@ -95,8 +95,15 @@ endif
 .PHONY: build
 build: deps-go-binary $(IAAS)-services-*.brokerpak ## build brokerpak
 
-$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf providers/terraform-provider-csbdynamodbns/cloudfoundry.org/cloud-service-broker/csbdynamodbns | $(PAK_BUILD_CACHE_PATH)
+$(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf providers | $(PAK_BUILD_CACHE_PATH)
 	$(RUN_CSB) pak build
+
+
+.PHONY: providers
+providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns # build custom providers
+
+providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
+	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build
 
 ###### Run ###################################################################
 .PHONY: run
@@ -120,7 +127,7 @@ examples: ## display available examples
 
 ###### run-examples ###################################################################
 .PHONY: run-examples
-run-examples: ## run examples in yml files. Runs examples for all services by default. Set service_name and/or example_name.
+run-examples: providers ## run examples in yml files. Runs examples for all services by default. Set service_name and/or example_name.
 	$(RUN_CSB) run-examples --service-name="$(service_name)" --example-name="$(example_name)"
 
 ###### test ###################################################################
@@ -133,13 +140,15 @@ run-integration-tests: run-provider-tests ## run integration tests for this brok
 	cd ./integration-tests && go run github.com/onsi/ginkgo/v2/ginkgo -r .
 
 .PHONY: run-terraform-tests
-run-terraform-tests: ## run terraform tests for this brokerpak
-	cd ./terraform-tests && go run github.com/onsi/ginkgo/v2/ginkgo -r .
+run-terraform-tests: providers custom.tfrc ## run terraform tests for this brokerpak
+	cd ./terraform-tests && TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go run github.com/onsi/ginkgo/v2/ginkgo -r .
 
 .PHONY: run-provider-tests
 run-provider-tests:  ## run the integration tests associated with providers
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
 
+custom.tfrc:
+	echo "provider_installation {\n  filesystem_mirror {\n    path = "'"'"$(PWD)/providers/build"'"'"\n    include = ["'"'"cloudfoundry.org/*/*"'"'"]\n  }\n  direct {\n    exclude = ["'"'"cloudfoundry.org/*/*"'"'"]\n  }\n}" > $@
 
 ###### info ###################################################################
 
@@ -241,6 +250,3 @@ format: ## format the source
 	${GOFMT} -s -e -l -w .
 	${GO} run golang.org/x/tools/cmd/goimports -l -w .
 	terraform fmt --recursive
-
-providers/terraform-provider-csbdynamodbns/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
-	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build

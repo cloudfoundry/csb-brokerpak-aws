@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     csbdynamodbns = {
-      source  = "cloud-service-broker/csbdynamodbns"
+      source  = "cloudfoundry.org/cloud-service-broker/csbdynamodbns"
       version = "1.0.0"
     }
     aws = {

@@ -2,11 +2,7 @@ resource "aws_iam_user" "housekeeping_user" {
   name = format("%s-housekeeping", var.prefix)
 }
 
-resource "aws_iam_access_key" "binding_user_key" {
-  user = aws_iam_user.housekeeping_user.name
-}
-
-resource "aws_iam_user_policy" "binding_policy" {
+resource "aws_iam_user_policy" "housekeeping_policy" {
   user = aws_iam_user.housekeeping_user.name
   policy = jsonencode({
     "Version" = "2012-10-17",

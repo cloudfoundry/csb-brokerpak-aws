@@ -24,17 +24,17 @@ help: ## list Makefile targets
 test: version download checkfmt checkimports vet ginkgo ## run all build, static analysis, and test steps
 
 .PHONY: build
-build: version download checkfmt checkimports vet cloudfoundry.org ## build the provider
+build: version download checkfmt checkimports vet ../build/cloudfoundry.org ## build the provider
 
-cloudfoundry.org: *.go */*.go
-	mkdir -p cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64
-	mkdir -p cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64
-	CGO_ENABLED=0 GOOS=linux $(GO) build -o cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
-	CGO_ENABLED=0 GOOS=darwin $(GO) build -o cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
+../build/cloudfoundry.org: *.go */*.go
+	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64
+	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64
+	CGO_ENABLED=0 GOOS=linux $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
+	CGO_ENABLED=0 GOOS=darwin $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
 
 .PHONY: clean
 clean: ## clean up build artifacts
-	- rm -rf cloudfoundry.org
+	- rm -rf ../build/cloudfoundry.org
 
 download: ## download dependencies
 	go mod download

@@ -1,13 +1,14 @@
 package terraformtests
 
 import (
-	. "csbbrokerpakaws/terraform-tests/helpers"
 	"path"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
+
+	. "csbbrokerpakaws/terraform-tests/helpers"
 )
 
 var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {

@@ -4,3 +4,5 @@ cloud-service-broker
 .aws-terraform-tests
 .csb.db
 **/.tmp
+providers/build
+custom.tfrc
