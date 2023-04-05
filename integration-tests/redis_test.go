@@ -10,9 +10,9 @@ import (
 const (
 	redisServiceID                        = "e9c11b1b-0caa-45c9-b9b2-592939c9a5a6"
 	redisServiceName                      = "csb-aws-redis"
-	redisServiceDescription               = "CSB Amazon ElastiCache for Redis - multinode with automatic failover"
+	redisServiceDescription               = "CSB Amazon ElastiCache for Redis"
 	redisServiceDisplayName               = "CSB Amazon ElastiCache for Redis"
-	redisServiceDocumentationURL          = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-redis.html"
+	redisServiceDocumentationURL          = "https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html"
 	redisServiceSupportURL                = "https://aws.amazon.com/redis/"
 	redisServiceProviderDisplayName       = "VMware"
 	redisCustomPlanName                   = "custom-sample"
