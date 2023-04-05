@@ -8,7 +8,7 @@ ifeq ($(GO_OK), 0)
   GO = go
   GOFMT = gofmt
 else ifeq ($(DOCKER_OK), 0)
-  GO_DOCKER_OPTS = --rm -v $(PWD)/../..:/src -w /src/providers/terraform-provider-csbdynamodbns
+  GO_DOCKER_OPTS = --rm -v $(PWD)/../..:/src -w /src/providers/terraform-provider-csbdynamodbns --network=host
   GO = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) go
   GOFMT = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) gofmt
 else
