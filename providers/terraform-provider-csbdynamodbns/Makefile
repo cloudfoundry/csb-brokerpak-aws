@@ -5,9 +5,12 @@ GO-VER = go$(GO-VERSION)
 GO_OK :=  $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; echo $$?))
 DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
 ifeq ($(GO_OK), 0)
-  GO=go
+  GO = go
+  GOFMT = gofmt
 else ifeq ($(DOCKER_OK), 0)
-  GO=docker run --rm -v $(PWD)/../..:/src -w /src/providers/terraform-provider-csbmssqldbrunfailover -e GOARCH -e GOOS -e CGO_ENABLED golang:$(GO-VERSION) go
+  GO_DOCKER_OPTS = --rm -v $(PWD)/../..:/src -w /src/providers/terraform-provider-csbdynamodbns
+  GO = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) go
+  GOFMT = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) gofmt
 else
   $(error either Go or Docker must be installed)
 endif
@@ -37,40 +40,40 @@ clean: ## clean up build artifacts
 	- rm -rf ../build/cloudfoundry.org
 
 download: ## download dependencies
-	go mod download
+	$(GO) mod download
 
 vet: ## run static code analysis
-	go vet ./...
-	go run honnef.co/go/tools/cmd/staticcheck ./...
+	$(GO) vet ./...
+	$(GO) run honnef.co/go/tools/cmd/staticcheck ./...
 
 checkfmt: ## check that the code is formatted correctly
-	@@if [ -n "$$(gofmt -s -e -l -d .)" ]; then \
+	@@if [ -n "$$(${GOFMT} -s -e -l -d .)" ]; then \
 		echo "gofmt check failed: run 'make fmt'"; \
 		exit 1; \
 	fi
 
 checkimports: ## check that imports are formatted correctly
-	@@if [ -n "$$(go run golang.org/x/tools/cmd/goimports -l -d .)" ]; then \
+	@@if [ -n "$$(${GO} run golang.org/x/tools/cmd/goimports -l -d .)" ]; then \
 		echo "goimports check failed: run 'make fmt'";  \
 		exit 1; \
 	fi
 
 fmt: ## format the code
-	gofmt -s -e -l -w .
-	go run golang.org/x/tools/cmd/goimports -l -w .
+	$(GOFMT) -s -e -l -w .
+	$(GO) run golang.org/x/tools/cmd/goimports -l -w .
 
 .PHONY: ginkgo
 ginkgo: generate ## run the tests with Ginkgo
-	go run github.com/onsi/ginkgo/v2/ginkgo -r
+	$(GO) run github.com/onsi/ginkgo/v2/ginkgo -r
 
 .PHONY: generate
 generate: ## generate test fakes
-	cd csbdynamodbns; go generate; cd ..
+	cd csbdynamodbns; $(GO) generate; cd ..
 
 .PHONY: version
 version:
-	@@go version
-	@@if [ "$$(go version | awk '{print $$3}')" != "${GO-VER}" ]; then \
-		echo "Go version does not match: expected: ${GO-VER}, got $$(go version | awk '{print $$3}')"; \
+	@@$(GO) version
+	@@if [ "$$(${GO} version | awk '{print $$3}')" != "${GO-VER}" ]; then \
+		echo "Go version does not match: expected: ${GO-VER}, got $$(${GO} version | awk '{print $$3}')"; \
 		exit 1; \
 	fi
