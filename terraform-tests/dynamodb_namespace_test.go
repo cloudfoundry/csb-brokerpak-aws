@@ -21,8 +21,10 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 		BeforeAll(func() {
 			terraformProvisionDir = path.Join(workingDir, "dynamodb-namespace/provision")
 			defaultVars = map[string]any{
-				"region": "fake-region",
-				"prefix": "csb-fake-5368-489c-9f18-b53140316fb2-",
+				"region":                awsRegion,
+				"prefix":                "csb-fake-5368-489c-9f18-b53140316fb2-",
+				"aws_access_key_id":     awsAccessKeyID,
+				"aws_secret_access_key": awsSecretAccessKey,
 			}
 			Init(terraformProvisionDir)
 		})
@@ -32,14 +34,30 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 			})
 
-			It("should not create any resources", func() {
-				Expect(plan.ResourceChanges).To(BeEmpty())
+			It("should create the housekeeping resources", func() {
+				type resourceId struct {
+					Type string
+					Name string
+				}
+				var changeList []resourceId
+
+				changes := plan.ResourceChanges
+				for _, change := range changes {
+					changeList = append(changeList, resourceId{Type: change.Type, Name: change.Name})
+				}
+
+				Expect(changeList).To(ConsistOf(
+					resourceId{Name: "housekeeping_user", Type: "aws_iam_user"},
+					resourceId{Name: "housekeeping_policy", Type: "aws_iam_user_policy"},
+					resourceId{Name: "housekeeping_user_key", Type: "aws_iam_access_key"},
+					resourceId{Name: "housekeeping", Type: "csbdynamodbns_instance"},
+				))
 			})
 
 			It("should pass through the parameters", func() {
 				Expect(plan.OutputChanges).To(HaveKeyWithValue("region", BeAssignableToTypeOf(&tfjson.Change{})))
 				Expect(plan.OutputChanges).To(HaveKeyWithValue("prefix", BeAssignableToTypeOf(&tfjson.Change{})))
-				Expect(plan.OutputChanges["region"].After).To(Equal("fake-region"))
+				Expect(plan.OutputChanges["region"].After).To(Equal(awsRegion))
 				Expect(plan.OutputChanges["prefix"].After).To(Equal("csb-fake-5368-489c-9f18-b53140316fb2-"))
 			})
 		})
@@ -47,18 +65,19 @@ var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, 
 
 	Describe("binding", func() {
 		BeforeAll(func() {
+			Expect(awsRegion).NotTo(BeEmpty(), "AWS region must be provided in AWS_DEFAULT_REGION or GSB_PROVISION_DEFAULTS")
+
 			terraformProvisionDir = path.Join(workingDir, "dynamodb-namespace/bind")
 			defaultVars = map[string]any{
 				"user_name":             "fake-user-name",
 				"prefix":                "csb-fake-5368-489c-9f18-b53140316fb2-",
-				"region":                "us-west-1",
+				"region":                awsRegion,
 				"aws_access_key_id":     awsAccessKeyID,
 				"aws_secret_access_key": awsSecretAccessKey,
 			}
 			Init(terraformProvisionDir)
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
 
-			Expect(awsRegion).NotTo(BeEmpty(), "AWS must be provided in GSB_PROVISION_DEFAULTS")
 		})
 
 		It("should include the new user credentials", func() {

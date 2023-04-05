@@ -26,6 +26,10 @@ func Init(dir string) {
 	CommandStart(command)
 }
 
+func chdirFlag(dir string) string {
+	return "-chdir=" + dir
+}
+
 func FailPlan(dir string, vars map[string]any) (*gexec.Session, error) {
 	tfvarsPath := path.Join(dir, "terraform.tfvars.json")
 	writeTFVarsFile(vars, tfvarsPath)
@@ -64,11 +68,11 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 }
 
 func terraformPlanCMD(dir string, planFile string) *exec.Cmd {
-	return exec.Command("terraform", "-chdir="+dir, "plan", "-refresh=false", fmt.Sprintf("-out=%s", planFile))
+	return exec.Command("terraform", chdirFlag(dir), "plan", "-refresh=false", fmt.Sprintf("-out=%s", planFile))
 }
 
 func decodePlan(dir, planFile string) []byte {
-	jsonPlan, err := CommandOutput(exec.Command("terraform", "-chdir="+dir, "show", "-json", planFile))
+	jsonPlan, err := CommandOutput(exec.Command("terraform", chdirFlag(dir), "show", "-json", planFile))
 	Expect(err).ToNot(HaveOccurred())
 	return jsonPlan
 }
