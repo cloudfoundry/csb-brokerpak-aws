@@ -109,7 +109,7 @@ provision:
     prohibit_update: true
   - field_name: multi_az_enabled
     type: boolean
-    details: Whether to enable Multi-AZ Support for the replication group. If true, `node_count` must be greater than 1.
+    details: Whether to enable Multi-AZ Support for the replication group. Only applies when `node_count` is greater than 1.
     default: true
   - field_name: kms_key_id
     type: string
@@ -118,7 +118,7 @@ provision:
     prohibit_update: true
   - field_name: automatic_failover_enabled
     type: boolean
-    details: Automatically promote replica to primary if the existing primary fails. If enabled, node_count must be greater than 1.
+    details: Automatically promote replica to primary if the existing primary fails. Only applies when `node_count` is greater than 1.
     default: true
   - <<: &nullable_string
       type: string
