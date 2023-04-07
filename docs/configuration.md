@@ -45,7 +45,9 @@ Broker service configuration values:
 | <tt>HOST</tt>                            | api.host          | string | <p>Host to bind broker to</p>         |
 
 ## Credhub Configuration
-The broker supports passing credentials to apps via [credhub references](https://github.com/cloudfoundry/credhub/blob/main/docs/secure-service-credentials.md#service-brokers), thus keeping them private to the application (they won't show up in `cf env app_name` output.)
+The broker supports passing credentials to apps via 
+[credhub references](https://github.com/cloudfoundry/credhub/blob/main/docs/secure-service-credentials.md#service-brokers),
+thus keeping them private to the application (they won't show up in `cf env app_name` output.)
 
 | Environment Variable   | Config File Value           | Type    | Description                                                                                                 |
 |------------------------|-----------------------------|---------|-------------------------------------------------------------------------------------------------------------|
@@ -79,7 +81,8 @@ The AWS brokerpak supports default values for access key id and secret access ke
 | AWS_SECRET_ACCESS_KEY | aws.secret_access_key | string | secret access key |
 
 ### Config Example
-```
+
+```yml
 aws:
   access_key_id: access key id
   secret_access_key: secret access key
@@ -116,7 +119,8 @@ provision:
 ### Plans Example
 
 Plans can be added to the brokerpak configuration on top of the ones provided:
-```
+
+```yaml
 service:
   csb-aws-postgresql:
     plans: '[
