@@ -91,6 +91,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"tags":                         HaveKeyWithValue("key1", "some-postgres-value"),
 				"monitoring_interval":          BeNumerically("==", 0),
 				"performance_insights_enabled": BeFalse(),
+				"apply_immediately":            BeTrue(),
 			}))
 		})
 
@@ -111,6 +112,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"deletion_protection":                BeFalse(),
 				"storage_encrypted":                  BeTrue(),
 				"engine_version":                     Equal("14.7"),
+				"apply_immediately":                  BeTrue(),
 			}))
 		})
 	})

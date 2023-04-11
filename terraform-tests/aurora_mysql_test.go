@@ -92,6 +92,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"tags":                         HaveKeyWithValue("key1", "some-mysql-value"),
 				"monitoring_interval":          BeNumerically("==", 0),
 				"performance_insights_enabled": BeFalse(),
+				"apply_immediately":            BeTrue(),
 			}))
 		})
 
@@ -112,6 +113,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"deletion_protection":                BeFalse(),
 				"enabled_cloudwatch_logs_exports":    BeNil(),
 				"storage_encrypted":                  BeTrue(),
+				"apply_immediately":                  BeTrue(),
 			}))
 		})
 	})
