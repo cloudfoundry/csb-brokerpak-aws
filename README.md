@@ -44,7 +44,9 @@ There is a make target to push the broker and brokerpak into a CloudFoundry foun
 
 - `make push-broker` will `cf push` the broker into CloudFoundry. Requires the `cf` cli to be installed.
 
-The broker gets pushed into CloudFoundry as *cloud-service-broker-aws*  It will be necessary to bind a MySQL database to the broker to provide broker state storage. See [AWS Installation](./docs/aws-installation.md) docs for more info.
+The broker gets pushed into CloudFoundry as *cloud-service-broker-aws*.
+It will be necessary to bind a MySQL database to the broker to provide broker state storage.
+See [AWS Installation](./docs/installation.md) docs for more info.
 
 ## Broker
 The version of Cloud Service Broker to use with this brokerpak is encoded in the `go.mod` file.

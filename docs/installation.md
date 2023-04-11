@@ -7,10 +7,13 @@ Documentation for broker configuration can be found [here](./configuration.md).
 ## Requirements
 
 ### CloudFoundry running on AWS.
-The AWS brokerpak services are provisioned with firewall rules that only allow internal connectivity. This allows `cf push`ed applications access, while denying any public access.
+The AWS brokerpak services are provisioned with firewall rules that only allow internal connectivity.
+This allows `cf push`ed applications access, while denying any public access.
 
 ### AWS Service Credentials
-The services need to be provisioned in the same AWS account that the foundation is running in. To do this, the broker needs the following service principal credentials to manage resources within that account:
+
+The services need to be provisioned in the same AWS account that the foundation is running in.
+To do this, the broker needs the following service principal credentials to manage resources within that account:
 - access key id
 - secret access key
 
@@ -158,21 +161,31 @@ The AWS account represented by the access key needs the following permission pol
 ```
 
 To enable the Enhanced Monitoring feature for Amazon RDS, it's necessary to grant additional permissions.
-To read about setting up and enabling Enhanced Monitoring see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.Enabling.html
+To read about setting up and enabling Enhanced Monitoring see the
+[AWS Documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.Enabling.html).
 
 ### MySQL Database for Broker State
 The broker keeps service instance and binding information in a MySQL database. 
 
 #### Binding a MySQL Database
-If there is an existing broker in the foundation that can provision a MySQL instance use `cf create-service` to create a new MySQL instance. Then use `cf bind-service` to bind that instance to the service broker.
+If there is an existing broker in the foundation that can provision a MySQL instance use `cf create-service`
+to create a new MySQL instance. Then use `cf bind-service` to bind that instance to the service broker.
 
 #### Manually Provisioning a MySQL Database
-If a MySQL instance needs to be manually provisioned, it must be accessible to applications running within the foundation so that the `cf push`ed broker can access it. The following configuration parameters will be needed:
+
+The AWS Service Broker stores the state of provisioned resources in a MySQL database.
+You may use any database compatible with the MySQL protocol.
+
+If a MySQL instance needs to be manually provisioned, it must be accessible to applications running within the
+foundation so that the `cf push`ed broker can access it.
+
+The following configuration parameters will be needed:
 - `DB_HOST`
 - `DB_USERNAME`
 - `DB_PASSWORD`
 
-It is also necessary to create a database named `servicebroker` within that server (use your favorite tool to connect to the MySQL server and issue `CREATE DATABASE servicebroker;`).
+It is also necessary to create a database named `servicebroker` or the name set in the parameter `DB_NAME`
+within that server (use your favorite tool to connect to the MySQL server and issue `CREATE DATABASE servicebroker;`).
 
 ## Step By Step From a Pre-build Release with a Bound MySQL Instance
 
@@ -185,19 +198,33 @@ The following tools are needed on your workstation:
 
 ### Assumptions
 
-The `cf` CLI has been used to authenticate with a foundation (`cf api` and `cf login`,) and an org and space have been targeted (`cf target`)
+The `cf` CLI has been used to authenticate with a foundation (`cf api` and `cf login`,) and an org and space
+have been targeted (`cf target`).
 
 ### Fetch A Broker and AWS Brokerpak
 
-Download a release from https://github.com/pivotal/cloud-service-broker/releases. Find the latest release matching the name pattern `sb-0.1.0-rc.XXX-aws-0.0.1-rc.YY`. This will have a broker. Follow the hyperlink into that release and download `cloud-service-broker`.
+Download a Cloud Service Broker release from [GitHub](https://github.com/cloudfoundry/cloud-service-broker/releases).
+Find the latest release matching the name pattern `vX.X.X`.
+Change filename `cloud-service-broker.linux` to `cloud-service-broker`.
+Add execution permissions `chmod +x cloud-service-broker`
 
-Download a release of the brokerpak https://github.com/cloudfoundry-incubator/csb-brokerpak-aws/releases.  Find the latest release and download the `.brokerpak`  file into the same directory on your workstation as the broker.
+Download an AWS Brokerpak release from [GitHub](https://github.com/cloudfoundry/csb-brokerpak-aws/releases).
+Find the latest release matching the name pattern `X.X.X`.
+
+Put the `cloud-service-broker` and `aws-services-X.X.X.brokerpak` into the same directory on your workstation.
 
 ### Create a MySQL instance with AWS broker
+
+If there is an existing AWS broker in the foundation that can provision a MySQL instance use `cf create-service`
+to create a new MySQL instance.
+Then use `cf bind-service` to bind that instance to the service broker app.
+
 The following command will create a basic MySQL database instance named `csb-sql`
+
 ```bash
-cf create-service aws-rds-mysql basic csb-sql
+cf create-service <MySQL_SERVICE_OFFERING_NAME> <PLAN_NAME> csb-sql [-b <SERVICE_BROKER_NAME>] 
 ```
+
 ### Build Config File
 To avoid putting any sensitive information in environment variables, a config file can be used.
 
@@ -211,6 +238,14 @@ aws:
 api:
   user: someusername
   password: somepassword
+```
+
+Add your custom plans to the `config.yml` file, for example, plans for MySQL
+
+```yaml
+service:
+  csb-aws-mysql:
+    plans: '[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class":"db.m6i.large","mysql_version":"8.0","storage_gb":100}]'
 ```
 
 ### Push and Register the Broker
@@ -231,15 +266,18 @@ Bind the MySQL database and start the service broker:
 cf bind-service cloud-service-broker csb-sql
 cf start "${APP_NAME}"
 ```
+
 Register the service broker:
 ```bash
 BROKER_NAME=csb-$USER
 
-cf create-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs) --space-scoped || cf update-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs)
+cf create-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(LANG=EN cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs) --space-scoped || cf update-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(LANG=EN cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs)
 ```
+
 Once this completes, the output from `cf marketplace` should include:
+
 ```
-csb-aws-mysql    small, medium, large            Amazon RDS for MySQL
+csb-aws-mysql    default            Default MySQL plan
 ```
 
 ## Step By Step From a Pre-built Release with a Manually Provisioned MySQL Instance
@@ -249,7 +287,11 @@ Fetch a pre-built broker and brokerpak and configure with a manually provisioned
 Requirements and assumptions are the same as above. Follow instructions above to [fetch the broker and brokerpak](#Fetch-A-Broker-and-AWS-Brokerpak)
 
 ### Create a MySQL Database
-Its an exercise for the reader to create a MySQL server somewhere that a `cf push`ed app can access. The database connection values (hostname, user name and password) will be needed in the next step. It is also necessary to create a database named `servicebroker` within that server (use your favorite tool to connect to the MySQL server and issue `CREATE DATABASE servicebroker;`).
+
+It's an exercise for the reader to create a MySQL server somewhere that a `cf push`ed app can access.
+The database connection values (hostname, username and password) will be needed in the next step.
+It is also necessary to create a database named `servicebroker` within that server (use your favorite tool to
+connect to the MySQL server and issue `CREATE DATABASE servicebroker;`).
 
 ### Build Config File
 To avoid putting any sensitive information in environment variables, a config file can be used.
@@ -269,27 +311,15 @@ db:
 api:
   user: someusername
   password: somepassword
+
+service:
+  csb-aws-mysql:
+    plans: '[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class":"db.m6i.large","mysql_version":"8.0","storage_gb":100}]'
 ```
 
-### Push and Register the Broker
+Add your custom plans to the `config.yml` file, for example, plans for MySQL
 
-Push the broker as a binary application:
-
-```bash
-SECURITY_USER_NAME=someusername
-SECURITY_USER_PASSWORD=somepassword
-APP_NAME=cloud-service-broker
-
-chmod +x cloud-service-broker
-cf push "${APP_NAME}" -c './cloud-service-broker serve --config config.yml' -b binary_buildpack --random-route
-```
-
-Register the service broker:
-```bash
-BROKER_NAME=csb-$USER
-
-cf create-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs) --space-scoped || cf update-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs)
-```
+Push and Register the Broker, see [previous section](#Push-and-Register-the-Broker)
 
 Once these steps are complete, the output from `cf marketplace` should resemble the same as above.
 
@@ -299,22 +329,23 @@ Grab the source code, build and deploy.
 ### Requirements
 
 The following tools are needed on your workstation:
-- [go 1.14](https://golang.org/dl/)
-- make
+- [The latest GoLang version](https://golang.org/dl/)
+- [make](https://www.gnu.org/software/make/)
 - [cf cli](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 
-The Pivotal AWS Service Broker must be installed in your foundation.
+The Cloud Service Broker for AWS must be installed in your foundation.
 
 ### Assumptions
 
-The `cf` CLI has been used to authenticate with a foundation (`cf api` and `cf login`,) and an org and space have been targeted (`cf target`)
+The `cf` CLI has been used to authenticate with a foundation (`cf api` and `cf login`,) and an org and space
+have been targeted (`cf target`).
 
 ### Clone the Repo
 
-The following commands will clone the service broker repository and cd into the resulting directory.
+The following commands will clone the service broker repository and cd into the resulting directory:
 ```bash
-git clone https://github.com/pivotal/"${APP_NAME}".git
-cd "${APP_NAME}"
+git clone https://github.com/cloudfoundry/cloud-service-broker.git
+cd cloud-service-broker
 ```
 ### Set Required Environment Variables
 
@@ -324,30 +355,49 @@ export AWS_SECRET_ACCESS_KEY=your secret access key
 export AWS_ACCESS_KEY_ID=your access key id
 
 ```
-Generate username and password for the broker - Cloud Foundry will use these credentials to authenticate API calls to the service broker.
+Generate username and password for the broker - Cloud Foundry will use these credentials to authenticate API calls to
+the service broker.
 ```bash
 export SECURITY_USER_NAME=someusername
 export SECURITY_USER_PASSWORD=somepassword
 ```
 ### Create a MySQL instance
 
+It's an exercise for the reader to create a MySQL server somewhere that a `cf push`ed app can access.
+If there is an existing AWS broker in the foundation that can provision a MySQL instance use `cf create-service`
+to create a new MySQL instance.
+Then use `cf bind-service` to bind that instance to the service broker app.
+
 The following command will create a basic MySQL database instance named `csb-sql`
+
 ```bash
-cf create-service aws-rds-mysql basic csb-sql
+cf create-service <MySQL_SERVICE_OFFERING_NAME> <PLAN_NAME> csb-sql [-b <SERVICE_BROKER_NAME>] 
 ```
+
 ### Use the Makefile to Deploy the Broker
-There is a make target that will build the broker and brokerpak and deploy to and register with Cloud Foundry as a space scoped broker. This will be local and private to the org and space your `cf` CLI is targeting.
+There is a make target that will build the broker and brokerpak and deploy to and register with Cloud Foundry
+as a space scoped broker. This will be local and private to the org and space your `cf` CLI is targeting.
+
 ```bash
-make push-broker-aws
+make push-broker
 ```
+
 Once these steps are complete, the output from `cf marketplace` should resemble the same as above.
 
 ## Step By Step Slightly Harder Way
 
-Requirements and assumptions are the same as above. Follow instructions for the first two steps above ([Clone the Repo](#Clone-the-Repo) and [Set Required Environment Variables](Set-Required-Environment-Variables))
+Requirements and assumptions are the same as above.
+Follow instructions for the first two steps above ([Clone the Repo](#Clone-the-Repo) and
+[Set Required Environment Variables](#Set-Required-Environment-Variables)).
 
 ### Create a MySQL Database
-Its an exercise for the reader to create a MySQL server somewhere that a `cf push`ed app can access. It is also necessary to create a database named `servicebroker` within that server (use your favorite tool to connect to the MySQL server and issue `CREATE DATABASE servicebroker;`). Set the following environment variables with information about that MySQL instance:
+
+It's an exercise for the reader to create a MySQL server somewhere that a `cf push`ed app can access.
+The database connection values (hostname, username and password) will be needed in the next step.
+It is also necessary to create a database named `servicebroker` within that server (use your favorite tool to
+connect to the MySQL server and issue `CREATE DATABASE servicebroker;`).
+Set the following environment variables with information about that MySQL instance:
+
 ```bash
 export DB_HOST=mysql server host
 export DB_USERNAME=mysql server username
@@ -355,11 +405,15 @@ export DB_PASSWORD=mysql server password
 ```
 
 ### Build the Broker and Brokerpak
+
 Use the makefile to build the broker executable and brokerpak.
 ```bash
-make build-aws-brokerpak
+make cloud-service-broker
+make build
 ```
+
 ### Pushing the Broker
+
 All the steps to push and register the broker:
 ```bash
 APP_NAME=cloud-service-broker
@@ -376,18 +430,20 @@ cf set-env "${APP_NAME}" DB_HOST "${DB_HOST}"
 cf set-env "${APP_NAME}" DB_USERNAME "${DB_USERNAME}"
 cf set-env "${APP_NAME}" DB_PASSWORD "${DB_PASSWORD}"
 
-cf set-env "${APP_NAME}" GSB_BROKERPAK_BUILTIN_PATH ./AWS-brokerpak
+cf set-env "${APP_NAME}" GSB_BROKERPAK_BUILTIN_PATH ./
 
 cf start "${APP_NAME}"
 
 BROKER_NAME=csb-$USER
 
-cf create-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs) --space-scoped || cf update-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs)
+cf create-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(LANG=EN cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs) --space-scoped || cf update-service-broker "${BROKER_NAME}" "${SECURITY_USER_NAME}" "${SECURITY_USER_PASSWORD}" https://$(LANG=EN cf app "${APP_NAME}" | grep 'routes:' | cut -d ':' -f 2 | xargs)
 ```
+
 Once these steps are complete, the output from `cf marketplace` should resemble the same as above.
 
 ## Uninstalling the Broker
-First, make sure there are all service instances created with `cf create-service` have been destroyed with `cf delete-service` otherwise removing the broker will fail.
+First, make sure there are all service instances created with `cf create-service` have been destroyed
+with `cf delete-service` otherwise removing the broker will fail.
 
 ### Unregister the Broker
 ```bash
