@@ -76,14 +76,11 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 
 			It("should create a parameter group", func() {
 				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(HaveLen(1))
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"parameter_group_name": Equal("rds-pg-csb-postgresql-test"),
-					}))
+				// aws_db_instance.parameter_group_name is known after apply. We can't check it.
 				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"name":   Equal("rds-pg-csb-postgresql-test"),
-						"family": Equal("postgres14"),
+						"name_prefix": ContainSubstring("rds-pg-csb-postgresql-test"),
+						"family":      Equal("postgres14"),
 						"parameter": ConsistOf(MatchKeys(IgnoreExtras, Keys{
 							"name":  Equal("rds.force_ssl"),
 							"value": Equal("0"),
@@ -101,10 +98,16 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			It("should configure the parameter in the parameter group", func() {
 				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"parameter": ConsistOf(MatchKeys(IgnoreExtras, Keys{
-							"name":  Equal("rds.force_ssl"),
-							"value": Equal("1"),
-						}))}))
+						"name_prefix": ContainSubstring("rds-pg-csb-postgresql-test"),
+						"family":      Equal("postgres14"),
+						"parameter": ConsistOf(
+							MatchKeys(IgnoreExtras, Keys{
+								"name":  Equal("rds.force_ssl"),
+								"value": Equal("1"),
+							}),
+						),
+					}),
+				)
 			})
 		})
 

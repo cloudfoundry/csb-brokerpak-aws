@@ -198,7 +198,8 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		It("should use the auto generated db cluster parameter group name", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_parameter_group")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"family": ContainSubstring("aurora-postgresql14"),
+					"family":      ContainSubstring("aurora-postgresql14"),
+					"name_prefix": ContainSubstring("aurora-pg-csb-aurorapg-test"),
 					"parameter": ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
 							"apply_method": Equal("immediate"),
