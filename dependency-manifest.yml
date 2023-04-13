@@ -37,6 +37,10 @@ dependencies:
       version: 1.4.2
       source: https://github.com/hashicorp/terraform/archive/v1.4.2.zip
       source_sha256: d04b859b3ca87f16fc31f5573c03b710631e8533493e4f1885c1eb795ebeddfa
+    - name: terraform
+      version: 1.4.4
+      source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
+      source_sha256: d5101d32158e2f4b67804a78d23008e964674df167c99964f35fab6560e71e5e
     - name: terraform-provider-aws
       version: 4.62.0
       source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.62.0.zip
