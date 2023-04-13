@@ -95,11 +95,17 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
 resource "aws_rds_cluster_parameter_group" "cluster_parameter_group" {
   count  = length(var.db_cluster_parameter_group_name) == 0 ? 1 : 0
   family = format("aurora-postgresql%s", local.major_version)
-  name   = format("aurora-pg-%s", var.instance_name)
+  # Must not match the name of an existing DB cluster parameter group.
+  # See https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBClusterParameterGroup.html
+  name_prefix = format("aurora-pg-%s", var.instance_name)
 
   parameter {
     name         = "rds.force_ssl"
     value        = var.require_ssl ? 1 : 0
     apply_method = "immediate"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
