@@ -73,8 +73,6 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			Expect(got).To(Equal(valueOne))
 
 			By("updating the instance plan")
-			// The new default plan in the .envrc file has the engine_version 14.7, which allows us to do the upgrade
-			// serviceInstance.Update(services.WithPlan("default"))
 			serviceInstance.Update(services.WithPlan("default_postgres_version14"))
 
 			By("checking previously written data still accessible")
