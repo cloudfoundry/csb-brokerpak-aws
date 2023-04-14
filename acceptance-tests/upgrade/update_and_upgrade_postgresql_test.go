@@ -14,7 +14,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			const (
-				postgreSQLPlanToUpgradeEngine = `[{"name":"default_postgres_version13","id":"95989511-5e6f-4845-ae26-1401e077c193","description":"Default Postgres plan with version 13.10","display_name":"default_postgres_version13","instance_class":"db.m6i.large","postgres_version":"13.10","storage_gb":100}]`
+				postgreSQLPlanToUpgradeEngine = `[{"name":"default_postgres_version14","id":"77de3441-1096-48aa-8909-a7dc5e457fa2","description":"Default Postgres plan with version 14.7","display_name":"default_postgres_version14","instance_class":"db.m6i.large","postgres_version":"14.7","storage_gb":100},{"name":"default_postgres_version13","id":"95989511-5e6f-4845-ae26-1401e077c193","description":"Default Postgres plan with version 13.10","display_name":"default_postgres_version13","instance_class":"db.m6i.large","postgres_version":"13.10","storage_gb":100}]`
 				plansVar                      = `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`
 			)
 
@@ -63,7 +63,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			Expect(got).To(Equal(valueOne))
 
 			By("pushing the development version of the broker")
-			serviceBroker.UpdateBroker(developmentBuildDir)
+			serviceBroker.UpdateBroker(developmentBuildDir, customPlans)
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()
@@ -74,7 +74,8 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 
 			By("updating the instance plan")
 			// The new default plan in the .envrc file has the engine_version 14.7, which allows us to do the upgrade
-			serviceInstance.Update(services.WithPlan("default"))
+			// serviceInstance.Update(services.WithPlan("default"))
+			serviceInstance.Update(services.WithPlan("default_postgres_version14"))
 
 			By("checking previously written data still accessible")
 			got = appTwo.GET("%s/%s", schema, keyOne).String()
