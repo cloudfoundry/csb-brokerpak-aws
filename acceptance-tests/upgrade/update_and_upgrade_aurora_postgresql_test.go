@@ -10,29 +10,29 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
-var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func() {
+var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgrade"), func() {
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
-			const (
-				postgreSQLPlanToUpgradeEngine = `[{"name":"default_postgres_version14","id":"77de3441-1096-48aa-8909-a7dc5e457fa2","description":"Default Postgres plan with version 14.7","display_name":"default_postgres_version14","instance_class":"db.m6i.large","postgres_version":"14.7","storage_gb":100},{"name":"default_postgres_version13","id":"95989511-5e6f-4845-ae26-1401e077c193","description":"Default Postgres plan with version 13.10","display_name":"default_postgres_version13","instance_class":"db.m6i.large","postgres_version":"13.10","storage_gb":100}]`
-				plansVar                      = `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`
-			)
-
-			customPlans := apps.EnvVar{Name: plansVar, Value: postgreSQLPlanToUpgradeEngine}
-
 			By("pushing latest released broker version")
 			serviceBroker := brokers.Create(
-				brokers.WithPrefix("csb-postgresql"),
+				brokers.WithPrefix("csb-aurora-postgresql"),
 				brokers.WithSourceDir(releasedBuildDir),
 				brokers.WithReleaseEnv(releasedBuildDir),
-				brokers.WithEnv(customPlans),
 			)
 			defer serviceBroker.Delete()
 
 			By("creating a service")
 			serviceInstance := services.CreateInstance(
-				"csb-aws-postgresql",
-				services.WithPlan("default_postgres_version13"),
+				"csb-aws-aurora-postgresql",
+				services.WithPlan("default"),
+				services.WithParameters(
+					map[string]any{
+						"engine_version":          "13.10",
+						"cluster_instances":       1,
+						"serverless_min_capacity": 0.5,
+						"serverless_max_capacity": 2,
+						"instance_class":          "db.serverless",
+					}),
 				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
@@ -63,7 +63,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			Expect(got).To(Equal(valueOne))
 
 			By("pushing the development version of the broker")
-			serviceBroker.UpdateBroker(developmentBuildDir, customPlans)
+			serviceBroker.UpdateBroker(developmentBuildDir)
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()
@@ -73,7 +73,12 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 			Expect(got).To(Equal(valueOne))
 
 			By("updating the instance plan")
-			serviceInstance.Update(services.WithPlan("default_postgres_version14"))
+			// It applies changes in Terraform:
+			// apply_immediately = true
+			// changes the lifecycle of the resource aws_rds_cluster_parameter_group
+			// when the new resource aws_rds_cluster_parameter_group is created and the changes are applied immediately,
+			// we can upgrade the version
+			serviceInstance.Update(services.WithParameters(map[string]any{"engine_version": "14.7"}))
 
 			By("checking previously written data still accessible")
 			got = appTwo.GET("%s/%s", schema, keyOne).String()

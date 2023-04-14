@@ -89,13 +89,20 @@ resource "aws_db_instance" "db_instance" {
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {
-  count = length(var.parameter_group_name) == 0 ? 1 : 0
-
-  name   = format("rds-pg-%s", var.instance_name)
+  count  = length(var.parameter_group_name) == 0 ? 1 : 0
   family = format("%s%s", local.engine, local.major_version)
+  # The name cannot be repeated. We need `name_prefix` when upgrading major version.
+  # See `DBParameterGroupAlreadyExists` error:
+  # https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBParameterGroup.html
+  name_prefix = format("rds-pg-%s", var.instance_name)
 
   parameter {
-    name  = "rds.force_ssl"
-    value = var.require_ssl ? 1 : 0
+    name         = "rds.force_ssl"
+    value        = var.require_ssl ? 1 : 0
+    apply_method = "immediate" // It is the default value, but it is worth being more explicit.
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
