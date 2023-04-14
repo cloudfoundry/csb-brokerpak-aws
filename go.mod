@@ -106,6 +106,6 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/driver/mysql v1.5.0 // indirect
-	gorm.io/driver/sqlite v1.5.0 // indirect
+	gorm.io/driver/sqlite v1.4.4 // indirect
 	gorm.io/gorm v1.25.0 // indirect
 )
