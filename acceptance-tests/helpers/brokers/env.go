@@ -1,9 +1,10 @@
 package brokers
 
 import (
-	"csbbrokerpakaws/acceptance-tests/helpers/testpath"
 	"fmt"
 	"os"
+
+	"csbbrokerpakaws/acceptance-tests/helpers/testpath"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 
@@ -43,6 +44,7 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
 		apps.EnvVar{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
 		apps.EnvVar{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
+		apps.EnvVar{Name: "CSB_DISABLE_TF_UPGRADE_PROVIDER_RENAMES", Value: true},
 	)
 
 	return append(result, b.envExtras...)
