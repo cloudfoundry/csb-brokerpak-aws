@@ -25,7 +25,7 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			By("creating a service instance")
 			tableName := random.Name(random.WithPrefix("csb", "dynamodb"))
 			serviceInstance := services.CreateInstance(
-				"csb-aws-dynamodb", // old service offering name
+				"csb-aws-dynamodb-table",
 				services.WithPlan("ondemand"),
 				services.WithParameters(config(tableName)),
 				services.WithBroker(serviceBroker),
