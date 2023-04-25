@@ -17,7 +17,6 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 		terraformProvisionDir string
 	)
 
-	requestPayer := "BucketOwner"
 	bucketName := "csb-s3-test"
 	defaultVars := map[string]any{
 		"aws_access_key_id":                          awsAccessKeyID,
@@ -39,8 +38,7 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 		"ol_configuration_default_retention_mode":    nil,
 		"ol_configuration_default_retention_days":    nil,
 		"ol_configuration_default_retention_years":   nil,
-		"request_payer":                              requestPayer,
-		"labels":                                     map[string]any{"k1": "v1"},
+		"labels": map[string]any{"k1": "v1"},
 	}
 
 	BeforeAll(func() {
