@@ -1,0 +1,98 @@
+---
+version: 1
+name: csb-aws-mssql
+id: 8b17758e-37a9-4c1c-af84-971d4a5552c1
+description: CSB Amazon RDS for MSSQL
+display_name: CSB Amazon RDS for MSSQL
+image_url: file://service-images/csb.png
+documentation_url: https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html
+provider_display_name: VMware
+support_url: https://aws.amazon.com/sql/
+tags: [aws, mssql, beta]
+plan_updateable: true
+provision:
+  plan_inputs: [] # Expected: mssql_version, storage_gb
+  user_inputs:
+  - field_name: db_name
+    type: string
+    details: Name for your database
+    default: vsbdb
+    constraints:
+      maxLength: 64
+    prohibit_update: true
+  - field_name: instance_name
+    type: string
+    details: Name for your MSSQL instance
+    default: csb-mssql-${request.instance_id}
+    constraints:
+      maxLength: 98
+      minLength: 6
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
+  - field_name: region
+    type: string
+    details: The region of AWS.
+    default: us-west-2
+    constraints:
+      examples:
+      - us-central1
+      - asia-northeast1
+      pattern: ^[a-z][a-z0-9-]+$
+    prohibit_update: true
+  - field_name: aws_access_key_id
+    type: string
+    details: AWS access key
+    default: ${config("aws.access_key_id")}
+  - field_name: aws_secret_access_key
+    type: string
+    details: AWS secret key
+    default: ${config("aws.secret_access_key")}
+  computed_inputs:
+  - name: labels
+    overwrite: true
+    type: object
+    default: ${json.marshal(request.default_labels)}
+  template_refs:
+    outputs: terraform/mssql/provision/outputs.tf
+    provider: terraform/mssql/provision/provider.tf
+    versions: terraform/mssql/provision/versions.tf
+    variables: terraform/mssql/provision/variables.tf
+    main: terraform/mssql/provision/main.tf
+    data: terraform/mssql/provision/data.tf
+  outputs:
+  - field_name: name
+    type: string
+    details: The name of the database.
+  - field_name: hostname
+    type: string
+    details: Hostname or IP address of the exposed mssql endpoint used by clients to connect to the service.
+  - field_name: username
+    type: string
+    details: The username to authenticate to the database instance.
+  - field_name: password
+    type: string
+    details: The password to authenticate to the database instance.
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: db_name
+    type: string
+    default: ${instance.details["name"]}
+    overwrite: true
+  - name: hostname
+    type: string
+    default: ${instance.details["hostname"]}
+    overwrite: true
+  - name: admin_username
+    type: string
+    default: ${instance.details["username"]}
+    overwrite: true
+  - name: admin_password
+    type: string
+    default: ${instance.details["password"]}
+    overwrite: true
+  template_refs:
+    variables: terraform/mssql/bind/variables.tf
+  outputs: []
+examples: []
