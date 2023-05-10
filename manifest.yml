@@ -85,6 +85,7 @@ service_definitions:
 - aws-dynamodb-namespace.yml
 - aws-aurora-postgresql.yml
 - aws-aurora-mysql.yml
+- aws-mssql.yml
 
 
 
