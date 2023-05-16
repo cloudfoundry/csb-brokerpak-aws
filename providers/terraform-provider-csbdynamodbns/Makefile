@@ -38,6 +38,9 @@ build: version download checkfmt checkimports vet ../build/cloudfoundry.org ## b
 .PHONY: clean
 clean: ## clean up build artifacts
 	- rm -rf ../build/cloudfoundry.org
+	- rm -rf /tmp/tpdynamodbns-non-fake.txt
+	- rm -rf /tmp/tpdynamodbns-pkgs.txt
+	- rm -rf /tmp/tpdynamodbns-coverage.out
 
 download: ## download dependencies
 	$(GO) mod download
@@ -65,6 +68,13 @@ fmt: ## format the code
 .PHONY: ginkgo
 ginkgo: generate ## run the tests with Ginkgo
 	$(GO) run github.com/onsi/ginkgo/v2/ginkgo -r
+
+.PHONY: ginkgo-coverage
+ginkgo-coverage: ## ginkgo tests coverage score
+	go list ./... | grep -v fake > /tmp/tpdynamodbns-non-fake.txt
+	paste -sd "," /tmp/tpdynamodbns-non-fake.txt > /tmp/tpdynamodbns-pkgs.txt
+	go test -coverpkg=`cat /tmp/tpdynamodbns-pkgs.txt` -coverprofile=/tmp/tpdynamodbns-coverage.out ./...
+	go tool cover -func /tmp/tpdynamodbns-coverage.out | grep total
 
 .PHONY: generate
 generate: ## generate test fakes
