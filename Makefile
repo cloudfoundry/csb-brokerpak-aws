@@ -132,6 +132,10 @@ run-examples: providers ## run examples in yml files. Runs examples for all serv
 
 ###### test ###################################################################
 
+.PHONY: test-coverage
+test-coverage: ## test coverage score
+	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) ginkgo-coverage
+
 .PHONY: test
 test: lint run-integration-tests ## run the tests
 
