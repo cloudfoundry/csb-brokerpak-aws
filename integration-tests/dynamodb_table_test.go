@@ -12,7 +12,6 @@ const (
 	dynamoDBTableServiceName                = "csb-aws-dynamodb-table"
 	dynamoDBTableServiceDescription         = "Beta - CSB Amazon DynamoDB Table"
 	dynamoDBTableServiceDisplayName         = "CSB Amazon DynamoDB Table (Beta)"
-	dynamoDBTableServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-dynamodb.html"
 	dynamoDBTableServiceSupportURL          = "https://aws.amazon.com/dynamodb/"
 	dynamoDBTableServiceProviderDisplayName = "VMware"
 )
@@ -54,7 +53,7 @@ var _ = Describe("DynamoDB Table", Label("DynamoDB Table"), func() {
 		Expect(service.Description).To(Equal(dynamoDBTableServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "dynamodb", "dynamodb-table", "beta"))
 		Expect(service.Metadata.DisplayName).To(Equal(dynamoDBTableServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(dynamoDBTableServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(dynamoDBTableServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(dynamoDBTableServiceProviderDisplayName))

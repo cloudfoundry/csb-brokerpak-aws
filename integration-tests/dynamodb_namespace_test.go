@@ -14,7 +14,6 @@ const (
 	dynamoDBNamespaceServiceName                = "csb-aws-dynamodb-namespace"
 	dynamoDBNamespaceServiceDescription         = "CSB Amazon DynamoDB Namespace"
 	dynamoDBNamespaceServiceDisplayName         = "CSB Amazon DynamoDB Namespace"
-	dynamoDBNamespaceServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.5/csb-aws/GUID-reference-aws-dynamodb-namespace.html"
 	dynamoDBNamespaceServiceSupportURL          = "https://aws.amazon.com/dynamodb/"
 	dynamoDBNamespaceServiceProviderDisplayName = "VMware"
 )
@@ -37,7 +36,7 @@ var _ = Describe("DynamoDB Namespace", Label("DynamoDB Namespace"), func() {
 		Expect(service.Description).To(Equal(dynamoDBNamespaceServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "dynamodb", "namespace"))
 		Expect(service.Metadata.DisplayName).To(Equal(dynamoDBNamespaceServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(dynamoDBNamespaceServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(dynamoDBNamespaceServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(dynamoDBNamespaceServiceProviderDisplayName))
