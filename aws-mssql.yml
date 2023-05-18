@@ -11,7 +11,29 @@ support_url: https://aws.amazon.com/sql/
 tags: [aws, mssql, beta]
 plan_updateable: true
 provision:
-  plan_inputs: [] # Expected: mssql_version, storage_gb
+  plan_inputs:
+  - field_name: engine
+    required: true
+    type: string
+    details: The edition for the MSSQL instance.
+    default: sqlserver-ee
+    enum:
+      sqlserver-ee: sqlserver-ee
+      sqlserver-ex: sqlserver-ex
+      sqlserver-se: sqlserver-se
+      sqlserver-web: sqlserver-web
+  - field_name: mssql_version
+    required: true
+    type: string
+    details: |
+      The version for the MSSQL instance. Can be any version supported by the provider.
+  - field_name: storage_gb
+    required: true
+    type: number
+    details: Size of storage volume for service instance.
+    constraints:
+      maximum: 4096
+      minimum: 20
   user_inputs:
   - field_name: db_name
     type: string
@@ -47,6 +69,25 @@ provision:
     type: string
     details: AWS secret key
     default: ${config("aws.secret_access_key")}
+  - field_name: aws_vpc_id
+    type: string
+    details: VPC ID for instance
+    default: ""
+  - field_name: instance_class
+    type: string
+    details: |
+      AWS DB instance class. Accepted values will depend on the selected engine and mssql_version.
+      See: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html#SQLServer.Concepts.General.InstanceClasses
+    default: ""
+  - field_name: rds_subnet_group
+    type: string
+    details: AWS RDS subnet group already in existence to use
+    default: ""
+  - field_name: rds_vpc_security_group_ids
+    type: string
+    details: Comma delimited list of security group ID's for instance
+    default: ""
+    prohibit_update: true
   computed_inputs:
   - name: labels
     overwrite: true
