@@ -1,9 +1,9 @@
 locals {
-  port = 1433
-  vpc_id = length(var.aws_vpc_id) > 0 ? data.aws_vpc.provided[0].id : data.aws_vpc.default.id
-  subnet_ids = length(var.rds_subnet_group) > 0 ? data.aws_subnets.in_subnet_group.ids : data.aws_subnets.in_vpc.ids
+  port               = 1433
+  vpc_id             = length(var.aws_vpc_id) > 0 ? data.aws_vpc.provided[0].id : data.aws_vpc.default.id
+  subnet_ids         = length(var.rds_subnet_group) > 0 ? data.aws_subnets.in_subnet_group.ids : data.aws_subnets.in_vpc.ids
   security_group_ids = length(var.rds_vpc_security_group_ids) > 0 ? data.aws_security_groups.provided[0].ids : [aws_security_group.rds-sg[0].id]
-  subnet_group_name = length(var.rds_subnet_group) > 0 ? data.aws_db_subnet_group.provided[0].name : aws_db_subnet_group.rds-private-subnet[0].name
+  subnet_group_name  = length(var.rds_subnet_group) > 0 ? data.aws_db_subnet_group.provided[0].name : aws_db_subnet_group.rds-private-subnet[0].name
 }
 
 data "aws_vpc" "default" {
@@ -19,7 +19,7 @@ data "aws_subnets" "in_vpc" {
 
 data "aws_vpc" "provided" {
   count = length(var.aws_vpc_id) > 0 ? 1 : 0
-  id = var.aws_vpc_id
+  id    = var.aws_vpc_id
 
   lifecycle {
     postcondition {
@@ -31,7 +31,7 @@ data "aws_vpc" "provided" {
 
 data "aws_db_subnet_group" "provided" {
   count = length(var.rds_subnet_group) > 0 ? 1 : 0
-  name = var.rds_subnet_group
+  name  = var.rds_subnet_group
 
   lifecycle {
     postcondition {
@@ -70,7 +70,7 @@ data "aws_subnets" "in_subnet_group" {
     values = [local.vpc_id]
   }
   filter {
-    name = "subnet-id"
+    name   = "subnet-id"
     values = length(var.rds_subnet_group) > 0 ? data.aws_db_subnet_group.provided[0].subnet_ids : []
   }
 

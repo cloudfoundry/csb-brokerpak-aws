@@ -19,8 +19,8 @@ variable "db_name" {
 }
 
 variable "aws_vpc_id" {
- type    = string
- default = ""
+  type    = string
+  default = ""
 }
 
 variable "rds_subnet_group" {
@@ -49,7 +49,7 @@ variable "engine" {
 }
 
 variable "storage_gb" {
-  type = number
+  type    = number
   default = 20
 
   validation {
