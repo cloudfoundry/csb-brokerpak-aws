@@ -38,7 +38,6 @@ var customMSSQLPlan = map[string]any{
 
 var requiredProperties = map[string]any{
 	"mssql_version": "some-mssql-version",
-	"storage_gb":    123,
 }
 
 var defaultProperties = map[string]any{
@@ -46,6 +45,7 @@ var defaultProperties = map[string]any{
 	"region":        "us-west-2",
 	"instance_name": "csb-mssql-0000000",
 	"db_name":       "vsbdb",
+	"storage_gb":    20,
 }
 
 var optionalProperties = map[string]any{
@@ -90,7 +90,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		It("should fail", func() {
 			_, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), nil)
 			Expect(err.Error()).To(Equal(
-				`unexpected status code 500: {"description":"2 error(s) occurred: (root): mssql_version is required; (root): storage_gb is required"}` + "\n",
+				`unexpected status code 500: {"description":"1 error(s) occurred: (root): mssql_version is required"}` + "\n",
 			))
 		})
 	})
@@ -144,6 +144,16 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				map[string]any{"engine": "not-an-allowed-engine"},
 				`unexpected status code 500: {"description":"1 error(s) occurred: engine: engine must be one of the following: \"sqlserver-ee\", \"sqlserver-ex\", \"sqlserver-se\", \"sqlserver-web\""}`+"\n",
 			),
+			Entry(
+				"storage_gb maximum value is 4096",
+				map[string]any{"storage_gb": 4097},
+				`unexpected status code 500: {"description":"1 error(s) occurred: storage_gb: Must be less than or equal to 4096"}`+"\n",
+			),
+			Entry(
+				"storage_gb minimum value is 20",
+				map[string]any{"storage_gb": 19},
+				`unexpected status code 500: {"description":"1 error(s) occurred: storage_gb: Must be greater than or equal to 20"}`+"\n",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -157,7 +167,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("engine", "sqlserver-ee"),
 					HaveKeyWithValue("mssql_version", "some-mssql-version"),
-					HaveKeyWithValue("storage_gb", float64(123)),
+					HaveKeyWithValue("storage_gb", float64(20)),
 					HaveKeyWithValue("rds_subnet_group", "some-rds-subnet-group"),
 					HaveKeyWithValue("rds_vpc_security_group_ids", "some-security-group-ids"),
 					HaveKeyWithValue("instance_class", "some-instance-class"),

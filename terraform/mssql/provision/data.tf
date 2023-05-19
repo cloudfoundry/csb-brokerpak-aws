@@ -2,7 +2,7 @@ locals {
   port = 1433
   vpc_id = length(var.aws_vpc_id) > 0 ? data.aws_vpc.provided[0].id : data.aws_vpc.default.id
   subnet_ids = length(var.rds_subnet_group) > 0 ? data.aws_subnets.in_subnet_group.ids : data.aws_subnets.in_vpc.ids
-  security_group_ids = length(var.rds_vpc_security_group_ids) > 0 ? data.aws_security_groups.provided.ids : [aws_security_group.rds-sg[0].id]
+  security_group_ids = length(var.rds_vpc_security_group_ids) > 0 ? data.aws_security_groups.provided[0].ids : [aws_security_group.rds-sg[0].id]
   subnet_group_name = length(var.rds_subnet_group) > 0 ? data.aws_db_subnet_group.provided[0].name : aws_db_subnet_group.rds-private-subnet[0].name
 }
 
@@ -42,6 +42,7 @@ data "aws_db_subnet_group" "provided" {
 }
 
 data "aws_security_groups" "provided" {
+  count = length(var.rds_vpc_security_group_ids) > 0 ? 1 : 0
   filter {
     name   = "vpc-id"
     values = [local.vpc_id]
@@ -57,7 +58,7 @@ data "aws_security_groups" "provided" {
       error_message = "the specified security groups don't exist or don't correspond to the specified vpc (1)"
     }
     postcondition {
-      condition     = length(var.rds_vpc_security_group_ids) == 0 || split(",", var.rds_vpc_security_group_ids) == self.ids
+      condition     = split(",", var.rds_vpc_security_group_ids) == self.ids
       error_message = "the specified security groups don't exist or don't correspond to the specified vpc (2)"
     }
   }
