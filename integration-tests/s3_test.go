@@ -14,7 +14,6 @@ const (
 	s3ServiceName                = "csb-aws-s3-bucket"
 	s3ServiceDescription         = "CSB AWS S3 Bucket"
 	s3ServiceDisplayName         = "CSB AWS S3 Bucket"
-	s3ServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-s3.html"
 	s3ServiceSupportURL          = "https://aws.amazon.com/s3/"
 	s3ServiceProviderDisplayName = "VMware"
 	s3CustomPlanName             = "custom-sample"
@@ -65,7 +64,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		Expect(service.Description).To(Equal(s3ServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "s3"))
 		Expect(service.Metadata.DisplayName).To(Equal(s3ServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(s3ServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(s3ServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(s3ServiceProviderDisplayName))

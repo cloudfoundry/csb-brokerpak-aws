@@ -14,7 +14,6 @@ const (
 	mySQLServiceName                = "csb-aws-mysql"
 	mySQLServiceDescription         = "CSB Amazon RDS for MySQL"
 	mySQLServiceDisplayName         = "CSB Amazon RDS for MySQL"
-	mySQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-mysql.html"
 	mySQLServiceSupportURL          = "https://aws.amazon.com/rds/mysql/resources/?nc=sn&loc=5"
 	mySQLServiceProviderDisplayName = "VMware"
 	mySQLCustomPlanName             = "custom-sample"
@@ -55,7 +54,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 		Expect(service.Description).To(Equal(mySQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "mysql"))
 		Expect(service.Metadata.DisplayName).To(Equal(mySQLServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(mySQLServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(mySQLServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(mySQLServiceProviderDisplayName))

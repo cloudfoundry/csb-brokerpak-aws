@@ -14,7 +14,6 @@ const (
 	auroraMySQLServiceName                = "csb-aws-aurora-mysql"
 	auroraMySQLServiceDescription         = "Amazon Aurora for MySQL"
 	auroraMySQLServiceDisplayName         = "Amazon Aurora for MySQL"
-	auroraMySQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html"
 	auroraMySQLServiceSupportURL          = "https://aws.amazon.com/rds/aurora/"
 	auroraMySQLServiceProviderDisplayName = "VMware"
 	auroraMySQLCustomPlanName             = "custom-sample"
@@ -54,7 +53,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		Expect(service.Description).To(Equal(auroraMySQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "mysql", "aurora"))
 		Expect(service.Metadata.DisplayName).To(Equal(auroraMySQLServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(auroraMySQLServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(auroraMySQLServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(auroraMySQLServiceProviderDisplayName))

@@ -12,7 +12,6 @@ const (
 	redisServiceName                      = "csb-aws-redis"
 	redisServiceDescription               = "CSB Amazon ElastiCache for Redis"
 	redisServiceDisplayName               = "CSB Amazon ElastiCache for Redis"
-	redisServiceDocumentationURL          = "https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html"
 	redisServiceSupportURL                = "https://aws.amazon.com/redis/"
 	redisServiceProviderDisplayName       = "VMware"
 	redisCustomPlanName                   = "custom-sample"
@@ -81,7 +80,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		Expect(service.Description).To(Equal(redisServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "redis"))
 		Expect(service.Metadata.DisplayName).To(Equal(redisServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(redisServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(redisServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(redisServiceProviderDisplayName))

@@ -14,7 +14,6 @@ const (
 	postgreSQLServiceName                = "csb-aws-postgresql"
 	postgreSQLServiceDescription         = "CSB Amazon RDS for PostgreSQL"
 	postgreSQLServiceDisplayName         = "CSB Amazon RDS for PostgreSQL"
-	postgreSQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-postgres.html"
 	postgreSQLServiceSupportURL          = "https://aws.amazon.com/rds/postgresql/"
 	postgreSQLServiceProviderDisplayName = "VMware"
 	postgreSQLCustomPlanName             = "custom-sample"
@@ -55,7 +54,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		Expect(service.Description).To(Equal(postgreSQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "postgres", "postgresql"))
 		Expect(service.Metadata.DisplayName).To(Equal(postgreSQLServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(postgreSQLServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(postgreSQLServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(postgreSQLServiceProviderDisplayName))

@@ -18,7 +18,7 @@ id: ffe28d48-c235-4e07-9c51-ddff5699e48c
 description: CSB AWS S3 Bucket
 display_name: CSB AWS S3 Bucket
 image_url: file://service-images/csb.png
-documentation_url: https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-reference-aws-s3.html
+documentation_url: https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html
 provider_display_name: VMware
 support_url: https://aws.amazon.com/s3/
 tags: [aws, s3]

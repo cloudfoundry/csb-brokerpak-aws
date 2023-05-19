@@ -14,7 +14,6 @@ const (
 	auroraPostgreSQLServiceName                = "csb-aws-aurora-postgresql"
 	auroraPostgreSQLServiceDescription         = "Amazon Aurora for PostgreSQL"
 	auroraPostgreSQLServiceDisplayName         = "Amazon Aurora for PostgreSQL"
-	auroraPostgreSQLServiceDocumentationURL    = "https://docs.vmware.com/en/Tanzu-Cloud-Service-Broker-for-AWS/1.2/csb-aws/GUID-index.html"
 	auroraPostgreSQLServiceSupportURL          = "https://aws.amazon.com/rds/aurora/"
 	auroraPostgreSQLServiceProviderDisplayName = "VMware"
 	auroraPostgreSQLCustomPlanName             = "custom-sample"
@@ -52,7 +51,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		Expect(service.Description).To(Equal(auroraPostgreSQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "postgres", "postgresql", "aurora"))
 		Expect(service.Metadata.DisplayName).To(Equal(auroraPostgreSQLServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(auroraPostgreSQLServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(auroraPostgreSQLServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(auroraPostgreSQLServiceProviderDisplayName))
