@@ -16,7 +16,6 @@ const (
 	msSQLServiceName                = "csb-aws-mssql"
 	msSQLServiceDescription         = "CSB Amazon RDS for MSSQL"
 	msSQLServiceDisplayName         = "CSB Amazon RDS for MSSQL"
-	msSQLServiceDocumentationURL    = "https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html"
 	msSQLServiceSupportURL          = "https://aws.amazon.com/sql/"
 	msSQLServiceProviderDisplayName = "VMware"
 	msSQLCustomPlanName             = "custom-sample"
@@ -72,7 +71,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		Expect(service.Description).To(Equal(msSQLServiceDescription))
 		Expect(service.Tags).To(ConsistOf("aws", "mssql", "beta"))
 		Expect(service.Metadata.DisplayName).To(Equal(msSQLServiceDisplayName))
-		Expect(service.Metadata.DocumentationUrl).To(Equal(msSQLServiceDocumentationURL))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(msSQLServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(msSQLServiceProviderDisplayName))
