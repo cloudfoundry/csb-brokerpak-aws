@@ -11,7 +11,8 @@ support_url: https://aws.amazon.com/sql/
 tags: [aws, mssql, beta]
 plan_updateable: true
 provision:
-  plan_inputs:
+  plan_inputs: []
+  user_inputs:
   - field_name: engine
     required: true
     type: string
@@ -34,7 +35,6 @@ provision:
     constraints:
       maximum: 4096
       minimum: 20
-  user_inputs:
   - field_name: db_name
     type: string
     details: Name for your database
