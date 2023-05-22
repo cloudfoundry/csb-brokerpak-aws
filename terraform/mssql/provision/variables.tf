@@ -53,7 +53,7 @@ variable "storage_gb" {
   default = 20
 
   validation {
-    condition     = var.storage_gb >= 20 && var.storage_gb <= 4096
-    error_message = "storage_gb must be >= 20 and <= 4096"
+    condition     = var.storage_gb >= 20
+    error_message = "storage_gb must be >= 20"
   }
 }

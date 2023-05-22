@@ -144,11 +144,6 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				`unexpected status code 500: {"description":"1 error(s) occurred: engine: engine must be one of the following: \"sqlserver-ee\", \"sqlserver-ex\", \"sqlserver-se\", \"sqlserver-web\""}`+"\n",
 			),
 			Entry(
-				"storage_gb maximum value is 4096",
-				map[string]any{"storage_gb": 4097},
-				`unexpected status code 500: {"description":"1 error(s) occurred: storage_gb: Must be less than or equal to 4096"}`+"\n",
-			),
-			Entry(
 				"storage_gb minimum value is 20",
 				map[string]any{"storage_gb": 19},
 				`unexpected status code 500: {"description":"1 error(s) occurred: storage_gb: Must be greater than or equal to 20"}`+"\n",
