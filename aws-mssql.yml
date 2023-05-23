@@ -17,7 +17,6 @@ provision:
     required: true
     type: string
     details: The edition for the MSSQL instance.
-    default: sqlserver-ee
     enum:
       sqlserver-ee: sqlserver-ee
       sqlserver-ex: sqlserver-ex

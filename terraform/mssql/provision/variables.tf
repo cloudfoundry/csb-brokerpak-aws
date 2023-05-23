@@ -40,10 +40,15 @@ variable "mssql_version" {
 
 variable "engine" {
   type    = string
-  default = "sqlserver-ee"
+  default = null
 
   validation {
-    condition     = contains(["sqlserver-ee", "sqlserver-ex", "sqlserver-se", "sqlserver-web"], var.engine)
+    condition = anytrue([
+      var.engine == "sqlserver-ee",
+      var.engine == "sqlserver-ex",
+      var.engine == "sqlserver-se",
+      var.engine == "sqlserver-web",
+    ])
     error_message = "engine not in the list of supported values: sqlserver-ee, sqlserver-ex, sqlserver-se, sqlserver-web"
   }
 }
