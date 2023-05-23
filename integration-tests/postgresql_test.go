@@ -142,6 +142,11 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", float64(7)),
+					HaveKeyWithValue("enable_export_postgresql_logs", false),
+					HaveKeyWithValue("cloudwatch_postgresql_log_group_retention_in_days", BeNumerically("==", 30)),
+					HaveKeyWithValue("enable_export_upgrade_logs", false),
+					HaveKeyWithValue("cloudwatch_upgrade_log_group_retention_in_days", BeNumerically("==", 30)),
+					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", ""),
 				),
 			)
 		})
@@ -179,6 +184,11 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"performance_insights_enabled":          true,
 				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 93,
+				"enable_export_postgresql_logs":         true,
+				"cloudwatch_postgresql_log_group_retention_in_days": 1,
+				"enable_export_upgrade_logs":                        true,
+				"cloudwatch_upgrade_log_group_retention_in_days":    1,
+				"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -215,6 +225,11 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("performance_insights_enabled", true),
 					HaveKeyWithValue("performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					HaveKeyWithValue("performance_insights_retention_period", float64(93)),
+					HaveKeyWithValue("enable_export_postgresql_logs", true),
+					HaveKeyWithValue("cloudwatch_postgresql_log_group_retention_in_days", BeNumerically("==", 1)),
+					HaveKeyWithValue("enable_export_upgrade_logs", true),
+					HaveKeyWithValue("cloudwatch_upgrade_log_group_retention_in_days", BeNumerically("==", 1)),
+					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 				),
 			)
 		})
@@ -272,6 +287,9 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "performance_insights_enabled", true),
 			Entry(nil, "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 			Entry(nil, "performance_insights_retention_period", 31),
+			Entry(nil, "enable_export_postgresql_logs", true),
+			Entry(nil, "enable_export_upgrade_logs", true),
+			Entry(nil, "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 		)
 	})
 })
