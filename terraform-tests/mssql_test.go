@@ -48,7 +48,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		When("with all required fields satisfied", func() {
 			It("should create a db instance with the right values", func() {
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any {"engine":"sqlserver-ee"}))
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"engine": "sqlserver-ee"}))
 				Expect(plan.ResourceChanges).To(HaveLen(6))
 
 				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
