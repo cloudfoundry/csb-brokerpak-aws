@@ -59,11 +59,112 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		"backup_retention_period":               7,
 		"aws_access_key_id":                     awsAccessKeyID,
 		"aws_secret_access_key":                 awsSecretAccessKey,
+		"enable_export_postgresql_logs":         false,
+		"cloudwatch_postgresql_log_group_retention_in_days": 30,
+		"enable_export_upgrade_logs":                        false,
+		"cloudwatch_upgrade_log_group_retention_in_days":    30,
+		"cloudwatch_log_groups_kms_key_id":                  "",
 	}
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "postgresql/provision")
 		Init(terraformProvisionDir)
+	})
+
+	Context("cloud watch log groups", func() {
+		When("no parameters passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"postgres_version": "14.1",
+				}))
+			})
+
+			It("should not create a cloud watch log group", func() {
+				Expect(ResourceCreationForType(plan, "aws_cloudwatch_log_group")).To(HaveLen(0))
+			})
+
+			It("should not set any cloud watch export", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						// TF provider checks v.(*schema.Set).Len() > 0 to set an array or nil
+						"enabled_cloudwatch_logs_exports": BeNil(),
+					}),
+				)
+			})
+		})
+
+		When("log groups enabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"postgres_version":                                  "14.1",
+					"enable_export_postgresql_logs":                     true,
+					"enable_export_upgrade_logs":                        true,
+					"cloudwatch_postgresql_log_group_retention_in_days": 1,
+					"cloudwatch_upgrade_log_group_retention_in_days":    1,
+					"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+				}))
+			})
+
+			It("should set two cloud watch export", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"enabled_cloudwatch_logs_exports": ConsistOf("postgresql", "upgrade"),
+					}),
+				)
+			})
+
+			It("should create two cloud watch log groups", func() {
+				Expect(GroupAfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
+					ConsistOf(
+						MatchKeys(IgnoreExtras, Keys{
+							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"name":              Equal("/aws/rds/instance/csb-postgresql-test/postgresql"),
+							"retention_in_days": BeNumerically("==", 1),
+							"skip_destroy":      BeFalse(),
+							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
+						}),
+						MatchKeys(IgnoreExtras, Keys{
+							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"name":              Equal("/aws/rds/instance/csb-postgresql-test/upgrade"),
+							"retention_in_days": BeNumerically("==", 1),
+							"skip_destroy":      BeFalse(),
+							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
+						}),
+					),
+				)
+			})
+		})
+
+		When("only one log group is enabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"postgres_version":                                  "14.1",
+					"enable_export_postgresql_logs":                     true,
+					"cloudwatch_postgresql_log_group_retention_in_days": 3,
+					"cloudwatch_log_groups_kms_key_id":                  "",
+				}))
+			})
+
+			It("should set one cloud watch export", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"enabled_cloudwatch_logs_exports": ConsistOf("postgresql"),
+					}),
+				)
+			})
+
+			It("should create one cloud watch log group", func() {
+				Expect(AfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"kms_key_id":        BeNil(),
+						"name":              Equal("/aws/rds/instance/csb-postgresql-test/postgresql"),
+						"retention_in_days": BeNumerically("==", 3),
+						"skip_destroy":      BeFalse(),
+						"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
+					}),
+				)
+			})
+		})
 	})
 
 	Context("postgres parameter groups", func() {

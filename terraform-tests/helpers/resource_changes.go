@@ -23,6 +23,16 @@ func AfterValuesForType(plan tfjson.Plan, resourceType string) interface{} {
 	return nil
 }
 
+func GroupAfterValuesForType(plan tfjson.Plan, resourceType string) interface{} {
+	var ee []interface{}
+	for _, change := range plan.ResourceChanges {
+		if change.Type == resourceType {
+			ee = append(ee, change.Change.After)
+		}
+	}
+	return ee
+}
+
 func UnknownValuesForType(plan tfjson.Plan, resourceType string) interface{} {
 	for _, change := range plan.ResourceChanges {
 		if change.Type == resourceType {
