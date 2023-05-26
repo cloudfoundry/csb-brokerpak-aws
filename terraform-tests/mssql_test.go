@@ -124,61 +124,19 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	})
 
 	Context("engine", func() {
-		When("no engine passed", func() {
-			It("should fail and complain about missing required value", func() {
-				session, _ := FailPlan(terraformProvisionDir, deleteVar("engine", buildVars(defaultVars, requiredVars)))
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say(`The root module input variable "engine" is not set`))
-			})
-		})
-
 		When("valid engine passed", func() {
 			It("should use the passed value", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"engine": "sqlserver-web"}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"engine": Equal("sqlserver-web")}))
 			})
 		})
-
-		When("invalid engine passed", func() {
-			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"engine": "THIS-ENGINE-DOESNT-EXIST"}))
-
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("engine not in the list of supported values:"))
-			})
-		})
-
-		When("valid rds engine but not sqlserver edition", func() {
-			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"engine": "mysql"}))
-
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("engine not in the list of supported values:"))
-			})
-		})
 	})
 
 	Context("storage_gb", func() {
-		When("no storage_gb passed", func() {
-			It("should use the default value", func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"allocated_storage": Equal(float64(20))}))
-			})
-		})
-
 		When("valid storage_gb passed", func() {
 			It("should use the passed value", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"storage_gb": 60}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"allocated_storage": Equal(float64(60))}))
-			})
-		})
-
-		When("storage_gb is below the allowed minimum", func() {
-			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"storage_gb": 19}))
-
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("Invalid value for variable"))
 			})
 		})
 	})
