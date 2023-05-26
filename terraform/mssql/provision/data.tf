@@ -1,30 +1,53 @@
 locals {
   port               = 1433
-  vpc_id             = length(var.aws_vpc_id) > 0 ? data.aws_vpc.provided[0].id : data.aws_vpc.default.id
-  subnet_ids         = length(var.rds_subnet_group) > 0 ? data.aws_subnets.in_subnet_group.ids : data.aws_subnets.in_vpc.ids
-  security_group_ids = length(var.rds_vpc_security_group_ids) > 0 ? data.aws_security_groups.provided[0].ids : [aws_security_group.rds-sg[0].id]
-  subnet_group_name  = length(var.rds_subnet_group) > 0 ? data.aws_db_subnet_group.provided[0].name : aws_db_subnet_group.rds-private-subnet[0].name
+  vpc_id             = try(data.aws_vpc.provided[0].id, data.aws_vpc.default.id)
+  subnet_ids         = try(data.aws_subnets.in_provided_subnet_group[0].ids, data.aws_subnets.in_provided_vpc[0].ids, data.aws_subnets.in_default_vpc.ids)
+  security_group_ids = try(data.aws_security_groups.provided[0].ids, aws_security_group.rds-sg[0].id)
+  subnet_group_name  = try(data.aws_db_subnet_group.provided[0].name, aws_db_subnet_group.rds-private-subnet[0].name)
 }
 
 data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnets" "in_vpc" {
+data "aws_subnets" "in_default_vpc" {
   filter {
     name   = "vpc-id"
-    values = [local.vpc_id]
+    values = [data.aws_vpc.default.id]
+  }
+
+  lifecycle {
+    postcondition {
+      condition     = length(self.ids) > 0
+      error_message = "the default vpc doesn't contain any subnets"
+    }
+    postcondition {
+      condition     = length(self.ids) <= 20
+      error_message = "the default vpc contains more than 20 subnets. please specify a different aws_vpc_id or a valid rds_subnet_group containing the desired subnets"
+    }
   }
 }
 
 data "aws_vpc" "provided" {
   count = length(var.aws_vpc_id) > 0 ? 1 : 0
   id    = var.aws_vpc_id
+}
+
+data "aws_subnets" "in_provided_vpc" {
+  count = length(var.aws_vpc_id) > 0 ? 1 : 0
+  filter {
+    name   = "vpc-id"
+    values = [var.aws_vpc_id]
+  }
 
   lifecycle {
     postcondition {
-      condition     = length(var.aws_vpc_id) == 0 || var.aws_vpc_id == self.id
-      error_message = "the specified vpc doesn't exist"
+      condition     = length(self.ids) > 0
+      error_message = "the specified aws_vpc_id doesn't contain any subnets"
+    }
+    postcondition {
+      condition     = length(self.ids) <= 20
+      error_message = "the specified aws_vpc_id contains more than 20 subnets. please specify a different aws_vpc_id or a valid rds_subnet_group containing the desired subnets"
     }
   }
 }
@@ -34,9 +57,13 @@ data "aws_db_subnet_group" "provided" {
   name  = var.rds_subnet_group
 
   lifecycle {
+    precondition {
+      condition     = length(var.aws_vpc_id) > 0
+      error_message = "when specifying rds_subnet_group please specify also the corresponding aws_vpc_id"
+    }
     postcondition {
-      condition     = length(var.aws_vpc_id) == 0 || var.aws_vpc_id == self.vpc_id
-      error_message = "the specified subnet group doesn't exist or doesn't correspond to the specified vpc"
+      condition     = var.aws_vpc_id == self.vpc_id
+      error_message = "the specified rds_subnet_group doesn't correspond to the specified aws_vpc_id"
     }
   }
 }
@@ -45,7 +72,7 @@ data "aws_security_groups" "provided" {
   count = length(var.rds_vpc_security_group_ids) > 0 ? 1 : 0
   filter {
     name   = "vpc-id"
-    values = [local.vpc_id]
+    values = [data.aws_vpc.provided[0].id]
   }
   filter {
     name   = "group-id"
@@ -53,8 +80,12 @@ data "aws_security_groups" "provided" {
   }
 
   lifecycle {
+    precondition {
+      condition     = length(var.aws_vpc_id) > 0
+      error_message = "when specifying rds_vpc_security_group_ids please specify also the corresponding aws_vpc_id"
+    }
     postcondition {
-      condition     = length(var.aws_vpc_id) == 0 || (length(self.vpc_ids) == 1 && contains(self.vpc_ids, var.aws_vpc_id))
+      condition     = length(self.vpc_ids) == 1 && contains(self.vpc_ids, var.aws_vpc_id)
       error_message = "the specified security groups don't exist or don't correspond to the specified vpc (1)"
     }
     postcondition {
@@ -64,20 +95,21 @@ data "aws_security_groups" "provided" {
   }
 }
 
-data "aws_subnets" "in_subnet_group" {
+data "aws_subnets" "in_provided_subnet_group" {
+  count = length(var.rds_subnet_group) > 0 ? 1 : 0
   filter {
     name   = "vpc-id"
-    values = [local.vpc_id]
+    values = [data.aws_vpc.provided[0].id]
   }
   filter {
     name   = "subnet-id"
-    values = length(var.rds_subnet_group) > 0 ? data.aws_db_subnet_group.provided[0].subnet_ids : []
+    values = data.aws_db_subnet_group.provided[0].subnet_ids
   }
 
   lifecycle {
     postcondition {
-      condition     = length(var.rds_subnet_group) == 0 || length(self.ids) > 0
-      error_message = "the specified subnet group doesn't exists or doesn't contain any valid subnets"
+      condition     = length(self.ids) > 0
+      error_message = "the specified rds_subnet_group doesn't contain any subnets"
     }
   }
 }

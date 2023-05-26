@@ -3,36 +3,36 @@ variable "aws_secret_access_key" { type = string }
 variable "labels" { type = map(any) }
 
 variable "region" {
-  type    = string
+  type = string
 }
 
 variable "instance_name" { type = string }
 variable "instance_class" {
-  type    = string
+  type = string
 }
 
 variable "db_name" {
-  type    = string
+  type = string
 }
 
 variable "aws_vpc_id" {
-  type    = string
+  type = string
 }
 
 variable "rds_subnet_group" {
-  type    = string
+  type = string
 }
 
 variable "rds_vpc_security_group_ids" {
-  type    = string
+  type = string
 }
 
 variable "mssql_version" {
-  type    = string
+  type = string
 }
 
 variable "engine" {
-  type    = string
+  type = string
 
   validation {
     condition = anytrue([
@@ -46,7 +46,7 @@ variable "engine" {
 }
 
 variable "storage_gb" {
-  type    = number
+  type = number
 
   validation {
     condition     = var.storage_gb >= 20

@@ -40,6 +40,8 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"mssql_version": "",
 	}
 
+	validVPC := awsVPCID
+
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "mssql/provision")
 		Init(terraformProvisionDir)
@@ -50,8 +52,8 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("should complain about missing required values", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars))
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say(`The root module input variable "mssql_version" is not set`))
-				Expect(session.Err).To(gbytes.Say(`The root module input variable "engine" is not set`))
+				Expect(session).To(gbytes.Say(`The root module input variable \\"mssql_version\\" is not set, and has no default value.`))
+				Expect(session).To(gbytes.Say(`The root module input variable \\"engine\\" is not set, and has no default value.`))
 
 			})
 		})
@@ -109,7 +111,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"instance_name": "THIS-ENGINE-DOESNT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("only lowercase alphanumeric characters, hyphens, underscores, periods, and spaces allowed in \"name\""))
+				Expect(session).To(gbytes.Say(`only lowercase alphanumeric characters, hyphens, underscores, periods, and spaces allowed in \\"name\\"`))
 
 			})
 		})
@@ -179,12 +181,12 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			})
 		})
 
-		When("invalid subnet group passed", func() {
+		When("invalid vpc passed", func() {
 			It("should fail and return a descriptive error message", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": "THIS-VPC-DOESNT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("no matching EC2 VPC found"))
+				Expect(session).To(gbytes.Say("no matching EC2 VPC found"))
 			})
 		})
 	})
@@ -199,19 +201,28 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			})
 		})
 
-		When("invalid subnet group passed", func() {
+		When("a subnet group passed without specifying a vpc", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "THIS-SUBNET-GROUP-DOESNT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "ANY-SUBNET-GROUP"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("no matching RDS DB Subnet Group found"))
+				Expect(session).To(gbytes.Say("when specifying rds_subnet_group please specify also the corresponding aws_vpc_id"))
+			})
+		})
+
+		When("invalid subnet group passed", func() {
+			It("should fail and return a descriptive error message", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "THIS-SUBNET-GROUP-DOESNT-EXIST", "aws_vpc_id": validVPC}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say(`no matching RDS DB Subnet Group found`))
 			})
 		})
 	})
 
 	Context("security groups", func() {
-		When("no security group ids passed", func() {
-			It("should create a new one", func() {
+		When("no security group ids passed and no vpc passed", func() {
+			It("should create a new security group in the default vpc", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
 				Expect(ResourceCreationForType(plan, "aws_security_group")).To(HaveLen(1))
 				Expect(UnknownValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"vpc_security_group_ids": BeTrue()}))
@@ -219,12 +230,30 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			})
 		})
 
-		When("invalid security group ids passed", func() {
+		When("no security group ids passed and a valid vpc passed", func() {
+			It("should create a new security group in the specified vpc", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": validVPC}))
+				Expect(ResourceCreationForType(plan, "aws_security_group")).To(HaveLen(1))
+				Expect(UnknownValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"vpc_security_group_ids": BeTrue()}))
+				Expect(AfterValuesForType(plan, "aws_security_group")).To(MatchKeys(IgnoreExtras, Keys{"name": Equal("csb-mssql-test-sg"), "vpc_id": Equal(validVPC)}))
+			})
+		})
+
+		When("a security group ids passed without specifying a vpc", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_vpc_security_group_ids": "THESE,SECURITY-GROUPS,DONT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_vpc_security_group_ids": "ANY,SECURITY,GROUP"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("Resource postcondition failed"))
+				Expect(session).To(gbytes.Say(`when specifying rds_vpc_security_group_ids please specify also the corresponding aws_vpc_id`))
+			})
+		})
+
+		When("invalid security group ids passed", func() {
+			It("should fail and return a descriptive error message", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_vpc_security_group_ids": "THESE,SECURITY-GROUPS,DONT-EXIST", "aws_vpc_id": validVPC}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say(`the specified security groups don't exist or don't correspond to the specified vpc \(1\)`))
 			})
 		})
 	})
