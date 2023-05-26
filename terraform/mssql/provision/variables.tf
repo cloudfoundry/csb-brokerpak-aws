@@ -4,43 +4,35 @@ variable "labels" { type = map(any) }
 
 variable "region" {
   type    = string
-  default = "us-west-2"
 }
 
 variable "instance_name" { type = string }
 variable "instance_class" {
   type    = string
-  default = ""
 }
 
 variable "db_name" {
   type    = string
-  default = "vsbdb"
 }
 
 variable "aws_vpc_id" {
   type    = string
-  default = ""
 }
 
 variable "rds_subnet_group" {
   type    = string
-  default = ""
 }
 
 variable "rds_vpc_security_group_ids" {
   type    = string
-  default = ""
 }
 
 variable "mssql_version" {
   type    = string
-  default = null
 }
 
 variable "engine" {
   type    = string
-  default = null
 
   validation {
     condition = anytrue([
@@ -55,7 +47,6 @@ variable "engine" {
 
 variable "storage_gb" {
   type    = number
-  default = 20
 
   validation {
     condition     = var.storage_gb >= 20

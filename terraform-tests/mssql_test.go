@@ -22,14 +22,22 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	// Having them there poses the same amount of duplication than having them in this file.
 	// However, having them there comes with some additional benefits.
 	defaultVars := map[string]any{
-		"aws_access_key_id":     awsAccessKeyID,
-		"aws_secret_access_key": awsSecretAccessKey,
-		"instance_name":         "csb-mssql-test",
-		"labels":                map[string]string{"label1": "value1"},
+		"aws_access_key_id":          awsAccessKeyID,
+		"aws_secret_access_key":      awsSecretAccessKey,
+		"aws_vpc_id":                 "",
+		"db_name":                    "vsbdb",
+		"instance_name":              "csb-mssql-test",
+		"instance_class":             "",
+		"labels":                     map[string]string{"label1": "value1"},
+		"storage_gb":                 20,
+		"region":                     "us-west-2",
+		"rds_subnet_group":           "",
+		"rds_vpc_security_group_ids": "",
 	}
 
 	requiredVars := map[string]any{
-		"engine": "sqlserver-ee",
+		"engine":        "sqlserver-ee",
+		"mssql_version": "",
 	}
 
 	BeforeAll(func() {
@@ -42,13 +50,15 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("should complain about missing required values", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars))
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say(`Invalid value for variable`))
+				Expect(session.Err).To(gbytes.Say(`The root module input variable "mssql_version" is not set`))
+				Expect(session.Err).To(gbytes.Say(`The root module input variable "engine" is not set`))
+
 			})
 		})
 
 		When("with all required fields satisfied", func() {
 			It("should create a db instance with the right values", func() {
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"engine": "sqlserver-ee"}))
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
 				Expect(plan.ResourceChanges).To(HaveLen(6))
 
 				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
@@ -96,7 +106,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	Context("instance_name", func() {
 		When("invalid instance_name is passed", func() {
 			It("fails and returns a descriptive message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"instance_name": "THIS-ENGINE-DOESNT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"instance_name": "THIS-ENGINE-DOESNT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session.Err).To(gbytes.Say("only lowercase alphanumeric characters, hyphens, underscores, periods, and spaces allowed in \"name\""))
@@ -116,34 +126,34 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	Context("engine", func() {
 		When("no engine passed", func() {
 			It("should fail and complain about missing required value", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, nil))
+				session, _ := FailPlan(terraformProvisionDir, deleteVar("engine", buildVars(defaultVars, requiredVars)))
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say(`Invalid value for variable`))
+				Expect(session.Err).To(gbytes.Say(`The root module input variable "engine" is not set`))
 			})
 		})
 
 		When("valid engine passed", func() {
 			It("should use the passed value", func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"engine": "sqlserver-web"}))
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"engine": "sqlserver-web"}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"engine": Equal("sqlserver-web")}))
 			})
 		})
 
 		When("invalid engine passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"engine": "THIS-ENGINE-DOESNT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"engine": "THIS-ENGINE-DOESNT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("Invalid value for variable"))
+				Expect(session.Err).To(gbytes.Say("engine not in the list of supported values:"))
 			})
 		})
 
 		When("valid rds engine but not sqlserver edition", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"engine": "mysql"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"engine": "mysql"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session.Err).To(gbytes.Say("Invalid value for variable"))
+				Expect(session.Err).To(gbytes.Say("engine not in the list of supported values:"))
 			})
 		})
 	})
@@ -165,7 +175,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		When("storage_gb is below the allowed minimum", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"storage_gb": 19}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"storage_gb": 19}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session.Err).To(gbytes.Say("Invalid value for variable"))
@@ -213,7 +223,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		When("invalid subnet group passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"aws_vpc_id": "THIS-VPC-DOESNT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": "THIS-VPC-DOESNT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session.Err).To(gbytes.Say("no matching EC2 VPC found"))
@@ -233,7 +243,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		When("invalid subnet group passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"rds_subnet_group": "THIS-SUBNET-GROUP-DOESNT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "THIS-SUBNET-GROUP-DOESNT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session.Err).To(gbytes.Say("no matching RDS DB Subnet Group found"))
@@ -253,7 +263,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		When("invalid security group ids passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"rds_vpc_security_group_ids": "THESE,SECURITY-GROUPS,DONT-EXIST"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_vpc_security_group_ids": "THESE,SECURITY-GROUPS,DONT-EXIST"}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session.Err).To(gbytes.Say("Resource postcondition failed"))

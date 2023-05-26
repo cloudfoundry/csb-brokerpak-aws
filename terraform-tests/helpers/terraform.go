@@ -68,7 +68,7 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 }
 
 func terraformPlanCMD(dir string, planFile string) *exec.Cmd {
-	return exec.Command("terraform", chdirFlag(dir), "plan", "-refresh=false", fmt.Sprintf("-out=%s", planFile))
+	return exec.Command("terraform", chdirFlag(dir), "plan", "-input=false", "-refresh=false", fmt.Sprintf("-out=%s", planFile))
 }
 
 func decodePlan(dir, planFile string) []byte {

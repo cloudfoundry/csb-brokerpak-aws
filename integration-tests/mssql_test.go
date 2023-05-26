@@ -36,11 +36,11 @@ var customMSSQLPlan = map[string]any{
 }
 
 var requiredProperties = map[string]any{
+	"engine":        "sqlserver-ee",
 	"mssql_version": "some-mssql-version",
 }
 
 var defaultProperties = map[string]any{
-	"engine":        "sqlserver-ee",
 	"region":        "us-west-2",
 	"instance_name": "csb-mssql-0000000",
 	"db_name":       "vsbdb",
@@ -89,7 +89,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		It("should fail", func() {
 			_, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), nil)
 			Expect(err.Error()).To(Equal(
-				`unexpected status code 500: {"description":"1 error(s) occurred: (root): mssql_version is required"}` + "\n",
+				`unexpected status code 500: {"description":"2 error(s) occurred: (root): engine is required; (root): mssql_version is required"}` + "\n",
 			))
 		})
 	})
@@ -186,7 +186,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: value})
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties, map[string]any{prop: value}))
 
 				Expect(err.Error()).To(Equal(
 					`unexpected status code 400: {"description":"attempt to update parameter that may result in service instance re-creation and data loss"}` + "\n",
