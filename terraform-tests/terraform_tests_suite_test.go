@@ -39,11 +39,6 @@ func buildVars(varOverrides ...map[string]any) map[string]any {
 	return result
 }
 
-func deleteVar(key string, vars map[string]any) map[string]any {
-	delete(vars, key)
-	return vars
-}
-
 func getAWSRegion() string {
 	envRegion := os.Getenv("AWS_DEFAULT_REGION")
 	if envRegion != "" {
