@@ -1,11 +1,51 @@
 package credentials
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/cloudfoundry-community/go-cfenv"
 	"github.com/mitchellh/mapstructure"
 )
+
+type Client struct {
+	S3Client    *s3.Client
+	Credentials S3Service
+}
+
+func NewClient() *Client {
+	creds, err := readCredentials()
+	if err != nil {
+		panic(err)
+	}
+	cfg, err := config.LoadDefaultConfig(
+		context.Background(),
+		config.WithCredentialsProvider(
+			aws.NewCredentialsCache(
+				credentials.NewStaticCredentialsProvider(
+					creds.AccessKeyId,
+					creds.AccessKeySecret,
+					"",
+				),
+			),
+		),
+		config.WithRegion(creds.Region),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	client := s3.NewFromConfig(cfg)
+	c := Client{
+		S3Client:    client,
+		Credentials: creds,
+	}
+	return &c
+}
 
 type S3Service struct {
 	AccessKeyId      string `mapstructure:"access_key_id"`
@@ -23,7 +63,7 @@ type S3ServiceLegacy struct {
 	BucketName      string `mapstructure:"bucket"`
 }
 
-func Read() (S3Service, error) {
+func readCredentials() (S3Service, error) {
 	serviceTag, serviceCred, err := findService()
 	if err != nil {
 		return S3Service{}, err

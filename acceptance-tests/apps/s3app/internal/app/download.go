@@ -4,17 +4,18 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
 	"s3app/internal/credentials"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func handleDownload(w http.ResponseWriter, r *http.Request, filename string, client *s3.Client, creds credentials.S3Service) {
+func handleDownload(w http.ResponseWriter, r *http.Request, filename string, client *credentials.Client) {
 	log.Println("Handling download.")
 
-	obj, err := client.GetObject(r.Context(), &s3.GetObjectInput{
-		Bucket: aws.String(creds.BucketName),
+	obj, err := client.S3Client.GetObject(r.Context(), &s3.GetObjectInput{
+		Bucket: aws.String(client.Credentials.BucketName),
 		Key:    aws.String(filename),
 	})
 	if err != nil {
