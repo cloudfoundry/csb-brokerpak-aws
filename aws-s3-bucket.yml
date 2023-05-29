@@ -148,6 +148,12 @@ provision:
       Optional property, but required if `ol_configuration_default_retention_days` is not specified.
       `ol_configuration_default_retention_mode` is required if this property is set.
       To enable Object Lock for a new bucket, see `ol_enabled`.
+  - field_name: restrict_to_tls_requests_only
+    type: boolean
+    default: false
+    details: |
+      Whether this bucket explicitly denies access to HTTP requests, in other words, the bucket only accepts
+      requests sent through HTTPS if enabled.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
