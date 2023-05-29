@@ -3,8 +3,6 @@ package integration_test
 import (
 	"fmt"
 
-	"golang.org/x/exp/maps"
-
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -97,19 +95,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				// Combine required properties and received params
-				// In case of collision params take precedence
-				combinedProperties := map[string]any{}
-				maps.Copy(combinedProperties, requiredProperties)
-				maps.Copy(combinedProperties, defaultProperties)
-				maps.Copy(combinedProperties, params)
-				// If we included required properties directly in the plan we wouldn't be able to test
-				// certain scenarios easily. For example, passing an invalid engine value would require
-				// another test and another plan without the engine (user-inputs can't override plan properties)
-				//
-				// However, with this "COMPOSITIONAL" approach we have more fine-grained control over the inputs
-
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", combinedProperties)
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties, requiredProperties, params))
 
 				Expect(err).To(MatchError(expectedErrorMsg))
 			},
@@ -151,10 +137,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		)
 
 		It("should provision a plan", func() {
-			combinedProperties := map[string]any{}
-			maps.Copy(combinedProperties, requiredProperties)
-			maps.Copy(combinedProperties, optionalProperties)
-			instanceID, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), combinedProperties)
+			instanceID, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties, optionalProperties))
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
