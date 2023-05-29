@@ -104,7 +104,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"notification_topic_arn":     BeNil(),
 					"timeouts":                   BeNil(),
 					"log_delivery_configuration": BeAssignableToTypeOf([]any{}),
-					"availability_zones":         BeNil(),
 					"multi_az_enabled":           BeAssignableToTypeOf(false),
 					"snapshot_arns":              BeNil(),
 					"tags_all":                   BeAssignableToTypeOf(map[string]any{}),
