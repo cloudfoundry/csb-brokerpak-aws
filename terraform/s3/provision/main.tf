@@ -91,24 +91,24 @@ resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configura
 }
 
 resource "aws_s3_bucket_policy" "bucket_restrict_to_tls_requests_only_policy" {
-  count = var.restrict_to_tls_requests_only ? 1 : 0
+  count  = var.restrict_to_tls_requests_only ? 1 : 0
   bucket = aws_s3_bucket.b.id
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [{
-      "Sid": "RestrictToTLSRequestsOnly",
-      "Action": "s3:*",
-      "Effect": "Deny",
-      "Resource": [
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Sid" : "RestrictToTLSRequestsOnly",
+      "Action" : "s3:*",
+      "Effect" : "Deny",
+      "Resource" : [
         "${aws_s3_bucket.b.arn}",
         "${aws_s3_bucket.b.arn}/*"
       ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+      "Condition" : {
+        "Bool" : {
+          "aws:SecureTransport" : "false"
         }
       },
-      "Principal": "*"
+      "Principal" : "*"
     }]
   })
 }
