@@ -1,19 +1,21 @@
 locals {
   port               = 1433
-  vpc_id             = try(data.aws_vpc.provided[0].id, data.aws_vpc.default.id)
-  subnet_ids         = try(data.aws_subnets.in_provided_subnet_group[0].ids, data.aws_subnets.in_provided_vpc[0].ids, data.aws_subnets.in_default_vpc.ids)
+  vpc_id             = try(data.aws_vpc.provided[0].id, data.aws_vpc.default[0].id)
+  subnet_ids         = try(data.aws_subnets.in_provided_subnet_group[0].ids, data.aws_subnets.in_provided_vpc[0].ids, data.aws_subnets.in_default_vpc[0].ids)
   security_group_ids = try(data.aws_security_groups.provided[0].ids, aws_security_group.rds-sg[0].id)
   subnet_group_name  = try(data.aws_db_subnet_group.provided[0].name, aws_db_subnet_group.rds-private-subnet[0].name)
 }
 
 data "aws_vpc" "default" {
+  count   = length(var.aws_vpc_id) > 0 ? 0 : 1
   default = true
 }
 
 data "aws_subnets" "in_default_vpc" {
+  count = length(var.aws_vpc_id) > 0 ? 0 : 1
   filter {
     name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+    values = [data.aws_vpc.default[0].id]
   }
 
   lifecycle {

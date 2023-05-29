@@ -29,7 +29,6 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"instance_name":              "csb-mssql-test",
 		"instance_class":             "",
 		"labels":                     map[string]string{"label1": "value1"},
-		"storage_gb":                 20,
 		"region":                     "us-west-2",
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
@@ -38,6 +37,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	requiredVars := map[string]any{
 		"engine":        "sqlserver-ee",
 		"mssql_version": "",
+		"storage_gb":    20,
 	}
 
 	validVPC := awsVPCID
@@ -52,9 +52,10 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("should complain about missing required values", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars))
 				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session).To(gbytes.Say(`The root module input variable \\"mssql_version\\" is not set, and has no default value.`))
-				Expect(session).To(gbytes.Say(`The root module input variable \\"engine\\" is not set, and has no default value.`))
-
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`The root module input variable \"mssql_version\" is not set, and has no default value.`))
+				Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
+				Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
 			})
 		})
 
