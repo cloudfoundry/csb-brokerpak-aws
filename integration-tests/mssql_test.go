@@ -36,13 +36,13 @@ var customMSSQLPlan = map[string]any{
 var requiredProperties = map[string]any{
 	"engine":        "sqlserver-ee",
 	"mssql_version": "some-mssql-version",
+	"storage_gb":    20,
 }
 
 var defaultProperties = map[string]any{
 	"region":        "us-west-2",
 	"instance_name": "csb-mssql-0000000",
 	"db_name":       "vsbdb",
-	"storage_gb":    20,
 }
 
 var optionalProperties = map[string]any{
@@ -86,13 +86,24 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 	Describe("provisioning without specifying required properties", func() {
 		It("should fail", func() {
 			_, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), nil)
-			Expect(err.Error()).To(Equal(
-				`unexpected status code 500: {"description":"2 error(s) occurred: (root): engine is required; (root): mssql_version is required"}` + "\n",
-			))
+			Expect(err.Error()).To(ContainSubstring(`engine is required`))
+			Expect(err.Error()).To(ContainSubstring(`mssql_version is required`))
+			Expect(err.Error()).To(ContainSubstring(`storage_gb is required`))
 		})
 	})
 
 	Describe("provisioning", func() {
+		DescribeTable("required properties",
+			func(property string) {
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties, requiredProperties)))
+
+				Expect(err).To(MatchError(`unexpected status code 500: {"description":"1 error(s) occurred: (root): ` + property + ` is required"}` + "\n"))
+			},
+			Entry("engine is required", "engine"),
+			Entry("mssql_version is required", "mssql_version"),
+			Entry("storage_gb is required", "storage_gb"),
+		)
+
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
 				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties, requiredProperties, params))

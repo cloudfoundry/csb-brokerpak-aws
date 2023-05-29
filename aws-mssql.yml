@@ -34,9 +34,9 @@ provision:
     details: | 
       Size of storage volume for service instance.
       For more information about Amazon RDS DB instance storage for MSSQL see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html
-    default: 20
     constraints:
       minimum: 20
+      maximum: 16384
   - field_name: db_name
     type: string
     details: Name for your database

@@ -78,3 +78,8 @@ func buildProperties(propertyOverrides ...map[string]any) map[string]any {
 	}
 	return result
 }
+
+func deleteProperty(key string, properties map[string]any) map[string]any {
+	delete(properties, key)
+	return properties
+}
