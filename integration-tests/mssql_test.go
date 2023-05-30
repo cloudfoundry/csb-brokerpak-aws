@@ -152,7 +152,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("engine", "sqlserver-ee"),
 					HaveKeyWithValue("mssql_version", "some-mssql-version"),
-					HaveKeyWithValue("storage_gb", float64(20)),
+					HaveKeyWithValue("storage_gb", BeNumerically("==", 20)),
 					HaveKeyWithValue("rds_subnet_group", "some-rds-subnet-group"),
 					HaveKeyWithValue("rds_vpc_security_group_ids", "some-security-group-ids"),
 					HaveKeyWithValue("instance_class", "some-instance-class"),
