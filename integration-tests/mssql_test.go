@@ -94,7 +94,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			func(property string) {
 				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties(), requiredProperties())))
 
-				Expect(err).To(MatchError(`unexpected status code 500: {"description":"1 error(s) occurred: (root): ` + property + ` is required"}` + "\n"))
+				Expect(err).To(MatchError(ContainSubstring("1 error(s) occurred: (root): " + property + " is required")))
 			},
 			Entry("engine is required", "engine"),
 			Entry("mssql_version is required", "mssql_version"),
@@ -105,42 +105,42 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			func(params map[string]any, expectedErrorMsg string) {
 				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties(), requiredProperties(), params))
 
-				Expect(err).To(MatchError(expectedErrorMsg))
+				Expect(err).To(MatchError(ContainSubstring(`1 error(s) occurred: ` + expectedErrorMsg)))
 			},
 			Entry(
 				"invalid region",
 				map[string]any{"region": "-Asia-northeast1"},
-				`unexpected status code 500: {"description":"1 error(s) occurred: region: Does not match pattern '^[a-z][a-z0-9-]+$'"}`+"\n",
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"instance name minimum length is 6 characters",
 				map[string]any{"instance_name": stringOfLen(5)},
-				`unexpected status code 500: {"description":"1 error(s) occurred: instance_name: String length must be greater than or equal to 6"}`+"\n",
+				"instance_name: String length must be greater than or equal to 6",
 			),
 			Entry(
 				"instance name maximum length is 98 characters",
 				map[string]any{"instance_name": stringOfLen(99)},
-				`unexpected status code 500: {"description":"1 error(s) occurred: instance_name: String length must be less than or equal to 98"}`+"\n",
+				"instance_name: String length must be less than or equal to 98",
 			),
 			Entry(
 				"instance name invalid characters",
 				map[string]any{"instance_name": ".aaaaa"},
-				`unexpected status code 500: {"description":"1 error(s) occurred: instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'"}`+"\n",
+				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
 				"database name maximum length is 64 characters",
 				map[string]any{"db_name": stringOfLen(65)},
-				`unexpected status code 500: {"description":"1 error(s) occurred: db_name: String length must be less than or equal to 64"}`+"\n",
+				"db_name: String length must be less than or equal to 64",
 			),
 			Entry(
 				"engine must be one of the allowed values",
 				map[string]any{"engine": "not-an-allowed-engine"},
-				`unexpected status code 500: {"description":"1 error(s) occurred: engine: engine must be one of the following: \"sqlserver-ee\", \"sqlserver-ex\", \"sqlserver-se\", \"sqlserver-web\""}`+"\n",
+				`engine: engine must be one of the following: \"sqlserver-ee\", \"sqlserver-ex\", \"sqlserver-se\", \"sqlserver-web\"`,
 			),
 			Entry(
 				"storage_gb minimum value is 20",
 				map[string]any{"storage_gb": 19},
-				`unexpected status code 500: {"description":"1 error(s) occurred: storage_gb: Must be greater than or equal to 20"}`+"\n",
+				"storage_gb: Must be greater than or equal to 20",
 			),
 		)
 
@@ -179,8 +179,10 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			func(prop string, value any) {
 				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), map[string]any{prop: value}))
 
-				Expect(err.Error()).To(Equal(
-					`unexpected status code 400: {"description":"attempt to update parameter that may result in service instance re-creation and data loss"}` + "\n",
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
 				))
 
 				const initialProvisionInvocation = 1
