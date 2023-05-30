@@ -33,25 +33,31 @@ var customMSSQLPlan = map[string]any{
 	},
 }
 
-var requiredProperties = map[string]any{
-	"engine":        "sqlserver-ee",
-	"mssql_version": "some-mssql-version",
-	"storage_gb":    20,
-}
-
-var defaultProperties = map[string]any{
-	"region":        "us-west-2",
-	"instance_name": "csb-mssql-0000000",
-	"db_name":       "vsbdb",
-}
-
-var optionalProperties = map[string]any{
-	"rds_vpc_security_group_ids": "some-security-group-ids",
-	"rds_subnet_group":           "some-rds-subnet-group",
-	"instance_class":             "some-instance-class",
-}
-
 var _ = Describe("MSSQL", Label("MSSQL"), func() {
+	var requiredProperties = func() map[string]any {
+		return map[string]any{
+			"engine":        "sqlserver-ee",
+			"mssql_version": "some-mssql-version",
+			"storage_gb":    20,
+		}
+	}
+
+	var defaultProperties = func() map[string]any {
+		return map[string]any{
+			"region":        "us-west-2",
+			"instance_name": "csb-mssql-0000000",
+			"db_name":       "vsbdb",
+		}
+	}
+
+	var optionalProperties = func() map[string]any {
+		return map[string]any{
+			"rds_vpc_security_group_ids": "some-security-group-ids",
+			"rds_subnet_group":           "some-rds-subnet-group",
+			"instance_class":             "some-instance-class",
+		}
+	}
+
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -95,7 +101,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("required properties",
 			func(property string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties, requiredProperties)))
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties(), requiredProperties())))
 
 				Expect(err).To(MatchError(`unexpected status code 500: {"description":"1 error(s) occurred: (root): ` + property + ` is required"}` + "\n"))
 			},
@@ -106,7 +112,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties, requiredProperties, params))
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties(), requiredProperties(), params))
 
 				Expect(err).To(MatchError(expectedErrorMsg))
 			},
@@ -148,7 +154,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties, optionalProperties))
+			instanceID, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), optionalProperties()))
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -173,14 +179,14 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), requiredProperties)
+			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), requiredProperties())
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties, map[string]any{prop: value}))
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), map[string]any{prop: value}))
 
 				Expect(err.Error()).To(Equal(
 					`unexpected status code 400: {"description":"attempt to update parameter that may result in service instance re-creation and data loss"}` + "\n",
