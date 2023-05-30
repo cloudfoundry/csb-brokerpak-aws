@@ -89,15 +89,6 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		)
 	})
 
-	Describe("provisioning without specifying required properties", func() {
-		It("should fail", func() {
-			_, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), nil)
-			Expect(err.Error()).To(ContainSubstring(`engine is required`))
-			Expect(err.Error()).To(ContainSubstring(`mssql_version is required`))
-			Expect(err.Error()).To(ContainSubstring(`storage_gb is required`))
-		})
-	})
-
 	Describe("provisioning", func() {
 		DescribeTable("required properties",
 			func(property string) {
