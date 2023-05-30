@@ -18,18 +18,16 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		terraformProvisionDir string
 	)
 
-	// Most default values are automatically loaded from /terraform/mssql/provision/variables.tf
-	// Having them there poses the same amount of duplication than having them in this file.
-	// However, having them there comes with some additional benefits.
 	defaultVars := map[string]any{
-		"aws_access_key_id":          awsAccessKeyID,
-		"aws_secret_access_key":      awsSecretAccessKey,
+		"aws_access_key_id":     awsAccessKeyID,
+		"aws_secret_access_key": awsSecretAccessKey,
+		"region":                "us-west-2",
+		"instance_name":         "csb-mssql-test",
+		"db_name":               "vsbdb",
+		"labels":                map[string]string{"label1": "value1"},
+
 		"aws_vpc_id":                 "",
-		"db_name":                    "vsbdb",
-		"instance_name":              "csb-mssql-test",
 		"instance_class":             "",
-		"labels":                     map[string]string{"label1": "value1"},
-		"region":                     "us-west-2",
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
 	}
@@ -47,42 +45,47 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		Init(terraformProvisionDir)
 	})
 
-	Context("Creating an Instance", func() {
-		When("only passing the default values", func() {
-			It("should complain about missing required values", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars))
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				msgs := string(session.Out.Contents())
-				Expect(msgs).To(ContainSubstring(`The root module input variable \"mssql_version\" is not set, and has no default value.`))
-				Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
-				Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
-			})
+	Context("with Default and required values", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
 		})
 
-		When("with all required fields satisfied", func() {
-			It("should create a db instance with the right values", func() {
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
-				Expect(plan.ResourceChanges).To(HaveLen(6))
+		It("should create the right resources", func() {
+			Expect(plan.ResourceChanges).To(HaveLen(6))
 
-				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-					"aws_db_instance",
-					"random_password",
-					"random_string",
-					"aws_security_group_rule",
-					"aws_db_subnet_group",
-					"aws_security_group",
-				))
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
-					"engine":               Equal("sqlserver-ee"),
-					"identifier":           Equal("csb-mssql-test"),
-					"instance_class":       Equal(""),
-					"tags":                 HaveKeyWithValue("label1", "value1"),
-					"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
-					"apply_immediately":    BeTrue(),
-					"skip_final_snapshot":  BeTrue(),
-					"license_model":        Equal("license-included"),
-				}))
-			})
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+				"aws_db_instance",
+				"random_password",
+				"random_string",
+				"aws_security_group_rule",
+				"aws_db_subnet_group",
+				"aws_security_group",
+			))
+		})
+
+		It("should create a db instance with the right values", func() {
+			Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
+				"engine":               Equal("sqlserver-ee"),
+				"engine_version":       Equal("15.00.4236.7.v1"),
+				"identifier":           Equal("csb-mssql-test"),
+				"instance_class":       Equal("db.m6i.xlarge"),
+				"tags":                 HaveKeyWithValue("label1", "value1"),
+				"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
+				"apply_immediately":    BeTrue(),
+				"skip_final_snapshot":  BeTrue(),
+				"license_model":        Equal("license-included"),
+			}))
+		})
+	})
+
+	Context("with Default values alone", func() {
+		It("should complain about missing required values", func() {
+			session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars))
+			Expect(session.ExitCode()).NotTo(Equal(0))
+			msgs := string(session.Out.Contents())
+			Expect(msgs).To(ContainSubstring(`The root module input variable \"mssql_version\" is not set, and has no default value.`))
+			Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
+			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
 		})
 	})
 

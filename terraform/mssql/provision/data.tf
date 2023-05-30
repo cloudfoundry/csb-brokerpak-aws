@@ -1,5 +1,6 @@
 locals {
-  port               = 1433
+  port = 1433
+
   vpc_id             = try(data.aws_vpc.provided[0].id, data.aws_vpc.default[0].id)
   subnet_ids         = try(data.aws_db_subnet_group.provided[0].subnet_ids, data.aws_subnets.in_provided_vpc[0].ids, data.aws_subnets.in_default_vpc[0].ids)
   security_group_ids = try(data.aws_security_groups.provided[0].ids, aws_security_group.rds-sg[0].id)
