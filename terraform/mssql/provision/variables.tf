@@ -33,23 +33,8 @@ variable "mssql_version" {
 
 variable "engine" {
   type = string
-
-  validation {
-    condition = anytrue([
-      var.engine == "sqlserver-ee",
-      var.engine == "sqlserver-ex",
-      var.engine == "sqlserver-se",
-      var.engine == "sqlserver-web",
-    ])
-    error_message = "engine not in the list of supported values: sqlserver-ee, sqlserver-ex, sqlserver-se, sqlserver-web"
-  }
 }
 
 variable "storage_gb" {
   type = number
-
-  validation {
-    condition     = var.storage_gb >= 20
-    error_message = "storage_gb must be >= 20"
-  }
 }
