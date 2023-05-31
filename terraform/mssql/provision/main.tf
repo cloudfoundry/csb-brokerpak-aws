@@ -1,17 +1,20 @@
 resource "aws_security_group" "rds-sg" {
+  count  = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
   name   = format("%s-sg", var.instance_name)
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = local.vpc_id
 }
 
 resource "aws_db_subnet_group" "rds-private-subnet" {
+  count      = length(var.rds_subnet_group) == 0 ? 1 : 0
   name       = format("%s-p-sn", var.instance_name)
-  subnet_ids = data.aws_subnets.all.ids
+  subnet_ids = local.subnet_ids
 }
 
 resource "aws_security_group_rule" "rds_inbound_access" {
+  count             = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
   from_port         = local.port
   protocol          = "tcp"
-  security_group_id = aws_security_group.rds-sg.id
+  security_group_id = aws_security_group.rds-sg[0].id
   to_port           = local.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
@@ -32,17 +35,17 @@ resource "random_password" "password" {
 
 resource "aws_db_instance" "db_instance" {
   license_model          = "license-included"
-  allocated_storage      = 20
-  engine                 = "sqlserver-ee"
-  engine_version         = "15.00.4236.7.v1"
-  instance_class         = "db.m6i.xlarge"
+  allocated_storage      = var.storage_gb
+  engine                 = var.engine
+  engine_version         = var.mssql_version
+  instance_class         = var.instance_class
   identifier             = var.instance_name
   db_name                = null # Otherwise: Error: InvalidParameterValue: DBName must be null for engine: sqlserver-xx
   username               = random_string.username.result
   password               = random_password.password.result
   tags                   = var.labels
-  vpc_security_group_ids = [aws_security_group.rds-sg.id]
-  db_subnet_group_name   = aws_db_subnet_group.rds-private-subnet.name
+  vpc_security_group_ids = local.security_group_ids
+  db_subnet_group_name   = local.subnet_group_name
   apply_immediately      = true
   skip_final_snapshot    = true
 

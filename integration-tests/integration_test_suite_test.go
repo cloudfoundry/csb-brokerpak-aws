@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/exp/maps"
+
 	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -67,4 +69,17 @@ func marshall(element any) string {
 
 func stringOfLen(length int) string {
 	return strings.Repeat("a", length)
+}
+
+func buildProperties(propertyOverrides ...map[string]any) map[string]any {
+	result := map[string]any{}
+	for _, override := range propertyOverrides {
+		maps.Copy(result, override)
+	}
+	return result
+}
+
+func deleteProperty(key string, properties map[string]any) map[string]any {
+	delete(properties, key)
+	return properties
 }

@@ -31,10 +31,11 @@ var _ = BeforeSuite(func() {
 	Expect(cp.Copy("../terraform", workingDir)).NotTo(HaveOccurred())
 })
 
-func buildVars(defaults, overrides map[string]any) map[string]any {
+func buildVars(varOverrides ...map[string]any) map[string]any {
 	result := map[string]any{}
-	maps.Copy(result, defaults)
-	maps.Copy(result, overrides)
+	for _, override := range varOverrides {
+		maps.Copy(result, override)
+	}
 	return result
 }
 
