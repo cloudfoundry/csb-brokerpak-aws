@@ -291,7 +291,8 @@ provision:
     type: integer
     details: |
       Used in conjunction with `enable_export_postgresql_logs`.
-      If provided will set the retention days for the log group containing the RDS postgresql logs.
+      If provided, it specifies the number of days you want to retain log events in the postgresql log group.
+      If you select 0, the events in the log group are always retained and never expire.
       Defaults to 30 Days.
     default: 30
     constraints:
@@ -313,7 +314,8 @@ provision:
     type: integer
     details: |
       Used in conjunction with `enable_export_upgrade_logs`.
-      If provided will set the retention days for the log group containing the RDS upgrade logs.
+      If provided, it specifies the number of days you want to retain log events in the upgrade log group.
+      If you select 0, the events in the log group are always retained and never expire.
       Defaults to 30 Days.
     default: 30
     constraints:
