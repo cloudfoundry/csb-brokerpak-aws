@@ -118,7 +118,8 @@ resource "aws_cloudwatch_log_group" "this" {
     create_before_destroy = true
   }
   name              = "/aws/rds/instance/${var.instance_name}/${each.key}"
-  retention_in_days = each.value
+  retention_in_days = each.value["retention_in_days"]
+  skip_destroy      = each.value["skip_destroy"]
   kms_key_id        = var.cloudwatch_log_groups_kms_key_id == "" ? null : var.cloudwatch_log_groups_kms_key_id
 
   tags = var.labels
