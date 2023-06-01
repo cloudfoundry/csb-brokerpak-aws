@@ -90,8 +90,8 @@ resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configura
   }
 }
 
-resource "aws_s3_bucket_policy" "bucket_restrict_to_tls_requests_only_policy" {
-  count  = var.restrict_to_tls_requests_only ? 1 : 0
+resource "aws_s3_bucket_policy" "bucket_require_tls_policy" {
+  count  = var.require_tls ? 1 : 0
   bucket = aws_s3_bucket.b.id
   policy = jsonencode({
     "Version" : "2012-10-17",
