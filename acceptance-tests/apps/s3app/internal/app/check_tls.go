@@ -5,20 +5,20 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
+	"path"
 	"time"
 
 	appcreds "s3app/internal/credentials"
 )
 
-func CheckHTTPSHandler(protocol, slug string, creds appcreds.S3Service) http.HandlerFunc {
+func CheckHTTPSHandler(protocol string, creds appcreds.S3Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Handling request %s.\n", r.URL.Path)
 
 		switch r.Method {
 		case http.MethodGet:
 			log.Printf("Handling check %s.", protocol)
-			file := strings.TrimPrefix(r.URL.Path, slug)
+			file := path.Base(r.URL.Path)
 
 			// Valid URL: https://bucket-name.s3.region-code.amazonaws.com/key-name
 			requestURL := fmt.Sprintf("%s://%s.s3.%s.amazonaws.com/%s", protocol, creds.BucketName, creds.Region, file)

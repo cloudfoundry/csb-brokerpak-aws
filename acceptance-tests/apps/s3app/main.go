@@ -20,9 +20,9 @@ func main() {
 	log.Printf("Listening on port: %s", p)
 
 	http.Handle("/", app.App(client))
-	http.Handle("/check-https/", app.CheckHTTPSHandler("https", "/check-https/", client.Credentials))
-	http.Handle("/check-http/", app.CheckHTTPSHandler("http", "/check-http/", client.Credentials))
-	http.Handle("/upload-with-public-read-acl/", app.HandleUploadWithACL("/upload-with-public-read-acl/", client, "public-read"))
+	http.Handle("/check-https/", app.CheckHTTPSHandler("https", client.Credentials))
+	http.Handle("/check-http/", app.CheckHTTPSHandler("http", client.Credentials))
+	http.Handle("/upload-with-public-read-acl/", app.HandleUploadWithACL(client, "public-read"))
 	if err := http.ListenAndServe(p, nil); err != http.ErrServerClosed {
 		panic(err)
 	}

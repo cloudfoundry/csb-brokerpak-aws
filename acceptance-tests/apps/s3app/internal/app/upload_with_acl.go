@@ -3,7 +3,7 @@ package app
 import (
 	"log"
 	"net/http"
-	"strings"
+	"path"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 
@@ -13,12 +13,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-func HandleUploadWithACL(slug string, client *credentials.Client, acl string) http.HandlerFunc {
+func HandleUploadWithACL(client *credentials.Client, acl string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling upload with ACL.")
 		switch r.Method {
 		case http.MethodPut:
-			filename := strings.Trim(r.URL.Path, slug)
+			filename := path.Base(r.URL.Path)
 
 			_, err := client.S3Client.PutObject(r.Context(), &s3.PutObjectInput{
 				Bucket:        aws.String(client.Credentials.BucketName),

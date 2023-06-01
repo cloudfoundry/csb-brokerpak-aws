@@ -1,7 +1,7 @@
 package app
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -19,11 +19,11 @@ func handleDownload(w http.ResponseWriter, r *http.Request, filename string, cli
 		Key:    aws.String(filename),
 	})
 	if err != nil {
-		fail(w, http.StatusFailedDependency, "Error downloading file %q: %s", filename, err)
+		fail(w, http.StatusFailedDependency, "Error downloading file %q from bucket %q: %s", filename, client.Credentials.BucketName, err)
 		return
 	}
 
-	fileContents, err := ioutil.ReadAll(obj.Body)
+	fileContents, err := io.ReadAll(obj.Body)
 	if err != nil {
 		fail(w, http.StatusFailedDependency, "Error reading file %q: %s", filename, err)
 		return

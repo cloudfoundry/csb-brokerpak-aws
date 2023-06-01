@@ -53,9 +53,9 @@ var _ = Describe("S3", Label("s3"), func() {
 			"csb-aws-s3-bucket",
 			services.WithPlan("default"),
 			services.WithParameters(map[string]any{
-				"restrict_to_tls_requests_only": true,
-				"acl":                           "public-read",
-				"boc_object_ownership":          "ObjectWriter",
+				"require_tls":          true,
+				"acl":                  "public-read",
+				"boc_object_ownership": "ObjectWriter",
 			}),
 		)
 		defer serviceInstance.Delete()
@@ -89,7 +89,15 @@ var _ = Describe("S3", Label("s3"), func() {
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(BeNumerically("==", http.StatusForbidden))
 
-		By("deleting the file from bucket using the second app")
+		By("updating the service instance to admit HTTP requests")
+		serviceInstance.Update(services.WithParameters(map[string]any{"require_tls": false}))
+
+		By("receiving a successful response when using the app and HTTP request")
+		resp = app.GETResponse("/check-http/%s", filename)
+		defer resp.Body.Close()
+		Expect(resp.StatusCode).To(BeNumerically("==", http.StatusOK))
+
+		By("deleting the file from bucket using the app")
 		app.DELETE(filename)
 	})
 })
