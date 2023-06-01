@@ -109,7 +109,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("sse_bucket_key_enabled", false),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
-					HaveKeyWithValue("restrict_to_tls_requests_only", false),
+					HaveKeyWithValue("require_tls", false),
 				),
 			)
 		})
@@ -130,7 +130,7 @@ var _ = Describe("S3", Label("s3"), func() {
 				"sse_default_algorithm":                   "aws:kms",
 				"aws_access_key_id":                       "fake-aws-access-key-id",
 				"aws_secret_access_key":                   "fake-aws-secret-access-key",
-				"restrict_to_tls_requests_only":           true,
+				"require_tls":                             true,
 			})
 
 			Expect(err).NotTo(HaveOccurred())
@@ -154,7 +154,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("sse_bucket_key_enabled", true),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
-					HaveKeyWithValue("restrict_to_tls_requests_only", true),
+					HaveKeyWithValue("require_tls", true),
 				),
 			)
 		})
@@ -225,7 +225,7 @@ var _ = Describe("S3", Label("s3"), func() {
 			Entry("update ol_configuration_default_retention_years", map[string]any{"ol_configuration_default_retention_years": 42}),
 			Entry("unset ol_configuration_default_retention_years", map[string]any{"ol_configuration_default_retention_years": nil}),
 			Entry("update enable_versioning", map[string]any{"enable_versioning": false}),
-			Entry("update restrict_to_tls_requests_only", map[string]any{"restrict_to_tls_requests_only": true}),
+			Entry("update require_tls", map[string]any{"require_tls": true}),
 		)
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance and lost data",
