@@ -34,6 +34,30 @@ var customMSSQLPlan = map[string]any{
 }
 
 var _ = Describe("MSSQL", Label("MSSQL"), func() {
+	var requiredProperties = func() map[string]any {
+		return map[string]any{
+			"engine":        "sqlserver-ee",
+			"mssql_version": "some-mssql-version",
+			"storage_gb":    20,
+		}
+	}
+
+	var defaultProperties = func() map[string]any {
+		return map[string]any{
+			"region":        "us-west-2",
+			"instance_name": "csb-mssql-0000000",
+			"db_name":       "vsbdb",
+		}
+	}
+
+	var optionalProperties = func() map[string]any {
+		return map[string]any{
+			"rds_vpc_security_group_ids": "some-security-group-ids",
+			"rds_subnet_group":           "some-rds-subnet-group",
+			"instance_class":             "some-instance-class",
+		}
+	}
+
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -66,11 +90,22 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 	})
 
 	Describe("provisioning", func() {
+		DescribeTable("required properties",
+			func(property string) {
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties(), requiredProperties())))
+
+				Expect(err).To(MatchError(ContainSubstring("1 error(s) occurred: (root): " + property + " is required")))
+			},
+			Entry("engine is required", "engine"),
+			Entry("mssql_version is required", "mssql_version"),
+			Entry("storage_gb is required", "storage_gb"),
+		)
+
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", params)
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties(), requiredProperties(), params))
 
-				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+				Expect(err).To(MatchError(ContainSubstring(`1 error(s) occurred: ` + expectedErrorMsg)))
 			},
 			Entry(
 				"invalid region",
@@ -97,14 +132,30 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				map[string]any{"db_name": stringOfLen(65)},
 				"db_name: String length must be less than or equal to 64",
 			),
+			Entry(
+				"engine must be one of the allowed values",
+				map[string]any{"engine": "not-an-allowed-engine"},
+				`engine: engine must be one of the following: \"sqlserver-ee\", \"sqlserver-ex\", \"sqlserver-se\", \"sqlserver-web\"`,
+			),
+			Entry(
+				"storage_gb minimum value is 20",
+				map[string]any{"storage_gb": 19},
+				"storage_gb: Must be greater than or equal to 20",
+			),
 		)
 
 		It("should provision a plan", func() {
-			instanceID, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), nil)
+			instanceID, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), optionalProperties()))
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
+					HaveKeyWithValue("engine", "sqlserver-ee"),
+					HaveKeyWithValue("mssql_version", "some-mssql-version"),
+					HaveKeyWithValue("storage_gb", BeNumerically("==", 20)),
+					HaveKeyWithValue("rds_subnet_group", "some-rds-subnet-group"),
+					HaveKeyWithValue("rds_vpc_security_group_ids", "some-security-group-ids"),
+					HaveKeyWithValue("instance_class", "some-instance-class"),
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-mssql-%s", instanceID)),
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("region", fakeRegion),
@@ -119,14 +170,14 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), nil)
+			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), requiredProperties())
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: value})
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), map[string]any{prop: value}))
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -139,6 +190,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			},
 			Entry("update region", "region", "no-matter-what-region"),
 			Entry("update db_name", "db_name", "no-matter-what-name"),
+			Entry("update instance_name", "instance_name", "no-matter-what-instance-name"),
+			Entry("update rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "no-matter-what-security-group"),
 		)
 	})
 })
