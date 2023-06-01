@@ -38,8 +38,8 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 		"ol_configuration_default_retention_mode":    nil,
 		"ol_configuration_default_retention_days":    nil,
 		"ol_configuration_default_retention_years":   nil,
-		"labels":                        map[string]any{"k1": "v1"},
-		"restrict_to_tls_requests_only": false,
+		"labels":      map[string]any{"k1": "v1"},
+		"require_tls": false,
 	}
 
 	BeforeAll(func() {
@@ -118,12 +118,12 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("explicitly denies access to HTTP requests", func() {
+	Context("setting require_tls to true", func() {
 		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"restrict_to_tls_requests_only": true}))
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"require_tls": true}))
 		})
 
-		It("should create the right resources", func() {
+		It("should create an aws_s3_bucket_policy", func() {
 			Expect(plan.ResourceChanges).To(HaveLen(6))
 
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
