@@ -30,7 +30,7 @@ provision:
       For more information about Microsoft SQL versions on Amazon RDS see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html#SQLServer.Concepts.General.VersionSupport
   - field_name: storage_gb
     required: true
-    type: number
+    type: integer
     details: | 
       Size of storage volume for service instance.
       For more information about Amazon RDS DB instance storage for MSSQL see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html
