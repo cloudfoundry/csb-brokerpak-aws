@@ -60,8 +60,10 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		"aws_access_key_id":                     awsAccessKeyID,
 		"aws_secret_access_key":                 awsSecretAccessKey,
 		"enable_export_postgresql_logs":         false,
+		"skip_destroy_postgresql_logs":          false,
 		"cloudwatch_postgresql_log_group_retention_in_days": 30,
 		"enable_export_upgrade_logs":                        false,
+		"skip_destroy_upgrade_logs":                         false,
 		"cloudwatch_upgrade_log_group_retention_in_days":    30,
 		"cloudwatch_log_groups_kms_key_id":                  "",
 	}
@@ -98,7 +100,9 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"postgres_version":                                  "14.1",
 					"enable_export_postgresql_logs":                     true,
+					"skip_destroy_postgresql_logs":                      true,
 					"enable_export_upgrade_logs":                        true,
+					"skip_destroy_upgrade_logs":                         true,
 					"cloudwatch_postgresql_log_group_retention_in_days": 1,
 					"cloudwatch_upgrade_log_group_retention_in_days":    1,
 					"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
@@ -120,14 +124,14 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-postgresql-test/postgresql"),
 							"retention_in_days": BeNumerically("==", 1),
-							"skip_destroy":      BeFalse(),
+							"skip_destroy":      BeTrue(),
 							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 						}),
 						MatchKeys(IgnoreExtras, Keys{
 							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-postgresql-test/upgrade"),
 							"retention_in_days": BeNumerically("==", 1),
-							"skip_destroy":      BeFalse(),
+							"skip_destroy":      BeTrue(),
 							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 						}),
 					),
@@ -142,6 +146,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					"enable_export_postgresql_logs":                     true,
 					"cloudwatch_postgresql_log_group_retention_in_days": 3,
 					"cloudwatch_log_groups_kms_key_id":                  "",
+					"skip_destroy_postgresql_logs":                      false,
 				}))
 			})
 

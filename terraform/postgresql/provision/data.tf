@@ -56,9 +56,20 @@ locals {
     var.maintenance_day, var.maintenance_start_hour, var.maintenance_start_min,
   var.maintenance_day, var.maintenance_end_hour, var.maintenance_end_min)
 
-  postgresql_log_group = var.enable_export_postgresql_logs == true ? { postgresql : var.cloudwatch_postgresql_log_group_retention_in_days } : {}
-  upgrade_log_group    = var.enable_export_upgrade_logs == true ? { upgrade : var.cloudwatch_upgrade_log_group_retention_in_days } : {}
-  log_groups           = merge(local.postgresql_log_group, local.upgrade_log_group)
+  postgresql_log_group_configuration = {
+    retention_in_days : var.cloudwatch_postgresql_log_group_retention_in_days,
+    skip_destroy : var.skip_destroy_postgresql_logs
+  }
+
+  upgrade_log_group_configuration = {
+    retention_in_days : var.cloudwatch_upgrade_log_group_retention_in_days,
+    skip_destroy : var.skip_destroy_upgrade_logs
+  }
+
+  postgresql_log_group = var.enable_export_postgresql_logs == true ? { postgresql : local.postgresql_log_group_configuration } : {}
+  upgrade_log_group    = var.enable_export_upgrade_logs == true ? { upgrade : local.upgrade_log_group_configuration } : {}
+
+  log_groups = merge(local.postgresql_log_group, local.upgrade_log_group)
 }
 
 data "aws_subnets" "all" {
