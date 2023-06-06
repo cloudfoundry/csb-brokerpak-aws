@@ -36,3 +36,5 @@ variable "ol_configuration_default_retention_mode" { type = string }
 variable "ol_configuration_default_retention_days" { type = number }
 variable "ol_configuration_default_retention_years" { type = number }
 
+variable "require_tls" { type = bool }
+

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"s3app/internal/app"
 	"s3app/internal/credentials"
 )
@@ -13,15 +14,18 @@ func main() {
 	log.Println("Starting.")
 
 	log.Println("Reading credentials.")
-	creds, err := credentials.Read()
-	if err != nil {
+	client := credentials.NewClient()
+
+	p := port()
+	log.Printf("Listening on port: %s", p)
+
+	http.Handle("/", app.App(client))
+	http.Handle("/check-https/", app.CheckHTTPSHandler("https", client.Credentials))
+	http.Handle("/check-http/", app.CheckHTTPSHandler("http", client.Credentials))
+	http.Handle("/upload-with-public-read-acl/", app.HandleUploadWithACL(client, "public-read"))
+	if err := http.ListenAndServe(p, nil); err != http.ErrServerClosed {
 		panic(err)
 	}
-
-	port := port()
-	log.Printf("Listening on port: %s", port)
-	http.Handle("/", app.App(creds))
-	http.ListenAndServe(port, nil)
 }
 
 func port() string {
