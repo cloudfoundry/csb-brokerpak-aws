@@ -281,12 +281,6 @@ provision:
       See AWS Docs for config options: 
       https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_LogAccess.Concepts.PostgreSQL.html#USER_LogAccess.Concepts.PostgreSQL.Query_Logging
       If set will enable the `postgresql` cloud_watch_log_export on the RDS instance.
-  - field_name: skip_destroy_postgresql_logs
-    type: boolean
-    default: false
-    details: |
-      Set to true if you do not wish the log group (and any logs it may contain) to be deleted at a disabling log time or
-      destroy instance time.
   - field_name: cloudwatch_postgresql_log_group_retention_in_days
     type: integer
     details: |
@@ -304,12 +298,6 @@ provision:
     details: |
       If set will enable the `upgrade` cloud_watch_log_export on the RDS instance.
       The upgrade log group only receives logs once a major upgrade happens, in other words, when the `pgupgrade` module is invoked.
-  - field_name: skip_destroy_upgrade_logs
-    type: boolean
-    default: false
-    details: |
-      Set to true if you do not wish the log group (and any logs it may contain) to be deleted at a disabling log time or
-      destroy instance time.
   - field_name: cloudwatch_upgrade_log_group_retention_in_days
     type: integer
     details: |
