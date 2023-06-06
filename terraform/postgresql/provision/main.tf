@@ -89,9 +89,6 @@ resource "aws_db_instance" "db_instance" {
     prevent_destroy = true
   }
 
-  # dependencies happen prior to resource expansion,
-  # so dependencies are always between resource blocks,
-  # not between the individual instances of those resource blocks
   depends_on = [aws_cloudwatch_log_group.this]
 
 }
@@ -121,8 +118,7 @@ resource "aws_cloudwatch_log_group" "this" {
     create_before_destroy = true
   }
   name              = "/aws/rds/instance/${var.instance_name}/${each.key}"
-  retention_in_days = each.value["retention_in_days"]
-  skip_destroy      = each.value["skip_destroy"]
+  retention_in_days = each.value
   kms_key_id        = var.cloudwatch_log_groups_kms_key_id == "" ? null : var.cloudwatch_log_groups_kms_key_id
 
   tags = var.labels

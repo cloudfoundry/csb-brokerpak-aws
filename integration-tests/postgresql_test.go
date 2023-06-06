@@ -101,9 +101,9 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"performance_insights_retention_period: Must be greater than or equal to 7",
 			),
 			Entry(
-				"cloudwatch_postgresql_log_group_retention_in_days minimum value is 0",
-				map[string]any{"cloudwatch_postgresql_log_group_retention_in_days": -1},
-				"cloudwatch_postgresql_log_group_retention_in_days: Must be greater than or equal to 0",
+				"cloudwatch_postgresql_log_group_retention_in_days minimum value is 1",
+				map[string]any{"cloudwatch_postgresql_log_group_retention_in_days": 0},
+				"cloudwatch_postgresql_log_group_retention_in_days: Must be greater than or equal to 1",
 			),
 			Entry(
 				"cloudwatch_postgresql_log_group_retention_in_days maximum value is 3653",
@@ -111,9 +111,9 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"cloudwatch_postgresql_log_group_retention_in_days: Must be less than or equal to 3653",
 			),
 			Entry(
-				"cloudwatch_upgrade_log_group_retention_in_days minimum value is 0",
-				map[string]any{"cloudwatch_upgrade_log_group_retention_in_days": -1},
-				"cloudwatch_upgrade_log_group_retention_in_days: Must be greater than or equal to 0",
+				"cloudwatch_upgrade_log_group_retention_in_days minimum value is 1",
+				map[string]any{"cloudwatch_upgrade_log_group_retention_in_days": 0},
+				"cloudwatch_upgrade_log_group_retention_in_days: Must be greater than or equal to 1",
 			),
 			Entry(
 				"cloudwatch_upgrade_log_group_retention_in_days maximum value is 3653",
