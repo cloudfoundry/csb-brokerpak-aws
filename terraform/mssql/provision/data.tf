@@ -92,11 +92,11 @@ data "aws_security_groups" "provided" {
       error_message = "when specifying rds_vpc_security_group_ids please specify also the corresponding aws_vpc_id"
     }
     postcondition {
-      condition     = length(self.vpc_ids) == 1 && contains(self.vpc_ids, var.aws_vpc_id)
+      condition     = length(distinct(self.vpc_ids)) == 1 && contains(self.vpc_ids, var.aws_vpc_id)
       error_message = "the specified security groups don't exist or don't correspond to the specified vpc (1)"
     }
     postcondition {
-      condition     = split(",", var.rds_vpc_security_group_ids) == self.ids
+      condition     = toset(split(",", var.rds_vpc_security_group_ids)) == toset(self.ids)
       error_message = "the specified security groups don't exist or don't correspond to the specified vpc (2)"
     }
   }
