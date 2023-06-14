@@ -236,7 +236,11 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKey("instance_name"),
-					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("cache_size", BeNil()),
 					HaveKeyWithValue("node_count", BeNumerically("==", 2)),

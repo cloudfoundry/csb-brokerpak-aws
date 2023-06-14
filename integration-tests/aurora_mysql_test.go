@@ -134,7 +134,11 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
 				HaveKeyWithValue("rds_vpc_security_group_ids", BeEmpty()),
 				HaveKeyWithValue("rds_subnet_group", BeEmpty()),
-				HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+				HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+					"pcf-instance-id": Equal(instanceID),
+					"key1":            Equal("value1"),
+					"key2":            Equal("value2"),
+				})),
 				HaveKeyWithValue("deletion_protection", BeFalse()),
 				HaveKeyWithValue("db_cluster_parameter_group_name", BeEmpty()),
 				HaveKeyWithValue("enable_audit_logging", BeFalse()),
@@ -243,6 +247,14 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+
+				Expect(mockTerraform.FirstTerraformInvocationVars()).To(SatisfyAll(
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
+				))
 			},
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),

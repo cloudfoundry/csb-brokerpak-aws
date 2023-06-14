@@ -52,6 +52,7 @@ var _ = BeforeSuite(func() {
 		"CSB_LISTENER_HOST=localhost",
 		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES=true",
 		"GSB_PROVISION_DEFAULTS=" + marshall(map[string]string{"region": fakeRegion}),
+		`GSB_BROKERPAK_CONFIG={"global_labels":[{"key":  "key1", "value":  "value1"},{"key":  "key2", "value":  "value2"}]}`,
 	})).To(Succeed())
 })
 
