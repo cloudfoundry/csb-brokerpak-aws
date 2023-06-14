@@ -13,14 +13,27 @@ import (
 
 var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 	It("can be accessed by an app", Label("JDBC-p"), func() {
-		var (
-			userIn, userOut jdbcapp.AppResponseUser
-			sslInfo         jdbcapp.PostgresSSLInfo
-		)
-
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("default"))
 		defer serviceInstance.Delete()
+
+		postgresTestMultipleApps(serviceInstance)
+	})
+
+	It("works with latest changes to public schema in postgres 15", Label("Postgres15"), func() {
+		By("creating a service instance")
+		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("pg15"))
+		defer serviceInstance.Delete()
+
+		postgresTestMultipleApps(serviceInstance)
+	})
+})
+
+func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
+	var (
+		userIn, userOut jdbcapp.AppResponseUser
+		sslInfo         jdbcapp.PostgresSSLInfo
+	)
 
 		By("pushing the unstarted app")
 		appManifest := jdbcapp.ManifestFor(jdbcapp.PostgreSQL)
@@ -57,5 +70,4 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 
 		By("deleting the entry using the first app")
 		appOne.DELETE("%d", userIn.ID)
-	})
-})
+}
