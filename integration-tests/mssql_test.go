@@ -150,6 +150,11 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("engine", "sqlserver-ee"),
 					HaveKeyWithValue("mssql_version", "some-mssql-version"),
 					HaveKeyWithValue("storage_gb", BeNumerically("==", 20)),

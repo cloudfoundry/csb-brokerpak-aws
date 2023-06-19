@@ -91,7 +91,11 @@ var _ = Describe("S3", Label("s3"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("bucket_name", "csb-"+instanceID),
 					HaveKeyWithValue("enable_versioning", false),
-					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("acl", BeNil()),
 					HaveKeyWithValue("ol_enabled", false),
@@ -138,7 +142,11 @@ var _ = Describe("S3", Label("s3"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("bucket_name", "fake-bucket-name"),
 					HaveKeyWithValue("enable_versioning", true),
-					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("region", "eu-west-1"),
 					HaveKeyWithValue("acl", "public-read"),
 					HaveKeyWithValue("ol_enabled", true),

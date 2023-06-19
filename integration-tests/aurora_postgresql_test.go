@@ -136,7 +136,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
 					HaveKeyWithValue("rds_vpc_security_group_ids", BeEmpty()),
 					HaveKeyWithValue("rds_subnet_group", BeEmpty()),
-					HaveKeyWithValue("labels", HaveKeyWithValue("pcf-instance-id", instanceID)),
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
 					HaveKeyWithValue("engine_version", "13.7"),
 					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),

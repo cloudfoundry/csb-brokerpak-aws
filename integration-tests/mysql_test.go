@@ -123,6 +123,11 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("storage_gb", float64(100)),
 					HaveKeyWithValue("storage_type", "io1"),
 					HaveKeyWithValue("iops", float64(3000)),

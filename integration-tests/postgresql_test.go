@@ -128,6 +128,11 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
 					HaveKeyWithValue("postgres_version", "14.2"),
 					HaveKeyWithValue("storage_gb", float64(100)),
 					HaveKeyWithValue("storage_type", "io1"),
