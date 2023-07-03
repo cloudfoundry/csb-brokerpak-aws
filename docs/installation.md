@@ -88,6 +88,7 @@ The AWS account represented by the access key needs the following permission pol
                 "logs:ListTagsLogGroup",
                 "logs:ListTagsForResource",
                 "logs:UntagLogGroup",
+                "logs:UntagResource",
                 "logs:TagResource",
                 "logs:TagLogGroup",
                 "logs:ListTagsForResource",
