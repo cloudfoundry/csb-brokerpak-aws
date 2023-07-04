@@ -30,8 +30,8 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
-			appOne := apps.Push(apps.WithApp(apps.S3))
-			appTwo := apps.Push(apps.WithApp(apps.S3))
+			appOne := apps.Push(apps.WithApp(apps.S3), apps.WithDisk("2G"))
+			appTwo := apps.Push(apps.WithApp(apps.S3), apps.WithDisk("2G"))
 			defer apps.Delete(appOne, appTwo)
 
 			By("binding the apps to the s3 service instance")

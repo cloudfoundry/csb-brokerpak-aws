@@ -31,6 +31,9 @@ func (a *App) Push(opts ...Option) {
 	if a.buildpack != "" {
 		cmd = append(cmd, "-b", a.buildpack)
 	}
+	if a.disk != "" {
+		cmd = append(cmd, "-k", a.disk)
+	}
 	if a.memory != "" {
 		cmd = append(cmd, "-m", a.memory)
 	}
@@ -81,9 +84,21 @@ func WithDir(dir string) Option {
 	}
 }
 
+func WithDisk(disk string) Option {
+	return func(a *App) {
+		a.disk = disk
+	}
+}
+
 func WithManifest(manifest string) Option {
 	return func(a *App) {
 		a.manifest = manifest
+	}
+}
+
+func WithMemory(memory string) Option {
+	return func(a *App) {
+		a.memory = memory
 	}
 }
 

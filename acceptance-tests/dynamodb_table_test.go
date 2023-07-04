@@ -20,8 +20,8 @@ var _ = Describe("DynamoDB Table", Label("dynamodb-table"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := apps.Push(apps.WithApp(apps.DynamoDBTable))
-		appTwo := apps.Push(apps.WithApp(apps.DynamoDBTable))
+		appOne := apps.Push(apps.WithApp(apps.DynamoDBTable), apps.WithDisk("2G"), apps.WithMemory("100M"))
+		appTwo := apps.Push(apps.WithApp(apps.DynamoDBTable), apps.WithDisk("2G"), apps.WithMemory("100M"))
 		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the DynamoDB Table service instance")
