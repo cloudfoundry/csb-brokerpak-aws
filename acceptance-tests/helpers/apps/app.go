@@ -9,4 +9,5 @@ type App struct {
 	memory    string
 	manifest  string
 	dir       dir
+	disk      string
 }

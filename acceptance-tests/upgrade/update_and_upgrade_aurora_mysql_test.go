@@ -36,8 +36,8 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
-			appOne := apps.Push(apps.WithApp(apps.MySQL))
-			appTwo := apps.Push(apps.WithApp(apps.MySQL))
+			appOne := apps.Push(apps.WithApp(apps.MySQL), apps.WithDisk("2G"))
+			appTwo := apps.Push(apps.WithApp(apps.MySQL), apps.WithDisk("2G"))
 			defer apps.Delete(appOne, appTwo)
 
 			By("binding to the apps")
