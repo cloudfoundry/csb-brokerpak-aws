@@ -31,6 +31,7 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
+  valid_storage_types_for_iops = ["io1", "gp3"]
   engine        = "postgres"
   major_version = split(".", var.postgres_version)[0]
   port          = 5432

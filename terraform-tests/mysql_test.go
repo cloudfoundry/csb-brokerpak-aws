@@ -136,6 +136,29 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			})
 		})
 
+		When("valid type for iops", func() {
+			DescribeTable("iops should be set",
+				func(storageTypeParam map[string]any) {
+					plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, storageTypeParam))
+					instanceData := AfterValuesForType(plan, "aws_db_instance")
+
+					Expect(instanceData).To(
+						MatchKeys(IgnoreExtras, Keys{
+							"storage_type": Equal(storageTypeParam["storage_type"]),
+						}),
+					)
+					Expect("iops").To(BeKeyOf(instanceData))
+				},
+				Entry(
+					"io1",
+					map[string]any{"storage_type": "io1"},
+				),
+				Entry(
+					"gp3",
+					map[string]any{"storage_type": "gp3"},
+				),
+			)
+		})
 	})
 
 	Context("autoscaling", func() {
