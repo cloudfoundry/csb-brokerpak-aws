@@ -44,7 +44,7 @@ func CreateEndpoint(params CreateEndpointParams) *Endpoint {
 		"--endpoint-type", string(params.EndpointType),
 		"--engine-name", params.Engine,
 		"--username", params.Username,
-		"--password", params.Password,
+		fmt.Sprintf("--password=%s", params.Password), // workaround for passwords starting with dashes as suggested in https://github.com/aws/aws-cli/issues/1135#issuecomment-77254897
 		"--port", fmt.Sprintf("%d", params.Port),
 		"--server-name", params.Server,
 		"--database-name", params.DatabaseName,
