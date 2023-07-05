@@ -50,7 +50,7 @@ resource "random_password" "password" {
 resource "aws_db_instance" "db_instance" {
   allocated_storage                     = var.storage_gb
   storage_type                          = var.storage_type
-  iops                                  = var.storage_type == "io1" ? var.iops : null
+  iops                                  = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
   skip_final_snapshot                   = true
   engine                                = var.engine
   engine_version                        = var.engine_version
