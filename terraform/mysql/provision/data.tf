@@ -29,6 +29,8 @@ locals {
     64 = "db.m5.16xlarge"
   }
 
+  valid_storage_types_for_iops = ["io1", "gp3"]
+
   port = 3306
 
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
