@@ -2,7 +2,6 @@ package csbmajorengineversion
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -41,10 +40,9 @@ func ResourceMajorEngineVersionRead(ctx context.Context, data *schema.ResourceDa
 		context.Background(),
 		config.WithCredentialsProvider(aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(settings.AWSAccessKeyID, settings.AWSSecretAccessKey, ""))),
 	)
-	data.SetId("version")
+
 	if err != nil {
-		data.Set(MajorVersionKey, fmt.Sprintf("Error returned from API %s", err))
-		return nil
+		return diag.FromErr(err)
 	}
 
 	awsClient := rds.NewFromConfig(cfg)
@@ -55,17 +53,15 @@ func ResourceMajorEngineVersionRead(ctx context.Context, data *schema.ResourceDa
 		Engine:        &engine,
 		EngineVersion: &engineVersion,
 	})
+
 	if err != nil {
-		data.Set(MajorVersionKey, fmt.Sprintf("Error returned from API %s. Engine %s; engine version %s", err, engine, engineVersion))
-		return nil
+		return diag.FromErr(err)
 	}
 
 	if len(output.DBEngineVersions) == 0 {
-		data.Set("error", fmt.Sprintf("No engine versions returned from API. Engine %s; engine version %s", engine, engineVersion))
-		data.Set(MajorVersionKey, "No data returned from API")
-		return nil
+		return diag.FromErr(err)
 	}
-
+	data.SetId("version")
 	data.Set(MajorVersionKey, output.DBEngineVersions[0].MajorEngineVersion)
 	return nil
 

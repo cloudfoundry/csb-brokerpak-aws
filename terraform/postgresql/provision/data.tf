@@ -75,10 +75,6 @@ data "csbmajorengineversion" "major_version_resource" {
 
   lifecycle {
     postcondition {
-      condition = self.error == null
-      error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled"
-    }
-    postcondition {
       condition = self.major_version == var.postgres_version
       error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled"
     }
