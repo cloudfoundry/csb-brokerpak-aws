@@ -68,15 +68,3 @@ data "aws_subnets" "all" {
     values = [data.aws_vpc.vpc.id]
   }
 }
-
-data "csbmajorengineversion" "major_version_resource" {
-  count = var.auto_minor_version_upgrade ? 1 : 0
-  engine_version = var.postgres_version
-
-  lifecycle {
-    postcondition {
-      condition = self.major_version == var.postgres_version
-      error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled"
-    }
-  }
-}
