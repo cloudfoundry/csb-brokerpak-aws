@@ -11,9 +11,11 @@ terraform {
 }
 
 provider "csbmajorengineversion" {
-  engine = "postgres"
+  engine            = "postgres"
+  access_key_id     = ""
+  secret_access_key = ""
 }
 
 data "csbmajorengineversion" "major_version" {
-  engine_version     = "14.7"
+  engine_version = "14.7"
 }

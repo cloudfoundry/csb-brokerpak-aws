@@ -2,67 +2,49 @@ package csbmajorengineversion
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
-	"github.com/aws/aws-sdk-go-v2/service/rds"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-)
-
-const (
-	EngineVersionKey = "engine_version"
-	MajorVersionKey  = "major_version"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func DataSourceMajorEngineVersion() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			EngineVersionKey: {
-				Type:     schema.TypeString,
-				Required: true,
+			engineVersionKey: {
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringIsNotEmpty,
 			},
-			MajorVersionKey: {
+			majorVersionKey: {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
 		},
-		ReadContext: ResourceMajorEngineVersionRead,
-		Description: "Returns major version value",
+		ReadContext: resourceMajorEngineVersionRead,
+		Description: "Returns major engine version value",
 	}
 }
 
-func ResourceMajorEngineVersionRead(ctx context.Context, data *schema.ResourceData, providerConfig any) diag.Diagnostics {
-	settings := providerConfig.(*RDSSettings)
+func resourceMajorEngineVersionRead(ctx context.Context, d *schema.ResourceData, meta any) diag.Diagnostics {
+	descriptor := meta.(*engineDescriptor)
 
-	cfg, err := config.LoadDefaultConfig(
-		context.Background(),
-		config.WithCredentialsProvider(aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(settings.AWSAccessKeyID, settings.AWSSecretAccessKey, ""))),
-	)
+	engineVersion := d.Get(engineVersionKey).(string)
+	majorEngineVersion, err := descriptor.Describe(ctx, engineVersion)
 
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	awsClient := rds.NewFromConfig(cfg)
-	engine := settings.engine
-	engineVersion := data.Get(EngineVersionKey).(string)
+	d.SetId("version")
 
-	output, err := awsClient.DescribeDBEngineVersions(context.Background(), &rds.DescribeDBEngineVersionsInput{
-		Engine:        &engine,
-		EngineVersion: &engineVersion,
+	tflog.Debug(ctx, "Setting Major DB engine version", map[string]any{
+		"major_engine_version": majorEngineVersion,
 	})
-
-	if err != nil {
+	if err := d.Set(majorVersionKey, majorEngineVersion); err != nil {
 		return diag.FromErr(err)
 	}
-
-	if len(output.DBEngineVersions) == 0 {
-		return diag.FromErr(err)
-	}
-	data.SetId("version")
-	data.Set(MajorVersionKey, output.DBEngineVersions[0].MajorEngineVersion)
 	return nil
 
 }

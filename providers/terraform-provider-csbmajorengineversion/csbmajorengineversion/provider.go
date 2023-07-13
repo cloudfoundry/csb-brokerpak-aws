@@ -1,57 +1,50 @@
-// Package csbmajorengineversion is a Terraform provider specialised for the DynamoDB Namespace service of the AWS brokerpak
+// Package csbmajorengineversion is a Terraform provider designed to get the RDS major version given an engine and a reference version.
 package csbmajorengineversion
 
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-)
-
-const (
-	engineKey             = "engine"
-	awsAccessKeyIDKey     = "access_key_id"
-	awsSecretAccessKeyKey = "secret_access_key"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
-		Schema: map[string]*schema.Schema{
-			engineKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			awsAccessKeyIDKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			awsSecretAccessKeyKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-		},
-		ConfigureContextFunc: providerConfigure,
+		Schema:               ProviderSchema(),
+		ConfigureContextFunc: ProviderConfigureContext,
 		DataSourcesMap: map[string]*schema.Resource{
-			"csbmajorengineversion": DataSourceMajorEngineVersion(),
+			DataResourceNameKey: DataSourceMajorEngineVersion(),
 		},
 	}
 }
 
-func providerConfigure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
-	var (
-		diags                     diag.Diagnostics
-		engine, secret, accessKey string
-	)
-
-	engine = d.Get(engineKey).(string)
-	secret = d.Get(awsSecretAccessKeyKey).(string)
-	accessKey = d.Get(awsAccessKeyIDKey).(string)
-
-	var settings = &RDSSettings{
-		engine:             engine,
-		AWSAccessKeyID:     accessKey,
-		AWSSecretAccessKey: secret,
+func ProviderSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		engineKey: {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringIsNotEmpty,
+		},
+		awsAccessKeyIDKey: {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringIsNotEmpty,
+		},
+		awsSecretAccessKeyKey: {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringIsNotEmpty,
+		},
 	}
+}
 
-	return settings, diags
+func ProviderConfigureContext(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
+	tflog.Debug(ctx, "Configuring Terraform csbmajorengineversion Provider")
+	engine := d.Get(engineKey).(string)
+	secret := d.Get(awsSecretAccessKeyKey).(string)
+	accessKey := d.Get(awsAccessKeyIDKey).(string)
+
+	return NewEngineDescriptor(engine, accessKey, secret), nil
 }
