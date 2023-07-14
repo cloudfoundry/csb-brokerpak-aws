@@ -73,10 +73,6 @@ terraform_binaries:
   version: 1.0.0
   provider: cloudfoundry.org/cloud-service-broker/csbdynamodbns
   url_template: ./providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/${version}/${os}_${arch}/${name}_v${version}
-- name: terraform-provider-csbmajorengineversion
-  version: 1.0.0
-  provider: cloudfoundry.org/cloud-service-broker/csbmajorengineversion
-  url_template: ./providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/${version}/${os}_${arch}/${name}_v${version}
 env_config_mapping:
   AWS_ACCESS_KEY_ID: aws.access_key_id
   AWS_SECRET_ACCESS_KEY: aws.secret_access_key
