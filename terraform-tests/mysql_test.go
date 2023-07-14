@@ -310,4 +310,30 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			})
 		})
 	})
+
+	Context("auto_minor_version_upgrade", func() {
+		When("is enabled and a not major version is selected", func() {
+			It("should complain about postcondition", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "5.7.39",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 5.7 - got: 5.7.39`))
+
+				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "8.0.31",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs = string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 8.0 - got: 8.0.31`))
+			})
+		})
+	})
 })
