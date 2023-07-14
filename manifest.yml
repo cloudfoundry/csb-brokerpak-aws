@@ -65,8 +65,8 @@ terraform_binaries:
   provider: cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
-  version: 1.2.7
-  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.7.zip
+  version: 1.2.8
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.8.zip
   provider: cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
