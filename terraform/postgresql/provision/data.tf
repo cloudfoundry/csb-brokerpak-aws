@@ -76,7 +76,7 @@ data "csbmajorengineversion" "major_version_checker" {
   lifecycle {
     postcondition {
       condition     = self.major_version == var.postgres_version
-      error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected postgres version: ${self.major_version} - got: ${var.postgres_version}"
+      error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: ${self.major_version} - got: ${var.postgres_version}"
     }
   }
 }
