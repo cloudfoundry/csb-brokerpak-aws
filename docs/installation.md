@@ -122,6 +122,7 @@ The AWS account represented by the access key needs the following permission pol
                 "rds:ModifyDBCluster",
                 "rds:ModifyDBInstance",
                 "rds:ModifyDBParameterGroup",
+                "rds:DescribeDBEngineVersions",
                 "s3:BypassGovernanceRetention",
                 "s3:BypassGovernanceRetention",
                 "s3:CreateAccessPoint",

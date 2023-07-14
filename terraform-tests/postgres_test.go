@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+// To execute this test individually: `TF_CLI_CONFIG_FILE="$(pwd)/custom.tfrc" ginkgo --label-filter=postgres-terraform  -v terraform-tests`
 var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
@@ -35,7 +36,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		"rds_subnet_group":                      "",
 		"rds_vpc_security_group_ids":            "",
 		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            true,
+		"auto_minor_version_upgrade":            false,
 		"maintenance_end_hour":                  nil,
 		"maintenance_start_hour":                nil,
 		"maintenance_end_min":                   nil,
@@ -431,6 +432,32 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 						"performance_insights_enabled":          Equal(true),
 						"performance_insights_retention_period": BeNumerically("==", retentionPeriod),
 					}))
+			})
+		})
+	})
+
+	Context("auto_minor_version_upgrade", func() {
+		When("is enabled and a not major version is selected", func() {
+			It("should complain about postcondition", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"postgres_version":           14.2,
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected postgres version: 14 - got: 14.2`))
+
+				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"postgres_version":           14.7,
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs = string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected postgres version: 14 - got: 14.7`))
 			})
 		})
 	})

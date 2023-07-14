@@ -100,10 +100,13 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf prov
 
 
 .PHONY: providers
-providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns # build custom providers
+providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion # build custom providers
 
 providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build
+
+providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion:
+	cd providers/terraform-provider-csbmajorengineversion; $(MAKE) build
 
 ###### Run ###################################################################
 .PHONY: run
@@ -135,6 +138,7 @@ run-examples: providers ## run examples in yml files. Runs examples for all serv
 .PHONY: test-coverage
 test-coverage: ## test coverage score
 	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) ginkgo-coverage
+	- cd providers/terraform-provider-csbmajorengineversion; $(MAKE) ginkgo-coverage
 
 .PHONY: test
 test: lint run-integration-tests ## run the tests
@@ -205,6 +209,7 @@ clean: ## delete build files
 	- rm -f ./cloud-service-broker
 	- rm -f ./brokerpak-user-docs.md
 	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) clean
+	- cd providers/terraform-provider-csbmajorengineversion; $(MAKE) clean
 
 $(PAK_BUILD_CACHE_PATH):
 	@echo "Folder $(PAK_BUILD_CACHE_PATH) does not exist. Creating it..."
