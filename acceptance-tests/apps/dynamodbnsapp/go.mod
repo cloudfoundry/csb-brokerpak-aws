@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.20.0
 	github.com/cloudfoundry-community/go-cfenv v1.18.0
 	github.com/go-chi/chi/v5 v5.0.10
-	github.com/go-chi/render v1.0.2
+	github.com/go-chi/render v1.0.3
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
