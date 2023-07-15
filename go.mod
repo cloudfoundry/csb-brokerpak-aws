@@ -5,7 +5,7 @@ go 1.20
 require (
 	code.cloudfoundry.org/jsonry v1.1.4
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/cloudfoundry/cloud-service-broker v0.19.1
+	github.com/cloudfoundry/cloud-service-broker v0.19.2
 	github.com/hashicorp/terraform-json v0.17.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.11.0
