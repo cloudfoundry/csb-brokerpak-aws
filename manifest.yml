@@ -46,8 +46,8 @@ terraform_binaries:
   source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
   default: true
 - name: terraform-provider-aws
-  version: 4.67.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v4.67.0.zip
+  version: 5.8.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.8.0.zip
 - name: terraform-provider-random
   version: 3.5.1
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.5.1.zip
@@ -55,8 +55,8 @@ terraform_binaries:
   version: 1.9.0
   source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
 - name: terraform-provider-postgresql
-  version: 1.19.0
-  source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.19.0.zip
+  version: 1.20.0
+  source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.20.0.zip
   provider: cyrilgdn/postgresql
   url_template: https://github.com/cyrilgdn/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbpg

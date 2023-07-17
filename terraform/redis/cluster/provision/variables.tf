@@ -46,3 +46,4 @@ variable "logs_slow_log_loggroup_kms_key_id" { type = string }
 variable "logs_engine_log_enabled" { type = bool }
 variable "logs_engine_log_loggroup_retention_in_days" { type = number }
 variable "logs_engine_log_loggroup_kms_key_id" { type = string }
+variable "auto_minor_version_upgrade" { type = bool }
