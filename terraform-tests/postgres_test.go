@@ -435,7 +435,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			It("should complain about postcondition", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": true,
-					"postgres_version":           14.2,
+					"postgres_version":           "14.2",
 				}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
@@ -445,13 +445,43 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 
 				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": true,
-					"postgres_version":           14.7,
+					"postgres_version":           "14.7",
 				}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				msgs = string(session.Out.Contents())
 				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
 				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 14 - got: 14.7`))
+			})
+		})
+
+		When("is disabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"postgres_version":           "14",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("14"),
+					}))
+			})
+		})
+
+		When("is disabled and a minor version is selected", func() {
+			It("should not complain about postcondition and create the instance", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"postgres_version":           "14.7",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("14.7"),
+					}))
 			})
 		})
 	})
