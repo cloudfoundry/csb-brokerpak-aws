@@ -3,6 +3,8 @@ package terraformtests
 import (
 	"path"
 
+	"github.com/onsi/gomega/gbytes"
+
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -57,6 +59,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"logs_engine_log_loggroup_kms_key_id":        "",
 		"logs_engine_log_loggroup_retention_in_days": 0,
 		"logs_engine_log_enabled":                    false,
+		"auto_minor_version_upgrade":                 false,
 	}
 
 	BeforeAll(func() {
@@ -398,6 +401,40 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 				"automatic_failover_enabled": BeFalse(),
 				"multi_az_enabled":           BeFalse(),
 			}))
+		})
+	})
+
+	Context("auto_minor_version_upgrade is true", func() {
+		Context("redis_version ends with .x", func() {
+			JustBeforeEach(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"redis_version":              "6.x",
+				}))
+			})
+
+			It("should proceed with provisioning with the specified values", func() {
+				Expect(AfterValuesForType(plan, resource)).To(MatchKeys(IgnoreExtras, Keys{
+					"auto_minor_version_upgrade": Equal("true"),
+					"engine_version":             Equal("6.x"),
+				}))
+			})
+		})
+
+		Context("redis_version does not end in .x", func() {
+			DescribeTable("should return an error",
+				func(version string) {
+					session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+						"auto_minor_version_upgrade": true,
+						"redis_version":              version,
+					}))
+
+					Expect(session.ExitCode()).NotTo(Equal(0))
+					Expect(session).To(gbytes.Say(`A version in the form d.x should be specified if auto_minor_version_upgrade is enabled. For example\: 6.x`))
+				},
+				Entry("6.0", "6.0"),
+				Entry("7.0", "7.0"),
+			)
 		})
 	})
 })

@@ -120,6 +120,12 @@ provision:
     type: boolean
     details: Automatically promote replica to primary if the existing primary fails. Only applies when `node_count` is greater than 1.
     default: true
+  - field_name: auto_minor_version_upgrade
+    type: boolean
+    details: | 
+      Specifies whether minor version engine upgrades will be applied automatically to the underlying Cache Cluster instances.
+      Only supported for redis version is 6 or higher.
+    default: false
   - <<: &nullable_string
       type: string
       default: null

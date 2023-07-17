@@ -208,7 +208,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Expect(err).To(MatchError(ContainSubstring("additional properties are not allowed: cache_size")))
 		})
 
-		It("should keeping working as before for existing customers relying on `cache_size` property", func() {
+		It("should keep working as before for existing customers relying on `cache_size` property", func() {
 			_, err := broker.Provision(redisServiceName, deprecatedCacheSizePlanName, map[string]any{})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -218,7 +218,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				))
 		})
 
-		It("should keeping working as before for existing customers relying on `cache_size` property and per-instance `node_type`", func() {
+		It("should keep working as before for existing customers relying on `cache_size` property and per-instance `node_type`", func() {
 			_, err := broker.Provision(redisServiceName, deprecatedCacheSizePlanName, map[string]any{"node_type": "cache.t2.micro"})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -276,6 +276,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("logs_engine_log_enabled", BeFalse()),
 					HaveKeyWithValue("logs_engine_log_loggroup_retention_in_days", BeNumerically("==", 0)),
 					HaveKeyWithValue("logs_engine_log_loggroup_kms_key_id", BeEmpty()),
+					HaveKeyWithValue("auto_minor_version_upgrade", BeFalse()),
 				))
 		})
 
@@ -313,6 +314,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"logs_engine_log_enabled":                    true,
 				"logs_engine_log_loggroup_retention_in_days": 2,
 				"logs_engine_log_loggroup_kms_key_id":        "engine-log-key",
+				"auto_minor_version_upgrade":                 true,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -351,6 +353,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("logs_engine_log_enabled", BeTrue()),
 					HaveKeyWithValue("logs_engine_log_loggroup_retention_in_days", BeNumerically("==", 2)),
 					HaveKeyWithValue("logs_engine_log_loggroup_kms_key_id", "engine-log-key"),
+					HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
 				),
 			)
 		})
@@ -448,6 +451,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("logs_engine_log_enabled", "logs_engine_log_enabled", true),
 			Entry("logs_engine_log_loggroup_retention_in_days", "logs_engine_log_loggroup_retention_in_days", 5),
 			Entry("logs_engine_log_loggroup_kms_key_id", "logs_engine_log_loggroup_kms_key_id", "engine-log-key-2"),
+			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", true),
 		)
 	})
 

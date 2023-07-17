@@ -76,3 +76,13 @@ data "aws_subnets" "all" {
     values = [data.aws_vpc.vpc.id]
   }
 }
+
+resource "terraform_data" "major_version" {
+  count = var.auto_minor_version_upgrade == true ? 1 : 0
+  lifecycle {
+    precondition {
+      condition     = endswith(var.redis_version, ".x")
+      error_message = "A version in the form d.x should be specified if auto_minor_version_upgrade is enabled. For example: 6.x"
+    }
+  }
+}
