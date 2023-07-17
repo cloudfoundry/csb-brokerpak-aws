@@ -25,7 +25,7 @@ var (
 )
 
 var _ = Describe("Provider", func() {
-
+	var region = "us-west-2"
 	DescribeTable("Major engine version can be obtained", func(engine, engineVersion, majorVersion, expectedErrorMessage string) {
 		provider := initTestProvider()
 		resource.Test(GinkgoT(), resource.TestCase{
@@ -36,7 +36,13 @@ var _ = Describe("Provider", func() {
 				failIfEnvEmpty(secretAccessKey)
 			},
 			Steps: []resource.TestStep{{
-				Config: testGetConfiguration(os.Getenv(accessKeyID), os.Getenv(secretAccessKey), engine, engineVersion),
+				Config: testGetConfiguration(
+					os.Getenv(accessKeyID),
+					os.Getenv(secretAccessKey),
+					region,
+					engine,
+					engineVersion,
+				),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(tfStateDataResourceName, "engine_version", engineVersion),
 					resource.TestCheckResourceAttr(tfStateDataResourceName, "id", "version"),
@@ -97,18 +103,19 @@ func getTestProviderFactories(provider *schema.Provider) map[string]func() (*sch
 	}
 }
 
-func testGetConfiguration(accessKeyID, secretAccessKey, engine, engineVersion string) string {
+func testGetConfiguration(accessKeyID, secretAccessKey, region, engine, engineVersion string) string {
 	return fmt.Sprintf(`
 provider "csbmajorengineversion" {
   engine 			= %[1]q
   access_key_id     = %[2]q
   secret_access_key = %[3]q
+  region            = %[4]q
 }
 
 data "csbmajorengineversion" "major_version" {
-  engine_version     = %[4]q
+  engine_version     = %[5]q
 }
-`, engine, accessKeyID, secretAccessKey, engineVersion)
+`, engine, accessKeyID, secretAccessKey, region, engineVersion)
 }
 
 func failIfEnvEmpty(name string) {

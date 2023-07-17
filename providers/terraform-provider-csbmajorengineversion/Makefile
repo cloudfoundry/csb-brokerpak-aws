@@ -30,9 +30,11 @@ help: ## list Makefile targets
 test: version download checkfmt checkimports vet ginkgo ## run all build, static analysis, and test steps
 
 .PHONY: build
-build: version download checkfmt checkimports vet ../build/cloudfoundry.org ## build the provider
+build: version download checkfmt checkimports vet build_binaries_in_cloudfoundry_namespace ## build the provider
 
-../build/cloudfoundry.org: *.go */*.go
+
+.PHONY: build_binaries_in_cloudfoundry_namespace
+build_binaries_in_cloudfoundry_namespace:
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/linux_amd64
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/darwin_amd64
 	CGO_ENABLED=0 GOOS=linux $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/linux_amd64/terraform-provider-csbmajorengineversion_v$(VERSION)
