@@ -68,10 +68,7 @@ resource "aws_elasticache_replication_group" "redis" {
   snapshot_window             = local.backup_window
   parameter_group_name        = var.parameter_group_name
   preferred_cache_cluster_azs = var.preferred_azs
-
-  // automatic upgrades are problematic because during the next update
-  // Terraform detects engine_version difference attempts to re-create
-  auto_minor_version_upgrade = false
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
 
   dynamic "log_delivery_configuration" {
     for_each = var.logs_slow_log_enabled ? [null] : []
