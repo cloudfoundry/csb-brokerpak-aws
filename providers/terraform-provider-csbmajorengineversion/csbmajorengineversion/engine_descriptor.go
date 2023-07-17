@@ -15,10 +15,11 @@ type engineDescriptor struct {
 	engine          string
 	accessKeyID     string
 	secretAccessKey string
+	region          string
 }
 
-func NewEngineDescriptor(engine, accessKeyID, secretAccessKey string) *engineDescriptor {
-	return &engineDescriptor{engine: engine, accessKeyID: accessKeyID, secretAccessKey: secretAccessKey}
+func NewEngineDescriptor(engine, accessKeyID, secretAccessKey, region string) *engineDescriptor {
+	return &engineDescriptor{engine: engine, accessKeyID: accessKeyID, secretAccessKey: secretAccessKey, region: region}
 }
 
 func (e *engineDescriptor) Describe(ctx context.Context, engineVersion string) (string, error) {
@@ -34,11 +35,13 @@ func (e *engineDescriptor) Describe(ctx context.Context, engineVersion string) (
 		"engine_version": engineVersion,
 	})
 	awsClient := rds.NewFromConfig(cfg)
-	output, err := awsClient.DescribeDBEngineVersions(ctx, &rds.DescribeDBEngineVersionsInput{
+	params := &rds.DescribeDBEngineVersionsInput{
 		Engine:        aws.String(e.engine),
 		EngineVersion: aws.String(engineVersion),
 		IncludeAll:    aws.Bool(true), // If false, Postgres version 14.2 does not return any output because it is no longer listed in the AWS console
-	})
+	}
+	optFns := func(options *rds.Options) { options.Region = e.region }
+	output, err := awsClient.DescribeDBEngineVersions(ctx, params, optFns)
 	if err != nil {
 		return "", err
 	}

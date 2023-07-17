@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+// To execute this test individually: `TF_CLI_CONFIG_FILE="$(pwd)/custom.tfrc" ginkgo --label-filter=postgres-terraform  -v terraform-tests`
 var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
@@ -26,7 +27,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		"publicly_accessible":                   false,
 		"multi_az":                              false,
 		"instance_class":                        "db.r5.large",
-		"postgres_version":                      14,
+		"postgres_version":                      "14",
 		"aws_vpc_id":                            awsVPCID,
 		"storage_autoscale":                     false,
 		"storage_autoscale_limit_gb":            0,
@@ -74,9 +75,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	Context("cloud watch log groups", func() {
 		When("no parameters passed", func() {
 			BeforeAll(func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"postgres_version": "14.1",
-				}))
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars))
 			})
 
 			It("should not create a cloud watch log group", func() {
@@ -96,7 +95,6 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		When("log groups enabled", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"postgres_version":                                  "14.1",
 					"enable_export_postgresql_logs":                     true,
 					"enable_export_upgrade_logs":                        true,
 					"cloudwatch_postgresql_log_group_retention_in_days": 1,
@@ -138,7 +136,6 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		When("only one log group is enabled", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"postgres_version":                                  "14.1",
 					"enable_export_postgresql_logs":                     true,
 					"cloudwatch_postgresql_log_group_retention_in_days": 3,
 					"cloudwatch_log_groups_kms_key_id":                  "",
@@ -170,9 +167,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	Context("postgres parameter groups", func() {
 		When("no parameter group name passed", func() {
 			BeforeAll(func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"postgres_version": "14.1",
-				}))
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars))
 			})
 
 			It("should create a parameter group", func() {
@@ -430,6 +425,62 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					MatchKeys(IgnoreExtras, Keys{
 						"performance_insights_enabled":          Equal(true),
 						"performance_insights_retention_period": BeNumerically("==", retentionPeriod),
+					}))
+			})
+		})
+	})
+
+	Context("auto_minor_version_upgrade", func() {
+		When("is enabled and a not major version is selected", func() {
+			It("should complain about postcondition", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"postgres_version":           "14.2",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 14 - got: 14.2`))
+
+				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"postgres_version":           "14.7",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs = string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 14 - got: 14.7`))
+			})
+		})
+
+		When("is disabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"postgres_version":           "14",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("14"),
+					}))
+			})
+		})
+
+		When("is disabled and a minor version is selected", func() {
+			It("should not complain about postcondition and create the instance", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"postgres_version":           "14.7",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("14.7"),
 					}))
 			})
 		})

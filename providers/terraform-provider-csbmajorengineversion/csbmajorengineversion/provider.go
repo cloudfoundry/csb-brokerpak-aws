@@ -37,6 +37,11 @@ func ProviderSchema() map[string]*schema.Schema {
 			Required:     true,
 			ValidateFunc: validation.StringIsNotEmpty,
 		},
+		awsRegionKey: {
+			Type:         schema.TypeString,
+			Required:     true,
+			ValidateFunc: validation.StringIsNotEmpty,
+		},
 	}
 }
 
@@ -45,6 +50,7 @@ func ProviderConfigureContext(ctx context.Context, d *schema.ResourceData) (any,
 	engine := d.Get(engineKey).(string)
 	secret := d.Get(awsSecretAccessKeyKey).(string)
 	accessKey := d.Get(awsAccessKeyIDKey).(string)
+	region := d.Get(awsRegionKey).(string)
 
-	return NewEngineDescriptor(engine, accessKey, secret), nil
+	return NewEngineDescriptor(engine, accessKey, secret, region), nil
 }

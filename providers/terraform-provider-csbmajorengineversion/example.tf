@@ -1,6 +1,3 @@
-# Run "make init" to perform "terraform init"
-# The easiest way to get a DynamoDB is: docker run -p 8000:8000 -t amazon/dynamodb-local
-
 terraform {
   required_providers {
     csbmajorengineversion = {
@@ -14,6 +11,7 @@ provider "csbmajorengineversion" {
   engine            = "postgres"
   access_key_id     = ""
   secret_access_key = ""
+  region            = "us-west-2"
 }
 
 data "csbmajorengineversion" "major_version" {
