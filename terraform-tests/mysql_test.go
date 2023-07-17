@@ -335,5 +335,35 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 8.0 - got: 8.0.31`))
 			})
 		})
+
+		When("is disabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"engine_version":             "5.7",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("5.7"),
+					}))
+			})
+		})
+
+		When("is disabled and a minor version is selected", func() {
+			It("should not complain about postcondition and create the instance", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"engine_version":             "5.7.42",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("5.7.42"),
+					}))
+			})
+		})
 	})
 })
