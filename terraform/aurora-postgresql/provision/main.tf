@@ -35,7 +35,7 @@ resource "random_password" "password" {
 
 resource "aws_rds_cluster" "cluster" {
   cluster_identifier              = var.instance_name
-  engine                          = "aurora-postgresql"
+  engine                          = local.engine
   engine_version                  = var.engine_version
   database_name                   = var.db_name
   tags                            = var.labels

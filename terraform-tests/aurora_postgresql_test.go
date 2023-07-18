@@ -38,7 +38,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"deletion_protection":                   false,
 		"require_ssl":                           false,
 		"db_cluster_parameter_group_name":       "",
-		"engine_version":                        "14.7",
+		"engine_version":                        "14",
 		"monitoring_interval":                   0,
 		"monitoring_role_arn":                   "",
 		"performance_insights_enabled":          false,
@@ -293,13 +293,13 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 	Context("engine_version", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"engine_version": "8.0.postgresql_aurora.3.02.0",
+				"engine_version": "14.3",
 			}))
 		})
 
 		It("passes the correct engine_version", func() {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine_version": Equal("8.0.postgresql_aurora.3.02.0"),
+				"engine_version": Equal("14.3"),
 			}))
 		})
 	})
@@ -340,6 +340,76 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				)
 			})
 
+		})
+	})
+
+	Context("auto_minor_version_upgrade", func() {
+		When("is enabled and a not major version is selected", func() {
+			It("should complain about postcondition", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "14.3",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 14 - got: 14.3`))
+
+				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "15.3",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs = string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 15 - got: 15.3`))
+			})
+		})
+
+		When("is disabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"engine_version":             "14",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"engine_version": Equal("14"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("14"),
+					}),
+				)
+			})
+		})
+
+		When("is disabled and a minor version is selected", func() {
+			It("should not complain about postcondition and create the instance", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"engine_version":             "14.7",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"engine_version": Equal("14.7"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("14.7"),
+					}),
+				)
+			})
 		})
 	})
 })

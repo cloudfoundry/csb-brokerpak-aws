@@ -78,7 +78,10 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			// changes the lifecycle of the resource aws_rds_cluster_parameter_group
 			// when the new resource aws_rds_cluster_parameter_group is created and the changes are applied immediately,
 			// we can upgrade the version
-			serviceInstance.Update(services.WithParameters(map[string]any{"engine_version": "14.7"}))
+			serviceInstance.Update(services.WithParameters(map[string]any{
+				"engine_version":             "14.7",
+				"auto_minor_version_upgrade": false,
+			}))
 
 			By("checking previously written data still accessible")
 			got = appTwo.GET("%s/%s", schema, keyOne).String()

@@ -23,7 +23,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		By("creating a service instance")
 		params := map[string]any{
-			"engine_version":    "13.7",
+			"engine_version":    "13",
 			"cluster_instances": 2,
 			"instance_class":    "db.r5.large",
 		}
