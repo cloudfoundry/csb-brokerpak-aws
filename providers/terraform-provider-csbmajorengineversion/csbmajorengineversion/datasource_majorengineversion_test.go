@@ -80,9 +80,9 @@ var _ = Describe("Provider", func() {
 		Entry(
 			"aurora-postgresql 8.0.postgresql_aurora.3.02.0",
 			"aurora-postgresql",
-			"8.0.postgresql_aurora.3.02.0",
+			"invalid_engine_version",
 			"xx",
-			"Error: invalid parameter combination. API does not return any db engine version - engine aurora-postgresql - engine version 8.0.postgresql_aurora.3.02.0",
+			"Error: invalid parameter combination. API does not return any db engine version - engine aurora-postgresql - engine version invalid_engine_version",
 		),
 	)
 
