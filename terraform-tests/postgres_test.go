@@ -36,7 +36,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		"rds_subnet_group":                      "",
 		"rds_vpc_security_group_ids":            "",
 		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            false,
+		"auto_minor_version_upgrade":            true,
 		"maintenance_end_hour":                  nil,
 		"maintenance_start_hour":                nil,
 		"maintenance_end_min":                   nil,
