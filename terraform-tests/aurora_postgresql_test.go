@@ -111,7 +111,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"copy_tags_to_snapshot":              BeTrue(),
 				"deletion_protection":                BeFalse(),
 				"storage_encrypted":                  BeTrue(),
-				"engine_version":                     Equal("14.7"),
+				"engine_version":                     Equal("14"),
 				"apply_immediately":                  BeTrue(),
 			}))
 		})
