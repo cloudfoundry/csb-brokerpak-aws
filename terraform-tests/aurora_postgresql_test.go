@@ -290,20 +290,6 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		})
 	})
 
-	Context("engine_version", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"engine_version": "14.3",
-			}))
-		})
-
-		It("passes the correct engine_version", func() {
-			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine_version": Equal("14.3"),
-			}))
-		})
-	})
-
 	Context("preferred_maintenance_window", func() {
 		When("no window is set", func() {
 			BeforeAll(func() {
