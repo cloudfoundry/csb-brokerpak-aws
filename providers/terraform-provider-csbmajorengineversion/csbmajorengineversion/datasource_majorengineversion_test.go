@@ -51,6 +51,10 @@ var _ = Describe("Provider", func() {
 			}},
 			ErrorCheck: func(err error) error {
 				if err != nil {
+					if expectedErrorMessage == "" {
+						return err
+					}
+
 					if strings.Contains(err.Error(), expectedErrorMessage) {
 						return nil
 					}
@@ -73,6 +77,13 @@ var _ = Describe("Provider", func() {
 		Entry("mysql 8.0.32", "mysql", "8.0.32", "8.0", ""),
 		Entry("no engine", "", "", "8.0.32", `Error: expected "engine" to not be an empty string`),
 		Entry("no engine version", "mysql", "", "", `Error: expected "engine_version" to not be an empty string`),
+		Entry(
+			"aurora-postgresql 8.0.postgresql_aurora.3.02.0",
+			"aurora-postgresql",
+			"invalid_engine_version",
+			"xx",
+			"Error: invalid parameter combination. API does not return any db engine version - engine aurora-postgresql - engine version invalid_engine_version",
+		),
 	)
 
 })
