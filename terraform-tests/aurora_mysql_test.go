@@ -28,7 +28,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"cluster_instances":                      3,
 		"serverless_min_capacity":                nil,
 		"serverless_max_capacity":                nil,
-		"engine_version":                         nil,
+		"engine_version":                         "8.0",
 		"rds_subnet_group":                       "",
 		"rds_vpc_security_group_ids":             "",
 		"allow_major_version_upgrade":            true,
@@ -270,20 +270,6 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		})
 	})
 
-	Context("engine_version", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"engine_version": "8.0.mysql_aurora.3.02.0",
-			}))
-		})
-
-		It("passes the min_capacity, max_capacity and correct instance_class", func() {
-			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine_version": Equal("8.0.mysql_aurora.3.02.0"),
-			}))
-		})
-	})
-
 	Context("preferred_maintenance_window", func() {
 		When("no window is set", func() {
 			BeforeAll(func() {
@@ -320,6 +306,76 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				)
 			})
 
+		})
+	})
+
+	Context("auto_minor_version_upgrade", func() {
+		When("is enabled and a not major version is selected", func() {
+			It("should complain about postcondition", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "8.0.mysql_aurora.3.02.0",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 8.0 - got: 8.0.mysql_aurora.3.02.0`))
+
+				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "5.7.mysql_aurora.2.07.0",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs = string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 5.7 - got: 5.7.mysql_aurora.2.07.0`))
+			})
+		})
+
+		When("is disabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"engine_version":             "5.7",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"engine_version": Equal("5.7"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("5.7"),
+					}),
+				)
+			})
+		})
+
+		When("is disabled and a minor version is selected", func() {
+			It("should not complain about postcondition and create the instance", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"engine_version":             "5.7.mysql_aurora.2.07.0",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"engine_version": Equal("5.7.mysql_aurora.2.07.0"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("5.7.mysql_aurora.2.07.0"),
+					}),
+				)
+			})
 		})
 	})
 })

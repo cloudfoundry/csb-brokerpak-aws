@@ -25,9 +25,10 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		By("creating a service instance")
 
 		params := map[string]any{
-			"cluster_instances": 2,
-			"instance_class":    "db.r5.large",
-			"engine_version":    "8.0.mysql_aurora.3.02.2",
+			"cluster_instances":          2,
+			"instance_class":             "db.r5.large",
+			"engine_version":             "8.0.mysql_aurora.3.02.2",
+			"auto_minor_version_upgrade": false,
 		}
 
 		serviceInstance := services.CreateInstance(
@@ -92,6 +93,6 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		b, err := io.ReadAll(response.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
 		Expect(string(b)).To(ContainSubstring("error connecting to database: failed to verify the connection"), "force TLS is enabled by default")
-		Expect(string(b)).To(ContainSubstring("Error 1045 (28000): Access denied for user"), "postgresql client cannot connect to the postgres server due to invalid TLS")
+		Expect(string(b)).To(ContainSubstring("Error 1045 (28000): Access denied for user"), "mysql client cannot connect to the mysql server due to invalid TLS")
 	})
 })

@@ -22,6 +22,17 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 			defer serviceBroker.Delete()
 
 			By("creating a service")
+			// The auto minor version upgrade is enabled by default.
+			// Performing tests using the major version for aurora-mysql 8, in other words, version 8.0
+			// we received this error:
+			// Error: creating RDS Cluster (csb-auroramysql-xxxx):
+			// InvalidParameterCombination: Cannot find version 8.0.mysql_aurora.3.04.0 for aurora-mysql status code: 400
+			//
+			// The `8.0.mysql_aurora.3.04.0` version does not appear in the AWS console or by running the following commands:
+			// `aws rds describe-db-engine-versions --engine aurora-mysql --engine-version 8.0 --region us-west-2`
+			// or `aws rds describe-db-engine-versions --engine aurora-mysql --output text --region us-west-2`
+			// There is no open incidence in the provider mentioning anything about it.
+			// We change the test and proceed to document issue.
 			serviceInstance := services.CreateInstance(
 				"csb-aws-aurora-mysql",
 				services.WithPlan("default"),
@@ -29,7 +40,7 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 					map[string]any{
 						"cluster_instances": 1,
 						"instance_class":    "db.r5.large",
-						"engine_version":    "8.0.mysql_aurora.3.02.2",
+						"engine_version":    "5.7",
 					}),
 				services.WithBroker(serviceBroker),
 			)
@@ -64,7 +75,7 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 			Expect(appTwo.GET(key).String()).To(Equal(value))
 
 			By("updating the instance")
-			serviceInstance.Update(services.WithParameters(map[string]any{"auto_minor_version_upgrade": false}))
+			serviceInstance.Update(services.WithParameters(map[string]any{"cluster_instances": 2}))
 
 			By("getting the value using the second app")
 			Expect(appTwo.GET(key).String()).To(Equal(value))

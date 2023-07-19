@@ -11,6 +11,7 @@ data "aws_subnets" "all" {
 }
 
 locals {
+  engine     = "aurora-mysql"
   port       = 3306
   serverless = var.serverless_max_capacity != null || var.serverless_min_capacity != null
 
@@ -35,4 +36,16 @@ locals {
     var.preferred_maintenance_end_hour,
     var.preferred_maintenance_end_min
   )
+}
+
+data "csbmajorengineversion" "major_version_checker" {
+  count          = var.auto_minor_version_upgrade ? 1 : 0
+  engine_version = var.engine_version
+
+  lifecycle {
+    postcondition {
+      condition     = self.major_version == var.engine_version
+      error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: ${self.major_version} - got: ${var.engine_version}"
+    }
+  }
 }
