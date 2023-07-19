@@ -32,7 +32,7 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 		defer csbServiceInstance.Delete()
 
 		By("pushing and binding an app")
-		app := apps.Push(apps.WithApp(apps.DynamoDBNamespace), apps.WithDisk("2G"), apps.WithMemory("100M"))
+		app := apps.Push(apps.WithApp(apps.DynamoDBNamespace))
 		defer apps.Delete(app)
 		legacyBinding := legacyServiceInstance.Bind(app)
 		apps.Start(app)

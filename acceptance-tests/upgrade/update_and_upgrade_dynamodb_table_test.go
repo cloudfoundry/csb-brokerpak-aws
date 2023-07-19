@@ -33,8 +33,8 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
-			appOne := apps.Push(apps.WithApp(apps.DynamoDBTable), apps.WithDisk("2G"))
-			appTwo := apps.Push(apps.WithApp(apps.DynamoDBTable), apps.WithDisk("2G"))
+			appOne := apps.Push(apps.WithApp(apps.DynamoDBTable))
+			appTwo := apps.Push(apps.WithApp(apps.DynamoDBTable))
 			defer apps.Delete(appOne, appTwo)
 
 			By("binding the apps to the DynamoDB Table service instance")
