@@ -377,5 +377,45 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				)
 			})
 		})
+
+		When("is enabled", func() {
+			It("should not complain about postcondition and create the instance if engine version is null", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             nil,
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"engine": Equal("aurora-mysql"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeTrue(),
+					}),
+				)
+			})
+
+			It("should not complain about postcondition and create the instance if engine version is empty", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"engine_version":             "",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"engine": Equal("aurora-mysql"),
+					}),
+				)
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeTrue(),
+					}),
+				)
+			})
+		})
 	})
 })

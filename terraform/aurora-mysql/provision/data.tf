@@ -36,10 +36,12 @@ locals {
     var.preferred_maintenance_end_hour,
     var.preferred_maintenance_end_min
   )
+
+  engine_version_is_defined = var.engine_version != "" && var.engine_version != null
 }
 
 data "csbmajorengineversion" "major_version_checker" {
-  count          = var.auto_minor_version_upgrade ? 1 : 0
+  count          = var.auto_minor_version_upgrade && local.engine_version_is_defined ? 1 : 0
   engine_version = var.engine_version
 
   lifecycle {
