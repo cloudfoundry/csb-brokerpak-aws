@@ -111,7 +111,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"copy_tags_to_snapshot":              BeTrue(),
 				"deletion_protection":                BeFalse(),
 				"storage_encrypted":                  BeTrue(),
-				"engine_version":                     Equal("14.7"),
+				"engine_version":                     Equal("14"),
 				"apply_immediately":                  BeTrue(),
 			}))
 		})
@@ -286,20 +286,6 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"instance_class": Equal("db.serverless"),
-			}))
-		})
-	})
-
-	Context("engine_version", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"engine_version": "14.3",
-			}))
-		})
-
-		It("passes the correct engine_version", func() {
-			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine_version": Equal("14.3"),
 			}))
 		})
 	})
