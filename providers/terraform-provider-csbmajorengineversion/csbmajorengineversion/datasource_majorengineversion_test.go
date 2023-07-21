@@ -69,6 +69,7 @@ var _ = Describe("Provider", func() {
 		Entry("postgres 15", "postgres", "15.3", "15", ""),
 		Entry("aurora-mysql 8", "aurora-mysql", "8.0", "8.0", ""),
 		Entry("aurora-mysql 8.0.mysql_aurora.3.03.1", "aurora-mysql", "8.0.mysql_aurora.3.03.1", "8.0", ""),
+		Entry("aurora-mysql 5.7.mysql_aurora.2.07.0", "aurora-mysql", "5.7.mysql_aurora.2.07.0", "5.7", ""),
 		Entry("aurora-postgresql 14", "aurora-postgresql", "14", "14", ""),
 		Entry("aurora-postgresql 14.3", "aurora-postgresql", "14.3", "14", ""),
 		Entry("mysql 5.7", "mysql", "5.7", "5.7", ""),
