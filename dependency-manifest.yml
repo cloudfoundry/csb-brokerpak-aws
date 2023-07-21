@@ -42,17 +42,17 @@ dependencies:
       source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
       source_sha256: d5101d32158e2f4b67804a78d23008e964674df167c99964f35fab6560e71e5e
     - name: terraform-provider-aws
-      version: 5.8.0
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.8.0.zip
-      source_sha256: e444ba1ab65b336668b12ec2c05be5c6deaa0591793ba4075c3499efb0968069
+      version: 5.9.0
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.9.0.zip
+      source_sha256: 2034f260422b730e61eb87fb6a3797ed8b8edc2e19736a73d1d40c2a7a14834e
     - name: terraform-provider-csbmysql
       version: 1.2.8
       source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.8.zip
       source_sha256: 265f3ee404a1883097adc71406ae71b4b746d48b1521e6d5a6e9af7939e26992
     - name: terraform-provider-csbpg
-      version: 1.2.1
-      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.1.zip
-      source_sha256: 62c514966b0b2ed9a2423e2d10983b0313baf24ef56b988cac354aad057e9a03
+      version: 1.2.2
+      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.2.zip
+      source_sha256: f5b9987123ef631eb5619d6c77562630871d60e1d354506f9e2c4000be807c07
     - name: terraform-provider-mysql
       version: 1.9.0
       source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
