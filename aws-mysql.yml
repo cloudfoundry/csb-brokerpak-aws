@@ -37,7 +37,7 @@ provision:
     type: string
     details: |
       The version for the MySQL instance. Can be any supported version by the provider.
-      If `auto_minor_version_upgrade` is enabled, you can provide a prefix of the version such as 5.7 (for 5.7.10).
+      If `auto_minor_version_upgrade` is enabled, you must specify a major version such as 5.7 (for 5.7.10).
       See https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html#MySQL.Concepts.VersionMgmt.Supported
   - field_name: storage_gb
     required: true
@@ -159,8 +159,9 @@ provision:
     default: true
   - field_name: auto_minor_version_upgrade
     type: boolean
-    details: Allow minor version upgrades automatically during the maintenance window
-    default: true
+    details: |
+      Allow minor version upgrades automatically during the maintenance window.
+      If `auto_minor_version_upgrade` is enabled, you must specify a major engine version.
   - <<: &nullable_string
       type: string
       default: null

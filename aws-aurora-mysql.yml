@@ -65,7 +65,12 @@ provision:
       default: null
       nullable: true
     field_name: engine_version
-    details: The Aurora engine version, e.g. "8.0.mysql_aurora.3.02.0". Not all features are supported by all versions. Refer to the AWS documentation for more details.
+    details: |
+      The Aurora engine version, e.g. "8.0.mysql_aurora.3.02.0".
+      If `auto_minor_version_upgrade` is enabled, you must specify a major version 
+      such as 8.0 (for 8.0.mysql_aurora.3.02.0) or not specify anything.
+      It is recommended setting the version.
+      Not all features are supported by all versions. Refer to the AWS documentation for more details.
   - field_name: allow_major_version_upgrade
     type: boolean
     details: Allow major version upgrades. Changing this parameter does not result in an outage and the change is asynchronously applied as soon as possible.
@@ -82,7 +87,9 @@ provision:
     prohibit_update: true
   - field_name: auto_minor_version_upgrade
     type: boolean
-    details: Allow minor version upgrades automatically during the maintenance window.
+    details: | 
+      Allow minor version upgrades automatically during the maintenance window.
+      If `auto_minor_version_upgrade` is enabled, you must specify a major engine version.
     default: true
   - field_name: deletion_protection
     type: boolean
