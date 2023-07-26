@@ -24,8 +24,8 @@ func (a AppCode) Dir() string {
 func WithApp(app AppCode) Option {
 	switch app {
 	case JDBCTestAppPostgres, JDBCTestAppMysql:
-		return WithDir(app.Dir())
+		return WithOptions(WithDir(app.Dir()), WithMemory("100MB"), WithDisk("250MB"))
 	default:
-		return WithPreBuild(app.Dir())
+		return WithOptions(WithPreBuild(app.Dir()), WithMemory("100MB"), WithDisk("250MB"))
 	}
 }

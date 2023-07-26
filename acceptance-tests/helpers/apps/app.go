@@ -7,6 +7,7 @@ type App struct {
 	start     bool
 	buildpack string
 	memory    string
+	disk      string
 	manifest  string
 	dir       dir
 }

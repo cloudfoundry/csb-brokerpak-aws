@@ -93,6 +93,18 @@ func WithStartedState() Option {
 	}
 }
 
+func WithMemory(memory string) Option {
+	return func(a *App) {
+		a.memory = memory
+	}
+}
+
+func WithDisk(disk string) Option {
+	return func(a *App) {
+		a.disk = disk
+	}
+}
+
 func WithOptions(opts ...Option) Option {
 	return func(a *App) {
 		for _, o := range opts {
