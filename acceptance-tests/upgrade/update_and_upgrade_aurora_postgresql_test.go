@@ -27,7 +27,7 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 				services.WithPlan("default"),
 				services.WithParameters(
 					map[string]any{
-						"engine_version":          "13.10",
+						"engine_version":          "13",
 						"cluster_instances":       1,
 						"serverless_min_capacity": 0.5,
 						"serverless_max_capacity": 2,
@@ -79,7 +79,7 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			// when the new resource aws_rds_cluster_parameter_group is created and the changes are applied immediately,
 			// we can upgrade the version
 			serviceInstance.Update(services.WithParameters(map[string]any{
-				"engine_version":             "14.7",
+				"engine_version":             "14",
 				"auto_minor_version_upgrade": false,
 			}))
 
