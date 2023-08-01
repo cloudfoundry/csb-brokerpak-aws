@@ -24,9 +24,9 @@ provision:
     details: Name for the DB cluster
     default: csb-aurorapg-${request.instance_id}
     constraints:
-      maxLength: 98
-      minLength: 6
-      pattern: ^[a-z][a-z0-9-]+$
+      maxLength: 63
+      minLength: 1
+      pattern: ^[a-zA-Z](-?[a-zA-Z0-9])*$
     prohibit_update: true
   - field_name: cluster_instances
     type: integer
