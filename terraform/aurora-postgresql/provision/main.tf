@@ -89,6 +89,12 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
 
   lifecycle {
     prevent_destroy = true
+
+    # See https://github.com/cloudfoundry/csb-brokerpak-aws/pull/1042#issuecomment-1660452452 for a justification for this precondition
+    precondition {
+      condition     = length("${var.instance_name}-${var.cluster_instances - 1}") <= 63
+      error_message = "Some cluster instances would have names longer than 63 characters. Please provide a shorter instance_name."
+    }
   }
 }
 
@@ -97,6 +103,9 @@ resource "aws_rds_cluster_parameter_group" "cluster_parameter_group" {
   family = format("aurora-postgresql%s", local.major_version)
   # Must not match the name of an existing DB cluster parameter group.
   # See https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBClusterParameterGroup.html
+  # Undocumented max length is 255
+  # Undocumented constraint:
+  # must begin with a letter; must contain only ASCII letters, digits, and hyphens; and must not end with a hyphen or contain two consecutive hyphens.
   name_prefix = format("aurora-pg-%s", var.instance_name)
 
   parameter {
