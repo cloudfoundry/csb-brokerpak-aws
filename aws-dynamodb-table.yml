@@ -48,9 +48,9 @@ provision:
     details: Name of the DynamoDB table
     default: csb-dynamodb-${request.instance_id}
     constraints:
-      maxLength: 255
-      minLength: 3
-      pattern: ^[a-zA-Z0-9_-.]+$
+      maxLength: 98
+      minLength: 6
+      pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
   - field_name: hash_key
     type: string
