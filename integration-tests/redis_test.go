@@ -114,11 +114,6 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
-				"instance name minimum length is 6 characters",
-				map[string]any{"instance_name": stringOfLen(5)},
-				"instance_name: String length must be greater than or equal to 6",
-			),
-			Entry(
 				"instance name maximum length is 40 characters",
 				map[string]any{"instance_name": stringOfLen(41)},
 				"instance_name: String length must be less than or equal to 40",

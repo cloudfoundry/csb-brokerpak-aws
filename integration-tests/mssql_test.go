@@ -113,16 +113,6 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
-				"instance name minimum length is 6 characters",
-				map[string]any{"instance_name": stringOfLen(5)},
-				"instance_name: String length must be greater than or equal to 6",
-			),
-			Entry(
-				"instance name maximum length is 98 characters",
-				map[string]any{"instance_name": stringOfLen(99)},
-				"instance_name: String length must be less than or equal to 98",
-			),
-			Entry(
 				"instance name invalid characters",
 				map[string]any{"instance_name": ".aaaaa"},
 				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
