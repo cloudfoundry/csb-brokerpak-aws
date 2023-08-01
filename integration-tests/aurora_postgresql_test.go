@@ -78,9 +78,28 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
-				"instance name invalid characters",
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-cluster.html#options
+				"instance name will be used as db-cluster-identifier so must contain from 1 to 63 letters, numbers or hyphens",
+				map[string]any{"instance_name": stringOfLen(64)},
+				"instance_name: String length must be less than or equal to 63",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-cluster.html#options
+				"instance name will be used as db-cluster-identifier so the first character must be a letter",
 				map[string]any{"instance_name": ".aaaaa"},
-				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-cluster.html#options
+				"instance name will be used as db-cluster-identifier so it cannot end with a hyphen",
+				map[string]any{"instance_name": "aaaaa-"},
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-cluster.html#options
+				"instance name will be used as db-cluster-identifier so it cannot contain two consecutive hyphens",
+				map[string]any{"instance_name": "aa--aaa"},
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
 			),
 			Entry(
 				"database name maximum length is 64 characters",

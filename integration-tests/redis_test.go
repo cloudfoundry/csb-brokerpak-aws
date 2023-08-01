@@ -114,14 +114,28 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
-				"instance name maximum length is 40 characters",
+				// https://docs.aws.amazon.com/cli/latest/reference/elasticache/create-replication-group.html#options
+				"instance name will be used as replication-group-id so must contain from 1 to 40 alphanumeric characters or hyphens",
 				map[string]any{"instance_name": stringOfLen(41)},
 				"instance_name: String length must be less than or equal to 40",
 			),
 			Entry(
-				"instance name invalid characters",
+				// https://docs.aws.amazon.com/cli/latest/reference/elasticache/create-replication-group.html#options
+				"instance name will be used as replication-group-id so the first character must be a letter",
 				map[string]any{"instance_name": ".aaaaa"},
-				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/elasticache/create-replication-group.html#options
+				"instance name will be used as replication-group-id so it cannot end with a hyphen",
+				map[string]any{"instance_name": "aaaaa-"},
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/elasticache/create-replication-group.html#options
+				"instance name will be used as replication-group-id so it cannot contain two consecutive hyphens",
+				map[string]any{"instance_name": "aa--aaa"},
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
 			),
 			Entry(
 				"maintenance_day invalid day",
