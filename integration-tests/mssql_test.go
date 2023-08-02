@@ -113,19 +113,28 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
 			Entry(
-				"instance name minimum length is 6 characters",
-				map[string]any{"instance_name": stringOfLen(5)},
-				"instance_name: String length must be greater than or equal to 6",
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
+				"instance name will be used as db-instance-identifier so must contain from 1 to 63 letters, numbers or hyphens",
+				map[string]any{"instance_name": stringOfLen(64)},
+				"instance_name: String length must be less than or equal to 63",
 			),
 			Entry(
-				"instance name maximum length is 98 characters",
-				map[string]any{"instance_name": stringOfLen(99)},
-				"instance_name: String length must be less than or equal to 98",
-			),
-			Entry(
-				"instance name invalid characters",
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
+				"instance name will be used as db-instance-identifier so the first character must be a letter",
 				map[string]any{"instance_name": ".aaaaa"},
-				"instance_name: Does not match pattern '^[a-z][a-z0-9-]+$'",
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
+				"instance name will be used as db-instance-identifier so it cannot end with a hyphen",
+				map[string]any{"instance_name": "aaaaa-"},
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+			),
+			Entry(
+				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
+				"instance name will be used as db-instance-identifier so it cannot contain two consecutive hyphens",
+				map[string]any{"instance_name": "aa--aaa"},
+				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
 			),
 			Entry(
 				"database name maximum length is 64 characters",
