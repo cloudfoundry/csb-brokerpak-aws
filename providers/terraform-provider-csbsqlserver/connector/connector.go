@@ -40,9 +40,10 @@ func (c *Connector) CreateBinding(ctx context.Context, username, password string
 	if err := c.withConnection(func(db *sql.DB) error {
 		tflog.Debug(ctx, "reconfiguring authentication")
 
-		if err := reconfigureAuthentication(ctx, db, c.database); err != nil {
-			return err
-		}
+		// No needed. We will use an option group
+		// if err := reconfigureAuthentication(ctx, db, c.database); err != nil {
+		// 	return err
+		// }
 		tflog.Debug(ctx, "creating database")
 
 		return createDatabaseIfNotExists(ctx, db, c.database)
@@ -162,12 +163,12 @@ func dropLogin(ctx context.Context, tx *sql.Tx, username string) error {
 	return nil
 }
 
-func reconfigureAuthentication(ctx context.Context, db *sql.DB, dbName string) error {
-	if _, err := db.ExecContext(ctx, `EXEC sp_configure 'contained database authentication', 1 RECONFIGURE`); err != nil {
-		return fmt.Errorf("error reconfiguring database authentication %q: %w", dbName, err)
-	}
-	return nil
-}
+// func reconfigureAuthentication(ctx context.Context, db *sql.DB, dbName string) error {
+// 	if _, err := db.ExecContext(ctx, `EXEC sp_configure 'contained database authentication', 1 RECONFIGURE`); err != nil {
+// 		return fmt.Errorf("error reconfiguring database authentication %q: %w", dbName, err)
+// 	}
+// 	return nil
+// }
 
 func createDatabaseIfNotExists(ctx context.Context, db *sql.DB, dbName string) error {
 	dbIdentifer := quoteIdentifier(dbName)
