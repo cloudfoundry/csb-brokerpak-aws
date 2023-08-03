@@ -9,8 +9,9 @@ resource "terraform_data" "kms_key_was_not_provided" {
   }
 }
 
-resource "terraform_data" "kms_key_was_provided" {
-  count = length(var.kms_key_id) > 0 ? 1 : 0
+data "aws_kms_key" "kms_key_was_provided" {
+  count  = length(var.kms_key_id) > 0 ? 1 : 0
+  key_id = var.kms_key_id
 
   lifecycle {
     precondition {

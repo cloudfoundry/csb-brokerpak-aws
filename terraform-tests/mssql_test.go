@@ -305,6 +305,28 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			})
 		})
 
+		When("a syntactically valid but unexisting kms_key_id is passed and storage_encrypted is true", func() {
+			It("should complain about kms_key_id not found in IAAS", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "arn:aws:kms:us-west-2:111122223333:alias/my-key", "storage_encrypted": true}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say("kms:DescribeKey on this resource because the resource does not exist in this Region"))
+			})
+		})
+
+		/*
+			// I tested this branch of code locally, but in order to commit a working test I would have to either:
+			// - Hardcode an existing kms_key_id in the test (no secure, not elegant, not future-proof)
+			// - Create a kms_key from on the fly for the test (no tooling for such thing in the project exists yet)
+			When("a valid kms_key_id is passed and storage_encrypted is true", func() {
+				It("should proceed without issues", func() {
+					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id":"arn:aws:kms:a-real-arn", "storage_encrypted":true}))
+					Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
+					Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeTrue()}))
+				})
+			})
+		*/
+
 		When("no kms_key_id passed and storage_encrypted set to false", func() {
 			It("should proceed without issues", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "", "storage_encrypted": false}))
