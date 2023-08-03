@@ -47,6 +47,9 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"region":        "us-west-2",
 			"instance_name": "csb-mssql-0000000",
 			"db_name":       "vsbdb",
+
+			"storage_encrypted": true,
+			"kms_key_id":        "",
 		}
 	}
 
@@ -171,6 +174,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("rds_vpc_security_group_ids", "some-security-group-ids"),
 					HaveKeyWithValue("instance_class", "some-instance-class"),
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-mssql-%s", instanceID)),
+					HaveKeyWithValue("storage_encrypted", BeTrue()),
+					HaveKeyWithValue("kms_key_id", ""),
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{"pcf-instance-id": Equal(instanceID)})),
@@ -184,14 +189,14 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), requiredProperties())
+			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(defaultProperties(), requiredProperties()))
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), map[string]any{prop: value}))
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(defaultProperties(), requiredProperties(), map[string]any{prop: value}))
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -203,6 +208,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
 			Entry("update region", "region", "no-matter-what-region"),
+			Entry("update storage_encrypted", "storage_encrypted", false),
+			Entry("update kms_key_id", "kms_key_id", "no-matter-what-kms-key-id"),
 			Entry("update db_name", "db_name", "no-matter-what-name"),
 			Entry("update instance_name", "instance_name", "no-matter-what-instance-name"),
 			Entry("update rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "no-matter-what-security-group"),
