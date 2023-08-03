@@ -100,13 +100,16 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf prov
 
 
 .PHONY: providers
-providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion # build custom providers
+providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion providers/build/cloudfoundry.org/cloud-service-broker/csbsqlserver # build custom providers
 
 providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build
 
 providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion:
 	cd providers/terraform-provider-csbmajorengineversion; $(MAKE) build
+
+providers/build/cloudfoundry.org/cloud-service-broker/csbsqlserver:
+	cd providers/terraform-provider-csbsqlserver; $(MAKE) build
 
 ###### Run ###################################################################
 .PHONY: run
@@ -210,6 +213,7 @@ clean: ## delete build files
 	- rm -f ./brokerpak-user-docs.md
 	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) clean
 	- cd providers/terraform-provider-csbmajorengineversion; $(MAKE) clean
+	- cd providers/terraform-provider-csbsqlserver; $(MAKE) clean
 
 $(PAK_BUILD_CACHE_PATH):
 	@echo "Folder $(PAK_BUILD_CACHE_PATH) does not exist. Creating it..."
