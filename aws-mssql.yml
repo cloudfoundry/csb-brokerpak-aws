@@ -37,6 +37,18 @@ provision:
     constraints:
       minimum: 20
       maximum: 16384
+  - field_name: storage_encrypted
+    type: boolean
+    default: true
+    details: Enable encrypted storage
+    prohibit_update: true
+  - field_name: kms_key_id
+    type: string
+    default: ""
+    details: |
+      The ARN for the KMS encryption key (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html)
+      The `storage_encrypted` property must be enabled if the key is specified.
+    prohibit_update: true
   - field_name: db_name
     type: string
     details: Name for your database
@@ -103,6 +115,7 @@ provision:
     variables: terraform/mssql/provision/variables.tf
     main: terraform/mssql/provision/main.tf
     data: terraform/mssql/provision/data.tf
+    validations: terraform/mssql/provision/validations.tf
   outputs:
   - field_name: name
     type: string
