@@ -268,22 +268,20 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 	Context("kms_key_id", func() {
 		When("with default values", func() {
-			It("should complain about kms_key_id being empty", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, nil))
-
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session).To(gbytes.Say("set `storage_encrypted` to `false` or provide a valid `kms_key_id`"))
+			It("should succeed", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, nil))
+				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeTrue()}))
 			})
 		})
 
 		When("no kms_key_id passed and storage_encrypted set to true", func() {
-			// Currently, this tests the exact same scenario as the one `with default values`
+			// Currently, this tests the exact same inputs as the one `with default values`
 			// However, I believe it is useful to keep it in case we decide to change the defaults
-			It("should complain about kms_key_id and storage_encrypted mismatch - storage_encrypted: true", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "", "storage_encrypted": true}))
-
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				Expect(session).To(gbytes.Say("set `storage_encrypted` to `false` or provide a valid `kms_key_id`"))
+			It("should succeed and use a kms key managed by AWS to encrypt the db", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "", "storage_encrypted": true}))
+				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeTrue()}))
 			})
 		})
 
@@ -297,7 +295,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 
 		When("an invalid kms_key_id is passed and storage_encrypted is true", func() {
-			It("should complain about kms_key_id not found in IAAS", func() {
+			It("should complain about kms_key_id not having a valid syntax", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "some-kms-id", "storage_encrypted": true}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
