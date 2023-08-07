@@ -8,3 +8,14 @@ resource "terraform_data" "kms_key_was_provided" {
     }
   }
 }
+
+resource "terraform_data" "mssql-express-encryption" {
+  count = var.engine == "sqlserver-ex" ? 1 : 0
+
+  lifecycle {
+    precondition {
+      condition     = var.storage_encrypted == false
+      error_message = "sqlserver-ex does not support encryption at rest"
+    }
+  }
+}
