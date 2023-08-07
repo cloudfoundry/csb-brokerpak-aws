@@ -51,7 +51,7 @@ resource "aws_db_instance" "db_instance" {
   kms_key_id             = var.kms_key_id == "" ? null : var.kms_key_id
   skip_final_snapshot    = true
   storage_type           = var.storage_type
-  iops                   = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
+  iops                   = var.iops
 
   lifecycle {
     prevent_destroy = true

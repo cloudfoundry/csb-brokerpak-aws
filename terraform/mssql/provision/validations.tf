@@ -8,3 +8,26 @@ resource "terraform_data" "kms_key_was_provided" {
     }
   }
 }
+
+resource "terraform_data" "iops-based-storage-type" {
+  count = var.iops != null ? 1 : 0
+
+  lifecycle {
+    precondition {
+      condition     = contains(["io1", "gp3"], var.storage_type)
+      error_message = "set `iops` to `null` or pick a valid `storage_type` such as io1, gp3"
+    }
+  }
+}
+
+resource "terraform_data" "non-iops-based-storage-type" {
+  count = var.iops == null ? 1 : 0
+
+  lifecycle {
+    precondition {
+      condition     = !contains(["io1", "gp3"], var.storage_type)
+      error_message = "specify an `iops` value or pick a `storage_type` different than io1, gp3"
+    }
+  }
+}
+
