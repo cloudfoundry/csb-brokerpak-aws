@@ -311,4 +311,26 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			})
 		})
 	})
+
+	Context("sqlserver validations", func() {
+		DescribeTable("sqlserver-ex is the only edition without encryption support",
+			func(extraProps map[string]any, expectedError string) {
+				if expectedError == "" {
+					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, extraProps))
+				} else {
+					session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, extraProps))
+					Expect(session.ExitCode()).NotTo(Equal(0))
+					Expect(session).To(gbytes.Say(expectedError))
+				}
+			},
+			Entry("sqlserver-ex  & encryption", map[string]any{"engine": "sqlserver-ex", "storage_encrypted": true}, "sqlserver-ex does not support encryption"),
+			Entry("sqlserver-se  & encryption", map[string]any{"engine": "sqlserver-se", "storage_encrypted": true}, ""),
+			Entry("sqlserver-ee  & encryption", map[string]any{"engine": "sqlserver-ee", "storage_encrypted": true}, ""),
+			Entry("sqlserver-web & encryption", map[string]any{"engine": "sqlserver-web", "storage_encrypted": true}, ""),
+			Entry("sqlserver-ex  ! encryption", map[string]any{"engine": "sqlserver-ex", "storage_encrypted": false}, ""),
+			Entry("sqlserver-se  ! encryption", map[string]any{"engine": "sqlserver-se", "storage_encrypted": false}, ""),
+			Entry("sqlserver-ee  ! encryption", map[string]any{"engine": "sqlserver-ee", "storage_encrypted": false}, ""),
+			Entry("sqlserver-web ! encryption", map[string]any{"engine": "sqlserver-web", "storage_encrypted": false}, ""),
+		)
+	})
 })
