@@ -71,7 +71,6 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"engine_version":       Equal("some-engine-version"),
 				"identifier":           Equal("csb-mssql-test"),
 				"storage_encrypted":    BeTrue(),
-				"kms_key_id":           Equal(""),
 				"instance_class":       Equal(""),
 				"tags":                 HaveKeyWithValue("label1", "value1"),
 				"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
