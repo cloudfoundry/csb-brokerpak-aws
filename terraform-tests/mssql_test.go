@@ -23,6 +23,8 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"aws_secret_access_key": awsSecretAccessKey,
 		"region":                "us-west-2",
 		"instance_name":         "csb-mssql-test",
+		"storage_encrypted":     true,
+		"kms_key_id":            "",
 		"db_name":               "vsbdb",
 		"labels":                map[string]string{"label1": "value1"},
 
@@ -68,6 +70,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"engine":               Equal("sqlserver-ee"),
 				"engine_version":       Equal("some-engine-version"),
 				"identifier":           Equal("csb-mssql-test"),
+				"storage_encrypted":    BeTrue(),
 				"instance_class":       Equal(""),
 				"tags":                 HaveKeyWithValue("label1", "value1"),
 				"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
@@ -260,5 +263,73 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				Expect(session).To(gbytes.Say(`the specified security groups don't exist or don't correspond to the specified vpc \(1\)`))
 			})
 		})
+	})
+
+	Context("kms_key_id", func() {
+		When("with default values", func() {
+			It("should succeed", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, nil))
+				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeTrue()}))
+			})
+		})
+
+		When("no kms_key_id passed and storage_encrypted set to true", func() {
+			// Currently, this tests the exact same inputs as the one `with default values`
+			// However, I believe it is useful to keep it in case we decide to change the defaults
+			It("should succeed and use a kms key managed by AWS to encrypt the db", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "", "storage_encrypted": true}))
+				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeTrue()}))
+			})
+		})
+
+		When("a kms_key_id is passed and storage_encrypted is false", func() {
+			It("should complain about kms_key_id and storage_encrypted mismatch - storage_encrypted: false", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "some-kms-id", "storage_encrypted": false}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say("set `storage_encrypted` to `true` or leave `kms_key_id` field blank"))
+			})
+		})
+
+		When("an invalid kms_key_id is passed and storage_encrypted is true", func() {
+			It("should complain about kms_key_id not having a valid syntax", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "some-kms-id", "storage_encrypted": true}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say("is an invalid ARN: arn: invalid prefix"))
+			})
+		})
+
+		When("no kms_key_id passed and storage_encrypted set to false", func() {
+			It("should proceed without issues", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "", "storage_encrypted": false}))
+				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeFalse()}))
+			})
+		})
+	})
+
+	Context("sqlserver validations", func() {
+		DescribeTable("sqlserver-ex is the only edition without encryption support",
+			func(extraProps map[string]any, expectedError string) {
+				if expectedError == "" {
+					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, extraProps))
+				} else {
+					session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, extraProps))
+					Expect(session.ExitCode()).NotTo(Equal(0))
+					Expect(session).To(gbytes.Say(expectedError))
+				}
+			},
+			Entry("sqlserver-ex  & encryption", map[string]any{"engine": "sqlserver-ex", "storage_encrypted": true}, "sqlserver-ex does not support encryption"),
+			Entry("sqlserver-se  & encryption", map[string]any{"engine": "sqlserver-se", "storage_encrypted": true}, ""),
+			Entry("sqlserver-ee  & encryption", map[string]any{"engine": "sqlserver-ee", "storage_encrypted": true}, ""),
+			Entry("sqlserver-web & encryption", map[string]any{"engine": "sqlserver-web", "storage_encrypted": true}, ""),
+			Entry("sqlserver-ex  ! encryption", map[string]any{"engine": "sqlserver-ex", "storage_encrypted": false}, ""),
+			Entry("sqlserver-se  ! encryption", map[string]any{"engine": "sqlserver-se", "storage_encrypted": false}, ""),
+			Entry("sqlserver-ee  ! encryption", map[string]any{"engine": "sqlserver-ee", "storage_encrypted": false}, ""),
+			Entry("sqlserver-web ! encryption", map[string]any{"engine": "sqlserver-web", "storage_encrypted": false}, ""),
+		)
 	})
 })
