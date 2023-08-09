@@ -219,8 +219,6 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update db_name", "db_name", "no-matter-what-name"),
 			Entry("update instance_name", "instance_name", "no-matter-what-instance-name"),
 			Entry("update rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "no-matter-what-security-group"),
-			Entry("update storage_type", "storage_type", "gp3"),
-			Entry("update iops", "iops", 5000),
 		)
 	})
 })
