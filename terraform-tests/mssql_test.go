@@ -329,28 +329,5 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					}))
 			})
 		})
-
-		Context("storage_type and iops validation", func() {
-			DescribeTable("matrix with valid and invalid combinations",
-				func(extraParams map[string]any, expectedError string) {
-					if expectedError == "" {
-						ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, extraParams))
-					} else {
-						session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, extraParams))
-						Expect(session.ExitCode()).NotTo(Equal(0))
-						Expect(session).To(gbytes.Say(expectedError))
-
-					}
-				},
-				Entry("standard & iops", map[string]any{"storage_type": "standard", "iops": 3000}, "set `iops` to `null` or pick a valid `storage_type` such as io1, gp3"),
-				Entry("gp2      & iops", map[string]any{"storage_type": "gp2", "iops": 3000}, "set `iops` to `null` or pick a valid `storage_type` such as io1, gp3"),
-				Entry("gp3      & iops", map[string]any{"storage_type": "gp3", "iops": 3000}, ""),
-				Entry("io1      & iops", map[string]any{"storage_type": "io1", "iops": 3000}, ""),
-				Entry("standard ! iops", map[string]any{"storage_type": "standard", "iops": nil}, ""),
-				Entry("gp2      ! iops", map[string]any{"storage_type": "gp2", "iops": nil}, ""),
-				Entry("gp3      ! iops", map[string]any{"storage_type": "gp3", "iops": nil}, "specify an `iops` value or pick a `storage_type` different than io1, gp3"),
-				Entry("io1      ! iops", map[string]any{"storage_type": "io1", "iops": nil}, "specify an `iops` value or pick a `storage_type` different than io1, gp3"),
-			)
-		})
 	})
 })

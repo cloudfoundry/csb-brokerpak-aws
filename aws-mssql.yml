@@ -112,6 +112,7 @@ provision:
     default: "io1"
   - field_name: iops
     type: integer
+    nullable: true
     details: |
       The amount of provisioned IOPS. For this property to take effect, `storage_type` must be
       set to `io1` or `gp3`.

@@ -14,4 +14,7 @@ variable "mssql_version" { type = string }
 variable "engine" { type = string }
 variable "storage_gb" { type = number }
 variable "storage_type" { type = string }
-variable "iops" { type = number }
+variable "iops" {
+  type     = number
+  nullable = true
+}
