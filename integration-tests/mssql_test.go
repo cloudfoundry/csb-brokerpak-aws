@@ -196,7 +196,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(defaultProperties(), requiredProperties(), map[string]any{prop: value}))
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
