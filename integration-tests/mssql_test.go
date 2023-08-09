@@ -53,6 +53,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"storage_encrypted": true,
 			"kms_key_id":        "",
 
+			"deletion_protection": false,
+
 			"storage_type": "io1",
 			"iops":         3000,
 		}
@@ -188,6 +190,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("max_allocated_storage", BeNumerically("==", 999)),
 					HaveKeyWithValue("storage_type", "io1"),
 					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
+					HaveKeyWithValue("deletion_protection", BeFalse()),
 				),
 			)
 		})
