@@ -29,7 +29,6 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"labels":                map[string]string{"label1": "value1"},
 
 		"aws_vpc_id":                 "",
-		"instance_class":             "",
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
 	}
@@ -38,6 +37,8 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"engine":        "sqlserver-ee",
 		"mssql_version": "some-engine-version",
 		"storage_gb":    20,
+
+		"instance_class": "some-instance-class",
 	}
 
 	validVPC := awsVPCID
@@ -71,7 +72,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"engine_version":       Equal("some-engine-version"),
 				"identifier":           Equal("csb-mssql-test"),
 				"storage_encrypted":    BeTrue(),
-				"instance_class":       Equal(""),
+				"instance_class":       Equal("some-instance-class"),
 				"tags":                 HaveKeyWithValue("label1", "value1"),
 				"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
 				"apply_immediately":    BeTrue(),
@@ -89,6 +90,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"mssql_version\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
+			Expect(msgs).To(ContainSubstring(`The root module input variable \"instance_class\" is not set, and has no default value.`))
 		})
 	})
 
