@@ -93,7 +93,6 @@ provision:
     details: |
       AWS DB instance class. Accepted values will depend on the selected engine and mssql_version.
       See: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html#SQLServer.Concepts.General.InstanceClasses
-    default: ""
   - field_name: rds_subnet_group
     type: string
     details: AWS RDS subnet group already in existence to use

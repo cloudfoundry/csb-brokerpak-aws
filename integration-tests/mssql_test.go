@@ -39,6 +39,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"engine":        "sqlserver-ee",
 			"mssql_version": "some-mssql-version",
 			"storage_gb":    20,
+
+			"instance_class": "some-instance-class",
 		}
 	}
 
