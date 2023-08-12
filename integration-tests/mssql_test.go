@@ -52,6 +52,9 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 			"storage_encrypted": true,
 			"kms_key_id":        "",
+
+			"storage_type": "io1",
+			"iops":         3000,
 		}
 	}
 
@@ -181,9 +184,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{"pcf-instance-id": Equal(instanceID)})),
+					HaveKeyWithValue("storage_type", "io1"),
+					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
 				),
 			)
 		})
+
 	})
 
 	Describe("updating instance", func() {

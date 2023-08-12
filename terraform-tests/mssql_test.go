@@ -31,6 +31,9 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"aws_vpc_id":                 "",
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
+
+		"storage_type": "io1",
+		"iops":         3000,
 	}
 
 	requiredVars := map[string]any{
@@ -309,6 +312,22 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"kms_key_id": "", "storage_encrypted": false}))
 				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeFalse()}))
+			})
+		})
+	})
+
+	Context("storage type", func() {
+		Context("default values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{}))
+			})
+
+			It("default values work with io1 and 3000 iops", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"storage_type": Equal("io1"),
+						"iops":         BeNumerically("==", 3000),
+					}))
 			})
 		})
 	})
