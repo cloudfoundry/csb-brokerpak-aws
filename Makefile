@@ -142,6 +142,7 @@ run-examples: providers ## run examples in yml files. Runs examples for all serv
 test-coverage: ## test coverage score
 	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) ginkgo-coverage
 	- cd providers/terraform-provider-csbmajorengineversion; $(MAKE) ginkgo-coverage
+	- cd providers/terraform-provider-csbsqlserver; $(MAKE) ginkgo-coverage
 
 .PHONY: test
 test: lint run-integration-tests ## run the tests
@@ -157,6 +158,7 @@ run-terraform-tests: providers custom.tfrc ## run terraform tests for this broke
 .PHONY: run-provider-tests
 run-provider-tests:  ## run the integration tests associated with providers
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
+	cd providers/terraform-provider-csbsqlserver; $(MAKE) test
 
 custom.tfrc:
 	sed "s#BROKERPAK_PATH#$(PWD)#" custom.tfrc.template > $@

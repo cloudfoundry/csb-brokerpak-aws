@@ -47,11 +47,9 @@ test: ## run the tests
 	## runs docker, so tricky to make it work inside docker
 	go run github.com/onsi/ginkgo/v2/ginkgo -r
 
-.PHONY: test-coverage
-test-coverage: ## test coverage score
-	go list ./... | grep -v fake > /tmp/tpcsbsqlserver-non-fake.txt
-	paste -sd "," /tmp/tpcsbsqlserver-non-fake.txt > /tmp/tpcsbsqlserver-pkgs.txt
-	go test -coverpkg=`cat /tmp/tpcsbsqlserver-pkgs.txt` -coverprofile=/tmp/tpcsbsqlserver-coverage.out ./...
+.PHONY: ginkgo-coverage
+ginkgo-coverage: ## ginkgo tests coverage score
+	go test -coverprofile=/tmp/tpcsbsqlserver-coverage.out ./...
 	go tool cover -func /tmp/tpcsbsqlserver-coverage.out | grep total
 
 download: ## download dependencies
