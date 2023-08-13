@@ -2,7 +2,7 @@
 
 VERSION = 1.0.0
 
-GO-VERSION = 1.20.6
+GO-VERSION = 1.21.0
 GO-VER = go$(GO-VERSION)
 GO_OK :=  $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; echo $$?))
 DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
@@ -38,8 +38,6 @@ build_binaries_in_cloudfoundry_namespace:
 .PHONY: clean
 clean: ## clean up build artifacts
 	- rm -rf ../build/cloudfoundry.org
-	- rm -rf /tmp/tpcsbsqlserver-non-fake.txt
-	- rm -rf /tmp/tpcsbsqlserver-pkgs.txt
 	- rm -rf /tmp/tpcsbsqlserver-coverage.out
 
 .PHONY: test
