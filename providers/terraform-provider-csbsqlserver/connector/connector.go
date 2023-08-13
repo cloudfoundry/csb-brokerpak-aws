@@ -11,7 +11,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-func New(server string, port int, username, password, database, encrypt string, enc URLEncoder) *Connector {
+const (
+	AWS   = "aws"
+	Azure = "azure"
+)
+
+func New(server string, port int, username, password, database, encrypt string, enc *Encoder) *Connector {
 	return &Connector{
 		server:   server,
 		username: username,
@@ -30,7 +35,7 @@ type Connector struct {
 	database string
 	encrypt  string
 	port     int
-	encoder  URLEncoder
+	encoder  *Encoder
 }
 
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
@@ -38,20 +43,12 @@ type Connector struct {
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
 	// create database must be executed without transaction since the Procedure is creating a transaction.
 	if err := c.withConnection(func(db *sql.DB) error {
-		tflog.Debug(ctx, "reconfiguring authentication")
 
-		// No needed. We will use an option group
-		// if err := reconfigureAuthentication(ctx, db, c.database); err != nil {
-		// 	return err
-		// }
 		tflog.Debug(ctx, "creating database")
-
 		return createDatabaseIfNotExists(ctx, db, c.database)
 	}); err != nil {
 		return err
 	}
-
-	tflog.Debug(ctx, "database created", map[string]interface{}{"database": c.database})
 
 	return c.withTransaction(func(tx *sql.Tx) error {
 
@@ -94,7 +91,7 @@ func (c *Connector) ReadBinding(ctx context.Context, username string) (result bo
 }
 
 func (c *Connector) withConnection(callback func(*sql.DB) error) error {
-	db, err := sql.Open("sqlserver", c.connStr())
+	db, err := sql.Open("sqlserver", c.encoder.Encode())
 	if err != nil {
 		return fmt.Errorf("error connecting to database %q on %q port %d with user %q: %w", c.database, c.server, c.port, c.username, err)
 	}
@@ -122,10 +119,6 @@ func (c *Connector) withTransaction(callback func(*sql.Tx) error) error {
 
 		return tx.Commit()
 	})
-}
-
-func (c *Connector) connStr() string {
-	return c.encoder.String()
 }
 
 type databaseActor interface {
@@ -162,13 +155,6 @@ func dropLogin(ctx context.Context, tx *sql.Tx, username string) error {
 
 	return nil
 }
-
-// func reconfigureAuthentication(ctx context.Context, db *sql.DB, dbName string) error {
-// 	if _, err := db.ExecContext(ctx, `EXEC sp_configure 'contained database authentication', 1 RECONFIGURE`); err != nil {
-// 		return fmt.Errorf("error reconfiguring database authentication %q: %w", dbName, err)
-// 	}
-// 	return nil
-// }
 
 func createDatabaseIfNotExists(ctx context.Context, db *sql.DB, dbName string) error {
 	dbIdentifer := quoteIdentifier(dbName)
@@ -213,6 +199,13 @@ func addRoles(ctx context.Context, tx *sql.Tx, username string, roles []string) 
 	return nil
 }
 
+// grantExec grants EXECUTE permission to all the user stored procedures.
+// Right out of the box, SQL Server makes it pretty easy to grant SELECT, INSERT, UPDATE, and DELETE to all user tables.
+// That’s accomplished by using the built-in db_datareader (SELECT) and
+// db_datawriter (INSERT, UPDATE, and DELETE) database roles in every user database.
+// Any user you add to those database roles will be granted those permissions.
+// But what if you want to grant EXECUTE permission to all the user stored procedures.
+// Where’s the built-in database role for that? Nowhere to be found.
 func grantExec(ctx context.Context, tx *sql.Tx, username string) error {
 	statement := fmt.Sprintf(`GRANT EXEC TO [%s]`, username)
 	if _, err := tx.ExecContext(ctx, statement); err != nil {

@@ -5,90 +5,61 @@ import (
 	"net/url"
 )
 
-type URLEncoder interface {
-	String() string
+type Encoder struct {
+	server      string
+	username    string
+	password    string
+	port        int
+	queryParams map[string]string
 }
 
-type awsEncoder struct {
-	server   string
-	username string
-	password string
-	database string
-	encrypt  string
-	port     int
-}
-
-func NewAWSEncoder(
+func NewEncoder(
 	server,
 	username,
 	password,
 	database,
-	encrypt string,
+	encrypt,
+	iaas string,
 	port int,
-) *awsEncoder {
-	return &awsEncoder{
-		server:   server,
-		username: username,
-		password: password,
-		database: database,
-		encrypt:  encrypt,
-		port:     port,
+) *Encoder {
+	var queryParams map[string]string
+	switch iaas {
+	case AWS:
+		queryParams = map[string]string{"encrypt": encrypt}
+	case Azure:
+		queryParams = map[string]string{"database": database, "encrypt": encrypt}
+	}
+	return &Encoder{
+		server:      server,
+		username:    username,
+		password:    password,
+		port:        port,
+		queryParams: queryParams,
 	}
 }
 
-func (a *awsEncoder) String() string {
-	query := url.Values{}
-	// query.Add("database", a.database)
-	query.Add("encrypt", a.encrypt)
-
-	u := &url.URL{
-		Scheme:   "sqlserver",
-		User:     url.UserPassword(a.username, a.password),
-		Host:     fmt.Sprintf("%s:%d", a.server, a.port),
-		RawQuery: query.Encode(),
-	}
+func (b *Encoder) Encode() string {
+	u := createURL(b.server, b.username, b.password, b.port)
+	u.RawQuery = createQueryParams(b.queryParams).Encode()
 
 	return u.String()
 }
 
-type azureEncoder struct {
-	server   string
-	username string
-	password string
-	database string
-	encrypt  string
-	port     int
+func createQueryParams(params map[string]string) url.Values {
+	q := url.Values{}
+	for key, value := range params {
+		q.Add(key, value)
+	}
+	return q
 }
 
-func NewAzureEncoder(
-	server,
-	username,
-	password,
-	database,
-	encrypt string,
-	port int,
-) *azureEncoder {
-	return &azureEncoder{
-		server:   server,
-		username: username,
-		password: password,
-		database: database,
-		encrypt:  encrypt,
-		port:     port,
-	}
-}
-
-func (a *azureEncoder) String() string {
-	query := url.Values{}
-	query.Add("database", a.database)
-	query.Add("encrypt", a.encrypt)
-
-	u := &url.URL{
-		Scheme:   "sqlserver",
-		User:     url.UserPassword(a.username, a.password),
-		Host:     fmt.Sprintf("%s:%d", a.server, a.port),
-		RawQuery: query.Encode(),
+func createURL(server, username, password string, port int) url.URL {
+	const scheme = "sqlserver"
+	u := url.URL{
+		Scheme: scheme,
+		User:   url.UserPassword(username, password),
+		Host:   fmt.Sprintf("%s:%d", server, port),
 	}
 
-	return u.String()
+	return u
 }

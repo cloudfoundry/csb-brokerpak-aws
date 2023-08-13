@@ -39,12 +39,13 @@ var _ = BeforeSuite(func() {
 		adminPassword,
 		testhelpers.TestDatabase,
 		"disable",
-		connector.NewAzureEncoder(
+		connector.NewEncoder(
 			testhelpers.Server,
 			testhelpers.AdminUser,
 			adminPassword,
 			testhelpers.TestDatabase,
 			"disable",
+			connector.Azure,
 			port,
 		),
 	)

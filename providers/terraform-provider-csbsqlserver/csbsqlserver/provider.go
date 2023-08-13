@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/connector"
 )
@@ -17,6 +18,7 @@ const (
 	providerUsernameKey = "username"
 	providerPasswordKey = "password"
 	encryptKey          = "encrypt"
+	iaasKey             = "iaas"
 )
 
 func Provider() *schema.Provider {
@@ -46,10 +48,11 @@ func Provider() *schema.Provider {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"iaas": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Default:  "aws",
+			iaasKey: {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      connector.AWS,
+				ValidateFunc: validation.StringInSlice([]string{connector.AWS, connector.Azure}, false),
 			},
 		},
 		ConfigureContextFunc: configure,
@@ -59,7 +62,7 @@ func Provider() *schema.Provider {
 	}
 }
 
-func configure(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
+func configure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
 	var (
 		server   string
 		port     int
@@ -67,6 +70,7 @@ func configure(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnosti
 		password string
 		database string
 		encrypt  string
+		iaas     string
 	)
 
 	for _, f := range []func() diag.Diagnostics{
@@ -94,37 +98,25 @@ func configure(ctx context.Context, d *schema.ResourceData) (any, diag.Diagnosti
 			encrypt, diags = getEncrypt(d, encryptKey)
 			return
 		},
+		func() (diags diag.Diagnostics) {
+			iaas, diags = getServerIdentifier(d, iaasKey)
+			return
+		},
 	} {
 		if d := f(); d != nil {
 			return nil, d
 		}
 	}
 
-	var e connector.URLEncoder
-
-	u := d.Get("iaas").(string)
-	switch u {
-	case "":
-		return "", diag.Errorf("invalid iaas provider configuration value")
-	case "aws":
-		e = connector.NewAWSEncoder(
-			server,
-			username,
-			password,
-			database,
-			encrypt,
-			port,
-		)
-	case "azure":
-		e = connector.NewAzureEncoder(
-			server,
-			username,
-			password,
-			database,
-			encrypt,
-			port,
-		)
-	}
+	var e = connector.NewEncoder(
+		server,
+		username,
+		password,
+		database,
+		encrypt,
+		iaas,
+		port,
+	)
 
 	return connector.New(server, port, username, password, database, encrypt, e), nil
 }
