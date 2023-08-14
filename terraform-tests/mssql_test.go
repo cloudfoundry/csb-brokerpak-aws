@@ -32,6 +32,9 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"aws_vpc_id":                 "",
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
+
+		"storage_type": "io1",
+		"iops":         3000,
 	}
 
 	requiredVars := map[string]any{
@@ -320,6 +323,62 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeFalse()}))
 			})
+		})
+	})
+
+	Context("storage type", func() {
+		Context("default values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{}))
+			})
+
+			It("default values work with io1 and 3000 iops", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"storage_type": Equal("io1"),
+						"iops":         BeNumerically("==", 3000),
+					}))
+			})
+		})
+
+		Context("storage_type gp2", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"storage_type": "gp2",
+				}))
+			})
+
+			It("iops should not be set", func() {
+				instanceData := AfterValuesForType(plan, "aws_db_instance")
+				Expect(instanceData).To(MatchKeys(IgnoreExtras, Keys{
+					"storage_type": Equal("gp2"),
+				}))
+				Expect("iops").NotTo(BeKeyOf(instanceData))
+			})
+		})
+
+		When("valid type for iops", func() {
+			DescribeTable("iops should be set",
+				func(storageTypeParam map[string]any) {
+					plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, storageTypeParam))
+					instanceData := AfterValuesForType(plan, "aws_db_instance")
+
+					Expect(instanceData).To(
+						MatchKeys(IgnoreExtras, Keys{
+							"storage_type": Equal(storageTypeParam["storage_type"]),
+						}),
+					)
+					Expect("iops").To(BeKeyOf(instanceData))
+				},
+				Entry(
+					"io1",
+					map[string]any{"storage_type": "io1"},
+				),
+				Entry(
+					"gp3",
+					map[string]any{"storage_type": "gp3"},
+				),
+			)
 		})
 	})
 
