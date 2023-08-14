@@ -27,6 +27,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"kms_key_id":            "",
 		"db_name":               "vsbdb",
 		"labels":                map[string]string{"label1": "value1"},
+		"max_allocated_storage": 0,
 
 		"aws_vpc_id":                 "",
 		"rds_subnet_group":           "",
@@ -148,6 +149,15 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("should use the passed value", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"storage_gb": 60}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"allocated_storage": Equal(float64(60))}))
+			})
+		})
+	})
+
+	Context("max_allocated_storage", func() {
+		When("valid max_allocated_storage passed", func() {
+			It("should use the passed value", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"max_allocated_storage": 250}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"max_allocated_storage": Equal(float64(250))}))
 			})
 		})
 	})

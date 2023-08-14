@@ -13,3 +13,7 @@ variable "rds_vpc_security_group_ids" { type = string }
 variable "mssql_version" { type = string }
 variable "engine" { type = string }
 variable "storage_gb" { type = number }
+variable "max_allocated_storage" {
+  type     = number
+  nullable = true
+}
