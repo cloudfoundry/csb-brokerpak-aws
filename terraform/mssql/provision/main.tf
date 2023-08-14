@@ -36,6 +36,7 @@ resource "random_password" "password" {
 resource "aws_db_instance" "db_instance" {
   license_model          = "license-included"
   allocated_storage      = var.storage_gb
+  max_allocated_storage  = var.max_allocated_storage
   engine                 = var.engine
   engine_version         = var.mssql_version
   instance_class         = var.instance_class
