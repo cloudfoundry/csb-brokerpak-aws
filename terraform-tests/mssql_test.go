@@ -371,7 +371,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			)
 		})
 	})
-  
+
 	Context("sqlserver validations", func() {
 		DescribeTable("sqlserver-ex is the only edition without encryption support",
 			func(extraProps map[string]any, expectedError string) {
