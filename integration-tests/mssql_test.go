@@ -52,6 +52,11 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 			"storage_encrypted": true,
 			"kms_key_id":        "",
+
+			"deletion_protection": false,
+
+			"storage_type": "io1",
+			"iops":         3000,
 		}
 	}
 
@@ -60,6 +65,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"rds_vpc_security_group_ids": "some-security-group-ids",
 			"rds_subnet_group":           "some-rds-subnet-group",
 			"instance_class":             "some-instance-class",
+			"max_allocated_storage":      999,
 		}
 	}
 
@@ -181,9 +187,14 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{"pcf-instance-id": Equal(instanceID)})),
+					HaveKeyWithValue("max_allocated_storage", BeNumerically("==", 999)),
+					HaveKeyWithValue("storage_type", "io1"),
+					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
+					HaveKeyWithValue("deletion_protection", BeFalse()),
 				),
 			)
 		})
+
 	})
 
 	Describe("updating instance", func() {
@@ -215,6 +226,40 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update db_name", "db_name", "no-matter-what-name"),
 			Entry("update instance_name", "instance_name", "no-matter-what-instance-name"),
 			Entry("update rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "no-matter-what-security-group"),
+		)
+
+		DescribeTable("should allow unsetting properties flagged as `nullable` by explicitly updating their value to be `nil`",
+			func(prop string, initValue any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: initValue})
+				Expect(err).NotTo(HaveOccurred())
+
+				err = broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: nil})
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry("max_allocated_storage is nullable", "max_allocated_storage", 999),
+		)
+
+		DescribeTable("should prevent unsetting properties not flagged as `nullable` by explicitly updating their value to be `nil`",
+			func(prop string, initValue any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: initValue})
+				Expect(err).NotTo(HaveOccurred())
+
+				err = broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: nil})
+				Expect(err).To(MatchError(ContainSubstring("Invalid type. Expected: ")))
+				Expect(err).To(MatchError(ContainSubstring(", given: null")))
+			},
+			Entry("rds_subnet_group isn't nullable", "rds_subnet_group", "any-value"),
+		)
+
+		DescribeTable("should allow updating properties",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
+
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry("update storage_type", "storage_type", "gp2"),
+			Entry("update iops", "iops", 1500),
+			Entry("update deletion_protection", "deletion_protection", true),
 		)
 	})
 })
