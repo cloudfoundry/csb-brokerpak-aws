@@ -28,6 +28,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"db_name":               "vsbdb",
 		"labels":                map[string]string{"label1": "value1"},
 		"max_allocated_storage": 0,
+		"deletion_protection":   true,
 
 		"aws_vpc_id":                 "",
 		"rds_subnet_group":           "",

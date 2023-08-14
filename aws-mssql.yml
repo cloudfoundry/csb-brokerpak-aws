@@ -109,6 +109,10 @@ provision:
     details: Comma delimited list of security group ID's for instance
     default: ""
     prohibit_update: true
+  - field_name: deletion_protection
+    type: boolean
+    details: Whether deletion protection is enabled. The database cannot be deleted when this property is enabled.
+    default: false
   - field_name: storage_type
     type: string
     details: |
