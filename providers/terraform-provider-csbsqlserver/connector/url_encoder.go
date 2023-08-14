@@ -2,7 +2,13 @@ package connector
 
 import (
 	"fmt"
+	"maps"
 	"net/url"
+)
+
+const (
+	queryParamDatabaseKey = "database"
+	queryParamEncryptKey  = "queryParamEncryptKey"
 )
 
 type Encoder struct {
@@ -18,17 +24,10 @@ func NewEncoder(
 	username,
 	password,
 	database,
-	encrypt,
-	iaas string,
+	encrypt string,
 	port int,
 ) *Encoder {
-	var queryParams map[string]string
-	switch iaas {
-	case AWS:
-		queryParams = map[string]string{"encrypt": encrypt}
-	case Azure:
-		queryParams = map[string]string{"database": database, "encrypt": encrypt}
-	}
+	queryParams := map[string]string{queryParamDatabaseKey: database, queryParamEncryptKey: encrypt}
 	return &Encoder{
 		server:      server,
 		username:    username,
@@ -41,6 +40,16 @@ func NewEncoder(
 func (b *Encoder) Encode() string {
 	u := createURL(b.server, b.username, b.password, b.port)
 	u.RawQuery = createQueryParams(b.queryParams).Encode()
+
+	return u.String()
+}
+
+func (b *Encoder) EncodeWithoutDB() string {
+	qp := make(map[string]string)
+	maps.Copy(qp, b.queryParams)
+	delete(qp, queryParamDatabaseKey)
+	u := createURL(b.server, b.username, b.password, b.port)
+	u.RawQuery = createQueryParams(qp).Encode()
 
 	return u.String()
 }

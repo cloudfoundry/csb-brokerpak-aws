@@ -11,11 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-const (
-	AWS   = "aws"
-	Azure = "azure"
-)
-
 func New(server string, port int, username, password, database, encrypt string, enc *Encoder) *Connector {
 	return &Connector{
 		server:   server,
@@ -42,7 +37,7 @@ type Connector struct {
 // It is idempotent.
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
 	// create database must be executed without transaction since the Procedure is creating a transaction.
-	if err := c.withConnection(func(db *sql.DB) error {
+	if err := c.withMasterDBConnection(func(db *sql.DB) error {
 
 		tflog.Debug(ctx, "creating database")
 		return createDatabaseIfNotExists(ctx, db, c.database)
@@ -98,6 +93,19 @@ func (c *Connector) withConnection(callback func(*sql.DB) error) error {
 
 	if err := db.Ping(); err != nil {
 		return fmt.Errorf("error pinging database %q on %q port %d with user %q: %w", c.database, c.server, c.port, c.username, err)
+	}
+
+	return callback(db)
+}
+
+func (c *Connector) withMasterDBConnection(callback func(*sql.DB) error) error {
+	db, err := sql.Open("sqlserver", c.encoder.EncodeWithoutDB())
+	if err != nil {
+		return fmt.Errorf("error connecting to master database on %q port %d with user %q: %w", c.server, c.port, c.username, err)
+	}
+
+	if err := db.Ping(); err != nil {
+		return fmt.Errorf("error pinging master database on %q port %d with user %q: %w", c.server, c.port, c.username, err)
 	}
 
 	return callback(db)

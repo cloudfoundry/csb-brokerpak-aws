@@ -46,7 +46,6 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				username = "%s"
 				password = "%s"
 				encrypt  = "disable"
-				iaas     = "azure"
 			}
 
 			resource "csbsqlserver_binding" "binding1" {

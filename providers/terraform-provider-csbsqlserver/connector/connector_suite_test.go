@@ -45,7 +45,6 @@ var _ = BeforeSuite(func() {
 			adminPassword,
 			testhelpers.TestDatabase,
 			"disable",
-			connector.Azure,
 			port,
 		),
 	)

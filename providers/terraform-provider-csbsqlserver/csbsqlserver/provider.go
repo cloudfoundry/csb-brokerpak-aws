@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/connector"
 )
@@ -18,7 +17,6 @@ const (
 	providerUsernameKey = "username"
 	providerPasswordKey = "password"
 	encryptKey          = "encrypt"
-	iaasKey             = "iaas"
 )
 
 func Provider() *schema.Provider {
@@ -48,12 +46,6 @@ func Provider() *schema.Provider {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			iaasKey: {
-				Type:         schema.TypeString,
-				Optional:     true,
-				Default:      connector.AWS,
-				ValidateFunc: validation.StringInSlice([]string{connector.AWS, connector.Azure}, false),
-			},
 		},
 		ConfigureContextFunc: configure,
 		ResourcesMap: map[string]*schema.Resource{
@@ -70,7 +62,6 @@ func configure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics
 		password string
 		database string
 		encrypt  string
-		iaas     string
 	)
 
 	for _, f := range []func() diag.Diagnostics{
@@ -98,10 +89,6 @@ func configure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics
 			encrypt, diags = getEncrypt(d, encryptKey)
 			return
 		},
-		func() (diags diag.Diagnostics) {
-			iaas, diags = getServerIdentifier(d, iaasKey)
-			return
-		},
 	} {
 		if d := f(); d != nil {
 			return nil, d
@@ -114,7 +101,6 @@ func configure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics
 		password,
 		database,
 		encrypt,
-		iaas,
 		port,
 	)
 

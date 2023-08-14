@@ -54,7 +54,6 @@ var _ = Describe("Provider Configuration", func() {
 					username = "%s"
 					password = "%s"
 					encrypt  = "%s"
-                    iaas     = "azure"
 				}
 
 				resource "csbsqlserver_binding" "binding" {
