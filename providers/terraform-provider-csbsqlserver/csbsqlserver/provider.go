@@ -95,14 +95,5 @@ func configure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics
 		}
 	}
 
-	var e = connector.NewEncoder(
-		server,
-		username,
-		password,
-		database,
-		encrypt,
-		port,
-	)
-
-	return connector.New(server, port, username, password, database, encrypt, e), nil
+	return connector.New(server, port, username, password, database, encrypt), nil
 }

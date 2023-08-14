@@ -11,26 +11,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-func New(server string, port int, username, password, database, encrypt string, enc *Encoder) *Connector {
+func New(server string, port int, username, password, database, encrypt string) *Connector {
 	return &Connector{
-		server:   server,
-		username: username,
-		password: password,
-		database: database,
-		encrypt:  encrypt,
-		port:     port,
-		encoder:  enc,
+		database:    database,
+		dbConnector: NewDBConnector(server, port, username, password, database, encrypt),
 	}
 }
 
 type Connector struct {
-	server   string
-	username string
-	password string
-	database string
-	encrypt  string
-	port     int
-	encoder  *Encoder
+	database    string
+	dbConnector *DBConnector
 }
 
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
@@ -86,47 +76,15 @@ func (c *Connector) ReadBinding(ctx context.Context, username string) (result bo
 }
 
 func (c *Connector) withConnection(callback func(*sql.DB) error) error {
-	db, err := sql.Open("sqlserver", c.encoder.Encode())
-	if err != nil {
-		return fmt.Errorf("error connecting to database %q on %q port %d with user %q: %w", c.database, c.server, c.port, c.username, err)
-	}
-
-	if err := db.Ping(); err != nil {
-		return fmt.Errorf("error pinging database %q on %q port %d with user %q: %w", c.database, c.server, c.port, c.username, err)
-	}
-
-	return callback(db)
+	return c.dbConnector.withConnection(callback)
 }
 
 func (c *Connector) withMasterDBConnection(callback func(*sql.DB) error) error {
-	db, err := sql.Open("sqlserver", c.encoder.EncodeWithoutDB())
-	if err != nil {
-		return fmt.Errorf("error connecting to master database on %q port %d with user %q: %w", c.server, c.port, c.username, err)
-	}
-
-	if err := db.Ping(); err != nil {
-		return fmt.Errorf("error pinging master database on %q port %d with user %q: %w", c.server, c.port, c.username, err)
-	}
-
-	return callback(db)
+	return c.dbConnector.withMasterDBConnection(callback)
 }
 
 func (c *Connector) withTransaction(callback func(*sql.Tx) error) error {
-	return c.withConnection(func(db *sql.DB) error {
-		tx, err := db.Begin()
-		if err != nil {
-			return err
-		}
-		defer func() {
-			_ = tx.Rollback()
-		}()
-
-		if err := callback(tx); err != nil {
-			return err
-		}
-
-		return tx.Commit()
-	})
+	return c.dbConnector.withTransaction(callback)
 }
 
 type databaseActor interface {
