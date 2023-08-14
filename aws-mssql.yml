@@ -109,6 +109,22 @@ provision:
     details: Comma delimited list of security group ID's for instance
     default: ""
     prohibit_update: true
+  - field_name: storage_type
+    type: string
+    details: |
+      Type of storage to be used.
+      One of "standard" (magnetic), "gp2" (general purpose SSD), "gp3" (general purpose SSD),
+      or "io1" (provisioned IOPS SSD).
+    default: "io1"
+  - field_name: iops
+    type: integer
+    details: |
+      The amount of provisioned IOPS. For this property to take effect, `storage_type` must be
+      set to `io1` or `gp3`.
+      Cannot be specified for `gp3` storage if the `storage_gb` value is below a per-engine threshold.
+      See the RDS User Guide for details:
+      https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#gp3-storage.
+    default: 3000
   computed_inputs:
   - name: labels
     overwrite: true

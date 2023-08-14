@@ -17,3 +17,5 @@ variable "max_allocated_storage" {
   type     = number
   nullable = true
 }
+variable "storage_type" { type = string }
+variable "iops" { type = number }
