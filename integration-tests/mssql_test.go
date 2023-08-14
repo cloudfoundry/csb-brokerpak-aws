@@ -259,6 +259,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			},
 			Entry("update storage_type", "storage_type", "gp2"),
 			Entry("update iops", "iops", 1500),
+			Entry("update deletion_protection", "deletion_protection", true),
 		)
 	})
 })
