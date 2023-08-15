@@ -38,25 +38,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		return map[string]any{
 			"engine":        "sqlserver-ee",
 			"mssql_version": "some-mssql-version",
-			"storage_gb":    20,
+			// For documentation purpose:
+			// use a valid storage GB value. Default iops is 3000.
+			// The IOPS to GiB ratio must be between 1 and 50
+			"storage_gb": 100,
 
 			"instance_class": "some-instance-class",
-		}
-	}
-
-	var defaultProperties = func() map[string]any {
-		return map[string]any{
-			"region":        "us-west-2",
-			"instance_name": "csb-mssql-0000000",
-			"db_name":       "vsbdb",
-
-			"storage_encrypted": true,
-			"kms_key_id":        "",
-
-			"deletion_protection": false,
-
-			"storage_type": "io1",
-			"iops":         3000,
 		}
 	}
 
@@ -103,7 +90,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("required properties",
 			func(property string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties(), requiredProperties())))
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, requiredProperties()))
 
 				Expect(err).To(MatchError(ContainSubstring("1 error(s) occurred: (root): " + property + " is required")))
 			},
@@ -114,7 +101,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties(), requiredProperties(), params))
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(requiredProperties(), params))
 
 				Expect(err).To(MatchError(ContainSubstring(`1 error(s) occurred: ` + expectedErrorMsg)))
 			},
@@ -177,7 +164,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					})),
 					HaveKeyWithValue("engine", "sqlserver-ee"),
 					HaveKeyWithValue("mssql_version", "some-mssql-version"),
-					HaveKeyWithValue("storage_gb", BeNumerically("==", 20)),
+					HaveKeyWithValue("storage_gb", BeNumerically("==", 100)),
 					HaveKeyWithValue("rds_subnet_group", "some-rds-subnet-group"),
 					HaveKeyWithValue("rds_vpc_security_group_ids", "some-security-group-ids"),
 					HaveKeyWithValue("instance_class", "some-instance-class"),
@@ -202,7 +189,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(defaultProperties(), requiredProperties()))
+			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), requiredProperties())
 
 			Expect(err).NotTo(HaveOccurred())
 		})
