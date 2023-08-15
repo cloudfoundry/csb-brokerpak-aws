@@ -5,6 +5,8 @@ locals {
   subnet_ids         = try(data.aws_db_subnet_group.provided[0].subnet_ids, data.aws_subnets.in_provided_vpc[0].ids, data.aws_subnets.in_default_vpc[0].ids)
   security_group_ids = try(data.aws_security_groups.provided[0].ids, [aws_security_group.rds-sg[0].id])
   subnet_group_name  = try(data.aws_db_subnet_group.provided[0].name, aws_db_subnet_group.rds-private-subnet[0].name)
+
+  valid_storage_types_for_iops = ["io1", "gp3"]
 }
 
 data "aws_vpc" "default" {

@@ -27,17 +27,23 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"kms_key_id":            "",
 		"db_name":               "vsbdb",
 		"labels":                map[string]string{"label1": "value1"},
+		"max_allocated_storage": 0,
+		"deletion_protection":   true,
 
 		"aws_vpc_id":                 "",
-		"instance_class":             "",
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
+
+		"storage_type": "io1",
+		"iops":         3000,
 	}
 
 	requiredVars := map[string]any{
 		"engine":        "sqlserver-ee",
 		"mssql_version": "some-engine-version",
 		"storage_gb":    20,
+
+		"instance_class": "some-instance-class",
 	}
 
 	validVPC := awsVPCID
@@ -71,7 +77,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"engine_version":       Equal("some-engine-version"),
 				"identifier":           Equal("csb-mssql-test"),
 				"storage_encrypted":    BeTrue(),
-				"instance_class":       Equal(""),
+				"instance_class":       Equal("some-instance-class"),
 				"tags":                 HaveKeyWithValue("label1", "value1"),
 				"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
 				"apply_immediately":    BeTrue(),
@@ -89,6 +95,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"mssql_version\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
+			Expect(msgs).To(ContainSubstring(`The root module input variable \"instance_class\" is not set, and has no default value.`))
 		})
 	})
 
@@ -146,6 +153,15 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("should use the passed value", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"storage_gb": 60}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"allocated_storage": Equal(float64(60))}))
+			})
+		})
+	})
+
+	Context("max_allocated_storage", func() {
+		When("valid max_allocated_storage passed", func() {
+			It("should use the passed value", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"max_allocated_storage": 250}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"max_allocated_storage": Equal(float64(250))}))
 			})
 		})
 	})
@@ -308,6 +324,62 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				Expect(ResourceCreationForType(plan, "aws_db_subnet_group")).To(HaveLen(1))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"storage_encrypted": BeFalse()}))
 			})
+		})
+	})
+
+	Context("storage type", func() {
+		Context("default values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{}))
+			})
+
+			It("default values work with io1 and 3000 iops", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"storage_type": Equal("io1"),
+						"iops":         BeNumerically("==", 3000),
+					}))
+			})
+		})
+
+		Context("storage_type gp2", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"storage_type": "gp2",
+				}))
+			})
+
+			It("iops should not be set", func() {
+				instanceData := AfterValuesForType(plan, "aws_db_instance")
+				Expect(instanceData).To(MatchKeys(IgnoreExtras, Keys{
+					"storage_type": Equal("gp2"),
+				}))
+				Expect("iops").NotTo(BeKeyOf(instanceData))
+			})
+		})
+
+		When("valid type for iops", func() {
+			DescribeTable("iops should be set",
+				func(storageTypeParam map[string]any) {
+					plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, storageTypeParam))
+					instanceData := AfterValuesForType(plan, "aws_db_instance")
+
+					Expect(instanceData).To(
+						MatchKeys(IgnoreExtras, Keys{
+							"storage_type": Equal(storageTypeParam["storage_type"]),
+						}),
+					)
+					Expect("iops").To(BeKeyOf(instanceData))
+				},
+				Entry(
+					"io1",
+					map[string]any{"storage_type": "io1"},
+				),
+				Entry(
+					"gp3",
+					map[string]any{"storage_type": "gp3"},
+				),
+			)
 		})
 	})
 

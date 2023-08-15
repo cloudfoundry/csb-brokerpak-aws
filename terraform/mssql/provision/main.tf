@@ -36,6 +36,7 @@ resource "random_password" "password" {
 resource "aws_db_instance" "db_instance" {
   license_model          = "license-included"
   allocated_storage      = var.storage_gb
+  max_allocated_storage  = var.max_allocated_storage
   engine                 = var.engine
   engine_version         = var.mssql_version
   instance_class         = var.instance_class
@@ -50,6 +51,9 @@ resource "aws_db_instance" "db_instance" {
   storage_encrypted      = var.storage_encrypted
   kms_key_id             = var.kms_key_id == "" ? null : var.kms_key_id
   skip_final_snapshot    = true
+  deletion_protection    = var.deletion_protection
+  storage_type           = var.storage_type
+  iops                   = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
 
   lifecycle {
     prevent_destroy = true

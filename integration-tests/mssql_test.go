@@ -38,18 +38,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		return map[string]any{
 			"engine":        "sqlserver-ee",
 			"mssql_version": "some-mssql-version",
-			"storage_gb":    20,
-		}
-	}
+			// For documentation purpose:
+			// use a valid storage GB value. Default iops is 3000.
+			// The IOPS to GiB ratio must be between 1 and 50
+			"storage_gb": 100,
 
-	var defaultProperties = func() map[string]any {
-		return map[string]any{
-			"region":        "us-west-2",
-			"instance_name": "csb-mssql-0000000",
-			"db_name":       "vsbdb",
-
-			"storage_encrypted": true,
-			"kms_key_id":        "",
+			"instance_class": "some-instance-class",
 		}
 	}
 
@@ -58,6 +52,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"rds_vpc_security_group_ids": "some-security-group-ids",
 			"rds_subnet_group":           "some-rds-subnet-group",
 			"instance_class":             "some-instance-class",
+			"max_allocated_storage":      999,
 		}
 	}
 
@@ -95,7 +90,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 	Describe("provisioning", func() {
 		DescribeTable("required properties",
 			func(property string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, buildProperties(defaultProperties(), requiredProperties())))
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", deleteProperty(property, requiredProperties()))
 
 				Expect(err).To(MatchError(ContainSubstring("1 error(s) occurred: (root): " + property + " is required")))
 			},
@@ -106,7 +101,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		DescribeTable("property constraints",
 			func(params map[string]any, expectedErrorMsg string) {
-				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(defaultProperties(), requiredProperties(), params))
+				_, err := broker.Provision(msSQLServiceName, "custom-sample", buildProperties(requiredProperties(), params))
 
 				Expect(err).To(MatchError(ContainSubstring(`1 error(s) occurred: ` + expectedErrorMsg)))
 			},
@@ -169,7 +164,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					})),
 					HaveKeyWithValue("engine", "sqlserver-ee"),
 					HaveKeyWithValue("mssql_version", "some-mssql-version"),
-					HaveKeyWithValue("storage_gb", BeNumerically("==", 20)),
+					HaveKeyWithValue("storage_gb", BeNumerically("==", 100)),
 					HaveKeyWithValue("rds_subnet_group", "some-rds-subnet-group"),
 					HaveKeyWithValue("rds_vpc_security_group_ids", "some-security-group-ids"),
 					HaveKeyWithValue("instance_class", "some-instance-class"),
@@ -179,9 +174,14 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("db_name", "vsbdb"),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{"pcf-instance-id": Equal(instanceID)})),
+					HaveKeyWithValue("max_allocated_storage", BeNumerically("==", 999)),
+					HaveKeyWithValue("storage_type", "io1"),
+					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
+					HaveKeyWithValue("deletion_protection", BeFalse()),
 				),
 			)
 		})
+
 	})
 
 	Describe("updating instance", func() {
@@ -189,14 +189,14 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		BeforeEach(func() {
 			var err error
-			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(defaultProperties(), requiredProperties()))
+			instanceID, err = broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), requiredProperties())
 
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(defaultProperties(), requiredProperties(), map[string]any{prop: value}))
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: value})
 
 				Expect(err).To(MatchError(
 					ContainSubstring(
@@ -213,6 +213,40 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update db_name", "db_name", "no-matter-what-name"),
 			Entry("update instance_name", "instance_name", "no-matter-what-instance-name"),
 			Entry("update rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "no-matter-what-security-group"),
+		)
+
+		DescribeTable("should allow unsetting properties flagged as `nullable` by explicitly updating their value to be `nil`",
+			func(prop string, initValue any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: initValue})
+				Expect(err).NotTo(HaveOccurred())
+
+				err = broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: nil})
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry("max_allocated_storage is nullable", "max_allocated_storage", 999),
+		)
+
+		DescribeTable("should prevent unsetting properties not flagged as `nullable` by explicitly updating their value to be `nil`",
+			func(prop string, initValue any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: initValue})
+				Expect(err).NotTo(HaveOccurred())
+
+				err = broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: nil})
+				Expect(err).To(MatchError(ContainSubstring("Invalid type. Expected: ")))
+				Expect(err).To(MatchError(ContainSubstring(", given: null")))
+			},
+			Entry("rds_subnet_group isn't nullable", "rds_subnet_group", "any-value"),
+		)
+
+		DescribeTable("should allow updating properties",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
+
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry("update storage_type", "storage_type", "gp2"),
+			Entry("update iops", "iops", 1500),
+			Entry("update deletion_protection", "deletion_protection", true),
 		)
 	})
 })

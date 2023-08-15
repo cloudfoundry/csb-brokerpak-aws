@@ -37,6 +37,13 @@ provision:
     constraints:
       minimum: 20
       maximum: 16384
+  - field_name: max_allocated_storage
+    type: integer
+    nullable: true
+    default: 0
+    details: |
+      Upper limit to which Amazon RDS can automatically scale the storage of the DB instance.
+      Must be greater than or equal to `storage_gb` or 0 to disable Storage Autoscaling.
   - field_name: storage_encrypted
     type: boolean
     default: true
@@ -93,7 +100,6 @@ provision:
     details: |
       AWS DB instance class. Accepted values will depend on the selected engine and mssql_version.
       See: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html#SQLServer.Concepts.General.InstanceClasses
-    default: ""
   - field_name: rds_subnet_group
     type: string
     details: AWS RDS subnet group already in existence to use
@@ -103,6 +109,26 @@ provision:
     details: Comma delimited list of security group ID's for instance
     default: ""
     prohibit_update: true
+  - field_name: deletion_protection
+    type: boolean
+    details: Whether deletion protection is enabled. The database cannot be deleted when this property is enabled.
+    default: false
+  - field_name: storage_type
+    type: string
+    details: |
+      Type of storage to be used.
+      One of "standard" (magnetic), "gp2" (general purpose SSD), "gp3" (general purpose SSD),
+      or "io1" (provisioned IOPS SSD).
+    default: "io1"
+  - field_name: iops
+    type: integer
+    details: |
+      The amount of provisioned IOPS. For this property to take effect, `storage_type` must be
+      set to `io1` or `gp3`.
+      Cannot be specified for `gp3` storage if the `storage_gb` value is below a per-engine threshold.
+      See the RDS User Guide for details:
+      https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#gp3-storage.
+    default: 3000
   computed_inputs:
   - name: labels
     overwrite: true
