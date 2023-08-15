@@ -27,7 +27,7 @@ type Connector struct {
 // It is idempotent.
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
 	// create database must be executed without transaction since the Procedure is creating a transaction.
-	if err := c.withMasterDBConnection(func(db *sql.DB) error {
+	if err := c.withDefaultDBConnection(func(db *sql.DB) error {
 
 		tflog.Debug(ctx, "creating database")
 		return createDatabaseIfNotExists(ctx, db, c.database)
@@ -79,8 +79,8 @@ func (c *Connector) withConnection(callback func(*sql.DB) error) error {
 	return c.dbConnector.withConnection(callback)
 }
 
-func (c *Connector) withMasterDBConnection(callback func(*sql.DB) error) error {
-	return c.dbConnector.withMasterDBConnection(callback)
+func (c *Connector) withDefaultDBConnection(callback func(*sql.DB) error) error {
+	return c.dbConnector.withDefaultDBConnection(callback)
 }
 
 func (c *Connector) withTransaction(callback func(*sql.Tx) error) error {

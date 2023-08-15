@@ -43,7 +43,7 @@ func (dbc *DBConnector) withConnection(callback func(*sql.DB) error) error {
 	return callback(db)
 }
 
-func (dbc *DBConnector) withMasterDBConnection(callback func(*sql.DB) error) error {
+func (dbc *DBConnector) withDefaultDBConnection(callback func(*sql.DB) error) error {
 	db, err := dbc.connect(dbc.encoder.EncodeWithoutDB())
 	if err != nil {
 		return err
