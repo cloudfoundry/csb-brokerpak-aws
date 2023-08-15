@@ -8,7 +8,7 @@ import (
 
 const (
 	queryParamDatabaseKey = "database"
-	queryParamEncryptKey  = "queryParamEncryptKey"
+	queryParamEncryptKey  = "encrypt"
 )
 
 type Encoder struct {
