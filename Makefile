@@ -100,13 +100,16 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf prov
 
 
 .PHONY: providers
-providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion # build custom providers
+providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion providers/build/cloudfoundry.org/cloud-service-broker/csbsqlserver # build custom providers
 
 providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build
 
 providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion:
 	cd providers/terraform-provider-csbmajorengineversion; $(MAKE) build
+
+providers/build/cloudfoundry.org/cloud-service-broker/csbsqlserver:
+	cd providers/terraform-provider-csbsqlserver; $(MAKE) build
 
 ###### Run ###################################################################
 .PHONY: run
@@ -139,6 +142,7 @@ run-examples: providers ## run examples in yml files. Runs examples for all serv
 test-coverage: ## test coverage score
 	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) ginkgo-coverage
 	- cd providers/terraform-provider-csbmajorengineversion; $(MAKE) ginkgo-coverage
+	- cd providers/terraform-provider-csbsqlserver; $(MAKE) ginkgo-coverage
 
 .PHONY: test
 test: lint run-integration-tests ## run the tests
@@ -154,6 +158,7 @@ run-terraform-tests: providers custom.tfrc ## run terraform tests for this broke
 .PHONY: run-provider-tests
 run-provider-tests:  ## run the integration tests associated with providers
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
+	cd providers/terraform-provider-csbsqlserver; $(MAKE) test
 
 custom.tfrc:
 	sed "s#BROKERPAK_PATH#$(PWD)#" custom.tfrc.template > $@
@@ -210,6 +215,7 @@ clean: ## delete build files
 	- rm -f ./brokerpak-user-docs.md
 	- cd providers/terraform-provider-csbdynamodbns; $(MAKE) clean
 	- cd providers/terraform-provider-csbmajorengineversion; $(MAKE) clean
+	- cd providers/terraform-provider-csbsqlserver; $(MAKE) clean
 
 $(PAK_BUILD_CACHE_PATH):
 	@echo "Folder $(PAK_BUILD_CACHE_PATH) does not exist. Creating it..."

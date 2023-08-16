@@ -176,6 +176,22 @@ bind:
     default: ${instance.details["password"]}
     overwrite: true
   template_refs:
+    outputs: terraform/mssql/bind/outputs.tf
+    provider: terraform/mssql/bind/provider.tf
+    versions: terraform/mssql/bind/versions.tf
     variables: terraform/mssql/bind/variables.tf
-  outputs: []
+    main: terraform/mssql/bind/main.tf
+  outputs:
+  - field_name: username
+    type: string
+    details: The username to authenticate to the database instance.
+  - field_name: password
+    type: string
+    details: The password to authenticate to the database instance.
+  - field_name: uri
+    type: string
+    details: The uri to connect to the database instance and database.
+  - field_name: jdbcUrl
+    type: string
+    details: The jdbc url to connect to the database instance and database.
 examples: []
