@@ -29,6 +29,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"labels":                map[string]string{"label1": "value1"},
 		"max_allocated_storage": 0,
 		"deletion_protection":   true,
+		"publicly_accessible":   false,
 
 		"aws_vpc_id":                 "",
 		"rds_subnet_group":           "",
@@ -83,6 +84,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"apply_immediately":    BeTrue(),
 				"skip_final_snapshot":  BeTrue(),
 				"license_model":        Equal("license-included"),
+				"publicly_accessible":  BeFalse(),
 			}))
 		})
 	})

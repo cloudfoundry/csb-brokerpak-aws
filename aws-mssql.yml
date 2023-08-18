@@ -129,6 +129,10 @@ provision:
       See the RDS User Guide for details:
       https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#gp3-storage.
     default: 3000
+  - field_name: publicly_accessible
+    type: boolean
+    details: Make instance public if true
+    default: false
   computed_inputs:
   - name: labels
     overwrite: true

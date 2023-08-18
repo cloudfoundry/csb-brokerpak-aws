@@ -53,6 +53,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"rds_subnet_group":           "some-rds-subnet-group",
 			"instance_class":             "some-instance-class",
 			"max_allocated_storage":      999,
+			"publicly_accessible":        false,
 		}
 	}
 
@@ -178,6 +179,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("storage_type", "io1"),
 					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
+					HaveKeyWithValue("publicly_accessible", BeFalse()),
 				),
 			)
 		})
@@ -236,6 +238,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				Expect(err).To(MatchError(ContainSubstring(", given: null")))
 			},
 			Entry("rds_subnet_group isn't nullable", "rds_subnet_group", "any-value"),
+			Entry("publicly_accessible isn't nullable", "publicly_accessible", true),
 		)
 
 		DescribeTable("should allow updating properties",
@@ -247,6 +250,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update storage_type", "storage_type", "gp2"),
 			Entry("update iops", "iops", 1500),
 			Entry("update deletion_protection", "deletion_protection", true),
+			Entry("update publicly_accessible", "publicly_accessible", true),
 		)
 	})
 })
