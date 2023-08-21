@@ -53,7 +53,6 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"rds_subnet_group":           "some-rds-subnet-group",
 			"instance_class":             "some-instance-class",
 			"max_allocated_storage":      999,
-			"publicly_accessible":        false,
 		}
 	}
 
