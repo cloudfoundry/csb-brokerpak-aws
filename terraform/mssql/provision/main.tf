@@ -56,11 +56,31 @@ resource "aws_db_instance" "db_instance" {
   storage_type           = var.storage_type
   iops                   = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
 
+  parameter_group_name = aws_db_parameter_group.db_parameter_group.name
+
   lifecycle {
     prevent_destroy = true
   }
 
   timeouts {
     create = "60m"
+  }
+}
+
+resource "aws_db_parameter_group" "db_parameter_group" {
+  family = local.family
+  # The name cannot be repeated. We need `name_prefix` when upgrading major version.
+  # See `DBParameterGroupAlreadyExists` error:
+  # https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBParameterGroup.html
+  name_prefix = format("rds-mssql-%s", var.instance_name)
+
+  parameter {
+    name         = "contained database authentication"
+    value        = 1
+    apply_method = "immediate" // It is the default value, but it is worth being more explicit.
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }

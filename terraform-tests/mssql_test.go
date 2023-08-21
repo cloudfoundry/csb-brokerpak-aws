@@ -41,7 +41,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 	requiredVars := map[string]any{
 		"engine":        "sqlserver-ee",
-		"mssql_version": "some-engine-version",
+		"mssql_version": "15.00.4236.7.v1",
 		"storage_gb":    20,
 
 		"instance_class": "some-instance-class",
@@ -75,7 +75,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		It("should create a db instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"engine":               Equal("sqlserver-ee"),
-				"engine_version":       Equal("some-engine-version"),
+				"engine_version":       Equal("15.00.4236.7.v1"),
 				"identifier":           Equal("csb-mssql-test"),
 				"storage_encrypted":    BeTrue(),
 				"instance_class":       Equal("some-instance-class"),
@@ -405,5 +405,29 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Entry("sqlserver-ee  ! encryption", map[string]any{"engine": "sqlserver-ee", "storage_encrypted": false}, ""),
 			Entry("sqlserver-web ! encryption", map[string]any{"engine": "sqlserver-web", "storage_encrypted": false}, ""),
 		)
+	})
+
+	Context("db parameter group", func() {
+		When("with default values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
+			})
+
+			It("should create a parameter group", func() {
+				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"name_prefix": ContainSubstring("rds-mssql-csb-mssql-test"),
+						"family":      Equal("sqlserver-ee-15.0"),
+						"parameter": ConsistOf(
+							MatchKeys(IgnoreExtras, Keys{
+								"name":         Equal("contained database authentication"),
+								"value":        Equal("1"),
+								"apply_method": Equal("immediate"),
+							}),
+						)},
+					))
+			})
+		})
 	})
 })

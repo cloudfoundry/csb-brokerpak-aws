@@ -6,6 +6,9 @@ locals {
   security_group_ids = try(data.aws_security_groups.provided[0].ids, [aws_security_group.rds-sg[0].id])
   subnet_group_name  = try(data.aws_db_subnet_group.provided[0].name, aws_db_subnet_group.rds-private-subnet[0].name)
 
+  major_version = split(".", data.csbmajorengineversion.major_version_retriever.major_version)[0]
+  family        = format("%s-%s.0", var.engine, local.major_version)
+
   valid_storage_types_for_iops = ["io1", "gp3"]
 }
 
@@ -103,4 +106,9 @@ data "aws_security_groups" "provided" {
     }
   }
 }
+
+data "csbmajorengineversion" "major_version_retriever" {
+  engine_version = var.mssql_version
+}
+
 
