@@ -46,8 +46,8 @@ terraform_binaries:
   source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
   default: true
 - name: terraform-provider-aws
-  version: 5.12.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.12.0.zip
+  version: 5.13.1
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.13.1.zip
 - name: terraform-provider-random
   version: 3.5.1
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.5.1.zip
@@ -60,13 +60,13 @@ terraform_binaries:
   provider: cyrilgdn/postgresql
   url_template: https://github.com/cyrilgdn/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbpg
-  version: 1.2.3
-  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.3.zip
+  version: 1.2.4
+  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.4.zip
   provider: cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
-  version: 1.2.9
-  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.9.zip
+  version: 1.2.10
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.10.zip
   provider: cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
