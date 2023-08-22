@@ -21,3 +21,5 @@ variable "max_allocated_storage" {
 variable "storage_type" { type = string }
 variable "iops" { type = number }
 variable "publicly_accessible" { type = bool }
+variable "monitoring_interval" { type = number }
+variable "monitoring_role_arn" { type = string }

@@ -55,6 +55,8 @@ resource "aws_db_instance" "db_instance" {
   deletion_protection    = var.deletion_protection
   storage_type           = var.storage_type
   iops                   = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
+  monitoring_interval    = var.monitoring_interval
+  monitoring_role_arn    = var.monitoring_role_arn
 
   parameter_group_name = aws_db_parameter_group.db_parameter_group.name
 

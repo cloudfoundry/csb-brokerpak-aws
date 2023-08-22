@@ -45,6 +45,9 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"storage_gb":    20,
 
 		"instance_class": "some-instance-class",
+
+		"monitoring_interval": 0,
+		"monitoring_role_arn": "",
 	}
 
 	validVPC := awsVPCID
@@ -86,6 +89,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"skip_final_snapshot":  BeTrue(),
 				"license_model":        Equal("license-included"),
 				"publicly_accessible":  BeFalse(),
+				"monitoring_interval":  BeNumerically("==", 0),
 			}))
 		})
 	})
@@ -99,6 +103,44 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"instance_class\" is not set, and has no default value.`))
+		})
+	})
+
+	Context("monitoring_interval", func() {
+		When("monitoring_role_arn is invalid", func() {
+			It("complains about invalid monitoring_role_arn", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_role_arn": "NOTVALID"}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`(NOTVALID) is an invalid ARN: arn: invalid prefix`))
+			})
+		})
+
+		When("monitoring_interval is invalid", func() {
+			It("complains about invalid monitoring_interval", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_interval": -1}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`expected monitoring_interval to be one of [0 1 5 10 15 30 60], got -1`))
+			})
+		})
+
+		When("monitoring_interval and monitoring_role_arn are valid", func() {
+			It("succeeds to plan operations", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_interval": 60, "monitoring_role_arn": "arn:aws:iam::123456789012:test"}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"monitoring_interval": BeNumerically("==", 60), "monitoring_role_arn": Equal("arn:aws:iam::123456789012:test")}))
+			})
+		})
+	})
+
+	Context("csbmajorengineversion provider needs a valid engine version", func() {
+		When("mssql_version is not valid", func() {
+			It("it fails when recovering the major version when creating the db parameter group", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"mssql_version": "ANY-VALUE-AT-ALL"}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`invalid parameter combination. API does not return any db engine version - engine sqlserver-ee - engine version ANY-VALUE-AT-ALL`))
+			})
 		})
 	})
 
