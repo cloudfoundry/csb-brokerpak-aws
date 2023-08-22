@@ -27,10 +27,8 @@ var (
 var _ = BeforeSuite(func() {
 	adminPassword = testhelpers.RandomPassword()
 	port = testhelpers.FreePort()
-	session := testhelpers.StartServer(adminPassword, port)
-	DeferCleanup(func() {
-		session.Terminate().Wait(time.Minute)
-	})
+	shutdownServerFn := testhelpers.StartServer(adminPassword, port)
+	DeferCleanup(func() { shutdownServerFn(time.Minute) })
 	db = testhelpers.Connect(testhelpers.AdminUser, adminPassword, testhelpers.TestDatabase, port)
 	conn = connector.New(
 		testhelpers.Server,
