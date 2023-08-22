@@ -39,7 +39,7 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				shutdownServerFn := testhelpers.StartServer(adminPassword, port)
 				DeferCleanup(func() { shutdownServerFn(time.Minute) })
 
-				resource.Test(GinkgoT(), getTestCase(adminPassword, port))
+				resource.Test(GinkgoT(), getTestCase(createTestCaseCnf(adminPassword, port)))
 			})
 		})
 	})
@@ -55,28 +55,55 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				shutdownServerFn := testhelpers.StartServer(adminPassword, port, testhelpers.WithSPConfigure())
 				DeferCleanup(func() { shutdownServerFn(time.Minute) })
 
-				resource.Test(GinkgoT(), getTestCase(adminPassword, port))
+				resource.Test(GinkgoT(), getTestCase(createTestCaseCnf(adminPassword, port)))
 			})
 		})
 	})
 })
 
-func getTestCase(adminPassword string, port int) resource.TestCase {
+type testCaseCnf struct {
+	ResourceBindingOneName string
+	ResourceBindingTwoName string
+	BindingUserOne         string
+	BindingUserTwo         string
+	BindingPasswordOne     string
+	BindingPasswordTwo     string
+	DatabaseName           string
+	AdminPassword          string
+	Port                   int
+}
+
+func createTestCaseCnf(adminPassword string, port int) testCaseCnf {
+	return testCaseCnf{
+		ResourceBindingOneName: fmt.Sprintf("%s.binding1", csbsqlserver.ResourceNameKey),
+		ResourceBindingTwoName: fmt.Sprintf("%s.binding2", csbsqlserver.ResourceNameKey),
+		BindingUserOne:         uuid.New(),
+		BindingUserTwo:         uuid.New(),
+		BindingPasswordOne:     testhelpers.RandomPassword(),
+		BindingPasswordTwo:     testhelpers.RandomPassword(),
+		DatabaseName:           testhelpers.RandomDatabaseName(),
+		AdminPassword:          adminPassword,
+		Port:                   port,
+	}
+}
+
+func getTestCase(cnf testCaseCnf, extraTestCheckFunc ...resource.TestCheckFunc) resource.TestCase {
 	var (
-		tfStateResourceBinding1Name        = fmt.Sprintf("%s.binding1", csbsqlserver.ResourceNameKey)
-		tfStateResourceBinding2Name        = fmt.Sprintf("%s.binding2", csbsqlserver.ResourceNameKey)
-		bindingUser1, bindingUser2         = uuid.New(), uuid.New()
-		bindingPassword1, bindingPassword2 = testhelpers.RandomPassword(), testhelpers.RandomPassword()
-		databaseName                       = testhelpers.RandomDatabaseName()
+		tfStateResourceBinding1Name        = cnf.ResourceBindingOneName
+		tfStateResourceBinding2Name        = cnf.ResourceBindingTwoName
+		bindingUser1, bindingUser2         = cnf.BindingUserOne, cnf.BindingUserTwo
+		bindingPassword1, bindingPassword2 = cnf.BindingPasswordOne, cnf.BindingPasswordTwo
+		databaseName                       = cnf.DatabaseName
 		provider                           = initTestProvider()
-		db                                 = testhelpers.Connect(testhelpers.AdminUser, adminPassword, databaseName, port)
+		db                                 = testhelpers.Connect(testhelpers.AdminUser, cnf.AdminPassword, databaseName, cnf.Port)
 	)
+
 	return resource.TestCase{
 		IsUnitTest:        true,
 		ProviderFactories: getTestProviderFactories(provider),
 		Steps: []resource.TestStep{{
 			ResourceName: csbsqlserver.ResourceNameKey,
-			Config:       testGetConfiguration(port, adminPassword, bindingUser1, bindingPassword1, bindingUser2, bindingPassword2, databaseName),
+			Config:       testGetConfiguration(cnf.Port, cnf.AdminPassword, bindingUser1, bindingPassword1, bindingUser2, bindingPassword2, databaseName),
 			Check: resource.ComposeTestCheckFunc(
 				resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "username", bindingUser1),
 				resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "password", bindingPassword1),
@@ -89,6 +116,14 @@ func getTestCase(adminPassword string, port int) resource.TestCase {
 				testCheckDatabaseExists(databaseName, provider),
 				testCheckUserExists(db, bindingUser1),
 				testCheckUserExists(db, bindingUser2),
+				func(state *terraform.State) error {
+					for _, checkFn := range extraTestCheckFunc {
+						if err := checkFn(state); err != nil {
+							return err
+						}
+					}
+					return nil
+				},
 			),
 		}},
 		CheckDestroy: func(state *terraform.State) error {
