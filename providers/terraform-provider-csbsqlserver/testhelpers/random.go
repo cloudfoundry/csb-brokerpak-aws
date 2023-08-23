@@ -6,7 +6,7 @@ import (
 	"net"
 
 	"github.com/onsi/gomega"
-	"github.com/pborman/uuid"
+	"github.com/google/uuid"
 )
 
 func FreePort() int {
