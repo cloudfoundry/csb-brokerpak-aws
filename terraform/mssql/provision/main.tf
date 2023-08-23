@@ -47,6 +47,7 @@ resource "aws_db_instance" "db_instance" {
   tags                   = var.labels
   vpc_security_group_ids = local.security_group_ids
   db_subnet_group_name   = local.subnet_group_name
+  option_group_name      = var.option_group_name
   publicly_accessible    = var.publicly_accessible
   apply_immediately      = true
   storage_encrypted      = var.storage_encrypted
