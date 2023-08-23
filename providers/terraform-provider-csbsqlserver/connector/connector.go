@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -101,10 +100,13 @@ func (c *Connector) CheckDatabaseExists(ctx context.Context, dbName string) (res
 }
 
 func (c *Connector) createDatabase(ctx context.Context, dbName string) error {
-	dbIdentifier := quoteIdentifier(dbName)
-	statement := fmt.Sprintf(`CREATE DATABASE %[1]v CONTAINMENT=PARTIAL`, dbIdentifier)
+	statement := `
+DECLARE @sql nvarchar(max)
+SET @sql = 'CREATE DATABASE ' + QuoteName(@databaseName) + ' CONTAINMENT=PARTIAL' 
+EXEC (@sql)
+`
 	return c.withDefaultDBConnection(func(db *sql.DB) (err error) {
-		if _, err := db.ExecContext(ctx, statement); err != nil {
+		if _, err := db.ExecContext(ctx, statement, sql.Named("databaseName", dbName)); err != nil {
 			return fmt.Errorf("error creating database %q: %w", dbName, err)
 		}
 		return nil
@@ -112,11 +114,14 @@ func (c *Connector) createDatabase(ctx context.Context, dbName string) error {
 }
 
 func (c *Connector) setAutoClose(ctx context.Context, dbName string) error {
-	dbIdentifier := quoteIdentifier(dbName)
-	statement := fmt.Sprintf(`ALTER DATABASE %[1]v SET AUTO_CLOSE OFF`, dbIdentifier)
+	statement := `
+DECLARE @sql nvarchar(max)
+SET @sql = 'ALTER DATABASE ' + QuoteName(@databaseName) + ' SET AUTO_CLOSE OFF' 
+EXEC (@sql)
+`
 	return c.withDefaultDBConnection(func(db *sql.DB) (err error) {
-		if _, err := db.ExecContext(ctx, statement); err != nil {
-			return fmt.Errorf("error creating database %q: %w", dbName, err)
+		if _, err := db.ExecContext(ctx, statement, sql.Named("databaseName", dbName)); err != nil {
+			return fmt.Errorf("error setting autoclose %q: %w", dbName, err)
 		}
 		return nil
 	})
@@ -211,10 +216,4 @@ func grantExec(ctx context.Context, tx *sql.Tx, username string) error {
 	}
 
 	return nil
-}
-
-func quoteIdentifier(id string) string {
-	id = strings.Replace(id, "[", "[[", -1)
-	id = strings.Replace(id, "]", "]]", -1)
-	return fmt.Sprintf("[%v]", id)
 }
