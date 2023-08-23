@@ -21,3 +21,4 @@ variable "max_allocated_storage" {
 variable "storage_type" { type = string }
 variable "iops" { type = number }
 variable "option_group_name" { type = string }
+variable "publicly_accessible" { type = bool }

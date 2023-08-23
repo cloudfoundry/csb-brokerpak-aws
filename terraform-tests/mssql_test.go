@@ -29,6 +29,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"labels":                map[string]string{"label1": "value1"},
 		"max_allocated_storage": 0,
 		"deletion_protection":   true,
+		"publicly_accessible":   false,
 
 		"aws_vpc_id":                 "",
 		"rds_subnet_group":           "",
@@ -59,7 +60,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 
 		It("should create the right resources", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(6))
+			Expect(plan.ResourceChanges).To(HaveLen(7))
 
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 				"aws_db_instance",
@@ -68,6 +69,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"aws_security_group_rule",
 				"aws_db_subnet_group",
 				"aws_security_group",
+				"aws_db_parameter_group",
 			))
 		})
 
@@ -83,6 +85,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"apply_immediately":    BeTrue(),
 				"skip_final_snapshot":  BeTrue(),
 				"license_model":        Equal("license-included"),
+				"publicly_accessible":  BeFalse(),
 			}))
 		})
 	})
@@ -99,19 +102,18 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("properties that pass-through without validation", func() {
-		When("mssql_version is passed", func() {
-			It("it passes-through without validation", func() {
-				// It would be possible to validate the engine version before apply using
-				// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/rds_engine_version
-				// It has some very interesting properties and use cases, such as:
-				//  - valid_upgrade_targets - Set of engine versions that this database engine version can be upgraded to.
-				//  - supports_read_replica - Indicates whether the database engine version supports read replicas.
-				//  - supports_log_exports_to_cloudwatch - Indicates whether the engine version supports exporting the log types specified by
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"mssql_version": "ANY-VALUE-AT-ALL"}))
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"engine_version": Equal("ANY-VALUE-AT-ALL")}))
+	Context("csbmajorengineversion provider needs a valid engine version", func() {
+		When("mssql_version is not valid", func() {
+			It("it fails when recovering the major version when creating the db parameter group", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"mssql_version": "ANY-VALUE-AT-ALL"}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`invalid parameter combination. API does not return any db engine version - engine sqlserver-ee - engine version ANY-VALUE-AT-ALL`))
 			})
 		})
+	})
+
+	Context("properties that pass-through without validation", func() {
 		When("instance_class is passed", func() {
 			It("it passes-through without validation", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"instance_class": "ANY-VALUE-AT-ALL"}))
@@ -200,6 +202,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					"aws_security_group_rule",
 					"aws_db_subnet_group",
 					"aws_security_group",
+					"aws_db_parameter_group",
 				))
 			})
 		})
