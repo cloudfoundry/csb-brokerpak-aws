@@ -88,9 +88,8 @@ func (c *Connector) ReadBinding(ctx context.Context, username string) (result bo
 
 func (c *Connector) CheckDatabaseExists(ctx context.Context, dbName string) (result bool, err error) {
 	return result, c.withDefaultDBConnection(func(db *sql.DB) (err error) {
-		dbStr := quoteString(dbName)
-		statement := fmt.Sprintf(`SELECT 1 FROM master.dbo.sysdatabases where name=%[1]v`, dbStr)
-		rows, err := db.QueryContext(ctx, statement)
+		statement := `SELECT 1 FROM master.dbo.sysdatabases where name=@p1`
+		rows, err := db.QueryContext(ctx, statement, dbName)
 		if err != nil {
 			return fmt.Errorf("error querying existence of database %q: %w", dbName, err)
 		}
@@ -212,10 +211,6 @@ func grantExec(ctx context.Context, tx *sql.Tx, username string) error {
 	}
 
 	return nil
-}
-
-func quoteString(str string) string {
-	return `N'` + strings.Replace(str, `'`, `''`, -1) + `'`
 }
 
 func quoteIdentifier(id string) string {
