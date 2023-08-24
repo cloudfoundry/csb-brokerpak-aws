@@ -178,6 +178,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("storage_type", "io1"),
 					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
+					HaveKeyWithValue("option_group_name", BeNil()),
 					HaveKeyWithValue("publicly_accessible", BeFalse()),
 				),
 			)
