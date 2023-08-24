@@ -11,14 +11,20 @@ import (
 
 func New(server string, port int, username, password, database, encrypt string) *Connector {
 	return &Connector{
-		database:    database,
-		dbConnector: NewDBConnector(server, port, username, password, database, encrypt),
-	}
+		database: database,
+		encoder: NewEncoder(
+			server,
+			username,
+			password,
+			database,
+			encrypt,
+			port,
+		)}
 }
 
 type Connector struct {
-	database    string
-	dbConnector *DBConnector
+	database string
+	encoder  *Encoder
 }
 
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
@@ -128,15 +134,52 @@ EXEC (@sql)
 }
 
 func (c *Connector) withConnection(callback func(*sql.DB) error) error {
-	return c.dbConnector.withConnection(callback)
+	db, err := c.connect(c.encoder.Encode())
+	if err != nil {
+		return err
+	}
+
+	return callback(db)
 }
 
 func (c *Connector) withDefaultDBConnection(callback func(*sql.DB) error) error {
-	return c.dbConnector.withDefaultDBConnection(callback)
+	db, err := c.connect(c.encoder.EncodeWithoutDB())
+	if err != nil {
+		return err
+	}
+
+	return callback(db)
 }
 
 func (c *Connector) withTransaction(callback func(*sql.Tx) error) error {
-	return c.dbConnector.withTransaction(callback)
+	return c.withConnection(func(db *sql.DB) error {
+		tx, err := db.Begin()
+		if err != nil {
+			return err
+		}
+		defer func() {
+			_ = tx.Rollback()
+		}()
+
+		if err := callback(tx); err != nil {
+			return err
+		}
+
+		return tx.Commit()
+	})
+}
+
+func (c *Connector) connect(url string) (*sql.DB, error) {
+	db, err := sql.Open("sqlserver", url)
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to database: %w", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("error pinging database: %w", err)
+	}
+
+	return db, nil
 }
 
 type databaseActor interface {
