@@ -65,7 +65,7 @@ func getTestCase(adminPassword string, port int) resource.TestCase {
 	var (
 		tfStateResourceBinding1Name        = fmt.Sprintf("%s.binding1", csbsqlserver.ResourceNameKey)
 		tfStateResourceBinding2Name        = fmt.Sprintf("%s.binding2", csbsqlserver.ResourceNameKey)
-		bindingUser1, bindingUser2         = uuid.New(), uuid.New()
+		bindingUser1, bindingUser2         = uuid.NewString(), uuid.NewString()
 		bindingPassword1, bindingPassword2 = testhelpers.RandomPassword(), testhelpers.RandomPassword()
 		databaseName                       = testhelpers.RandomDatabaseName()
 		provider                           = initTestProvider()
