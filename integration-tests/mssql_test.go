@@ -179,6 +179,9 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
 					HaveKeyWithValue("publicly_accessible", BeFalse()),
+					HaveKeyWithValue("backup_retention_period", float64(7)),
+					HaveKeyWithValue("copy_tags_to_snapshot", true),
+					HaveKeyWithValue("delete_automated_backups", true),
 				),
 			)
 		})
@@ -220,11 +223,17 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			func(prop string, initValue any) {
 				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: initValue})
 				Expect(err).NotTo(HaveOccurred())
+				Expect(mockTerraform.FirstTerraformInvocationVars()).To(HaveKeyWithValue(prop, initValue))
+
+				Expect(mockTerraform.Reset()).To(Succeed())
+				Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 
 				err = broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: nil})
 				Expect(err).NotTo(HaveOccurred())
+				Expect(mockTerraform.FirstTerraformInvocationVars()).To(HaveKey(prop))
 			},
 			Entry("max_allocated_storage is nullable", "max_allocated_storage", 999),
+			Entry("backup_window is nullable", "backup_window", "00:00-00:00"),
 		)
 
 		DescribeTable("should prevent unsetting properties not flagged as `nullable` by explicitly updating their value to be `nil`",
@@ -245,11 +254,18 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				err := broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
 
 				Expect(err).NotTo(HaveOccurred())
+				Expect(mockTerraform.FirstTerraformInvocationVars()).To(HaveKeyWithValue(prop, value))
 			},
 			Entry("update storage_type", "storage_type", "gp2"),
 			Entry("update iops", "iops", 1500),
 			Entry("update deletion_protection", "deletion_protection", true),
 			Entry("update publicly_accessible", "publicly_accessible", true),
+			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
+			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
+			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
+			Entry("update backup_window", "backup_window", "01:02-03:04"),
+			Entry("update copy_tags_to_snapshot", "copy_tags_to_snapshot", false),
+			Entry("update delete_automated_backups", "delete_automated_backups", false),
 		)
 	})
 })
