@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/onsi/gomega"
 	"github.com/google/uuid"
+	"github.com/onsi/gomega"
 )
 
 func FreePort() int {
