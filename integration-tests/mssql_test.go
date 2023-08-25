@@ -223,16 +223,13 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			func(prop string, initValue any) {
 				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: initValue})
 				Expect(err).NotTo(HaveOccurred())
-				Expect(mockTerraform.FirstTerraformInvocationVars()).To(HaveKeyWithValue(prop, initValue))
-
-				Expect(mockTerraform.Reset()).To(Succeed())
-				Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
+				Expect(nthTerraformInvocationVars(mockTerraform, 1)).To(HaveKeyWithValue(prop, initValue))
 
 				err = broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: nil})
 				Expect(err).NotTo(HaveOccurred())
-				Expect(mockTerraform.FirstTerraformInvocationVars()).To(HaveKey(prop))
+				Expect(nthTerraformInvocationVars(mockTerraform, 2)).To(HaveKeyWithValue(prop, BeNil()))
 			},
-			Entry("max_allocated_storage is nullable", "max_allocated_storage", 999),
+			Entry("max_allocated_storage is nullable", "max_allocated_storage", float64(987)),
 			Entry("backup_window is nullable", "backup_window", "00:00-00:00"),
 		)
 
@@ -254,14 +251,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				err := broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
 
 				Expect(err).NotTo(HaveOccurred())
-				Expect(mockTerraform.FirstTerraformInvocationVars()).To(HaveKeyWithValue(prop, value))
+				Expect(nthTerraformInvocationVars(mockTerraform, 1)).To(HaveKeyWithValue(prop, value))
 			},
 			Entry("update storage_type", "storage_type", "gp2"),
-			Entry("update iops", "iops", 1500),
+			Entry("update iops", "iops", float64(1500)),
 			Entry("update deletion_protection", "deletion_protection", true),
 			Entry("update publicly_accessible", "publicly_accessible", true),
-			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
-			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
 			Entry("update backup_retention_period", "backup_retention_period", float64(2)),
 			Entry("update backup_window", "backup_window", "01:02-03:04"),
 			Entry("update copy_tags_to_snapshot", "copy_tags_to_snapshot", false),
