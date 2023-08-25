@@ -114,8 +114,7 @@ provision:
     default: false
   - field_name: option_group_name
     type: string
-    default: null
-    nullable: true
+    default: ""
     details: |
       Name of the DB option group to associate.
       MSSQL offers additional features such as SQL Server Audit, Transparent Data Encryption, etc.
