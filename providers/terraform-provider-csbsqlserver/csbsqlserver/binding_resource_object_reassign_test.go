@@ -20,8 +20,8 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 		When("binding is deleted", func() {
 			It("should allow access to previous objects", func() {
 				var (
-					adminPassword = "W3_Mv2p5gnEN24tE"
-					port          = 1433
+					adminPassword = testhelpers.RandomPassword()
+					port          = testhelpers.FreePort()
 				)
 
 				_ = testhelpers.StartServer(adminPassword, port, testhelpers.WithSPConfigure())
