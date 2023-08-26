@@ -65,6 +65,8 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 							testCheckSchemaNames(cnf, cnf.ResourceBindingOneName, schemaNameUserOne, schemaNameUserTwo),
 							// user TWO reads schema names
 							testCheckSchemaNames(cnf, cnf.ResourceBindingTwoName, schemaNameUserOne, schemaNameUserTwo),
+							// user ONE CANNOT create a database
+							testCheckCreateDatabase(cnf, "fake_database_name", cnf.ResourceBindingOneName, `mssql: CREATE DATABASE permission denied in database 'master'`),
 						),
 						getStepOnlyBindingOne(cnf,
 							// user ONE reads content in a table created by himself - user TWO was deleted
@@ -80,7 +82,7 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 							// user ONE is not the owner of the schema created by user TWO - user TWO was deleted
 							testCheckUserIsNotOwnerOfTheSchema(cnf, cnf.ResourceBindingOneName, schemaNameUserTwo),
 							// role "binding_user_group" is the owner of the schema created by user TWO - user TWO was deleted
-							testCheckRoleIsOwnerOfTheSchema(cnf, cnf.ResourceBindingOneName, "binding_user_group", schemaNameUserTwo),
+							testCheckEntityIsOwnerOfTheSchema(cnf, cnf.ResourceBindingOneName, "binding_user_group", schemaNameUserTwo),
 							// user ONE reads content created by USER TWO in a schema.table created by USER TWO - user TWO was deleted
 							testCheckUserCanReadContentInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingOneName, "fake_content"),
 							// user ONE writes content in a schema.table created by USER TWO - user TWO was deleted
@@ -91,9 +93,7 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 							testCheckDropTableInSchema(cnf, schemaNameUserOne, tableNameUserOne, cnf.ResourceBindingOneName),
 							// user ONE drops the schema created by himself
 							testCheckDroopSchema(cnf, schemaNameUserOne, cnf.ResourceBindingOneName),
-							// user ONE reads the schema created by USER TWO
-							testCheckSchemaNames(cnf, cnf.ResourceBindingOneName, schemaNameUserTwo),
-							// user ONE reads the schema created by USER TWO - schema does not exist
+							// user ONE reads the schema created by himself - schema does not exist
 							func(state *terraform.State) error {
 								err := testCheckSchemaNames(cnf, cnf.ResourceBindingOneName, schemaNameUserOne)(state)
 								if err != nil && strings.Contains(err.Error(), "schema not found") {
@@ -101,7 +101,15 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 								}
 								return err
 							},
-							// user ONE drops table in the schema created by USER TWO
+							// user ONE reads the schema created by USER TWO - user TWO was deleted
+							testCheckSchemaNames(cnf, cnf.ResourceBindingOneName, schemaNameUserTwo),
+							// user ONE creates table in schema created by USER TWO - user TWO was deleted
+							testCheckUserCanCreateTableInSchema(cnf, schemaNameUserTwo, tableNameUserOne, cnf.ResourceBindingOneName),
+							// user ONE drops table created by himself in the schema created by USER TWO
+							testCheckDropTableInSchema(cnf, schemaNameUserTwo, tableNameUserOne, cnf.ResourceBindingOneName),
+							// user ONE alter table in schema created by user TWO
+							testCheckAddColumnToTableInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingOneName, "another_column"),
+							// user ONE drops table created by USER TWO in the schema created by USER TWO
 							testCheckDropTableInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingOneName),
 							// user ONE drops the schema created by USER TWO
 							testCheckDroopSchema(cnf, schemaNameUserTwo, cnf.ResourceBindingOneName),
@@ -356,7 +364,7 @@ func testCheckUserIsNotOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName str
 	}
 }
 
-func testCheckRoleIsOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName string, roleName, expectedSchemaName string) resource.TestCheckFunc {
+func testCheckEntityIsOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName string, roleName, expectedSchemaName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		cr, err := getCredentialsFromState(state, resourceBindingName)
 		if err != nil {
@@ -409,6 +417,49 @@ func testCheckDroopSchema(cnf testCaseCnf, schemaName, resourceBindingName strin
 
 		if _, err := db.Exec(fmt.Sprintf("DROP SCHEMA %s", schemaName)); err != nil {
 			return fmt.Errorf("error deleting schema %w", err)
+		}
+
+		return nil
+	}
+}
+
+func testCheckCreateDatabase(cnf testCaseCnf, dbName, resourceBindingName, expectedError string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		cr, err := getCredentialsFromState(state, resourceBindingName)
+		if err != nil {
+			return err
+		}
+
+		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
+		defer db.Close()
+
+		statement := `
+DECLARE @sql nvarchar(max)
+SET @sql = 'CREATE DATABASE ' + QuoteName(@databaseName) + ' CONTAINMENT=PARTIAL' 
+EXEC (@sql)
+`
+		if _, err := db.Exec(statement, sql.Named("databaseName", dbName)); err != nil {
+			if !strings.Contains(err.Error(), expectedError) {
+				return fmt.Errorf("unexpected error %w", err)
+			}
+		}
+
+		return nil
+	}
+}
+
+func testCheckAddColumnToTableInSchema(cnf testCaseCnf, schemaName, randomTableName, resourceBindingName, columnName string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		cr, err := getCredentialsFromState(state, resourceBindingName)
+		if err != nil {
+			return err
+		}
+
+		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
+		defer db.Close()
+
+		if _, err := db.Exec(fmt.Sprintf("ALTER TABLE %s.%s ADD %s VARCHAR(20) NULL", schemaName, randomTableName, columnName)); err != nil {
+			return fmt.Errorf("error altering table %w", err)
 		}
 
 		return nil
