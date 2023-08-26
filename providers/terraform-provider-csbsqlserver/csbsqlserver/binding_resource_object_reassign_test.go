@@ -303,6 +303,10 @@ func testCheckSchemaNames(cnf testCaseCnf, resourceBindingName string, expectedS
 			schemas = append(schemas, s)
 		}
 
+		if rows.Err() != nil {
+			return rows.Err()
+		}
+
 		var multiErr error
 	external:
 		for _, expectedSchemaName := range expectedSchemaNames {
@@ -461,6 +465,10 @@ func findSchemaByOwner(db *sql.DB, entityOwner string, expectedSchemaName string
 			return false, fmt.Errorf("error scanning schema %w", err)
 		}
 		schemas = append(schemas, s)
+	}
+
+	if rows.Err() != nil {
+		return false, rows.Err()
 	}
 
 	found := false
