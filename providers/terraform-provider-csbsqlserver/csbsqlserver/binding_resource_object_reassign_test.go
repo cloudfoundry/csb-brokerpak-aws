@@ -330,58 +330,6 @@ func testCheckSchemaNames(cnf testCaseCnf, resourceBindingName string, expectedS
 	}
 }
 
-func testCheckSchemaNamesByUserOwner(cnf testCaseCnf, resourceBindingName string, expectedSchemaNames ...string) resource.TestCheckFunc {
-	return func(state *terraform.State) error {
-		cr, err := getCredentialsFromState(state, resourceBindingName)
-		if err != nil {
-			return err
-		}
-
-		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
-		defer db.Close()
-
-		rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", cr.username)
-		if err != nil {
-			return fmt.Errorf("error retrieving schemas %w", err)
-		}
-		defer rows.Close()
-
-		var schemas []string
-
-		for rows.Next() {
-			var s string
-			if err := rows.Scan(&s); err != nil {
-				return fmt.Errorf("error scanning schema %w", err)
-			}
-			schemas = append(schemas, s)
-		}
-
-		var multiErr error
-	external:
-		for _, expectedSchemaName := range expectedSchemaNames {
-
-			for _, schema := range schemas {
-				if schema == expectedSchemaName {
-					continue external
-				}
-			}
-
-			err := fmt.Errorf("schema not found: %s", expectedSchemaName)
-			if multiErr != nil {
-				multiErr = errors.Join(multiErr, err)
-			} else {
-				multiErr = err
-			}
-		}
-
-		if multiErr != nil {
-			return fmt.Errorf("error checking schemas - available schemas %s: %w", strings.Join(schemas, ","), multiErr)
-		}
-
-		return multiErr
-	}
-}
-
 func testCheckUserIsNotOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName string, expectedSchemaName string) resource.TestCheckFunc {
 	return func(state *terraform.State) error {
 		cr, err := getCredentialsFromState(state, resourceBindingName)
@@ -392,28 +340,9 @@ func testCheckUserIsNotOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName str
 		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
 		defer db.Close()
 
-		rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", cr.username)
+		found, err := findSchemaByOwner(db, cr.username, expectedSchemaName)
 		if err != nil {
-			return fmt.Errorf("error retrieving schemas %w", err)
-		}
-		defer rows.Close()
-
-		var schemas []string
-
-		for rows.Next() {
-			var s string
-			if err := rows.Scan(&s); err != nil {
-				return fmt.Errorf("error scanning schema %w", err)
-			}
-			schemas = append(schemas, s)
-		}
-
-		found := false
-		for _, schema := range schemas {
-			if schema == expectedSchemaName {
-				found = true
-				break
-			}
+			return err
 		}
 
 		if found {
@@ -434,28 +363,9 @@ func testCheckRoleIsOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName string
 		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
 		defer db.Close()
 
-		rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", roleName)
+		found, err := findSchemaByOwner(db, roleName, expectedSchemaName)
 		if err != nil {
-			return fmt.Errorf("error retrieving schemas %w", err)
-		}
-		defer rows.Close()
-
-		var schemas []string
-
-		for rows.Next() {
-			var s string
-			if err := rows.Scan(&s); err != nil {
-				return fmt.Errorf("error scanning schema %w", err)
-			}
-			schemas = append(schemas, s)
-		}
-
-		found := false
-		for _, schema := range schemas {
-			if schema == expectedSchemaName {
-				found = true
-				break
-			}
+			return err
 		}
 
 		if !found {
@@ -535,6 +445,33 @@ func getPropertyValueFromResource(rs *terraform.ResourceState, attrName string) 
 		return "", fmt.Errorf("attribute %q not found", attrName)
 	}
 	return v, nil
+}
+
+func findSchemaByOwner(db *sql.DB, entityOwner string, expectedSchemaName string) (bool, error) {
+	rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", entityOwner)
+	if err != nil {
+		return false, fmt.Errorf("error retrieving schemas %w", err)
+	}
+	defer rows.Close()
+
+	var schemas []string
+
+	for rows.Next() {
+		var s string
+		if err := rows.Scan(&s); err != nil {
+			return false, fmt.Errorf("error scanning schema %w", err)
+		}
+		schemas = append(schemas, s)
+	}
+
+	found := false
+	for _, schema := range schemas {
+		if schema == expectedSchemaName {
+			found = true
+			break
+		}
+	}
+	return found, nil
 }
 
 func getCreateTableSQL(tableName string) string {
