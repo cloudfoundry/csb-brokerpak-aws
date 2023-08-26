@@ -29,8 +29,10 @@ func RandomTableName() string {
 	return strings.ReplaceAll(randomWithPrefix("table"), "-", "_")
 }
 
-func RandomSchemaName() string {
-	return strings.ReplaceAll(randomWithPrefix("schema"), "-", "_")
+func RandomSchemaName(prefixes ...string) string {
+	p := strings.Join(prefixes, "_")
+	p = fmt.Sprintf("schema_%s", p)
+	return strings.ReplaceAll(randomWithPrefix(p), "-", "_")
 }
 
 func randomWithPrefix(prefix string) string {
