@@ -20,10 +20,11 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 		When("binding is deleted", func() {
 			It("should allow access to previous objects", func() {
 				var (
-					adminPassword = testhelpers.RandomPassword()
-					port          = testhelpers.FreePort()
+					adminPassword = "W3_Mv2p5gnEN24tE"
+					port          = 1433
 				)
 
+				_ = testhelpers.StartServer(adminPassword, port, testhelpers.WithSPConfigure())
 				shutdownServerFn := testhelpers.StartServer(adminPassword, port, testhelpers.WithSPConfigure())
 				DeferCleanup(func() { shutdownServerFn(time.Minute) })
 
@@ -31,8 +32,8 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				tableNameUserOne := testhelpers.RandomTableName()
 				tableNameUserTwo := testhelpers.RandomTableName()
 
-				schemaNameUserOne := testhelpers.RandomSchemaName()
-				schemaNameUserTwo := testhelpers.RandomSchemaName()
+				schemaNameUserOne := testhelpers.RandomSchemaName("user_one")
+				schemaNameUserTwo := testhelpers.RandomSchemaName("user_two")
 
 				resource.Test(GinkgoT(),
 					getTestCase(cnf,
@@ -61,6 +62,10 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 							testCheckUserCanCreateTableInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingTwoName),
 							testCheckUserCanWriteContentInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingTwoName, "fake_content"),
 							testCheckUserCanReadContentInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingTwoName, "fake_content"),
+							// user ONE reads schema names
+							testCheckSchemaNames(cnf, cnf.ResourceBindingOneName, schemaNameUserOne, schemaNameUserTwo),
+							// user TWO reads schema names
+							testCheckSchemaNames(cnf, cnf.ResourceBindingTwoName, schemaNameUserOne, schemaNameUserTwo),
 						),
 						getStepOnlyBindingOne(cnf,
 							// user ONE reads content in a table created by himself - user TWO was deleted
@@ -73,6 +78,10 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 							testCheckUserCanReadContent(cnf, tableNameUserTwo, cnf.ResourceBindingOneName, "another_content"),
 							// user ONE reads content created by himself in a schema.table created by himself - user TWO was deleted
 							testCheckUserCanReadContentInSchema(cnf, schemaNameUserOne, tableNameUserOne, cnf.ResourceBindingOneName, "fake_content"),
+							// user ONE is not the owner of the schema created by user TWO - user TWO was deleted
+							testCheckUserIsNotOwnerOfTheSchema(cnf, cnf.ResourceBindingOneName, schemaNameUserTwo),
+							// role "binding_user_group" is the owner of the schema created by user TWO - user TWO was deleted
+							testCheckRoleIsOwnerOfTheSchema(cnf, cnf.ResourceBindingOneName, "binding_user_group", schemaNameUserTwo),
 							// user ONE reads content created by USER TWO in a schema.table created by USER TWO - user TWO was deleted
 							testCheckUserCanReadContentInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingOneName, "fake_content"),
 							// user ONE writes content in a schema.table created by USER TWO - user TWO was deleted
@@ -318,6 +327,142 @@ func testCheckSchemaNames(cnf testCaseCnf, resourceBindingName string, expectedS
 		}
 
 		return multiErr
+	}
+}
+
+func testCheckSchemaNamesByUserOwner(cnf testCaseCnf, resourceBindingName string, expectedSchemaNames ...string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		cr, err := getCredentialsFromState(state, resourceBindingName)
+		if err != nil {
+			return err
+		}
+
+		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
+		defer db.Close()
+
+		rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", cr.username)
+		if err != nil {
+			return fmt.Errorf("error retrieving schemas %w", err)
+		}
+		defer rows.Close()
+
+		var schemas []string
+
+		for rows.Next() {
+			var s string
+			if err := rows.Scan(&s); err != nil {
+				return fmt.Errorf("error scanning schema %w", err)
+			}
+			schemas = append(schemas, s)
+		}
+
+		var multiErr error
+	external:
+		for _, expectedSchemaName := range expectedSchemaNames {
+
+			for _, schema := range schemas {
+				if schema == expectedSchemaName {
+					continue external
+				}
+			}
+
+			err := fmt.Errorf("schema not found: %s", expectedSchemaName)
+			if multiErr != nil {
+				multiErr = errors.Join(multiErr, err)
+			} else {
+				multiErr = err
+			}
+		}
+
+		if multiErr != nil {
+			return fmt.Errorf("error checking schemas - available schemas %s: %w", strings.Join(schemas, ","), multiErr)
+		}
+
+		return multiErr
+	}
+}
+
+func testCheckUserIsNotOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName string, expectedSchemaName string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		cr, err := getCredentialsFromState(state, resourceBindingName)
+		if err != nil {
+			return err
+		}
+
+		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
+		defer db.Close()
+
+		rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", cr.username)
+		if err != nil {
+			return fmt.Errorf("error retrieving schemas %w", err)
+		}
+		defer rows.Close()
+
+		var schemas []string
+
+		for rows.Next() {
+			var s string
+			if err := rows.Scan(&s); err != nil {
+				return fmt.Errorf("error scanning schema %w", err)
+			}
+			schemas = append(schemas, s)
+		}
+
+		found := false
+		for _, schema := range schemas {
+			if schema == expectedSchemaName {
+				found = true
+				break
+			}
+		}
+
+		if found {
+			return fmt.Errorf("the user %s is owner of the schema: %s", cr.username, expectedSchemaName)
+		}
+
+		return nil
+	}
+}
+
+func testCheckRoleIsOwnerOfTheSchema(cnf testCaseCnf, resourceBindingName string, roleName, expectedSchemaName string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		cr, err := getCredentialsFromState(state, resourceBindingName)
+		if err != nil {
+			return err
+		}
+
+		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
+		defer db.Close()
+
+		rows, err := db.Query("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_OWNER = @p1", roleName)
+		if err != nil {
+			return fmt.Errorf("error retrieving schemas %w", err)
+		}
+		defer rows.Close()
+
+		var schemas []string
+
+		for rows.Next() {
+			var s string
+			if err := rows.Scan(&s); err != nil {
+				return fmt.Errorf("error scanning schema %w", err)
+			}
+			schemas = append(schemas, s)
+		}
+
+		found := false
+		for _, schema := range schemas {
+			if schema == expectedSchemaName {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return fmt.Errorf("the role %s is not the owner of the schema: %s", roleName, expectedSchemaName)
+		}
+
+		return nil
 	}
 }
 

@@ -79,13 +79,15 @@ func createTestCaseCnf(adminPassword string, port int) testCaseCnf {
 		ResourceBindingOneName: fmt.Sprintf("%s.binding1", csbsqlserver.ResourceNameKey),
 		ResourceBindingTwoName: fmt.Sprintf("%s.binding2", csbsqlserver.ResourceNameKey),
 		BindingUserOne:         fmt.Sprintf("user_one_%s", uuid.New()),
-		BindingUserTwo:         fmt.Sprintf("user_two_%s", uuid.New()),
-		BindingPasswordOne:     testhelpers.RandomPassword(),
-		BindingPasswordTwo:     testhelpers.RandomPassword(),
-		DatabaseName:           testhelpers.RandomDatabaseName(),
-		AdminPassword:          adminPassword,
-		Port:                   port,
-		provider:               initTestProvider(),
+		BindingUserTwo:         "user_two_60ba6032-462e-460f-a1e8-2951bc21431e",
+		// BindingUserTwo:         fmt.Sprintf("user_two_%s", uuid.New()),
+		BindingPasswordOne: testhelpers.RandomPassword(),
+		// BindingPasswordTwo:     testhelpers.RandomPassword(),
+		BindingPasswordTwo: "W3_Mv2p5gnEN24tEtwo",
+		DatabaseName:       testhelpers.RandomDatabaseName(),
+		AdminPassword:      adminPassword,
+		Port:               port,
+		provider:           initTestProvider(),
 	}
 }
 
