@@ -39,7 +39,9 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				shutdownServerFn := testhelpers.StartServer(adminPassword, port)
 				DeferCleanup(func() { shutdownServerFn(time.Minute) })
 
-				resource.Test(GinkgoT(), getTestCase(createTestCaseCnf(adminPassword, port)))
+				cnf := createTestCaseCnf(adminPassword, port)
+
+				resource.Test(GinkgoT(), getTestCase(cnf, getMandatoryStep(cnf)))
 			})
 		})
 	})
@@ -55,7 +57,9 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				shutdownServerFn := testhelpers.StartServer(adminPassword, port, testhelpers.WithSPConfigure())
 				DeferCleanup(func() { shutdownServerFn(time.Minute) })
 
-				resource.Test(GinkgoT(), getTestCase(createTestCaseCnf(adminPassword, port)))
+				cnf := createTestCaseCnf(adminPassword, port)
+
+				resource.Test(GinkgoT(), getTestCase(cnf, getMandatoryStep(cnf)))
 			})
 		})
 	})
