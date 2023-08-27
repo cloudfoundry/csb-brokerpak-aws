@@ -85,7 +85,7 @@ var _ = Describe("Connector", func() {
 			By("creating a legacy login")
 			_, err := db.Exec(fmt.Sprintf(`CREATE LOGIN [%s] with PASSWORD='%s'`, bindingUsername, bindingPassword))
 			Expect(err).NotTo(HaveOccurred())
-			db.Exec(fmt.Sprintf(`CREATE USER [%s] from LOGIN %s`, bindingUsername, bindingUsername))
+			_, err = db.Exec(fmt.Sprintf(`CREATE USER [%s] from LOGIN [%s]`, bindingUsername, bindingUsername))
 			Expect(err).NotTo(HaveOccurred())
 
 			By("deleting the binding")
