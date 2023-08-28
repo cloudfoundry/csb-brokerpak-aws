@@ -179,6 +179,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
 					HaveKeyWithValue("publicly_accessible", BeFalse()),
+					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),
+					HaveKeyWithValue("monitoring_role_arn", Equal("")),
 					HaveKeyWithValue("backup_retention_period", float64(7)),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),

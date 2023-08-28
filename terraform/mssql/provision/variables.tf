@@ -20,8 +20,10 @@ variable "max_allocated_storage" {
 }
 variable "storage_type" { type = string }
 variable "iops" { type = number }
-variable "option_group_name" { type = string }
 variable "publicly_accessible" { type = bool }
+variable "monitoring_interval" { type = number }
+variable "monitoring_role_arn" { type = string }
+variable "option_group_name" { type = string }
 variable "backup_retention_period" { type = string }
 variable "backup_window" { type = string }
 variable "copy_tags_to_snapshot" { type = bool }
