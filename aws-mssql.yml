@@ -112,6 +112,14 @@ provision:
     type: boolean
     details: Whether deletion protection is enabled. The database cannot be deleted when this property is enabled.
     default: false
+  - field_name: option_group_name
+    type: string
+    default: ""
+    details: |
+      Name of the DB option group to associate.
+      MSSQL offers additional features such as SQL Server Audit, Transparent Data Encryption, etc.
+      See AWS RDS options for the Microsoft SQL Server database engine for details:
+      https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.SQLServer.Options.html
   - field_name: storage_type
     type: string
     details: |
