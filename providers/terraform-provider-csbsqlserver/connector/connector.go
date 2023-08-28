@@ -5,9 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
-	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -26,13 +24,25 @@ type Connector struct {
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
 // It is idempotent.
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
-	// create database must be executed without transaction since the Procedure is creating a transaction.
-	if err := c.withDefaultDBConnection(func(db *sql.DB) error {
 
-		tflog.Debug(ctx, "creating database")
-		return createDatabaseIfNotExists(ctx, db, c.database)
-	}); err != nil {
+	exists, err := c.CheckDatabaseExists(ctx, c.database)
+	if err != nil {
 		return err
+	}
+
+	if !exists {
+		// First binding => future provision phase
+		// Transact-SQL Statements not allowed in a Transaction:
+		// https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms191544(v=sql.105)
+		tflog.Debug(ctx, "creating database")
+		if err := c.createDatabase(ctx, c.database); err != nil {
+			return err
+		}
+
+		tflog.Debug(ctx, "setting auto close option")
+		if err := c.setAutoClose(ctx, c.database); err != nil {
+			return err
+		}
 	}
 
 	return c.withTransaction(func(tx *sql.Tx) error {
@@ -72,6 +82,48 @@ func (c *Connector) ReadBinding(ctx context.Context, username string) (result bo
 	return result, c.withConnection(func(db *sql.DB) (err error) {
 		result, err = checkUser(ctx, db, username)
 		return
+	})
+}
+
+func (c *Connector) CheckDatabaseExists(ctx context.Context, dbName string) (result bool, err error) {
+	return result, c.withDefaultDBConnection(func(db *sql.DB) (err error) {
+		statement := `SELECT 1 FROM master.dbo.sysdatabases where name=@p1`
+		rows, err := db.QueryContext(ctx, statement, dbName)
+		if err != nil {
+			return fmt.Errorf("error querying existence of database %q: %w", dbName, err)
+		}
+		defer rows.Close()
+
+		result = rows.Next()
+		return nil
+	})
+}
+
+func (c *Connector) createDatabase(ctx context.Context, dbName string) error {
+	statement := `
+DECLARE @sql nvarchar(max)
+SET @sql = 'CREATE DATABASE ' + QuoteName(@databaseName) + ' CONTAINMENT=PARTIAL' 
+EXEC (@sql)
+`
+	return c.withDefaultDBConnection(func(db *sql.DB) (err error) {
+		if _, err := db.ExecContext(ctx, statement, sql.Named("databaseName", dbName)); err != nil {
+			return fmt.Errorf("error creating database %q: %w", dbName, err)
+		}
+		return nil
+	})
+}
+
+func (c *Connector) setAutoClose(ctx context.Context, dbName string) error {
+	statement := `
+DECLARE @sql nvarchar(max)
+SET @sql = 'ALTER DATABASE ' + QuoteName(@databaseName) + ' SET AUTO_CLOSE OFF' 
+EXEC (@sql)
+`
+	return c.withDefaultDBConnection(func(db *sql.DB) (err error) {
+		if _, err := db.ExecContext(ctx, statement, sql.Named("databaseName", dbName)); err != nil {
+			return fmt.Errorf("error setting autoclose %q: %w", dbName, err)
+		}
+		return nil
 	})
 }
 
@@ -122,21 +174,6 @@ func dropLogin(ctx context.Context, tx *sql.Tx, username string) error {
 	return nil
 }
 
-func createDatabaseIfNotExists(ctx context.Context, db *sql.DB, dbName string) error {
-	dbIdentifer := quoteIdentifier(dbName)
-	dbStr := quoteString(dbName)
-	statement := fmt.Sprintf(`
-IF NOT EXISTS (SELECT name FROM master.dbo.sysdatabases where name=%[1]v)
-BEGIN
-	CREATE DATABASE %[2]v CONTAINMENT=PARTIAL;
-	ALTER DATABASE %[2]v SET AUTO_CLOSE OFF;
-END`, dbStr, dbIdentifer)
-	if _, err := db.ExecContext(ctx, statement); err != nil {
-		return fmt.Errorf("error creating database %q: %w", dbName, err)
-	}
-	return nil
-}
-
 func createUser(ctx context.Context, tx *sql.Tx, username, password string) error {
 	ok, err := checkUser(ctx, tx, username)
 	switch {
@@ -179,14 +216,4 @@ func grantExec(ctx context.Context, tx *sql.Tx, username string) error {
 	}
 
 	return nil
-}
-
-func quoteString(str string) string {
-	return `N'` + strings.Replace(str, `'`, `''`, -1) + `'`
-}
-
-func quoteIdentifier(id string) string {
-	id = strings.Replace(id, "[", "[[", -1)
-	id = strings.Replace(id, "]", "]]", -1)
-	return fmt.Sprintf("[%v]", id)
 }

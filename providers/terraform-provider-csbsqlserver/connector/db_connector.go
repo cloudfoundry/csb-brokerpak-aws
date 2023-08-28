@@ -3,6 +3,8 @@ package connector
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 type DBConnector struct {

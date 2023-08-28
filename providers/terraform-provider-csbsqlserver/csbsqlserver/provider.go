@@ -17,44 +17,49 @@ const (
 	providerUsernameKey = "username"
 	providerPasswordKey = "password"
 	encryptKey          = "encrypt"
+	ResourceNameKey     = "csbsqlserver_binding"
 )
 
 func Provider() *schema.Provider {
 	return &schema.Provider{
-		Schema: map[string]*schema.Schema{
-			serverKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			portKey: {
-				Type:     schema.TypeInt,
-				Required: true,
-			},
-			databaseKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			providerUsernameKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			providerPasswordKey: {
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			encryptKey: {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
-		},
-		ConfigureContextFunc: configure,
+		Schema:               GetProviderSchema(),
+		ConfigureContextFunc: ProviderContextFunc,
 		ResourcesMap: map[string]*schema.Resource{
-			"csbsqlserver_binding": bindingResource(),
+			ResourceNameKey: BindingResource(),
 		},
 	}
 }
 
-func configure(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
+func GetProviderSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		serverKey: {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		portKey: {
+			Type:     schema.TypeInt,
+			Required: true,
+		},
+		databaseKey: {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		providerUsernameKey: {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		providerPasswordKey: {
+			Type:     schema.TypeString,
+			Required: true,
+		},
+		encryptKey: {
+			Type:     schema.TypeString,
+			Optional: true,
+		},
+	}
+}
+
+func ProviderContextFunc(_ context.Context, d *schema.ResourceData) (any, diag.Diagnostics) {
 	var (
 		server   string
 		port     int

@@ -19,3 +19,7 @@ func FreePort() int {
 func RandomPassword() string {
 	return fmt.Sprintf("AaZz09~._%s", uuid.New())
 }
+
+func RandomDatabaseName() string {
+	return fmt.Sprintf("database_%s", uuid.New())
+}
