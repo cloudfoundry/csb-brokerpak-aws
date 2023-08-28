@@ -46,8 +46,13 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		got := appTwo.GET("%s/%s", schema, key).String()
 		Expect(got).To(Equal(value))
 
-		By("dropping the schema using the first app")
-		appOne.DELETE(schema)
+		By("deleting binding one the binding two keeps reading the value")
+		binding.Unbind()
+		got = appTwo.GET("%s/%s", schema, key).String()
+		Expect(got).To(Equal(value))
+
+		By("dropping the schema using the second app")
+		appTwo.DELETE(schema)
 	})
 
 	It("can't be destroyed if `deletion_protection: true`", func() {
