@@ -16,7 +16,7 @@ const (
 	bindingRoles    = "roles"
 )
 
-func bindingResource() *schema.Resource {
+func BindingResource() *schema.Resource {
 	return &schema.Resource{
 		Description: "A MS-SQL Server binding for the CSB brokerpak",
 		Schema: map[string]*schema.Schema{
