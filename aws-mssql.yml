@@ -155,6 +155,30 @@ provision:
       This property represents the ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs.
       To read about Enhanced Monitoring metrics see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.html
     default: ""
+  - field_name: backup_retention_period
+    type: number
+    details: |
+      The number of days (1-35) for which automatic backups are kept.
+      Set the value to 0 to disable automated backups.
+      An outage occurs if you change the backup retention period from 0 to a nonzero value or vice versa.
+    default: 7
+  - field_name: backup_window
+    type: string
+    nullable: true
+    default: null
+    details: | 
+      The daily time range in UTC during which automated backups are created, e.g.: "09:46-10:16".
+      Must not overlap with the maintenance window.
+      If not set, uses the default for the region
+      (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html#USER_WorkingWithAutomatedBackups.BackupWindow)'
+  - field_name: delete_automated_backups
+    type: boolean
+    details: Specifies whether to remove automated backups immediately after the DB instance is deleted
+    default: true
+  - field_name: copy_tags_to_snapshot
+    type: boolean
+    details: Copy all instance tags to snapshots
+    default: true
   computed_inputs:
   - name: labels
     overwrite: true

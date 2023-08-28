@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -83,4 +84,22 @@ func buildProperties(propertyOverrides ...map[string]any) map[string]any {
 func deleteProperty(key string, properties map[string]any) map[string]any {
 	delete(properties, key)
 	return properties
+}
+
+func nthTerraformInvocationVars(p testframework.TerraformMock, n int) (map[string]any, error) {
+	// Notice that n is expected to be zero-based
+	// Copied from https://github.com/cloudfoundry/cloud-service-broker/blob/0a9138aa6cbda08e9bf1f8c32feef16a9a610956/brokerpaktestframework/terraform_mock.go#L101-L115
+	invocations, err := p.ApplyInvocations()
+	if err != nil {
+		return nil, err
+	}
+	if len(invocations) < n+1 || n < 0 {
+		return nil, fmt.Errorf("unexpected invocation index. max_index: %d requested_index: %d", len(invocations)-1, n)
+	}
+
+	vars, err := invocations[n].TFVars()
+	if err != nil {
+		return nil, err
+	}
+	return vars, nil
 }
