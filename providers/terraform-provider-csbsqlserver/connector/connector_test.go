@@ -70,12 +70,18 @@ var _ = Describe("Connector", func() {
 			Expect(testhelpers.UserExists(db, bindingUsername)).To(BeFalse(), "binding user still exists")
 		})
 
-		It("is idempotent", func() {
+		It("should fail when binding does not exists", func() {
 			bindingUsername := uuid.New()
 
 			By("deleting a binding that does not exist")
 			err := conn.DeleteBinding(context.TODO(), bindingUsername)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(
+				MatchError(
+					ContainSubstring(
+						fmt.Sprintf("the principal '%s', because it does not exist or you do not have permission", bindingUsername),
+					),
+				),
+			)
 		})
 
 		It("removes legacy logins", func() {
