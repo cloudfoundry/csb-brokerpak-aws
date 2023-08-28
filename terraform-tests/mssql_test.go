@@ -38,6 +38,11 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		"storage_type": "io1",
 		"iops":         3000,
+
+		"backup_window":            nil,
+		"copy_tags_to_snapshot":    true,
+		"backup_retention_period":  7,
+		"delete_automated_backups": true,
 	}
 
 	requiredVars := map[string]any{

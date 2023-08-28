@@ -24,3 +24,7 @@ variable "publicly_accessible" { type = bool }
 variable "monitoring_interval" { type = number }
 variable "monitoring_role_arn" { type = string }
 variable "option_group_name" { type = string }
+variable "backup_retention_period" { type = string }
+variable "backup_window" { type = string }
+variable "copy_tags_to_snapshot" { type = bool }
+variable "delete_automated_backups" { type = bool }
