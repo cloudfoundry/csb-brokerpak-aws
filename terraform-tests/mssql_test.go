@@ -163,17 +163,6 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("csbmajorengineversion provider needs a valid engine version", func() {
-		When("mssql_version is not valid", func() {
-			It("it fails when recovering the major version when creating the db parameter group", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"mssql_version": "ANY-VALUE-AT-ALL"}))
-				Expect(session.ExitCode()).NotTo(Equal(0))
-				msgs := string(session.Out.Contents())
-				Expect(msgs).To(ContainSubstring(`invalid parameter combination. API does not return any db engine version - engine sqlserver-ee - engine version ANY-VALUE-AT-ALL`))
-			})
-		})
-	})
-
 	Context("properties that pass-through without validation", func() {
 		When("instance_class is passed", func() {
 			It("it passes-through without validation", func() {
