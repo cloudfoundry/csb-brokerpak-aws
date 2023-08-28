@@ -1,7 +1,6 @@
 package csbsqlserver_test
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -15,7 +14,6 @@ import (
 
 	"github.com/pborman/uuid"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/connector"
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/csbsqlserver"
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/testhelpers"
 )
@@ -123,7 +121,6 @@ func getMandatoryStep(cnf testCaseCnf, extraTestCheckFunc ...resource.TestCheckF
 		bindingUser1, bindingUser2         = cnf.BindingUserOne, cnf.BindingUserTwo
 		bindingPassword1, bindingPassword2 = cnf.BindingPasswordOne, cnf.BindingPasswordTwo
 		databaseName                       = cnf.DatabaseName
-		provider                           = cnf.provider
 		db                                 = testhelpers.Connect(testhelpers.AdminUser, cnf.AdminPassword, databaseName, cnf.Port)
 	)
 
@@ -143,7 +140,7 @@ func getMandatoryStep(cnf testCaseCnf, extraTestCheckFunc ...resource.TestCheckF
 			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.1", "db_datareader"),
 			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.2", "db_datawriter"),
 			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.3", "db_accessadmin"),
-			testCheckDatabaseExists(databaseName, provider),
+			testCheckDatabaseExists(db, databaseName),
 			testCheckUserExists(db, bindingUser1),
 			testCheckUserExists(db, bindingUser2),
 			func(state *terraform.State) error {
@@ -164,7 +161,6 @@ func getStepOnlyBindingOne(cnf testCaseCnf, extraTestCheckFunc ...resource.TestC
 		bindingUser1                = cnf.BindingUserOne
 		bindingPassword1            = cnf.BindingPasswordOne
 		databaseName                = cnf.DatabaseName
-		provider                    = cnf.provider
 		db                          = testhelpers.Connect(testhelpers.AdminUser, cnf.AdminPassword, databaseName, cnf.Port)
 	)
 
@@ -178,7 +174,7 @@ func getStepOnlyBindingOne(cnf testCaseCnf, extraTestCheckFunc ...resource.TestC
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.1", "db_datareader"),
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.2", "db_datawriter"),
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.3", "db_accessadmin"),
-			testCheckDatabaseExists(databaseName, provider),
+			testCheckDatabaseExists(db, databaseName),
 			testCheckUserExists(db, bindingUser1),
 			testCheckUserDoesNotExists(db, cnf.BindingUserTwo),
 			resource.ComposeAggregateTestCheckFunc(extraTestCheckFunc...),
@@ -204,13 +200,16 @@ func testCheckUserDoesNotExists(db *sql.DB, username string) func(state *terrafo
 	}
 }
 
-func testCheckDatabaseExists(databaseName string, provider *schema.Provider) func(state *terraform.State) error {
+func testCheckDatabaseExists(db *sql.DB, databaseName string) func(state *terraform.State) error {
 	return func(state *terraform.State) error {
-		c := provider.Meta().(*connector.Connector)
-		exists, err := c.CheckDatabaseExists(context.Background(), databaseName)
+		statement := `SELECT 1 FROM master.dbo.sysdatabases where name=@p1`
+		rows, err := db.Query(statement, databaseName)
 		if err != nil {
-			return err
+			return fmt.Errorf("error querying existence of database %q: %w", databaseName, err)
 		}
+		defer rows.Close()
+
+		exists := rows.Next()
 
 		if !exists {
 			return fmt.Errorf("database %s was not created", databaseName)
