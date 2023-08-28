@@ -59,7 +59,7 @@ resource "aws_db_instance" "db_instance" {
   monitoring_interval    = var.monitoring_interval
   monitoring_role_arn    = var.monitoring_role_arn
 
-  parameter_group_name = aws_db_parameter_group.db_parameter_group.name
+  parameter_group_name = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
 
   lifecycle {
     prevent_destroy = true
@@ -71,6 +71,7 @@ resource "aws_db_instance" "db_instance" {
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {
+  count  = length(var.parameter_group_name) == 0 ? 1 : 0
   family = local.family
   # The name cannot be repeated. We need `name_prefix` when upgrading major version.
   # See `DBParameterGroupAlreadyExists` error:

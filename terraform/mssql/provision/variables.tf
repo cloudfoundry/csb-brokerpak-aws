@@ -24,3 +24,4 @@ variable "publicly_accessible" { type = bool }
 variable "monitoring_interval" { type = number }
 variable "monitoring_role_arn" { type = string }
 variable "option_group_name" { type = string }
+variable "parameter_group_name" { type = string }

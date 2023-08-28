@@ -120,6 +120,17 @@ provision:
       MSSQL offers additional features such as SQL Server Audit, Transparent Data Encryption, etc.
       See AWS RDS options for the Microsoft SQL Server database engine for details:
       https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.SQLServer.Options.html
+  - field_name: parameter_group_name
+    type: string
+    default: ""
+    details: |
+      Name of the custom parameter group to associate with this instance.
+      If left unset, the default parameter group for the specified mssql_version is used.
+      Once the parameter has been set, make sure that it is updated to an appropriate value
+      when updating the mssql_version. To set to default, specify the name of the default
+      parameter group for the MSSQL version, for example `default.sqlserver-ex-14.0`.
+      For more information about parameter groups, see
+      https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithParamGroups.html
   - field_name: storage_type
     type: string
     details: |
