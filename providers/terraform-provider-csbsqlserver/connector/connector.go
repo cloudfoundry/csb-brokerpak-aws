@@ -5,8 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 const (
@@ -14,39 +12,28 @@ const (
 )
 
 func New(server string, port int, username, password, database, encrypt string) *Connector {
+	dbConnector := NewDBConnector(server, port, username, password, database, encrypt)
 	return &Connector{
-		database:    database,
-		dbConnector: NewDBConnector(server, port, username, password, database, encrypt),
+		database:         database,
+		dbConnector:      dbConnector,
+		objectReassigner: NewObjectReassigner(dbConnector),
+		dbCreator:        NewDBCreator(dbConnector),
 	}
 }
 
 type Connector struct {
-	database    string
-	dbConnector *DBConnector
+	database         string
+	dbConnector      *DBConnector
+	objectReassigner *ObjectReassigner
+	dbCreator        *DBCreator
 }
 
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
 // It is idempotent.
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
 
-	exists, err := c.CheckDatabaseExists(ctx, c.database)
-	if err != nil {
+	if err := c.dbCreator.ManageDBCreation(ctx, c.database); err != nil {
 		return err
-	}
-
-	if !exists {
-		// First binding => future provision phase
-		// Transact-SQL Statements not allowed in a Transaction:
-		// https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms191544(v=sql.105)
-		tflog.Debug(ctx, "creating database")
-		if err := c.createDatabase(ctx, c.database); err != nil {
-			return err
-		}
-
-		tflog.Debug(ctx, "setting auto close option")
-		if err := c.setAutoClose(ctx, c.database); err != nil {
-			return err
-		}
 	}
 
 	return c.withTransaction(func(tx *sql.Tx) error {
@@ -70,7 +57,7 @@ func (c *Connector) CreateBinding(ctx context.Context, username, password string
 // DeleteBinding drops the binding user. It is idempotent.
 func (c *Connector) DeleteBinding(ctx context.Context, username string) error {
 
-	if err := c.ManageObjectReassignment(ctx, username); err != nil {
+	if err := c.objectReassigner.ManageObjectReassignment(ctx, username); err != nil {
 		return err
 	}
 
@@ -94,163 +81,8 @@ func (c *Connector) ReadBinding(ctx context.Context, username string) (result bo
 	})
 }
 
-func (c *Connector) CheckDatabaseExists(ctx context.Context, dbName string) (result bool, err error) {
-	return result, c.withDefaultDBConnection(func(db *sql.DB) (err error) {
-		statement := `SELECT 1 FROM master.dbo.sysdatabases where name=@p1`
-		rows, err := db.QueryContext(ctx, statement, dbName)
-		if err != nil {
-			return fmt.Errorf("error querying existence of database %q: %w", dbName, err)
-		}
-		defer rows.Close()
-
-		result = rows.Next()
-		return nil
-	})
-}
-
-func (c *Connector) ManageObjectReassignment(ctx context.Context, username string) error {
-	exists, err := c.checkObjectReassignmentRoleExist(ctx)
-	if err != nil {
-		return err
-	}
-
-	if !exists {
-		if err := c.createObjectReassignmentRole(ctx); err != nil {
-			return err
-		}
-	}
-
-	if err := c.addUserToObjectReassignmentRole(ctx, username); err != nil {
-		return err
-	}
-
-	schemas, err := c.getSchemaNamesByUserOwner(ctx, username)
-	if err != nil {
-		return err
-	}
-
-	if err := c.transferOwnershipToObjectReassignmentRole(ctx, schemas); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (c *Connector) getSchemaNamesByUserOwner(ctx context.Context, username string) (schemaNames []string, err error) {
-	return schemaNames, c.withConnection(func(db *sql.DB) (err error) {
-		statement := `SELECT schema_name FROM information_schema.schemata WHERE schema_owner=@p1`
-		rows, err := db.QueryContext(ctx, statement, username)
-		if err != nil {
-			return fmt.Errorf("error querying existence of schemas by username %q: %w", username, err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var s string
-			if err := rows.Scan(&s); err != nil {
-				return fmt.Errorf("error scanning schema %w", err)
-			}
-			schemaNames = append(schemaNames, s)
-		}
-
-		return nil
-	})
-}
-
-func (c *Connector) checkObjectReassignmentRoleExist(ctx context.Context) (result bool, err error) {
-	return result, c.withConnection(func(db *sql.DB) (err error) {
-		statement := `SELECT 1 FROM sys.database_principals WHERE type_desc = 'DATABASE_ROLE' AND name = @p1`
-		rows, err := db.QueryContext(ctx, statement, roleName)
-		if err != nil {
-			return fmt.Errorf("error querying existence of role %q: %w", roleName, err)
-		}
-		defer rows.Close()
-
-		result = rows.Next()
-		return nil
-	})
-}
-
-func (c *Connector) createObjectReassignmentRole(ctx context.Context) error {
-	return c.withConnection(func(db *sql.DB) (err error) {
-		// It needs to be granted to the **user** database and not the **master**.
-		// We change the database context through the connection.
-		// We must use the specific database connection!! (withConnection instead of withDefaultDBConnection)
-		// otherwise when trying to add the user to the role, we will not have permissions.
-		// Remember that the user authentication information is stored in each database.
-		statement := fmt.Sprintf("CREATE ROLE %s AUTHORIZATION dbo", roleName)
-		if _, err := db.ExecContext(ctx, statement); err != nil {
-			return fmt.Errorf("error creating role %q: %w", roleName, err)
-		}
-		return nil
-	})
-}
-
-func (c *Connector) addUserToObjectReassignmentRole(ctx context.Context, username string) error {
-	return c.withConnection(func(db *sql.DB) (err error) {
-		statement := `
-DECLARE @sql nvarchar(max)
-SET @sql = 'ALTER ROLE ' + QuoteName(@roleName) + ' ADD MEMBER ' + QuoteName(@username) + ' '
-EXEC (@sql)
-`
-		if _, err := db.ExecContext(ctx, statement, sql.Named("roleName", roleName), sql.Named("username", username)); err != nil {
-			return fmt.Errorf("error adding user %q to role %q: %w", username, roleName, err)
-		}
-		return nil
-	})
-}
-
-func (c *Connector) transferOwnershipToObjectReassignmentRole(ctx context.Context, schemas []string) error {
-	// TODO transaction????
-	if len(schemas) == 0 {
-		return nil
-	}
-
-	return c.withConnection(func(db *sql.DB) (err error) {
-		for _, schema := range schemas {
-			statement := fmt.Sprintf("ALTER AUTHORIZATION ON SCHEMA::%s TO %s", schema, roleName)
-			if _, err := db.ExecContext(ctx, statement); err != nil {
-				return fmt.Errorf("error transfering ownership of the %q schema to the %s role: %w", schema, roleName, err)
-			}
-		}
-		return nil
-	})
-}
-
-func (c *Connector) createDatabase(ctx context.Context, dbName string) error {
-	statement := `
-DECLARE @sql nvarchar(max)
-SET @sql = 'CREATE DATABASE ' + QuoteName(@databaseName) + ' CONTAINMENT=PARTIAL' 
-EXEC (@sql)
-`
-	return c.withDefaultDBConnection(func(db *sql.DB) (err error) {
-		if _, err := db.ExecContext(ctx, statement, sql.Named("databaseName", dbName)); err != nil {
-			return fmt.Errorf("error creating database %q: %w", dbName, err)
-		}
-		return nil
-	})
-}
-
-func (c *Connector) setAutoClose(ctx context.Context, dbName string) error {
-	statement := `
-DECLARE @sql nvarchar(max)
-SET @sql = 'ALTER DATABASE ' + QuoteName(@databaseName) + ' SET AUTO_CLOSE OFF' 
-EXEC (@sql)
-`
-	return c.withDefaultDBConnection(func(db *sql.DB) (err error) {
-		if _, err := db.ExecContext(ctx, statement, sql.Named("databaseName", dbName)); err != nil {
-			return fmt.Errorf("error setting autoclose %q: %w", dbName, err)
-		}
-		return nil
-	})
-}
-
 func (c *Connector) withConnection(callback func(*sql.DB) error) error {
 	return c.dbConnector.withConnection(callback)
-}
-
-func (c *Connector) withDefaultDBConnection(callback func(*sql.DB) error) error {
-	return c.dbConnector.withDefaultDBConnection(callback)
 }
 
 func (c *Connector) withTransaction(callback func(*sql.Tx) error) error {
