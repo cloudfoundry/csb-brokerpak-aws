@@ -65,6 +65,8 @@ resource "aws_db_instance" "db_instance" {
   backup_window            = var.backup_window
   copy_tags_to_snapshot    = var.copy_tags_to_snapshot
   delete_automated_backups = var.delete_automated_backups
+  maintenance_window       = local.maintenance_window
+
 
   lifecycle {
     prevent_destroy = true

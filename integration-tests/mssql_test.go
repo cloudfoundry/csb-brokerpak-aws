@@ -184,6 +184,11 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("backup_retention_period", float64(7)),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
+					HaveKeyWithValue("maintenance_day", BeNil()),
+					HaveKeyWithValue("maintenance_start_hour", BeNil()),
+					HaveKeyWithValue("maintenance_start_min", BeNil()),
+					HaveKeyWithValue("maintenance_end_hour", BeNil()),
+					HaveKeyWithValue("maintenance_end_min", BeNil()),
 				),
 			)
 		})

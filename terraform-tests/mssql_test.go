@@ -43,6 +43,11 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"copy_tags_to_snapshot":    true,
 		"backup_retention_period":  7,
 		"delete_automated_backups": true,
+		"maintenance_end_hour":     nil,
+		"maintenance_start_hour":   nil,
+		"maintenance_end_min":      nil,
+		"maintenance_start_min":    nil,
+		"maintenance_day":          nil,
 	}
 
 	requiredVars := map[string]any{
@@ -485,5 +490,36 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					))
 			})
 		})
+	})
+
+	Context("maintenance_window", func() {
+		When("no window is set", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{}))
+			})
+			It("should not be passed", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(Not(HaveKey("maintenance_window")))
+			})
+		})
+		When("maintainance window specified with all values", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"maintenance_day":        "Mon",
+					"maintenance_start_hour": "01",
+					"maintenance_end_hour":   "02",
+					"maintenance_start_min":  "03",
+					"maintenance_end_min":    "04",
+				}))
+			})
+
+			It("should pass the correct window", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"maintenance_window": Equal("mon:01:03-mon:02:04"),
+					}))
+			})
+
+		})
+
 	})
 })

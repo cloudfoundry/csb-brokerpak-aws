@@ -10,6 +10,23 @@ locals {
   family        = format("%s-%s.0", var.engine, local.major_version)
 
   valid_storage_types_for_iops = ["io1", "gp3"]
+
+  is_maintenance_window_blank = length(compact([
+    var.maintenance_day,
+    var.maintenance_start_hour,
+    var.maintenance_end_hour,
+    var.maintenance_start_min,
+    var.maintenance_end_min
+  ])) == 0
+
+  maintenance_window = local.is_maintenance_window_blank ? null : format("%s:%s:%s-%s:%s:%s",
+    var.maintenance_day,
+    var.maintenance_start_hour,
+    var.maintenance_start_min,
+    var.maintenance_day,
+    var.maintenance_end_hour,
+    var.maintenance_end_min
+  )
 }
 
 data "aws_vpc" "default" {
@@ -110,5 +127,4 @@ data "aws_security_groups" "provided" {
 data "csbmajorengineversion" "major_version_retriever" {
   engine_version = var.mssql_version
 }
-
 
