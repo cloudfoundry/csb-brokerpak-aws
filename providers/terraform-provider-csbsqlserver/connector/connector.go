@@ -24,6 +24,10 @@ type Connector struct {
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
 // It is idempotent.
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
+	err := c.withDefaultDBConnection(runSingleRowQueriesUntilFirstError(ctx, checkEngineContainmentIsEnabled()))
+	if err != nil {
+		return err
+	}
 
 	exists, err := c.CheckDatabaseExists(ctx, c.database)
 	if err != nil {
@@ -43,6 +47,11 @@ func (c *Connector) CreateBinding(ctx context.Context, username, password string
 		if err := c.setAutoClose(ctx, c.database); err != nil {
 			return err
 		}
+	}
+
+	err = c.withDefaultDBConnection(runSingleRowQueriesUntilFirstError(ctx, checkDatabaseIsContained(c.database)))
+	if err != nil {
+		return err
 	}
 
 	return c.withTransaction(func(tx *sql.Tx) error {
@@ -216,4 +225,29 @@ func grantExec(ctx context.Context, tx *sql.Tx, username string) error {
 	}
 
 	return nil
+}
+
+func runSingleRowQueriesUntilFirstError(ctx context.Context, queries []query) func(*sql.DB) error {
+	return func(db *sql.DB) (err error) {
+		for _, query := range queries {
+			rows, err := db.QueryContext(ctx, query.statement, query.parameters...)
+			if err != nil {
+				return fmt.Errorf("error running query %v: %w", query, err)
+			}
+			defer rows.Close()
+			if !rows.Next() {
+				return fmt.Errorf("expecting exactly one row but got none for query: %v: %w", query, err)
+			}
+			if err := rows.Scan(query.colOutputs...); err != nil {
+				return fmt.Errorf("invalid ouputs for query: %v: %w", query, err)
+			}
+			if err := rows.Err(); err != nil {
+				return fmt.Errorf("error iterating rows for query: %v: %w", query, err)
+			}
+			if rows.Next() {
+				return fmt.Errorf("expecting exactly one row but got several for query: %v: %w", query, err)
+			}
+		}
+		return nil
+	}
 }
