@@ -38,6 +38,11 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		"storage_type": "io1",
 		"iops":         3000,
+
+		"backup_window":            nil,
+		"copy_tags_to_snapshot":    true,
+		"backup_retention_period":  7,
+		"delete_automated_backups": true,
 	}
 
 	requiredVars := map[string]any{
@@ -46,6 +51,9 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"storage_gb":    20,
 
 		"instance_class": "some-instance-class",
+
+		"monitoring_interval": 0,
+		"monitoring_role_arn": "",
 	}
 
 	validVPC := awsVPCID
@@ -87,6 +95,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"skip_final_snapshot":  BeTrue(),
 				"license_model":        Equal("license-included"),
 				"publicly_accessible":  BeFalse(),
+				"monitoring_interval":  BeNumerically("==", 0),
 			}))
 		})
 	})
@@ -100,6 +109,51 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"engine\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"instance_class\" is not set, and has no default value.`))
+		})
+	})
+
+	Context("monitoring_interval", func() {
+		When("monitoring_role_arn is invalid", func() {
+			It("complains about invalid monitoring_role_arn", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_role_arn": "NOTVALID"}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`(NOTVALID) is an invalid ARN: arn: invalid prefix`))
+			})
+		})
+
+		When("monitoring_role_arn has a valid prefix but invalid account id", func() {
+			It("complains about invalid account id value", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_role_arn": "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`(arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access) is an invalid ARN: invalid account ID value (expecting to match regular expression: ^(aws|aws-managed|third-party|\\d{12}|cw.{10})$)`))
+			})
+		})
+
+		When("monitoring_interval is invalid", func() {
+			It("complains about invalid monitoring_interval", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_interval": -1}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`expected monitoring_interval to be one of [0 1 5 10 15 30 60], got -1`))
+			})
+		})
+
+		When("monitoring_interval is invalid in positive range", func() {
+			It("complains about invalid monitoring_interval", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_interval": 9}))
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`expected monitoring_interval to be one of [0 1 5 10 15 30 60], got 9`))
+			})
+		})
+
+		When("monitoring_interval and monitoring_role_arn are valid", func() {
+			It("succeeds to plan operations", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_interval": 60, "monitoring_role_arn": "arn:aws:iam::123456789012:test"}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"monitoring_interval": BeNumerically("==", 60), "monitoring_role_arn": Equal("arn:aws:iam::123456789012:test")}))
+			})
 		})
 	})
 

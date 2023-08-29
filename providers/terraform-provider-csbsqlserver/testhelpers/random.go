@@ -38,3 +38,7 @@ func RandomSchemaName(prefixes ...string) string {
 func randomWithPrefix(prefix string) string {
 	return fmt.Sprintf("%s_%s", prefix, uuid.New())
 }
+
+func RandomDatabaseName() string {
+	return fmt.Sprintf("database_%s", uuid.New())
+}
