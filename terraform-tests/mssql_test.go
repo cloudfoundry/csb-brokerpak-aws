@@ -35,6 +35,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
 		"option_group_name":          "",
+		"parameter_group_name":       "",
 
 		"storage_type": "io1",
 		"iops":         3000,
