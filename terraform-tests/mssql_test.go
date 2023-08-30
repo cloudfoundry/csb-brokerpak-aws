@@ -46,6 +46,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"delete_automated_backups": true,
 
 		"allow_major_version_upgrade": true,
+		"auto_minor_version_upgrade": true,
 	}
 
 	requiredVars := map[string]any{
