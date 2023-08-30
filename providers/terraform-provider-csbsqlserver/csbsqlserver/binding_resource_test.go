@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -59,9 +60,34 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 			})
 		})
 	})
+
+	Context("database does not exists", func() {
+		When("containment is not enable", func() {
+			It("should fail to create the binding", func() {
+				var (
+					adminPassword = testhelpers.RandomPassword()
+					port          = testhelpers.FreePort()
+				)
+
+				shutdownServerFn := testhelpers.StartServer(adminPassword, port, testhelpers.WithNoop())
+				DeferCleanup(func() { shutdownServerFn(time.Minute) })
+
+				expectErrorRegexp := regexp.MustCompile(`engine containment is not enabled`)
+				resource.Test(GinkgoT(), getTestCaseWithError(adminPassword, port, expectErrorRegexp))
+			})
+		})
+	})
 })
 
+func getTestCaseWithError(adminPassword string, port int, expectError *regexp.Regexp) resource.TestCase {
+	return getTestCaseWithParams(adminPassword, port, expectError)
+}
+
 func getTestCase(adminPassword string, port int) resource.TestCase {
+	return getTestCaseWithParams(adminPassword, port, nil)
+}
+
+func getTestCaseWithParams(adminPassword string, port int, expectError *regexp.Regexp) resource.TestCase {
 	var (
 		tfStateResourceBinding1Name        = fmt.Sprintf("%s.binding1", csbsqlserver.ResourceNameKey)
 		tfStateResourceBinding2Name        = fmt.Sprintf("%s.binding2", csbsqlserver.ResourceNameKey)
@@ -75,6 +101,7 @@ func getTestCase(adminPassword string, port int) resource.TestCase {
 		IsUnitTest:        true,
 		ProviderFactories: getTestProviderFactories(provider),
 		Steps: []resource.TestStep{{
+			ExpectError:  expectError,
 			ResourceName: csbsqlserver.ResourceNameKey,
 			Config:       testGetConfiguration(port, adminPassword, bindingUser1, bindingPassword1, bindingUser2, bindingPassword2, databaseName),
 			Check: resource.ComposeTestCheckFunc(
