@@ -35,6 +35,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"rds_subnet_group":           "",
 		"rds_vpc_security_group_ids": "",
 		"option_group_name":          "",
+		"parameter_group_name":       "",
 
 		"storage_type": "io1",
 		"iops":         3000,
@@ -43,11 +44,14 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"copy_tags_to_snapshot":    true,
 		"backup_retention_period":  7,
 		"delete_automated_backups": true,
+
+		"allow_major_version_upgrade": true,
+		"auto_minor_version_upgrade":  true,
 	}
 
 	requiredVars := map[string]any{
 		"engine":        "sqlserver-ee",
-		"mssql_version": "15.00.4236.7.v1",
+		"mssql_version": "15.00",
 		"storage_gb":    20,
 
 		"instance_class": "some-instance-class",
@@ -85,7 +89,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		It("should create a db instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"engine":               Equal("sqlserver-ee"),
-				"engine_version":       Equal("15.00.4236.7.v1"),
+				"engine_version":       Equal("15.00"),
 				"identifier":           Equal("csb-mssql-test"),
 				"storage_encrypted":    BeTrue(),
 				"instance_class":       Equal("some-instance-class"),
@@ -483,6 +487,67 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 							}),
 						)},
 					))
+			})
+		})
+	})
+
+	Context("auto_minor_version_upgrade", func() {
+		When("is enabled and a not major version is selected", func() {
+			It("should complain about postcondition", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"mssql_version":              "15.00.4236.7.v1",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 15.00 - got: 15.00.4236.7.v1`))
+			})
+		})
+
+		When("is enabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"auto_minor_version_upgrade": true,
+					"mssql_version":              "15.00",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeTrue(),
+						"engine_version":             Equal("15.00"),
+					}))
+			})
+		})
+
+		When("is disabled and a major version is selected", func() {
+			It("should not complain about postcondition", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"mssql_version":              "15.00",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("15.00"),
+					}))
+			})
+		})
+
+		When("is disabled and a minor version is selected", func() {
+			It("should not complain about postcondition and create the instance", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"auto_minor_version_upgrade": false,
+					"mssql_version":              "15.00.4236.7.v1",
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"auto_minor_version_upgrade": BeFalse(),
+						"engine_version":             Equal("15.00.4236.7.v1"),
+					}))
 			})
 		})
 	})

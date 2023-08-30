@@ -59,12 +59,15 @@ resource "aws_db_instance" "db_instance" {
   monitoring_interval    = var.monitoring_interval
   monitoring_role_arn    = var.monitoring_role_arn
 
-  parameter_group_name = aws_db_parameter_group.db_parameter_group.name
+  parameter_group_name = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
 
   backup_retention_period  = var.backup_retention_period
   backup_window            = var.backup_window
   copy_tags_to_snapshot    = var.copy_tags_to_snapshot
   delete_automated_backups = var.delete_automated_backups
+
+  allow_major_version_upgrade = var.allow_major_version_upgrade
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
 
   lifecycle {
     prevent_destroy = true
@@ -76,6 +79,7 @@ resource "aws_db_instance" "db_instance" {
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {
+  count  = length(var.parameter_group_name) == 0 ? 1 : 0
   family = local.family
   # The name cannot be repeated. We need `name_prefix` when upgrading major version.
   # See `DBParameterGroupAlreadyExists` error:
