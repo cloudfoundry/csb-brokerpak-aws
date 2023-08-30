@@ -46,12 +46,12 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"delete_automated_backups": true,
 
 		"allow_major_version_upgrade": true,
-		"auto_minor_version_upgrade": true,
+		"auto_minor_version_upgrade":  true,
 	}
 
 	requiredVars := map[string]any{
 		"engine":        "sqlserver-ee",
-		"mssql_version": "15.00.4236.7.v1",
+		"mssql_version": "15.00",
 		"storage_gb":    20,
 
 		"instance_class": "some-instance-class",
@@ -89,7 +89,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		It("should create a db instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
 				"engine":               Equal("sqlserver-ee"),
-				"engine_version":       Equal("15.00.4236.7.v1"),
+				"engine_version":       Equal("15.00"),
 				"identifier":           Equal("csb-mssql-test"),
 				"storage_encrypted":    BeTrue(),
 				"instance_class":       Equal("some-instance-class"),
