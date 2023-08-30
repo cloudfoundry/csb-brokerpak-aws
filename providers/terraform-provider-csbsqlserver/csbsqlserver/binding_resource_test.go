@@ -75,7 +75,9 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 				DeferCleanup(func() { shutdownServerFn(time.Minute) })
 
 				expectErrorRegexp := regexp.MustCompile(`engine containment is not enabled`)
-				resource.Test(GinkgoT(), getTestCaseWithError(adminPassword, port, expectErrorRegexp))
+				cnf := createTestCaseCnf(adminPassword, port)
+				cnf.ExpectError = expectErrorRegexp
+				resource.Test(GinkgoT(), getTestCaseWithError(cnf, getMandatoryStep(cnf)))
 			})
 		})
 	})
@@ -92,6 +94,7 @@ type testCaseCnf struct {
 	AdminPassword          string
 	Port                   int
 	provider               *schema.Provider
+	ExpectError            *regexp.Regexp
 }
 
 func createTestCaseCnf(adminPassword string, port int) testCaseCnf {
@@ -109,12 +112,12 @@ func createTestCaseCnf(adminPassword string, port int) testCaseCnf {
 	}
 }
 
-func getTestCaseWithError(adminPassword string, port int, expectError *regexp.Regexp) resource.TestCase {
-	return getTestCaseWithParams(adminPassword, port, expectError)
+func getTestCaseWithError(cnf testCaseCnf, steps ...resource.TestStep) resource.TestCase {
+	return getTestCaseWithParams(cnf, steps...)
 }
 
-func getTestCase(adminPassword string, port int) resource.TestCase {
-	return getTestCaseWithParams(adminPassword, port, nil)
+func getTestCase(cnf testCaseCnf, steps ...resource.TestStep) resource.TestCase {
+	return getTestCaseWithParams(cnf, steps...)
 }
 
 func getTestCaseWithParams(cnf testCaseCnf, steps ...resource.TestStep) resource.TestCase {
@@ -153,6 +156,7 @@ func getMandatoryStep(cnf testCaseCnf, extraTestCheckFunc ...resource.TestCheckF
 	return resource.TestStep{
 		ResourceName: csbsqlserver.ResourceNameKey,
 		Config:       testGetConfiguration(cnf.Port, cnf.AdminPassword, bindingUser1, bindingPassword1, bindingUser2, bindingPassword2, databaseName),
+		ExpectError:  cnf.ExpectError,
 		Check: resource.ComposeTestCheckFunc(
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "username", bindingUser1),
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "password", bindingPassword1),

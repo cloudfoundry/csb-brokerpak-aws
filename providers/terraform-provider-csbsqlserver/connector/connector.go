@@ -90,9 +90,8 @@ func (c *Connector) ReadBinding(ctx context.Context, username string) (result bo
 	})
 }
 
-
 func (c *Connector) checkEngineContainmentIsEnabled(ctx context.Context) error {
-	return c.withDefaultDBConnection(func(db *sql.DB) error {
+	return c.dbConnector.withDefaultDBConnection(func(db *sql.DB) error {
 		statement := `SELECT 1 FROM sys.configurations
 				WHERE [name] = N'contained database authentication'
 				AND value_in_use = 1
@@ -113,7 +112,7 @@ func (c *Connector) checkEngineContainmentIsEnabled(ctx context.Context) error {
 }
 
 func (c *Connector) checkDatabaseIsContained(ctx context.Context, dbName string) error {
-	return c.withDefaultDBConnection(func(db *sql.DB) error {
+	return c.dbConnector.withDefaultDBConnection(func(db *sql.DB) error {
 		statement := `SELECT 1 FROM sys.databases
 				WHERE [name] = @p1
 				AND containment <> 0`
@@ -131,7 +130,6 @@ func (c *Connector) checkDatabaseIsContained(ctx context.Context, dbName string)
 		return nil
 	})
 }
-
 
 func (c *Connector) withConnection(callback func(*sql.DB) error) error {
 	return c.dbConnector.withConnection(callback)
