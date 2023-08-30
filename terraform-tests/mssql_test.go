@@ -496,6 +496,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("should complain about postcondition", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
 					"auto_minor_version_upgrade": true,
+					"mssql_version":              "15.00.4236.7.v1",
 				}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
