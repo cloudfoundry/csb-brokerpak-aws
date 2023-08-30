@@ -66,6 +66,9 @@ resource "aws_db_instance" "db_instance" {
   copy_tags_to_snapshot    = var.copy_tags_to_snapshot
   delete_automated_backups = var.delete_automated_backups
 
+  allow_major_version_upgrade = var.allow_major_version_upgrade
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
+
   lifecycle {
     prevent_destroy = true
   }

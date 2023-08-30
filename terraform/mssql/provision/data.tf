@@ -111,4 +111,14 @@ data "csbmajorengineversion" "major_version_retriever" {
   engine_version = var.mssql_version
 }
 
+data "csbmajorengineversion" "major_version_checker" {
+  count          = var.auto_minor_version_upgrade ? 1 : 0
+  engine_version = var.mssql_version
 
+  lifecycle {
+    postcondition {
+      condition     = self.major_version == var.mssql_version
+      error_message = "A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: ${self.major_version} - got: ${var.mssql_version}"
+    }
+  }
+}

@@ -13,9 +13,18 @@ import (
 var _ = Describe("MSSQL", Label("mssql"), func() {
 	It("can be created", func() {
 		By("creating a service instance")
+		params := map[string]any{
+			// The backups add quite some time to acceptance test.
+			// Every time we test the service using the cf CLI we do it with backups enabled as it is the
+			// default option. The idea is to speed up the execution of the test.
+			"backup_retention_period": 0,
+		}
+
 		serviceInstance := services.CreateInstance(
 			"csb-aws-mssql",
-			services.WithPlan("default"))
+			services.WithPlan("default"),
+			services.WithParameters(params),
+		)
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")

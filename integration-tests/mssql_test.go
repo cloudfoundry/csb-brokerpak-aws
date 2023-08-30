@@ -49,10 +49,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 	var optionalProperties = func() map[string]any {
 		return map[string]any{
-			"rds_vpc_security_group_ids": "some-security-group-ids",
-			"rds_subnet_group":           "some-rds-subnet-group",
-			"instance_class":             "some-instance-class",
-			"max_allocated_storage":      999,
+			"rds_vpc_security_group_ids":  "some-security-group-ids",
+			"rds_subnet_group":            "some-rds-subnet-group",
+			"instance_class":              "some-instance-class",
+			"max_allocated_storage":       999,
+			"auto_minor_version_upgrade":  false,
+			"allow_major_version_upgrade": false,
 		}
 	}
 
@@ -184,6 +186,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("backup_retention_period", float64(7)),
 					HaveKeyWithValue("copy_tags_to_snapshot", true),
 					HaveKeyWithValue("delete_automated_backups", true),
+					HaveKeyWithValue("allow_major_version_upgrade", false),
+					HaveKeyWithValue("auto_minor_version_upgrade", false),
 				),
 			)
 		})
@@ -263,6 +267,8 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update backup_window", "backup_window", "01:02-03:04"),
 			Entry("update copy_tags_to_snapshot", "copy_tags_to_snapshot", false),
 			Entry("update delete_automated_backups", "delete_automated_backups", false),
+			Entry("update allow_major_version_upgrade", "allow_major_version_upgrade", false),
+			Entry("update auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 		)
 	})
 })
