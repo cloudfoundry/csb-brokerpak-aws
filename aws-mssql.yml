@@ -27,7 +27,9 @@ provision:
     type: string
     details: |
       The version for the MSSQL instance. Can be any version supported by the provider.
-      For more information about Microsoft SQL versions on Amazon RDS see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html#SQLServer.Concepts.General.VersionSupport
+      If `auto_minor_version_upgrade` is enabled, you must specify a major version such as 15.00 (for 15.00.4236.7.v1).
+      For more information about Microsoft SQL versions on Amazon RDS see
+      https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_SQLServer.html#SQLServer.Concepts.General.VersionSupport
   - field_name: storage_gb
     required: true
     type: integer
@@ -189,6 +191,18 @@ provision:
   - field_name: copy_tags_to_snapshot
     type: boolean
     details: Copy all instance tags to snapshots
+    default: true
+  - field_name: allow_major_version_upgrade
+    type: boolean
+    details: |
+      Allow major version upgrades. Changing this parameter does not result in an outage and
+      the change is asynchronously applied as soon as possible.
+    default: true
+  - field_name: auto_minor_version_upgrade
+    type: boolean
+    details: |
+      Allow minor version upgrades automatically during the maintenance window.
+      If `auto_minor_version_upgrade` is enabled, you must specify a major engine version.
     default: true
   computed_inputs:
   - name: labels
