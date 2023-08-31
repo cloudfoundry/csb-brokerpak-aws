@@ -34,6 +34,10 @@ type Connector struct {
 // CreateBinding creates the binding user, adds roles and grants permission to execute store procedures
 // It is idempotent.
 func (c *Connector) CreateBinding(ctx context.Context, username, password string, roles []string) error {
+	err := c.checkEngineContainmentIsEnabled(ctx)
+	if err != nil {
+		return err
+	}
 
 	exists, err := c.CheckDatabaseExists(ctx, c.database)
 	if err != nil {
@@ -53,6 +57,11 @@ func (c *Connector) CreateBinding(ctx context.Context, username, password string
 		if err := c.setAutoClose(ctx, c.database); err != nil {
 			return err
 		}
+	}
+
+	err = c.checkDatabaseIsContained(ctx, c.database)
+	if err != nil {
+		return err
 	}
 
 	return c.withTransaction(func(tx *sql.Tx) error {
@@ -234,6 +243,48 @@ EXEC (@sql)
 	})
 }
 
+func (c *Connector) checkEngineContainmentIsEnabled(ctx context.Context) error {
+	return c.withDefaultDBConnection(func(db *sql.DB) error {
+		statement := `SELECT 1 FROM sys.configurations
+				WHERE [name] = N'contained database authentication'
+				AND value_in_use = 1
+				AND value = 1`
+
+		var i int
+		err := db.QueryRowContext(ctx, statement).Scan(&i)
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("engine containment is not enabled %w", err)
+		}
+
+		if err != nil {
+			return fmt.Errorf("error checking engine containment %w", err)
+		}
+
+		return nil
+	})
+}
+
+func (c *Connector) checkDatabaseIsContained(ctx context.Context, dbName string) error {
+	return c.withDefaultDBConnection(func(db *sql.DB) error {
+		statement := `SELECT 1 FROM sys.databases
+				WHERE [name] = @p1
+				AND containment <> 0`
+
+		var i int
+		err := db.QueryRowContext(ctx, statement, dbName).Scan(&i)
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("database %q is not contained %w", dbName, err)
+		}
+
+		if err != nil {
+			return fmt.Errorf("error checking if database is contained %w", err)
+		}
+
+		return nil
+	})
+}
+
+// withConnection returns a DB connection tied to the user's database connection
 func (c *Connector) withConnection(callback func(*sql.DB) error) error {
 	db, err := c.connect(c.encoder.Encode())
 	if err != nil {
@@ -243,6 +294,7 @@ func (c *Connector) withConnection(callback func(*sql.DB) error) error {
 	return callback(db)
 }
 
+// withDefaultDBConnection returns a DB connection tied to the default database of the server
 func (c *Connector) withDefaultDBConnection(callback func(*sql.DB) error) error {
 	db, err := c.connect(c.encoder.EncodeWithoutDB())
 	if err != nil {
