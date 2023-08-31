@@ -181,9 +181,31 @@ The AWS account represented by the access key needs the following permission pol
 }
 ```
 
+##### IAM Policies in Enhanced Monitoring
+
 To enable the Enhanced Monitoring feature for Amazon RDS, it's necessary to grant additional permissions.
+This feature requires permission to act on your behalf to send OS metric information to CloudWatch Logs.
+You grant Enhanced Monitoring permissions using an AWS Identity and Access Management (IAM) role.
+
+To configure the ARN for the IAM role that permits RDS to send enhanced monitoring metrics to CloudWatch Logs,
+the user that you want to access Enhanced Monitoring needs a policy that includes a statement that allows the 
+user to pass the role, like the following. Use your _account number_ and replace the _role name_ with 
+the name of your role.
+
+```json
+{
+        "Sid": "PolicyStatementToAllowUserToPassOneSpecificRole",
+        "Effect": "Allow",
+        "Action": [ "iam:PassRole" ],
+        "Resource": "arn:aws:iam::account-id:role/RDS-Monitoring-Role-Name"
+    }
+```
+
 To read about setting up and enabling Enhanced Monitoring see the
 [AWS Documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_Monitoring.OS.Enabling.html).
+
+To read about granting a user permission to pass a role to an AWS service, see the
+[AWS Documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html).
 
 ### MySQL Database for Broker State
 The broker keeps service instance and binding information in a MySQL database. 
