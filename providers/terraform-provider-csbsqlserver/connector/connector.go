@@ -130,37 +130,11 @@ func (c *Connector) ManageObjectReassignment(ctx context.Context, username strin
 		return err
 	}
 
-	schemas, err := c.getSchemaNamesByUserOwner(ctx, username)
-	if err != nil {
-		return err
-	}
-
-	if err := c.transferOwnershipToObjectReassignmentRole(ctx, schemas); err != nil {
+	if err := c.transferOwnershipToObjectReassignmentRole(ctx, username); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (c *Connector) getSchemaNamesByUserOwner(ctx context.Context, username string) (schemaNames []string, err error) {
-	return schemaNames, c.withConnection(func(db *sql.DB) (err error) {
-		statement := `SELECT schema_name FROM information_schema.schemata WHERE schema_owner=@p1`
-		rows, err := db.QueryContext(ctx, statement, username)
-		if err != nil {
-			return fmt.Errorf("error querying existence of schemas by username %q: %w", username, err)
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			var s string
-			if err := rows.Scan(&s); err != nil {
-				return fmt.Errorf("error scanning schema %w", err)
-			}
-			schemaNames = append(schemaNames, s)
-		}
-
-		return nil
-	})
 }
 
 func (c *Connector) checkObjectReassignmentRoleExist(ctx context.Context) (result bool, err error) {
@@ -206,18 +180,27 @@ EXEC (@sql)
 	})
 }
 
-func (c *Connector) transferOwnershipToObjectReassignmentRole(ctx context.Context, schemas []string) error {
-	// TODO transaction????
-	if len(schemas) == 0 {
-		return nil
-	}
+func (c *Connector) transferOwnershipToObjectReassignmentRole(ctx context.Context, username string) error {
+	statement := `
+DECLARE @cur CURSOR, @sql nvarchar(max), @schemaName nvarchar(max);
+SET @cur = CURSOR STATIC FOR
+    SELECT schema_name FROM information_schema.schemata WHERE schema_owner=@username
 
-	return c.withConnection(func(db *sql.DB) (err error) {
-		for _, schema := range schemas {
-			statement := fmt.Sprintf("ALTER AUTHORIZATION ON SCHEMA::%s TO %s", schema, roleName)
-			if _, err := db.ExecContext(ctx, statement); err != nil {
-				return fmt.Errorf("error transfering ownership of the %q schema to the %s role: %w", schema, roleName, err)
-			}
+OPEN @cur
+
+WHILE 1 = 1
+BEGIN
+     FETCH @cur INTO @schemaName
+     IF @@fetch_status <> 0
+        BREAK
+     SET @sql = 'ALTER AUTHORIZATION ON SCHEMA::' + QuoteName(@schemaName) + ' TO ' + QuoteName(@roleName) + ' '
+	 EXEC (@sql)
+END
+`
+
+	return c.withTransaction(func(tx *sql.Tx) (err error) {
+		if _, err := tx.ExecContext(ctx, statement, sql.Named("username", username), sql.Named("roleName", roleName)); err != nil {
+			return fmt.Errorf("error transfering ownership of schemas owned by %s to the %s role: %w", username, roleName, err)
 		}
 		return nil
 	})
