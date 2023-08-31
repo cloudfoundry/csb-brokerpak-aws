@@ -29,8 +29,12 @@ variable "backup_retention_period" { type = string }
 variable "backup_window" { type = string }
 variable "copy_tags_to_snapshot" { type = bool }
 variable "delete_automated_backups" { type = bool }
+
 variable "maintenance_day" { type = string }
 variable "maintenance_start_hour" { type = string }
 variable "maintenance_start_min" { type = string }
 variable "maintenance_end_hour" { type = string }
 variable "maintenance_end_min" { type = string }
+
+variable "allow_major_version_upgrade" { type = bool }
+variable "auto_minor_version_upgrade" { type = bool }

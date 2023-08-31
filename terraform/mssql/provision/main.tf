@@ -68,6 +68,9 @@ resource "aws_db_instance" "db_instance" {
   maintenance_window       = local.maintenance_window
 
 
+  allow_major_version_upgrade = var.allow_major_version_upgrade
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
+
   lifecycle {
     prevent_destroy = true
   }
