@@ -84,6 +84,8 @@ func WithDatabase() ServerOption {
 	}
 }
 
+func WithNoop() ServerOption { return func(db *sql.DB) {} }
+
 func Connect(username, password, database string, port int) *sql.DB {
 	db, err := sql.Open("sqlserver", NewEncoder(Server, username, password, database, "disable", port).Encode())
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
