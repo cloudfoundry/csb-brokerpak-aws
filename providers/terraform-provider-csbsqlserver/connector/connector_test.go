@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/pborman/uuid"
 
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/testhelpers"
 )
@@ -14,7 +14,7 @@ import (
 var _ = Describe("Connector", func() {
 	Describe("CreateBinding()", func() {
 		It("creates a binding", func() {
-			bindingUsername := uuid.New()
+			bindingUsername := uuid.NewString()
 			bindingPassword := testhelpers.RandomPassword()
 
 			By("creating the binding")
@@ -37,7 +37,7 @@ var _ = Describe("Connector", func() {
 		})
 
 		It("is idempotent", func() {
-			bindingUsername := uuid.New()
+			bindingUsername := uuid.NewString()
 			bindingPassword := testhelpers.RandomPassword()
 
 			By("creating the binding")
@@ -52,7 +52,7 @@ var _ = Describe("Connector", func() {
 
 	Describe("DeleteBinding()", func() {
 		It("removes a binding", func() {
-			bindingUsername := uuid.New()
+			bindingUsername := uuid.NewString()
 			bindingPassword := testhelpers.RandomPassword()
 
 			By("creating the binding")
@@ -71,7 +71,7 @@ var _ = Describe("Connector", func() {
 		})
 
 		It("should fail when binding does not exists", func() {
-			bindingUsername := uuid.New()
+			bindingUsername := uuid.NewString()
 
 			By("deleting a binding that does not exist")
 			err := conn.DeleteBinding(context.TODO(), bindingUsername)
@@ -85,7 +85,7 @@ var _ = Describe("Connector", func() {
 		})
 
 		It("removes legacy logins", func() {
-			bindingUsername := uuid.New()
+			bindingUsername := uuid.NewString()
 			bindingPassword := testhelpers.RandomPassword()
 
 			By("creating a legacy login")
@@ -108,7 +108,7 @@ var _ = Describe("Connector", func() {
 
 	Describe("ReadBinding()", func() {
 		It("can detect whether a user exists", func() {
-			bindingUsername := uuid.New()
+			bindingUsername := uuid.NewString()
 			bindingPassword := testhelpers.RandomPassword()
 
 			By("creating the binding")
@@ -121,7 +121,7 @@ var _ = Describe("Connector", func() {
 			Expect(found).To(BeTrue())
 
 			By("failing to find a user that doesn't exist")
-			found, err = conn.ReadBinding(context.TODO(), uuid.New())
+			found, err = conn.ReadBinding(context.TODO(), uuid.NewString())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(found).To(BeFalse())
 		})
@@ -129,7 +129,7 @@ var _ = Describe("Connector", func() {
 
 	Describe("persisting data", func() {
 		It("persists data between bindings", func() {
-			bindingUsername1 := uuid.New()
+			bindingUsername1 := uuid.NewString()
 			bindingPassword1 := testhelpers.RandomPassword()
 
 			By("creating a first binding")
@@ -137,7 +137,7 @@ var _ = Describe("Connector", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			By("connecting and creating data")
-			value := uuid.New()
+			value := uuid.NewString()
 			udb := testhelpers.Connect(bindingUsername1, bindingPassword1, testhelpers.TestDatabase, port)
 			_, err = udb.Exec(`CREATE SCHEMA persist AUTHORIZATION dbo`)
 			Expect(err).NotTo(HaveOccurred())
@@ -151,7 +151,7 @@ var _ = Describe("Connector", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			By("creating another binding")
-			bindingUsername2 := uuid.New()
+			bindingUsername2 := uuid.NewString()
 			bindingPassword2 := testhelpers.RandomPassword()
 			err = conn.CreateBinding(context.TODO(), bindingUsername2, bindingPassword2, []string{"db_accessadmin", "db_datareader"})
 			Expect(err).NotTo(HaveOccurred())

@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/pborman/uuid"
+	"github.com/google/uuid"
 
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/csbsqlserver"
 	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver/testhelpers"
@@ -109,8 +109,8 @@ func createTestCaseCnf(adminPassword string, port int) testCaseCnf {
 	return testCaseCnf{
 		ResourceBindingOneName: fmt.Sprintf("%s.binding1", csbsqlserver.ResourceNameKey),
 		ResourceBindingTwoName: fmt.Sprintf("%s.binding2", csbsqlserver.ResourceNameKey),
-		BindingUserOne:         fmt.Sprintf("user_one_%s", uuid.New()),
-		BindingUserTwo:         fmt.Sprintf("user_two_%s", uuid.New()),
+		BindingUserOne:         fmt.Sprintf("user_one_%s", uuid.NewString()),
+		BindingUserTwo:         fmt.Sprintf("user_two_%s", uuid.NewString()),
 		BindingPasswordOne:     testhelpers.RandomPassword(),
 		BindingPasswordTwo:     testhelpers.RandomPassword(),
 		DatabaseName:           testhelpers.RandomDatabaseName(),
