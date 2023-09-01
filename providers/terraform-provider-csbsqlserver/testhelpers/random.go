@@ -6,8 +6,8 @@ import (
 	"net"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/onsi/gomega"
-	"github.com/pborman/uuid"
 )
 
 func FreePort() int {
@@ -36,5 +36,5 @@ func RandomSchemaName(prefixes ...string) string {
 }
 
 func randomWithPrefix(prefix string) string {
-	return fmt.Sprintf("%s_%s", prefix, uuid.New())
+	return fmt.Sprintf("%s_%s", prefix, uuid.NewString())
 }
