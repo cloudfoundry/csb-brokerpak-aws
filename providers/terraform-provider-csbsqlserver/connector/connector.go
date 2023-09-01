@@ -6,7 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-log/tflog"
+	_ "github.com/microsoft/go-mssqldb"
 )
 
 const (
@@ -48,12 +48,10 @@ func (c *Connector) CreateBinding(ctx context.Context, username, password string
 		// First binding => future provision phase
 		// Transact-SQL Statements not allowed in a Transaction:
 		// https://learn.microsoft.com/en-us/previous-versions/sql/sql-server-2008-r2/ms191544(v=sql.105)
-		tflog.Debug(ctx, "creating database")
 		if err := c.createDatabase(ctx, c.database); err != nil {
 			return err
 		}
 
-		tflog.Debug(ctx, "setting auto close option")
 		if err := c.setAutoClose(ctx, c.database); err != nil {
 			return err
 		}
