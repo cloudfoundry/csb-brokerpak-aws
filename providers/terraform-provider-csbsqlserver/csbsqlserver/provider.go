@@ -11,13 +11,13 @@ import (
 )
 
 const (
-	serverKey           = "server"
-	portKey             = "port"
-	databaseKey         = "database"
-	providerUsernameKey = "username"
-	providerPasswordKey = "password"
-	encryptKey          = "encrypt"
-	ResourceNameKey     = "csbsqlserver_binding"
+	serverKey       = "server"
+	portKey         = "port"
+	databaseKey     = "database"
+	usernameKey     = "username"
+	passwordKey     = "password"
+	encryptKey      = "encrypt"
+	ResourceNameKey = "csbsqlserver_binding"
 )
 
 func Provider() *schema.Provider {
@@ -44,11 +44,11 @@ func GetProviderSchema() map[string]*schema.Schema {
 			Type:     schema.TypeString,
 			Required: true,
 		},
-		providerUsernameKey: {
+		usernameKey: {
 			Type:     schema.TypeString,
 			Required: true,
 		},
-		providerPasswordKey: {
+		passwordKey: {
 			Type:     schema.TypeString,
 			Required: true,
 		},
@@ -79,11 +79,11 @@ func ProviderContextFunc(_ context.Context, d *schema.ResourceData) (any, diag.D
 			return
 		},
 		func() (diags diag.Diagnostics) {
-			username, diags = getServerIdentifier(d, providerUsernameKey)
+			username, diags = getServerIdentifier(d, usernameKey)
 			return
 		},
 		func() (diags diag.Diagnostics) {
-			password, diags = getServerPassword(d, providerPasswordKey)
+			password, diags = getServerPassword(d, passwordKey)
 			return
 		},
 		func() (diags diag.Diagnostics) {
