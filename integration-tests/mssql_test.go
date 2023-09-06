@@ -193,6 +193,9 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
+					HaveKeyWithValue("performance_insights_enabled", false),
+					HaveKeyWithValue("performance_insights_kms_key_id", ""),
+					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
 				),
 			)
 		})
