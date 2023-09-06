@@ -49,6 +49,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"maintenance_end_min":      nil,
 		"maintenance_start_min":    nil,
 		"maintenance_day":          nil,
+		"character_set_name":       nil,
 
 		"allow_major_version_upgrade": true,
 		"auto_minor_version_upgrade":  true,
@@ -119,6 +120,16 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"instance_class\" is not set, and has no default value.`))
 		})
+	})
+
+	Context("simple pass-through fields for aws_db_instance", func() {
+		DescribeTable("are passed to Terraform aws_db_instance unmodified",
+			func(propName string, propValue any) {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{propName: propValue}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{propName: Equal(propValue)}))
+			},
+			Entry("passthrough", "character_set_name", "a_custom_charset_value"),
+		)
 	})
 
 	Context("monitoring_interval", func() {

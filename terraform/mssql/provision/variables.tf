@@ -38,3 +38,5 @@ variable "maintenance_end_min" { type = string }
 
 variable "allow_major_version_upgrade" { type = bool }
 variable "auto_minor_version_upgrade" { type = bool }
+
+variable "character_set_name" { type = string }

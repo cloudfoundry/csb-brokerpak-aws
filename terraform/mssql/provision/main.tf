@@ -66,6 +66,7 @@ resource "aws_db_instance" "db_instance" {
   copy_tags_to_snapshot    = var.copy_tags_to_snapshot
   delete_automated_backups = var.delete_automated_backups
   maintenance_window       = local.maintenance_window
+  character_set_name       = var.character_set_name
 
 
   allow_major_version_upgrade = var.allow_major_version_upgrade
