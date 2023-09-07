@@ -66,6 +66,7 @@ resource "aws_db_instance" "db_instance" {
   copy_tags_to_snapshot    = var.copy_tags_to_snapshot
   delete_automated_backups = var.delete_automated_backups
   maintenance_window       = local.maintenance_window
+  character_set_name       = var.character_set_name
 
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id == "" ? null : var.performance_insights_kms_key_id
