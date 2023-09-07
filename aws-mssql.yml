@@ -263,8 +263,8 @@ provision:
       Allow minor version upgrades automatically during the maintenance window.
       If `auto_minor_version_upgrade` is enabled, you must specify a major engine version.
     default: true
-  - <<: *nullable_string
-    field_name: character_set_name
+  - field_name: character_set_name
+    type: string
     prohibit_update: true
     details: |
       The default server collation when you create the DB instance.
