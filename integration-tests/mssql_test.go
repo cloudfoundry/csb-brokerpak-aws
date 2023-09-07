@@ -193,6 +193,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
+					HaveKeyWithValue("character_set_name", BeNil()),
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
@@ -231,6 +232,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update db_name", "db_name", "no-matter-what-name"),
 			Entry("update instance_name", "instance_name", "no-matter-what-instance-name"),
 			Entry("update rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "no-matter-what-security-group"),
+			Entry("should prevent updating", "character_set_name", "no-matter-its-value"),
 		)
 
 		DescribeTable("should allow unsetting properties flagged as `nullable` by explicitly updating their value to be `nil`",

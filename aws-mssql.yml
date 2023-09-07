@@ -263,6 +263,12 @@ provision:
       Allow minor version upgrades automatically during the maintenance window.
       If `auto_minor_version_upgrade` is enabled, you must specify a major engine version.
     default: true
+  - field_name: character_set_name
+    type: string
+    prohibit_update: true
+    details: |
+      The default server collation when you create the DB instance.
+      Can't be modified, but apps can specify a different collation at table, or column level.
   - field_name: performance_insights_enabled
     type: boolean
     details: Specifies whether Performance Insights are enabled (see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.Overview.html).
