@@ -155,6 +155,10 @@ run-integration-tests: run-provider-tests ## run integration tests for this brok
 run-terraform-tests: providers custom.tfrc ## run terraform tests for this brokerpak
 	cd ./terraform-tests && TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go run github.com/onsi/ginkgo/v2/ginkgo -r .
 
+.PHONY: run-modified-tests
+run-modified-tests: providers custom.tfrc
+	TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go run github.com/onsi/ginkgo/v2/ginkgo -r --timeout=3h --focus-file none $$(git diff --name-only HEAD | awk '{printf(" --focus-file  %s", $$0)}')
+
 .PHONY: run-provider-tests
 run-provider-tests:  ## run the integration tests associated with providers
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
