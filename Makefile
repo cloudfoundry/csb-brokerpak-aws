@@ -7,7 +7,7 @@ help: ## list Makefile targets
 
 ###### Setup ##################################################################
 IAAS=aws
-GO-VERSION = 1.21.0
+GO-VERSION = 1.21.1
 GO-VER = go$(GO-VERSION)
 CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
 CSB_RELEASE_VERSION := $(CSB_VERSION) # this doesnt work well if we did make latest-csb.
@@ -154,6 +154,10 @@ run-integration-tests: run-provider-tests ## run integration tests for this brok
 .PHONY: run-terraform-tests
 run-terraform-tests: providers custom.tfrc ## run terraform tests for this brokerpak
 	cd ./terraform-tests && TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go run github.com/onsi/ginkgo/v2/ginkgo -r .
+
+.PHONY: run-modified-tests
+run-modified-tests: providers custom.tfrc
+	TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go run github.com/onsi/ginkgo/v2/ginkgo -r --timeout=3h --focus-file none $$(git diff --name-only HEAD | awk '{printf(" --focus-file  %s", $$0)}')
 
 .PHONY: run-provider-tests
 run-provider-tests:  ## run the integration tests associated with providers
