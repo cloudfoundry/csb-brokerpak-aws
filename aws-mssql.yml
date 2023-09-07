@@ -292,6 +292,14 @@ provision:
     default: 7
     constraints:
       minimum: 7
+  - field_name: multi_az
+    type: boolean
+    default: true
+    details: |
+      Allows enabling/disabling Multi-AZ using either SQL Server Database Mirroring (DBM) or Always On Availability Groups (AGs) depending on the chosen SQL Server version.
+      For Multi-AZ to work properly your security group needs to be configured to allow UDP and TCP traffic for port 3343.
+      For more information, see the https://aws.amazon.com/rds/sqlserver/faqs/#Multi-AZ_instance_ports_requirement
+      Also see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_SQLServerMultiAZ.html
   computed_inputs:
   - name: labels
     overwrite: true

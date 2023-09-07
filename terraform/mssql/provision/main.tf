@@ -20,6 +20,47 @@ resource "aws_security_group_rule" "rds_inbound_access" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "mssql_multiaz_udp_egress" {
+  count             = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  security_group_id = aws_security_group.rds-sg[0].id
+  type              = "egress"
+  protocol          = "udp"
+  from_port         = 3343
+  to_port           = 3343
+  cidr_blocks       = ["0.0.0.0/0"]
+
+}
+
+resource "aws_security_group_rule" "mssql_multiaz_udp_ingress" {
+  count             = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  security_group_id = aws_security_group.rds-sg[0].id
+  type              = "ingress"
+  protocol          = "udp"
+  from_port         = 3343
+  to_port           = 3343
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "mssql_multiaz_tcp_egress" {
+  count             = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  security_group_id = aws_security_group.rds-sg[0].id
+  type              = "egress"
+  protocol          = "tcp"
+  from_port         = 3343
+  to_port           = 3343
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "mssql_multiaz_tcp_ingress" {
+  count             = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  type              = "ingress"
+  protocol          = "tcp"
+  from_port         = 3343
+  to_port           = 3343
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.rds-sg[0].id
+}
+
 resource "random_string" "username" {
   length  = 16
   special = false
@@ -58,6 +99,7 @@ resource "aws_db_instance" "db_instance" {
   iops                   = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
   monitoring_interval    = var.monitoring_interval
   monitoring_role_arn    = var.monitoring_role_arn
+  multi_az               = var.multi_az
 
   parameter_group_name = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
 

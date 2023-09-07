@@ -41,6 +41,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		"storage_type": "io1",
 		"iops":         3000,
+		"multi_az":     true,
 
 		"backup_window":            nil,
 		"copy_tags_to_snapshot":    true,
@@ -85,12 +86,16 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 
 		It("should create the right resources", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(7))
+			Expect(plan.ResourceChanges).To(HaveLen(11))
 
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 				"aws_db_instance",
 				"random_password",
 				"random_string",
+				"aws_security_group_rule",
+				"aws_security_group_rule",
+				"aws_security_group_rule",
+				"aws_security_group_rule",
 				"aws_security_group_rule",
 				"aws_db_subnet_group",
 				"aws_security_group",
@@ -137,6 +142,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{propName: Equal(propValue)}))
 			},
 			Entry("passthrough", "character_set_name", "a_custom_charset_value"),
+			Entry("passthrough", "multi_az", false),
 		)
 	})
 
@@ -282,6 +288,10 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					"aws_db_instance",
 					"random_password",
 					"random_string",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
 					"aws_security_group_rule",
 					"aws_db_subnet_group",
 					"aws_security_group",
@@ -670,5 +680,85 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				)
 			})
 		})
+	})
+
+	Context("multi az", func() {
+		When("some invalid combinations are passed", func() {
+			It("it doesn't fail during the plan stage, only during apply", func() {
+				overrideIncompatibleDefaults := map[string]any{"storage_encrypted": false}
+
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, overrideIncompatibleDefaults, requiredVars, map[string]any{
+					"multi_az": true,
+					"engine":   "sqlserver-ex",
+				}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"multi_az": BeTrue(),
+						"engine":   Equal("sqlserver-ex"),
+					}),
+				)
+			})
+		})
+
+		When("no custom security_group_ids passed and multi_az is enabled", func() {
+			It("should create several security_group_rules", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"rds_vpc_security_group_ids": "",
+					"multi_az":                   true,
+				}))
+				Expect(ResourceChangesNames(plan)).To(ConsistOf(
+					"db_instance",
+					"db_parameter_group",
+					"rds-private-subnet",
+					"rds-sg",
+					"mssql_multiaz_tcp_egress",
+					"mssql_multiaz_tcp_ingress",
+					"mssql_multiaz_udp_egress",
+					"mssql_multiaz_udp_ingress",
+					"rds_inbound_access",
+					"password",
+					"username",
+				))
+			})
+		})
+
+		When("no custom security_group_ids passed and multi_az is disabled", func() {
+			It("should create several security_group_rules", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"rds_vpc_security_group_ids": "",
+					"multi_az":                   false,
+				}))
+				Expect(ResourceChangesNames(plan)).To(ConsistOf(
+					"db_instance",
+					"db_parameter_group",
+					"rds-private-subnet",
+					"rds-sg",
+					"rds_inbound_access",
+					"password",
+					"username",
+				))
+			})
+		})
+
+		/*
+			// Can't implement this test because existing validations reject dummy security_group_ids
+			When("some security_group_ids passed and multi_az is enabled", func() {
+				It("should not create any security_group_rules", func() {
+					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+						"rds_vpc_security_group_ids": "id1,id2,id3",
+						"multi_az": true,
+					}))
+					Expect(ResourceChangesNames(plan)).To(ConsistOf(
+						"db_instance",
+						"db_parameter_group",
+						"rds-private-subnet",
+						"rds-sg",
+						"rds_inbound_access",
+						"password",
+						"username",
+					))
+				})
+			})
+		*/
 	})
 })
