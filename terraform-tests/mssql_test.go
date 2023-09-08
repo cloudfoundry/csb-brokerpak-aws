@@ -3,6 +3,8 @@ package terraformtests
 import (
 	"path"
 
+	"golang.org/x/exp/maps"
+
 	. "csbbrokerpakaws/terraform-tests/helpers"
 
 	tfjson "github.com/hashicorp/terraform-json"
@@ -49,10 +51,15 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"maintenance_end_min":      nil,
 		"maintenance_start_min":    nil,
 		"maintenance_day":          nil,
+		"character_set_name":       nil,
 
 		"allow_major_version_upgrade": true,
 		"auto_minor_version_upgrade":  true,
 		"require_ssl":                 true,
+
+		"performance_insights_enabled":          false,
+		"performance_insights_kms_key_id":       "",
+		"performance_insights_retention_period": 7,
 	}
 
 	requiredVars := map[string]any{
@@ -107,6 +114,8 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"publicly_accessible":  BeFalse(),
 				"monitoring_interval":  BeNumerically("==", 0),
 				"require_ssl":          BeTrue(),
+
+				"performance_insights_enabled": BeFalse(),
 			}))
 		})
 	})
@@ -121,6 +130,16 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"storage_gb\" is not set, and has no default value.`))
 			Expect(msgs).To(ContainSubstring(`The root module input variable \"instance_class\" is not set, and has no default value.`))
 		})
+	})
+
+	Context("simple pass-through fields for aws_db_instance", func() {
+		DescribeTable("are passed to Terraform aws_db_instance unmodified",
+			func(propName string, propValue any) {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{propName: propValue}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{propName: Equal(propValue)}))
+			},
+			Entry("passthrough", "character_set_name", "a_custom_charset_value"),
+		)
 	})
 
 	Context("monitoring_interval", func() {
@@ -586,6 +605,71 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 						"auto_minor_version_upgrade": BeFalse(),
 						"engine_version":             Equal("15.00.4236.7.v1"),
 					}))
+			})
+		})
+	})
+
+	Context("performance insights", func() {
+		When("performance insights is enabled", func() {
+			It("works as expected", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"performance_insights_enabled":          true,
+					"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+					"performance_insights_retention_period": 93,
+				}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"performance_insights_enabled":          BeTrue(),
+						"performance_insights_kms_key_id":       Equal("arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+						"performance_insights_retention_period": BeNumerically("==", 93),
+					}),
+				)
+			})
+		})
+
+		When("performance insights is disabled", func() {
+			It("causes kms_key_id and retention_period to be ignored", func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"performance_insights_enabled":          false,
+					"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+					"performance_insights_retention_period": 93,
+				}))
+				Expect(maps.Keys(AfterValuesForType(plan, "aws_db_instance").(map[string]any))).To(
+					Not(ContainElements(
+						"performance_insights_enabled",
+						"performance_insights_kms_key_id",
+						"performance_insights_retention_period",
+					)),
+				)
+			})
+		})
+
+		When("a kms key id with invalid format is passed", func() {
+			It("refuses to create the aws_db_instance", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"performance_insights_kms_key_id": "an-invalid-kms-key-id",
+				}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				msgs := string(session.Out.Contents())
+				Expect(msgs).To(ContainSubstring(`(an-invalid-kms-key-id) is an invalid ARN: arn: invalid prefix`))
+			})
+		})
+
+		When("an invalid retention period is passed", func() {
+			It("doesn't detect any errors and plan finishes succesfully", func() {
+				// invalid values for the retention_period are handled by the IAAS not Terraform
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"performance_insights_enabled":          true,
+					"performance_insights_retention_period": 13,
+				}))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"performance_insights_enabled":          BeTrue(),
+						"performance_insights_retention_period": BeNumerically("==", 13),
+					}),
+				)
 			})
 		})
 	})
