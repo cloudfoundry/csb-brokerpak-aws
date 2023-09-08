@@ -52,6 +52,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		"allow_major_version_upgrade": true,
 		"auto_minor_version_upgrade":  true,
+		"require_ssl":                 true,
 	}
 
 	requiredVars := map[string]any{
@@ -105,6 +106,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"license_model":        Equal("license-included"),
 				"publicly_accessible":  BeFalse(),
 				"monitoring_interval":  BeNumerically("==", 0),
+				"require_ssl":          BeTrue(),
 			}))
 		})
 	})
