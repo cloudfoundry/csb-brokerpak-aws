@@ -9,6 +9,9 @@ import (
 const (
 	queryParamDatabaseKey = "database"
 	queryParamEncryptKey  = "encrypt"
+
+	queryParamTrustServerCertificate = "TrustServerCertificate"
+	queryParamHostNameInCertificate  = "HostNameInCertificate"
 )
 
 type Encoder struct {
@@ -27,7 +30,16 @@ func NewEncoder(
 	encrypt string,
 	port int,
 ) *Encoder {
-	queryParams := map[string]string{queryParamDatabaseKey: database, queryParamEncryptKey: encrypt}
+	queryParams := map[string]string{
+		queryParamDatabaseKey: database,
+		queryParamEncryptKey:  encrypt,
+	}
+
+	if encrypt == "true" {
+		queryParams[queryParamTrustServerCertificate] = "false"
+		queryParams[queryParamHostNameInCertificate] = server
+	}
+
 	return &Encoder{
 		server:      server,
 		username:    username,
