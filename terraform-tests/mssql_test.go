@@ -113,7 +113,6 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				"license_model":        Equal("license-included"),
 				"publicly_accessible":  BeFalse(),
 				"monitoring_interval":  BeNumerically("==", 0),
-				"require_ssl":          BeTrue(),
 
 				"performance_insights_enabled": BeFalse(),
 			}))
@@ -511,8 +510,40 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 								"value":        Equal("1"),
 								"apply_method": Equal("immediate"),
 							}),
-						)},
-					))
+							MatchKeys(IgnoreExtras, Keys{
+								"name":         Equal("rds.force_ssl"),
+								"value":        Equal("1"),
+								"apply_method": Equal("pending-reboot"),
+							}),
+						),
+					}))
+			})
+		})
+
+		When("require ssl disabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"require_ssl": false}))
+			})
+
+			It("should create a parameter group without force ssl", func() {
+				Expect(ResourceCreationForType(plan, "aws_db_parameter_group")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_db_parameter_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"name_prefix": ContainSubstring("rds-mssql-csb-mssql-test"),
+						"family":      Equal("sqlserver-ee-15.0"),
+						"parameter": ConsistOf(
+							MatchKeys(IgnoreExtras, Keys{
+								"name":         Equal("contained database authentication"),
+								"value":        Equal("1"),
+								"apply_method": Equal("immediate"),
+							}),
+							MatchKeys(IgnoreExtras, Keys{
+								"name":         Equal("rds.force_ssl"),
+								"value":        Equal("0"),
+								"apply_method": Equal("pending-reboot"),
+							}),
+						),
+					}))
 			})
 		})
 	})
