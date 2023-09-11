@@ -34,3 +34,6 @@ variable "server_side_encryption_enabled" { type = bool }
 
 variable "write_capacity" { type = number }
 variable "read_capacity" { type = number }
+variable "iam_arn" { type = string }
+variable "role_name" { type = string }
+variable "creds_endpoint" { type = string }

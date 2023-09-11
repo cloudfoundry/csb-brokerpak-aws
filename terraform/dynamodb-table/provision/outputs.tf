@@ -16,3 +16,6 @@ output "region" { value = var.region }
 output "dynamodb_table_arn" { value = element(concat(aws_dynamodb_table.this.*.arn, tolist([])), 0) }
 output "dynamodb_table_id" { value = element(concat(aws_dynamodb_table.this.*.id, tolist([])), 0) }
 output "dynamodb_table_name" { value = aws_dynamodb_table.this.name }
+output "iam_arn" { value = var.iam_arn }
+output "role_name" { value = var.role_name }
+output "creds_endpoint" { value = var.creds_endpoint }

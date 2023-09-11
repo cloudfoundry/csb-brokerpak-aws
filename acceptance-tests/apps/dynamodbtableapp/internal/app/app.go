@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,22 +10,21 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/credentials/endpointcreds"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 
 	appcreds "dynamodbtableapp/internal/credentials"
 )
 
 func App(creds appcreds.DynamoDBService) http.HandlerFunc {
+	authToken := base64.StdEncoding.EncodeToString([]byte(strings.ReplaceAll(creds.AccessKeyId, ":", "*") + ":" + creds.AccessKeySecret))
 	cfg, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithCredentialsProvider(
 			aws.NewCredentialsCache(
-				credentials.NewStaticCredentialsProvider(
-					creds.AccessKeyId,
-					creds.AccessKeySecret,
-					"",
-				),
+				endpointcreds.New(creds.CredsEndpoint, func(options *endpointcreds.Options) {
+					options.AuthorizationToken = "Basic " + authToken
+				}),
 			),
 		),
 		config.WithRegion(creds.Region),

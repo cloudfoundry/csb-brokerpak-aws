@@ -73,5 +73,9 @@ func config() any {
 				"non_key_attributes": []string{"id"},
 			},
 		},
+		"iam_arn":        "arn:aws:iam::000000000000:user/this-user-must-exist-and-have-permission-to-assume-role",
+		"role_name":      "this-role-must-exist-and-allow-the-above-user-to-assume-role",
+		"region":         "us-west-1",
+		"creds_endpoint": "https://the-endpoint-for-the-cloud-service-broker.csb.cf-app.com/creds",
 	}
 }

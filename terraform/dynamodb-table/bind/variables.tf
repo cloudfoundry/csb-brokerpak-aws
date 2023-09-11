@@ -14,4 +14,6 @@
 
 variable "dynamodb_table_arn" { type = string }
 variable "dynamodb_table_id" { type = string }
-variable "user_name" { type = string }
+variable "iam_arn" { type = string }
+variable "role_name" { type = string }
+variable "creds_endpoint" { type = string }

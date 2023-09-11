@@ -10,8 +10,15 @@ import (
 type DynamoDBService struct {
 	AccessKeyId     string `mapstructure:"access_key_id"`
 	AccessKeySecret string `mapstructure:"secret_access_key"`
+	CredsEndpoint   string `mapstructure:"creds_endpoint"`
+	RoleName        string `mapstructure:"role_name"`
 	Region          string `mapstructure:"region"`
 	TableName       string `mapstructure:"dynamodb_table_name"`
+}
+
+type Creds struct {
+	AccessKeyId     string `json:"AccessKeyId"`
+	SecretAccessKey string `json:"SecretAccessKey"`
 }
 
 func Read() (DynamoDBService, error) {
