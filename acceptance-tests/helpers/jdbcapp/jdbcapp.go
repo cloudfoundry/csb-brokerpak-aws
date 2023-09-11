@@ -15,6 +15,7 @@ type DatabaseEngine string
 const (
 	MySQL      DatabaseEngine = "mysql"
 	PostgreSQL DatabaseEngine = "postgres"
+	SQLServer  DatabaseEngine = "sqlserver"
 )
 
 type AppResponseUser struct {

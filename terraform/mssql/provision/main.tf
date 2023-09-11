@@ -98,6 +98,12 @@ resource "aws_db_parameter_group" "db_parameter_group" {
     apply_method = "immediate" // It is the default value, but it is worth being more explicit.
   }
 
+  parameter {
+    name         = "rds.force_ssl"
+    value        = var.require_ssl ? 1 : 0
+    apply_method = "pending-reboot" // MSSQL engine can't apply this parameter without a reboot. Apply type = Static in AWS
+  }
+
   lifecycle {
     create_before_destroy = true
   }

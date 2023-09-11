@@ -263,6 +263,12 @@ provision:
       Allow minor version upgrades automatically during the maintenance window.
       If `auto_minor_version_upgrade` is enabled, you must specify a major engine version.
     default: true
+  - field_name: require_ssl
+    type: boolean
+    details: |
+      Require that connections use SSL.
+      Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
+    default: true
   - field_name: character_set_name
     type: string
     prohibit_update: true
@@ -318,6 +324,9 @@ provision:
   - field_name: password
     type: string
     details: The password to authenticate to the database instance.
+  - field_name: require_ssl
+    type: boolean
+    details: Require that connections use SSL
 bind:
   plan_inputs: []
   user_inputs: []
@@ -338,8 +347,13 @@ bind:
     type: string
     default: ${instance.details["password"]}
     overwrite: true
+  - name: require_ssl
+    type: boolean
+    default: ${instance.details["require_ssl"]}
+    overwrite: true
   template_refs:
     outputs: terraform/mssql/bind/outputs.tf
+    data: terraform/mssql/bind/data.tf
     provider: terraform/mssql/bind/provider.tf
     versions: terraform/mssql/bind/versions.tf
     variables: terraform/mssql/bind/variables.tf
