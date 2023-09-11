@@ -4,13 +4,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"mssqlapp/internal/credentials"
 )
 
-func handleDropSchema(config string) func(w http.ResponseWriter, r *http.Request) {
+func handleDropSchema(connector *credentials.Connector) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling drop schema.")
-		db := connect(config)
-		defer db.Close()
+		db, err := connector.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
+		if err != nil {
+			fail(w, http.StatusInternalServerError, "failed to connect to database: %s", err)
+			return
+		}
 
 		schema, err := schemaName(r)
 		if err != nil {

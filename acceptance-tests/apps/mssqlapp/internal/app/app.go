@@ -1,7 +1,6 @@
 package app
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,25 +8,26 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/go-chi/chi/v5"
+
+	"mssqlapp/internal/credentials"
 )
 
 const (
 	tableName   = "test"
 	keyColumn   = "keyname"
 	valueColumn = "valuedata"
+
+	tlsQueryParam = "tls"
 )
 
-func App(config string) http.Handler {
-	db := connect(config)
-	defer db.Close()
-
+func App(connector *credentials.Connector) http.Handler {
 	r := chi.NewRouter()
 	r.Head("/", aliveness)
-	r.Put("/{schema}", handleCreateSchema(config))
-	r.Post("/{schema}", handleFillDatabase(config))
-	r.Delete("/{schema}", handleDropSchema(config))
-	r.Put("/{schema}/{key}", handleSet(config))
-	r.Get("/{schema}/{key}", handleGet(config))
+	r.Put("/{schema}", handleCreateSchema(connector))
+	r.Post("/{schema}", handleFillDatabase(connector))
+	r.Delete("/{schema}", handleDropSchema(connector))
+	r.Put("/{schema}/{key}", handleSet(connector))
+	r.Get("/{schema}/{key}", handleGet(connector))
 
 	return r
 }
@@ -35,19 +35,6 @@ func App(config string) http.Handler {
 func aliveness(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Handled aliveness test.")
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func connect(config string) *sql.DB {
-	db, err := sql.Open("sqlserver", config)
-	if err != nil {
-		log.Fatalf("failed to connect to database. Configuration: %q: %w", config, err)
-	}
-
-	if err := db.Ping(); err != nil {
-		log.Fatalf("error pinging database. Configuration: %q: %w", config, err)
-	}
-
-	return db
 }
 
 func schemaName(r *http.Request) (string, error) {

@@ -193,6 +193,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("maintenance_end_min", BeNil()),
 					HaveKeyWithValue("allow_major_version_upgrade", false),
 					HaveKeyWithValue("auto_minor_version_upgrade", false),
+					HaveKeyWithValue("require_ssl", true),
 					HaveKeyWithValue("character_set_name", BeNil()),
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
@@ -280,6 +281,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update delete_automated_backups", "delete_automated_backups", false),
 			Entry("update allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("update auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
+			Entry("update require_ssl", "require_ssl", false),
 		)
 	})
 })

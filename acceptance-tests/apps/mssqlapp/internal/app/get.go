@@ -6,13 +6,18 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+
+	"mssqlapp/internal/credentials"
 )
 
-func handleGet(config string) func(w http.ResponseWriter, r *http.Request) {
+func handleGet(connector *credentials.Connector) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling get.")
-		db := connect(config)
-		defer db.Close()
+		db, err := connector.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
+		if err != nil {
+			fail(w, http.StatusInternalServerError, "failed to connect to database: %s", err)
+			return
+		}
 
 		schema, err := schemaName(r)
 		if err != nil {
