@@ -10,6 +10,9 @@ variable "admin_username" {
 variable "admin_password" {
   type = string
 }
+variable "require_ssl" {
+  type = bool
+}
 
 locals {
   port = 1433

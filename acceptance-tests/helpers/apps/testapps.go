@@ -16,6 +16,8 @@ const (
 	DynamoDBNamespace   AppCode = "dynamodbnsapp"
 	JDBCTestAppPostgres AppCode = "jdbctestapp/jdbctestapp-postgres-1.0.0.jar"
 	JDBCTestAppMysql    AppCode = "jdbctestapp/jdbctestapp-mysql-1.0.0.jar"
+
+	JDBCTestAppSQLServer AppCode = "jdbctestapp/jdbctestapp-sqlserver-1.0.0.jar"
 )
 
 func (a AppCode) Dir() string {
@@ -24,7 +26,7 @@ func (a AppCode) Dir() string {
 
 func WithApp(app AppCode) Option {
 	switch app {
-	case JDBCTestAppPostgres, JDBCTestAppMysql:
+	case JDBCTestAppPostgres, JDBCTestAppMysql, JDBCTestAppSQLServer:
 		return WithOptions(WithDir(app.Dir()), WithMemory("1GB"), WithDisk("250MB"))
 	default:
 		return WithOptions(WithPreBuild(app.Dir()), WithMemory("100MB"), WithDisk("250MB"))

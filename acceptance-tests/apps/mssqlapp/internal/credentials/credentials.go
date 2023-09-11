@@ -17,32 +17,31 @@ type Config struct {
 	Database string `mapstructure:"name"`
 }
 
-func Read() (string, error) {
+func Read() (*Connector, error) {
 	app, err := cfenv.Current()
 	if err != nil {
-		return "", fmt.Errorf("error reading app env: %w", err)
+		return nil, fmt.Errorf("error reading app env: %w", err)
 	}
 	if svs, err := app.Services.WithTag("mssql"); err == nil {
 		log.Println("found tag: mssql")
 		return readService(svs)
 	}
 
-	return "", fmt.Errorf("error reading MSSQL service details")
+	return nil, fmt.Errorf("error reading MSSQL service details")
 }
 
-func readService(svs []cfenv.Service) (string, error) {
+func readService(svs []cfenv.Service) (*Connector, error) {
 	var c Config
 	if err := mapstructure.Decode(svs[0].Credentials, &c); err != nil {
-		return "", fmt.Errorf("failed to decode credentials: %w", err)
+		return nil, fmt.Errorf("failed to decode credentials: %w", err)
 	}
 
-	enc := NewEncoder(
+	connector := NewConnector(
 		c.Server,
 		c.Username,
 		c.Password,
 		c.Database,
-		"true",
 		c.Port,
 	)
-	return enc.Encode(), nil
+	return connector, nil
 }

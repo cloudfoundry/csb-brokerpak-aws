@@ -8,6 +8,9 @@ import (
 const (
 	queryParamDatabaseKey = "database"
 	queryParamEncryptKey  = "encrypt"
+
+	queryParamTrustServerCertificate = "TrustServerCertificate"
+	queryParamHostNameInCertificate  = "HostNameInCertificate"
 )
 
 type Encoder struct {
@@ -27,6 +30,12 @@ func NewEncoder(
 	port int,
 ) *Encoder {
 	queryParams := map[string]string{queryParamDatabaseKey: database, queryParamEncryptKey: encrypt}
+
+	if encrypt == "true" {
+		queryParams[queryParamTrustServerCertificate] = "false"
+		queryParams[queryParamHostNameInCertificate] = server
+	}
+
 	return &Encoder{
 		server:      server,
 		username:    username,
@@ -36,17 +45,33 @@ func NewEncoder(
 	}
 }
 
-func (b *Encoder) Encode() string {
-	u := createURL(b.server, b.username, b.password, b.port)
-	u.RawQuery = createQueryParams(b.queryParams).Encode()
+func (e *Encoder) Encode() string {
+	u := createURL(e.server, e.username, e.password, e.port)
+	u.RawQuery = createQueryParams(e.queryParams).Encode()
 
 	return u.String()
+}
+
+func (e *Encoder) withEncrypt() *Encoder {
+	e.queryParams[queryParamEncryptKey] = "true"
+	e.queryParams[queryParamTrustServerCertificate] = "false"
+	e.queryParams[queryParamHostNameInCertificate] = e.server
+	return e
+}
+
+func (e *Encoder) withoutEncrypt() *Encoder {
+	e.queryParams[queryParamEncryptKey] = "disable"
+	e.queryParams[queryParamTrustServerCertificate] = "true"
+	e.queryParams[queryParamHostNameInCertificate] = ""
+	return e
 }
 
 func createQueryParams(params map[string]string) url.Values {
 	q := url.Values{}
 	for key, value := range params {
-		q.Add(key, value)
+		if value != "" {
+			q.Add(key, value)
+		}
 	}
 	return q
 }
