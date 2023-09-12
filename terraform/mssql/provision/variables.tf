@@ -46,3 +46,9 @@ variable "character_set_name" { type = string }
 variable "performance_insights_enabled" { type = bool }
 variable "performance_insights_kms_key_id" { type = string }
 variable "performance_insights_retention_period" { type = number }
+
+variable "enable_export_agent_logs" { type = bool }
+variable "enable_export_error_logs" { type = bool }
+variable "cloudwatch_agent_log_group_retention_in_days" { type = number }
+variable "cloudwatch_error_log_group_retention_in_days" { type = number }
+variable "cloudwatch_log_groups_kms_key_id" { type = string }

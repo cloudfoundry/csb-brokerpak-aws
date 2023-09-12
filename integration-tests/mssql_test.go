@@ -55,6 +55,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"max_allocated_storage":       999,
 			"auto_minor_version_upgrade":  false,
 			"allow_major_version_upgrade": false,
+
+			"enable_export_agent_logs":                     true,
+			"cloudwatch_agent_log_group_retention_in_days": 1,
+			"enable_export_error_logs":                     true,
+			"cloudwatch_error_log_group_retention_in_days": 1,
+			"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 		}
 	}
 
@@ -151,6 +157,26 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				map[string]any{"storage_gb": 19},
 				"storage_gb: Must be greater than or equal to 20",
 			),
+			Entry(
+				"cloudwatch_agent_log_group_retention_in_days minimum value is 0",
+				map[string]any{"cloudwatch_agent_log_group_retention_in_days": -1},
+				"cloudwatch_agent_log_group_retention_in_days: Must be greater than or equal to 0",
+			),
+			Entry(
+				"cloudwatch_agent_log_group_retention_in_days maximum value is 3653",
+				map[string]any{"cloudwatch_agent_log_group_retention_in_days": 3654},
+				"cloudwatch_agent_log_group_retention_in_days: Must be less than or equal to 3653",
+			),
+			Entry(
+				"cloudwatch_error_log_group_retention_in_days minimum value is 0",
+				map[string]any{"cloudwatch_error_log_group_retention_in_days": -1},
+				"cloudwatch_error_log_group_retention_in_days: Must be greater than or equal to 0",
+			),
+			Entry(
+				"cloudwatch_error_log_group_retention_in_days maximum value is 3653",
+				map[string]any{"cloudwatch_error_log_group_retention_in_days": 3654},
+				"cloudwatch_error_log_group_retention_in_days: Must be less than or equal to 3653",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -198,6 +224,11 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+					HaveKeyWithValue("enable_export_agent_logs", true),
+					HaveKeyWithValue("cloudwatch_agent_log_group_retention_in_days", BeNumerically("==", 1)),
+					HaveKeyWithValue("enable_export_error_logs", true),
+					HaveKeyWithValue("cloudwatch_error_log_group_retention_in_days", BeNumerically("==", 1)),
+					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 				),
 			)
 		})
@@ -281,6 +312,9 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("update auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("update require_ssl", "require_ssl", false),
+			Entry("update enable_export_agent_logs", "enable_export_agent_logs", true),
+			Entry("update enable_export_error_logs", "enable_export_error_logs", true),
+			Entry("update cloudwatch_log_groups_kms_key_id", "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 		)
 	})
 })
