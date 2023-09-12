@@ -21,7 +21,12 @@ resource "aws_security_group_rule" "rds_inbound_access" {
 }
 
 resource "aws_security_group_rule" "mssql_multiaz_udp_egress" {
-  count             = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  count = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  # This rule is not strictly mandatory since in AWS all egress traffic is allowed by default.
+  # Still, I believe it is valuable:
+  # - As a safeguard if such behaviour changes.
+  # - As documentation of Multi-AZ requirements.
+  # https://aws.amazon.com/rds/sqlserver/faqs/#Multi-AZ_instance_ports_requirement
   security_group_id = aws_security_group.rds-sg[0].id
   type              = "egress"
   protocol          = "udp"
@@ -42,7 +47,12 @@ resource "aws_security_group_rule" "mssql_multiaz_udp_ingress" {
 }
 
 resource "aws_security_group_rule" "mssql_multiaz_tcp_egress" {
-  count             = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  count = length(var.rds_vpc_security_group_ids) == 0 && var.multi_az ? 1 : 0
+  # This rule is not strictly mandatory since in AWS all egress traffic is allowed by default.
+  # Still, I believe it is valuable:
+  # - As a safeguard if such behaviour changes.
+  # - As documentation of Multi-AZ requirements.
+  # https://aws.amazon.com/rds/sqlserver/faqs/#Multi-AZ_instance_ports_requirement
   security_group_id = aws_security_group.rds-sg[0].id
   type              = "egress"
   protocol          = "tcp"

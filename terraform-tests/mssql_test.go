@@ -772,26 +772,5 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				))
 			})
 		})
-
-		/*
-			// Can't implement this test because existing validations reject dummy security_group_ids
-			When("some security_group_ids passed and multi_az is enabled", func() {
-				It("should not create any security_group_rules", func() {
-					plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
-						"rds_vpc_security_group_ids": "id1,id2,id3",
-						"multi_az": true,
-					}))
-					Expect(ResourceChangesNames(plan)).To(ConsistOf(
-						"db_instance",
-						"db_parameter_group",
-						"rds-private-subnet",
-						"rds-sg",
-						"rds_inbound_access",
-						"password",
-						"username",
-					))
-				})
-			})
-		*/
 	})
 })
