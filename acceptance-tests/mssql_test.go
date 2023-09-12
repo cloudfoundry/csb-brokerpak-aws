@@ -105,6 +105,46 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		golangAppTwo.DELETE(schema)
 	})
 
+	It("can be accessed by a JAVA app using the JDBC URL when require ssl is disabled", Label("JDBC-mssql"), func() {
+		var (
+			userIn  jdbcapp.AppResponseUser
+			userOut jdbcapp.AppResponseUser
+		)
+
+		By("creating a service instance")
+		params := map[string]any{
+			"backup_retention_period": 0,
+			"require_ssl":             false,
+			"multi_az":                false,
+		}
+
+		serviceInstance := services.CreateInstance(
+			"csb-aws-mssql",
+			services.WithPlan("default"),
+			services.WithParameters(params),
+		)
+		defer serviceInstance.Delete()
+
+		By("pushing the unstarted app")
+		manifest := jdbcapp.ManifestFor(jdbcapp.SQLServer)
+		appWriter := apps.Push(apps.WithApp(apps.JDBCTestAppSQLServer), apps.WithManifest(manifest))
+		defer apps.Delete(appWriter)
+
+		By("binding the the app")
+		serviceInstance.Bind(appWriter)
+
+		By("starting the writer app")
+		apps.Start(appWriter)
+
+		By("creating an entry using the writer app")
+		value := random.Hexadecimal()
+		appWriter.POST("", "?name=%s", value).ParseInto(&userIn)
+
+		By("getting the entry using the reader app")
+		appWriter.GET("%d", userIn.ID).ParseInto(&userOut)
+		Expect(userOut.Name).To(Equal(value))
+	})
+
 	It("can't be destroyed if `deletion_protection: true`", func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
