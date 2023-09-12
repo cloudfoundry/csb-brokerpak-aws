@@ -198,6 +198,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+					HaveKeyWithValue("multi_az", BeTrue()),
 				),
 			)
 		})
