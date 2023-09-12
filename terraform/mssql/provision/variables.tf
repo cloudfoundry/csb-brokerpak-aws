@@ -52,3 +52,5 @@ variable "enable_export_error_logs" { type = bool }
 variable "cloudwatch_agent_log_group_retention_in_days" { type = number }
 variable "cloudwatch_error_log_group_retention_in_days" { type = number }
 variable "cloudwatch_log_groups_kms_key_id" { type = string }
+
+variable "multi_az" { type = bool }

@@ -229,6 +229,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("enable_export_error_logs", true),
 					HaveKeyWithValue("cloudwatch_error_log_group_retention_in_days", BeNumerically("==", 1)),
 					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+					HaveKeyWithValue("multi_az", BeTrue()),
 				),
 			)
 		})
