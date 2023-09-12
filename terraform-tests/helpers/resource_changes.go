@@ -49,3 +49,11 @@ func ResourceChangesTypes(plan tfjson.Plan) []string {
 	}
 	return result
 }
+
+func ResourceChangesNames(plan tfjson.Plan) []string {
+	var result []string
+	for _, change := range plan.ResourceChanges {
+		result = append(result, change.Name)
+	}
+	return result
+}
