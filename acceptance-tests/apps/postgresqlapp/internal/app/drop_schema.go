@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"postgresqlapp/internal/connector"
 )
 
@@ -19,7 +20,7 @@ func handleDropSchema(conn *connector.Connector) func(w http.ResponseWriter, r *
 
 		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
-			fail(w, http.StatusInternalServerError, "failed to connect to database: %e", err)
+			fail(w, http.StatusInternalServerError, "failed to connect to database: %s", err)
 		}
 		defer db.Close()
 
