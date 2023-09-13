@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+
 	"postgresqlapp/internal/connector"
 
 	"github.com/go-chi/chi/v5"
@@ -28,7 +29,7 @@ func handleSet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Re
 
 		db, err := conn.Connect(connector.WithTLS(r.URL.Query().Get(tlsQueryParam)))
 		if err != nil {
-			fail(w, http.StatusInternalServerError, "failed to connect to database: %e", err)
+			fail(w, http.StatusInternalServerError, "failed to connect to database: %s", err)
 		}
 		defer db.Close()
 
