@@ -61,6 +61,12 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"performance_insights_enabled":          false,
 		"performance_insights_kms_key_id":       "",
 		"performance_insights_retention_period": 7,
+
+		"enable_export_agent_logs":                     false,
+		"cloudwatch_agent_log_group_retention_in_days": 30,
+		"enable_export_error_logs":                     false,
+		"cloudwatch_error_log_group_retention_in_days": 30,
+		"cloudwatch_log_groups_kms_key_id":             "",
 	}
 
 	requiredVars := map[string]any{
@@ -87,7 +93,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 
 		It("should create the right resources", func() {
-			Expect(plan.ResourceChanges).To(HaveLen(11))
+			Expect(plan.ResourceChanges).To(HaveLen(11), "incorrect number of resources")
 
 			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 				"aws_db_instance",
@@ -709,6 +715,98 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					MatchKeys(IgnoreExtras, Keys{
 						"performance_insights_enabled":          BeTrue(),
 						"performance_insights_retention_period": BeNumerically("==", 13),
+					}),
+				)
+			})
+		})
+	})
+
+	Context("cloud watch log groups", func() {
+		When("no parameters passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars))
+			})
+
+			It("should not create a cloud watch log group", func() {
+				Expect(ResourceCreationForType(plan, "aws_cloudwatch_log_group")).To(HaveLen(0))
+			})
+
+			It("should not set any cloud watch export", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						// TF provider checks v.(*schema.Set).Len() > 0 to set an array or nil
+						"enabled_cloudwatch_logs_exports": BeNil(),
+					}),
+				)
+			})
+		})
+
+		When("log groups enabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"enable_export_agent_logs":                     true,
+					"enable_export_error_logs":                     true,
+					"cloudwatch_agent_log_group_retention_in_days": 1,
+					"cloudwatch_error_log_group_retention_in_days": 1,
+					"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+				}))
+			})
+
+			It("should set two cloud watch export", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"enabled_cloudwatch_logs_exports": ConsistOf("agent", "error"),
+					}),
+				)
+			})
+
+			It("should create two cloud watch log groups", func() {
+				Expect(GroupAfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
+					ConsistOf(
+						MatchKeys(IgnoreExtras, Keys{
+							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"name":              Equal("/aws/rds/instance/csb-mssql-test/agent"),
+							"retention_in_days": BeNumerically("==", 1),
+							"skip_destroy":      BeFalse(),
+							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
+						}),
+						MatchKeys(IgnoreExtras, Keys{
+							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"name":              Equal("/aws/rds/instance/csb-mssql-test/error"),
+							"retention_in_days": BeNumerically("==", 1),
+							"skip_destroy":      BeFalse(),
+							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
+						}),
+					),
+				)
+			})
+		})
+
+		When("only one log group is enabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+					"enable_export_agent_logs":                     true,
+					"cloudwatch_agent_log_group_retention_in_days": 3,
+					"cloudwatch_log_groups_kms_key_id":             "",
+				}))
+			})
+
+			It("should set one cloud watch export", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"enabled_cloudwatch_logs_exports": ConsistOf("agent"),
+					}),
+				)
+			})
+
+			It("should create one cloud watch log group", func() {
+				Expect(AfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"kms_key_id":        BeNil(),
+						"name":              Equal("/aws/rds/instance/csb-mssql-test/agent"),
+						"retention_in_days": BeNumerically("==", 3),
+						"skip_destroy":      BeFalse(),
+						"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 					}),
 				)
 			})
