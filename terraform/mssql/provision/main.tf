@@ -127,6 +127,8 @@ resource "aws_db_instance" "db_instance" {
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
 
+  enabled_cloudwatch_logs_exports = keys(local.log_groups)
+
   lifecycle {
     prevent_destroy = true
   }
@@ -159,4 +161,16 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_cloudwatch_log_group" "this" {
+  for_each = local.log_groups
+  lifecycle {
+    create_before_destroy = true
+  }
+  name              = "/aws/rds/instance/${var.instance_name}/${each.key}"
+  retention_in_days = each.value
+  kms_key_id        = var.cloudwatch_log_groups_kms_key_id == "" ? null : var.cloudwatch_log_groups_kms_key_id
+
+  tags = var.labels
 }
