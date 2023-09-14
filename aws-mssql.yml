@@ -298,6 +298,48 @@ provision:
     default: 7
     constraints:
       minimum: 7
+  - field_name: enable_export_agent_logs
+    type: boolean
+    default: false
+    details: |
+      If set will enable the `agent` cloud_watch_log_export on the RDS instance.
+  - field_name: cloudwatch_agent_log_group_retention_in_days
+    type: integer
+    details: |
+      Used in conjunction with `enable_export_agent_logs`.
+      If provided, it specifies the number of days you want to retain log events in the agent log group.
+      If you select 0, the events in the log group are always retained and never expire.
+      Defaults to 30 Days.
+    default: 30
+    constraints:
+      minimum: 0
+      maximum: 3653 #10y
+  - field_name: enable_export_error_logs
+    type: boolean
+    default: false
+    details: |
+      If set will enable the `error` cloud_watch_log_export on the RDS instance.
+  - field_name: cloudwatch_error_log_group_retention_in_days
+    type: integer
+    details: |
+      Used in conjunction with `enable_export_error_logs`.
+      If provided, it specifies the number of days you want to retain log events in the error log group.
+      If you select 0, the events in the log group are always retained and never expire.
+      Defaults to 30 Days.
+    default: 30
+    constraints:
+      minimum: 0
+      maximum: 3653 #10y
+  - field_name: cloudwatch_log_groups_kms_key_id
+    type: string
+    default: ""
+    details: |
+      Used in conjunction with `enable_export_agent_logs` or `enable_export_error_logs`.
+      Log group data is always encrypted in CloudWatch Logs. By default, CloudWatch Logs uses server-side encryption
+      for the log data at rest. As an alternative, you can use AWS Key Management Service for this encryption.
+      If you do, the encryption is done using an AWS KMS customer managed key.
+      This property if provided, will set the customer managed key to use for encrypting the Cloudwatch log group
+      created for the RDS MSSQL agent and error logs.
   - field_name: multi_az
     type: boolean
     default: true

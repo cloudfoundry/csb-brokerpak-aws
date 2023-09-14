@@ -27,6 +27,10 @@ locals {
     var.maintenance_end_hour,
     var.maintenance_end_min
   )
+
+  agent_log_group = var.enable_export_agent_logs == true ? { agent : var.cloudwatch_agent_log_group_retention_in_days } : {}
+  error_log_group = var.enable_export_error_logs == true ? { error : var.cloudwatch_error_log_group_retention_in_days } : {}
+  log_groups      = merge(local.agent_log_group, local.error_log_group)
 }
 
 data "aws_vpc" "default" {
