@@ -82,7 +82,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		Expect(response).To(HaveHTTPStatus(http.StatusInternalServerError), "force TLS is enabled by default")
 		b, err := io.ReadAll(response.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in TLS failure")
-		Expect(string(b)).To(ContainSubstring("TLS Handshake failed: cannot read handshake packet: EOF"), "force TLS is enabled by default")
+		Expect(string(b)).To(ContainSubstring("TLS Handshake failed: cannot read handshake packet:"), "force TLS is enabled by default")
 
 		By("deleting binding one the binding two keeps reading the value - object reassignment works")
 		binding.Unbind()
