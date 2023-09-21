@@ -79,7 +79,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		service := testframework.FindService(catalog, msSQLServiceName)
 		Expect(service.ID).To(Equal(msSQLServiceID))
 		Expect(service.Description).To(Equal(msSQLServiceDescription))
-		Expect(service.Tags).To(ConsistOf("aws", "mssql", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "mssql"))
 		Expect(service.Metadata.DisplayName).To(Equal(msSQLServiceDisplayName))
 		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
