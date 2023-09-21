@@ -90,6 +90,12 @@ resource "aws_rds_cluster_instance" "cluster_instances" {
 
   lifecycle {
     prevent_destroy = true
+
+    # See https://github.com/cloudfoundry/csb-brokerpak-aws/pull/1042#issuecomment-1660452452 for a justification for this precondition
+    precondition {
+      condition     = length("${var.instance_name}-${var.cluster_instances - 1}") <= 63
+      error_message = "Some cluster instances would have names longer than 63 characters. Please provide a shorter instance_name."
+    }
   }
 }
 
