@@ -128,19 +128,19 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
 				"instance name will be used as db-instance-identifier so the first character must be a letter",
 				map[string]any{"instance_name": ".aaaaa"},
-				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+				"instance_name: Does not match pattern '^[a-z](-?[a-z0-9])*$'",
 			),
 			Entry(
 				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
 				"instance name will be used as db-instance-identifier so it cannot end with a hyphen",
 				map[string]any{"instance_name": "aaaaa-"},
-				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+				"instance_name: Does not match pattern '^[a-z](-?[a-z0-9])*$'",
 			),
 			Entry(
 				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
 				"instance name will be used as db-instance-identifier so it cannot contain two consecutive hyphens",
 				map[string]any{"instance_name": "aa--aaa"},
-				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+				"instance_name: Does not match pattern '^[a-z](-?[a-z0-9])*$'",
 			),
 			Entry(
 				"database name maximum length is 64 characters",
