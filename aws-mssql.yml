@@ -71,7 +71,7 @@ provision:
     constraints:
       maxLength: 63
       minLength: 1
-      pattern: ^[a-zA-Z](-?[a-zA-Z0-9])*$
+      pattern: ^[a-z](-?[a-z0-9])*$
     prohibit_update: true
   - field_name: region
     type: string
