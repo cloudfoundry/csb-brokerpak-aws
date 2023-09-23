@@ -12,9 +12,9 @@ require (
 	github.com/onsi/gomega v1.27.10
 	github.com/otiai10/copy v1.12.0
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
-	golang.org/x/tools v0.12.0
+	golang.org/x/tools v0.12.1-0.20230825192346-2191a27a6dc5
 	gopkg.in/yaml.v3 v3.0.1
-	honnef.co/go/tools v0.4.5
+	honnef.co/go/tools v0.4.6
 )
 
 require (
