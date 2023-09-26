@@ -22,6 +22,7 @@ const (
 	envMasterUsername = "MasterUsername"
 )
 
+// The legacy_data_assister binary must be installed. See script in CI project and instructions on the Wiki
 var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 	var masterUsername string
 
