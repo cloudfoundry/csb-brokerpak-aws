@@ -113,6 +113,8 @@ var _ = Describe("csbsqlserver_binding resource", func() {
 							testCheckDropTableInSchema(cnf, schemaNameUserTwo, tableNameUserTwo, cnf.ResourceBindingOneName),
 							// user ONE drops the schema created by USER TWO
 							testCheckDroopSchema(cnf, schemaNameUserTwo, cnf.ResourceBindingOneName),
+							// user ONE drops the role we use to execute the reassignment. `db_owner` manages database roles
+							testCheckDeleteRole(cnf, cnf.ResourceBindingOneName, "binding_user_group"),
 						),
 					),
 				)
@@ -460,6 +462,24 @@ func testCheckAddColumnToTableInSchema(cnf testCaseCnf, schemaName, randomTableN
 
 		if _, err := db.Exec(fmt.Sprintf("ALTER TABLE %s.%s ADD %s VARCHAR(20) NULL", schemaName, randomTableName, columnName)); err != nil {
 			return fmt.Errorf("error altering table %w", err)
+		}
+
+		return nil
+	}
+}
+
+func testCheckDeleteRole(cnf testCaseCnf, resourceBindingName, roleName string) resource.TestCheckFunc {
+	return func(state *terraform.State) error {
+		cr, err := getCredentialsFromState(state, resourceBindingName)
+		if err != nil {
+			return err
+		}
+
+		db := testhelpers.Connect(cr.username, cr.password, cnf.DatabaseName, cnf.Port)
+		defer db.Close()
+
+		if _, err := db.Exec(fmt.Sprintf("DROP ROLE %s", roleName)); err != nil {
+			return fmt.Errorf("error deleting role %s %w", roleName, err)
 		}
 
 		return nil
