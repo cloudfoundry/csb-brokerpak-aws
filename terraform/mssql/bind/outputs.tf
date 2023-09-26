@@ -5,6 +5,8 @@ output "password" {
   sensitive = true
 }
 
+output "port" {  value = local.port }
+
 output "jdbcUrl" {
   value = format(
     "jdbc:sqlserver://%s:%d;database=%s;user=%s;password=%s;loginTimeout=30;%s",
