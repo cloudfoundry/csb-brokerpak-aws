@@ -5,7 +5,7 @@ output "password" {
   sensitive = true
 }
 
-output "port" {  value = local.port }
+output "port" { value = local.port }
 
 output "jdbcUrl" {
   value = format(
