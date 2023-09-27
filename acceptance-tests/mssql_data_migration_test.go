@@ -28,7 +28,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 
 	It("can migrate data from the previous broker to the CSB", func() {
 		By("reading legacy broker RDS data")
-		masterUsername = os.Getenv(envMasterUsername)
+		sourceAdminUsername = os.Getenv(envMasterUsername)
 		Expect(masterUsername).NotTo(BeEmpty(), "The MasterUsername environment variable is mandatory")
 
 		By("creating a replication instance")
