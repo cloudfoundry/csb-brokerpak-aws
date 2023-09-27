@@ -55,6 +55,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"max_allocated_storage":       999,
 			"auto_minor_version_upgrade":  false,
 			"allow_major_version_upgrade": false,
+
+			"enable_export_agent_logs":                     true,
+			"cloudwatch_agent_log_group_retention_in_days": 1,
+			"enable_export_error_logs":                     true,
+			"cloudwatch_error_log_group_retention_in_days": 1,
+			"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 		}
 	}
 
@@ -73,7 +79,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 		service := testframework.FindService(catalog, msSQLServiceName)
 		Expect(service.ID).To(Equal(msSQLServiceID))
 		Expect(service.Description).To(Equal(msSQLServiceDescription))
-		Expect(service.Tags).To(ConsistOf("aws", "mssql", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "mssql"))
 		Expect(service.Metadata.DisplayName).To(Equal(msSQLServiceDisplayName))
 		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
@@ -122,19 +128,19 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
 				"instance name will be used as db-instance-identifier so the first character must be a letter",
 				map[string]any{"instance_name": ".aaaaa"},
-				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+				"instance_name: Does not match pattern '^[a-z](-?[a-z0-9])*$'",
 			),
 			Entry(
 				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
 				"instance name will be used as db-instance-identifier so it cannot end with a hyphen",
 				map[string]any{"instance_name": "aaaaa-"},
-				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+				"instance_name: Does not match pattern '^[a-z](-?[a-z0-9])*$'",
 			),
 			Entry(
 				// https://docs.aws.amazon.com/cli/latest/reference/rds/create-db-instance.html#options
 				"instance name will be used as db-instance-identifier so it cannot contain two consecutive hyphens",
 				map[string]any{"instance_name": "aa--aaa"},
-				"instance_name: Does not match pattern '^[a-zA-Z](-?[a-zA-Z0-9])*$'",
+				"instance_name: Does not match pattern '^[a-z](-?[a-z0-9])*$'",
 			),
 			Entry(
 				"database name maximum length is 64 characters",
@@ -150,6 +156,26 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				"storage_gb minimum value is 20",
 				map[string]any{"storage_gb": 19},
 				"storage_gb: Must be greater than or equal to 20",
+			),
+			Entry(
+				"cloudwatch_agent_log_group_retention_in_days minimum value is 0",
+				map[string]any{"cloudwatch_agent_log_group_retention_in_days": -1},
+				"cloudwatch_agent_log_group_retention_in_days: Must be greater than or equal to 0",
+			),
+			Entry(
+				"cloudwatch_agent_log_group_retention_in_days maximum value is 3653",
+				map[string]any{"cloudwatch_agent_log_group_retention_in_days": 3654},
+				"cloudwatch_agent_log_group_retention_in_days: Must be less than or equal to 3653",
+			),
+			Entry(
+				"cloudwatch_error_log_group_retention_in_days minimum value is 0",
+				map[string]any{"cloudwatch_error_log_group_retention_in_days": -1},
+				"cloudwatch_error_log_group_retention_in_days: Must be greater than or equal to 0",
+			),
+			Entry(
+				"cloudwatch_error_log_group_retention_in_days maximum value is 3653",
+				map[string]any{"cloudwatch_error_log_group_retention_in_days": 3654},
+				"cloudwatch_error_log_group_retention_in_days: Must be less than or equal to 3653",
 			),
 		)
 
@@ -198,6 +224,11 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("performance_insights_enabled", false),
 					HaveKeyWithValue("performance_insights_kms_key_id", ""),
 					HaveKeyWithValue("performance_insights_retention_period", BeNumerically("==", 7)),
+					HaveKeyWithValue("enable_export_agent_logs", true),
+					HaveKeyWithValue("cloudwatch_agent_log_group_retention_in_days", BeNumerically("==", 1)),
+					HaveKeyWithValue("enable_export_error_logs", true),
+					HaveKeyWithValue("cloudwatch_error_log_group_retention_in_days", BeNumerically("==", 1)),
+					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 					HaveKeyWithValue("multi_az", BeTrue()),
 				),
 			)
@@ -282,6 +313,9 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update allow_major_version_upgrade", "allow_major_version_upgrade", false),
 			Entry("update auto_minor_version_upgrade", "auto_minor_version_upgrade", false),
 			Entry("update require_ssl", "require_ssl", false),
+			Entry("update enable_export_agent_logs", "enable_export_agent_logs", true),
+			Entry("update enable_export_error_logs", "enable_export_error_logs", true),
+			Entry("update cloudwatch_log_groups_kms_key_id", "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 		)
 	})
 })
