@@ -75,7 +75,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		replicationInstance.Wait()
 
 		legacyServiceInstanceUUID := legacyServiceInstance.GUID()
-		password := getPassword(
+		sourceAdminPassword := getPassword(
 			"/bin/bash", "-c",
 			fmt.Sprintf(
 				`/usr/local/bin/legacy_data_assister --instance-uuid="%s"`,
