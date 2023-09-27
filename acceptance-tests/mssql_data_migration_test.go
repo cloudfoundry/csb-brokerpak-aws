@@ -29,7 +29,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 	It("can migrate data from the previous broker to the CSB", func() {
 		By("reading legacy broker RDS data")
 		sourceAdminUsername = os.Getenv(envMasterUsername)
-		Expect(masterUsername).NotTo(BeEmpty(), "The MasterUsername environment variable is mandatory")
+		Expect(sourceAdminUsername).NotTo(BeEmpty(), "The MasterUsername environment variable is mandatory")
 
 		By("creating a replication instance")
 		replicationInstance := dms.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
@@ -98,7 +98,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		sourceEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
 			EndpointType:    dms.Source,
 			EnvironmentName: metadata.Name,
-			Username:        masterUsername,
+			Username:        sourceAdminUsername,
 			Password:        sourceAdminPassword,
 			Server:          sourceReceiver.Server,
 			DatabaseName:    sourceReceiver.DBName,
