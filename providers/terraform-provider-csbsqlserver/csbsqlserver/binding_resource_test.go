@@ -160,10 +160,16 @@ func getMandatoryStep(cnf testCaseCnf, extraTestCheckFunc ...resource.TestCheckF
 		Check: resource.ComposeTestCheckFunc(
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "username", bindingUser1),
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "password", bindingPassword1),
-			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.0", "db_owner"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.0", "db_ddladmin"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.1", "db_datareader"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.2", "db_datawriter"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.3", "db_accessadmin"),
 			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "username", bindingUser2),
 			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "password", bindingPassword2),
-			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.0", "db_owner"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.0", "db_ddladmin"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.1", "db_datareader"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.2", "db_datawriter"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding2Name, "roles.3", "db_accessadmin"),
 			testCheckDatabaseExists(db, databaseName),
 			testCheckUserExists(db, bindingUser1),
 			testCheckUserExists(db, bindingUser2),
@@ -194,7 +200,10 @@ func getStepOnlyBindingOne(cnf testCaseCnf, extraTestCheckFunc ...resource.TestC
 		Check: resource.ComposeTestCheckFunc(
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "username", bindingUser1),
 			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "password", bindingPassword1),
-			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.0", "db_owner"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.0", "db_ddladmin"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.1", "db_datareader"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.2", "db_datawriter"),
+			resource.TestCheckResourceAttr(tfStateResourceBinding1Name, "roles.3", "db_accessadmin"),
 			testCheckDatabaseExists(db, databaseName),
 			testCheckUserExists(db, bindingUser1),
 			testCheckUserDoesNotExists(db, cnf.BindingUserTwo),
@@ -280,13 +289,13 @@ func testGetConfiguration(port int, adminPassword, bindingUser1, bindingPassword
 			resource "csbsqlserver_binding" "binding1" {
 				username = "%s"
 				password = "%s"
-				roles    = ["db_owner"]
+				roles    = ["db_ddladmin", "db_datareader", "db_datawriter", "db_accessadmin"]
 			}
 
 			resource "csbsqlserver_binding" "binding2" {
 				username   = "%s"
 				password   = "%s"
-				roles      = ["db_owner"]
+				roles      = ["db_ddladmin", "db_datareader", "db_datawriter", "db_accessadmin"]
                 depends_on = [csbsqlserver_binding.binding1]
 			}`,
 		testhelpers.Server,
@@ -315,7 +324,7 @@ func testGetConfigurationOnlyBindingOne(port int, adminPassword, bindingUser1, b
 			resource "csbsqlserver_binding" "binding1" {
 				username = "%s"
 				password = "%s"
-				roles    = ["db_owner"]
+				roles    = ["db_ddladmin", "db_datareader", "db_datawriter", "db_accessadmin"]
 			}`,
 		testhelpers.Server,
 		port,
