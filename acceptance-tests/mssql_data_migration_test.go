@@ -99,7 +99,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 			EndpointType:    dms.Source,
 			EnvironmentName: metadata.Name,
 			Username:        masterUsername,
-			Password:        password,
+			Password:        sourceAdminPassword,
 			Server:          sourceReceiver.Server,
 			DatabaseName:    sourceReceiver.DBName,
 			Region:          metadata.Region,
