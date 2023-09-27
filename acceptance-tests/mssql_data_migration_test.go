@@ -83,7 +83,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 			),
 		)
 
-		Expect(password).NotTo(BeEmpty())
+		Expect(sourceAdminPassword).NotTo(BeEmpty())
 
 		By("creating a DMS source endpoint")
 		sourceCreds := legacyBinding.Credential()
