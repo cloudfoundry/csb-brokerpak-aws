@@ -146,9 +146,6 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		})
 		defer targetEndpoint.Cleanup()
 
-		By("waiting for the replication instance to be ready")
-		replicationInstance.Wait()
-
 		By("running the replication task")
 		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, schema)
 
