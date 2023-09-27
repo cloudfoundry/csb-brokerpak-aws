@@ -161,6 +161,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 })
 
 func getPassword(cmd string, args ...string) string {
+	GinkgoHelper()
 	command := exec.Command(cmd, args...)
 	session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
 	Expect(err).NotTo(HaveOccurred())
