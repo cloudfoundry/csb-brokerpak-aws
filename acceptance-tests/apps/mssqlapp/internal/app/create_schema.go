@@ -25,8 +25,10 @@ func handleCreateSchema(connector *credentials.Connector) func(w http.ResponseWr
 
 		statement := fmt.Sprintf(`CREATE SCHEMA %s`, schema)
 		switch r.URL.Query().Get("dbo") {
-		case "", "true":
+		case "true":
 			statement = statement + " AUTHORIZATION dbo"
+		case "":
+			break // default value " AUTHORIZATION connected user"
 		case "false":
 		default:
 			fail(w, http.StatusBadRequest, "invalid value for dbo")

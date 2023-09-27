@@ -15,6 +15,6 @@ resource "random_password" "password" {
 resource "csbsqlserver_binding" "binding" {
   username = random_string.username.result
   password = random_password.password.result
-  roles    = ["db_ddladmin", "db_datareader", "db_datawriter", "db_accessadmin"]
+  roles    = ["db_owner"]
 }
 
