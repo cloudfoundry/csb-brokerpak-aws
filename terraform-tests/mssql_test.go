@@ -40,7 +40,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		"parameter_group_name":       "",
 
 		"storage_type": "io1",
-		"iops":         3000,
+		"iops":         1000,
 		"multi_az":     true,
 
 		"backup_window":            nil,
@@ -436,11 +436,11 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{}))
 			})
 
-			It("default values work with io1 and 3000 iops", func() {
+			It("default values work with io1 and 1000 iops", func() {
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"storage_type": Equal("io1"),
-						"iops":         BeNumerically("==", 3000),
+						"iops":         BeNumerically("==", 1000),
 					}))
 			})
 		})

@@ -148,7 +148,7 @@ provision:
       Cannot be specified for `gp3` storage if the `storage_gb` value is below a per-engine threshold.
       See the RDS User Guide for details:
       https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#gp3-storage.
-    default: 3000
+    default: 1000
   - field_name: publicly_accessible
     type: boolean
     details: Make instance public if true

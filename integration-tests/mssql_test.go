@@ -39,7 +39,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			"engine":        "sqlserver-ee",
 			"mssql_version": "some-mssql-version",
 			// For documentation purpose:
-			// use a valid storage GB value. Default iops is 3000.
+			// use a valid storage GB value. Default iops is 1000.
 			// The IOPS to GiB ratio must be between 1 and 50
 			"storage_gb": 100,
 
@@ -204,7 +204,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{"pcf-instance-id": Equal(instanceID)})),
 					HaveKeyWithValue("max_allocated_storage", BeNumerically("==", 999)),
 					HaveKeyWithValue("storage_type", "io1"),
-					HaveKeyWithValue("iops", BeNumerically("==", 3000)),
+					HaveKeyWithValue("iops", BeNumerically("==", 1000)),
 					HaveKeyWithValue("deletion_protection", BeFalse()),
 					HaveKeyWithValue("publicly_accessible", BeFalse()),
 					HaveKeyWithValue("monitoring_interval", BeNumerically("==", 0)),
