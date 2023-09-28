@@ -22,6 +22,7 @@ provision:
       sqlserver-ex: sqlserver-ex
       sqlserver-se: sqlserver-se
       sqlserver-web: sqlserver-web
+    prohibit_update: true
   - field_name: mssql_version
     required: true
     type: string
