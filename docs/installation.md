@@ -37,6 +37,7 @@ The AWS account represented by the access key needs the following permission pol
                 "dynamodb:TagResource",
                 "dynamodb:UntagResource",
                 "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:AuthorizeSecurityGroupEgress",
                 "ec2:CreateSecurityGroup",
                 "ec2:DeleteSecurityGroup",
                 "ec2:DescribeNetworkInterfaces",
