@@ -295,6 +295,29 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("publicly_accessible isn't nullable", "publicly_accessible", true),
 		)
 
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, msSQLServiceName, customMSSQLPlan["name"].(string), map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
+
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("update engine", "engine", "no-matter-what-engine"),
+			Entry("update storage_encrypted", "storage_encrypted", true),
+			Entry("update kms_key_id", "kms_key_id", "no-matter-what-key"),
+			Entry("update db_name", "db_name", "no-matter-what-name"),
+			Entry("update instance_name", "instance_name", "no-matter-what-name"),
+			Entry("update region", "region", "no-matter-what-region"),
+			Entry("rds_vpc_security_group_ids", "rds_vpc_security_group_ids", "group3"),
+			Entry("character_set_name", "character_set_name", "no-matter-what-character-set"),
+		)
+
 		DescribeTable("should allow updating properties",
 			func(prop string, value any) {
 				err := broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
