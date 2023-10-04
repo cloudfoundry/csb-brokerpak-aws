@@ -44,7 +44,6 @@ provision:
     type: number
     details: Size of storage volume for service instance.
     constraints:
-      maximum: 4096
       minimum: 5
   user_inputs:
   - field_name: storage_type

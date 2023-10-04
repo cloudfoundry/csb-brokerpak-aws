@@ -39,7 +39,6 @@ provision:
       For more information about Amazon RDS DB instance storage for MSSQL see https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html
     constraints:
       minimum: 20
-      maximum: 16384
   - field_name: max_allocated_storage
     type: integer
     nullable: true
