@@ -3,7 +3,7 @@ module s3app
 go 1.21
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.21.0
+	github.com/aws/aws-sdk-go-v2 v1.21.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.42
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.40
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.40.0
@@ -25,7 +25,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.14.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.17.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.22.0 // indirect
-	github.com/aws/smithy-go v1.14.2 // indirect
+	github.com/aws/smithy-go v1.15.0 // indirect
 	github.com/onsi/gomega v1.10.5 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 )
