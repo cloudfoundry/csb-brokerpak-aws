@@ -1,6 +1,7 @@
 .DEFAULT_GOAL = help
 
-GO-VERSION = 1.21.2
+GO-VERSION=$(shell go mod edit -json | jq -r .Go)
+GOTOOLCHAIN=go$(GO-VERSION)
 GO-VER = go$(GO-VERSION)
 GO_OK :=  $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; echo $$?))
 DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
@@ -12,6 +13,7 @@ else ifeq ($(DOCKER_OK), 0)
   		-v $(PWD)/../..:/src \
   		--workdir /src/providers/terraform-provider-csbmajorengineversion \
   		--network=host \
+		-e GOTOOLCHAIN \
   		-e AWS_ACCESS_KEY_ID \
 		-e AWS_SECRET_ACCESS_KEY
   GO = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) go
@@ -83,3 +85,7 @@ version:
 		echo "Go version does not match: expected: ${GO-VER}, got $$(${GO} version | awk '{print $$3}')"; \
 		exit 1; \
 	fi
+
+bump-go: ## bump go to latest version
+	$(eval GO-NEW-VERSION := $(shell curl -L 'https://go.dev/VERSION?m=text' | head -n1 | cut -c3-))
+	go mod edit -go $(GO-NEW-VERSION)

@@ -7,7 +7,8 @@ help: ## list Makefile targets
 
 ###### Setup ##################################################################
 IAAS=aws
-GO-VERSION = 1.21.2
+GO-VERSION=$(shell go mod edit -json | jq -r .Go)
+GOTOOLCHAIN=go$(GO-VERSION)
 GO-VER = go$(GO-VERSION)
 CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
 CSB_RELEASE_VERSION := $(CSB_VERSION) # this doesnt work well if we did make latest-csb.
@@ -49,6 +50,7 @@ GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) 
 else ifeq ($(DOCKER_OK), 0)
 BROKER_DOCKER_OPTS=--rm -v $(PAK_BUILD_CACHE_PATH):$(PAK_BUILD_CACHE_PATH) -v $(PWD):/brokerpak -w /brokerpak --network=host  \
     -p 8080:8080 \
+		-e GOTOOLCHAIN \
 		-e SECURITY_USER_NAME \
 		-e SECURITY_USER_PASSWORD \
 		-e AWS_ACCESS_KEY_ID \
@@ -269,3 +271,7 @@ format: ## format the source
 	${GOFMT} -s -e -l -w .
 	${GO} run golang.org/x/tools/cmd/goimports -l -w .
 	terraform fmt --recursive
+
+go-bump: ## bump go to latest version
+	$(eval GO-NEW-VERSION := $(shell curl -L 'https://go.dev/VERSION?m=text' | head -n1 | cut -c3-))
+	go mod edit -go $(GO-NEW-VERSION)

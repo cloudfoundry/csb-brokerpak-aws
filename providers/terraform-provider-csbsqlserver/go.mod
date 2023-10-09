@@ -1,6 +1,6 @@
 module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver
 
-go 1.21
+go 1.21.2
 
 require (
 	github.com/google/uuid v1.3.0
