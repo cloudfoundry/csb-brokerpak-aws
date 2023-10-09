@@ -14,7 +14,6 @@ require (
 	golang.org/x/exp v0.0.0-20220927162542-c76eaa363f9d
 	golang.org/x/tools v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
-	honnef.co/go/tools v0.4.6
 )
 
 require (
