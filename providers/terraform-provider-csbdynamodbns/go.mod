@@ -1,6 +1,6 @@
 module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns
 
-go 1.21
+go 1.21.2
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.7
@@ -15,7 +15,6 @@ require (
 	github.com/onsi/gomega v1.27.5
 	github.com/pborman/uuid v1.2.1
 	golang.org/x/tools v0.7.0
-	honnef.co/go/tools v0.4.3
 )
 
 require (

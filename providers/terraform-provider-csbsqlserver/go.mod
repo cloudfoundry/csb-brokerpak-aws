@@ -1,6 +1,6 @@
 module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-csbsqlserver
 
-go 1.21
+go 1.21.2
 
 require (
 	github.com/google/uuid v1.3.0
@@ -9,7 +9,6 @@ require (
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
 	golang.org/x/tools v0.9.3
-	honnef.co/go/tools v0.4.3
 )
 
 require (
