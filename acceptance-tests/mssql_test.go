@@ -69,7 +69,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		apps.Start(golangAppOne, golangAppTwo)
 		By("creating a schema using the first app")
 		schema := random.Name(random.WithMaxLength(10))
-		golangAppOne.PUT("", schema)
+		golangAppOne.PUT("", "%s?dbo=false", schema)
 
 		By("setting a key-value using the first app")
 		key := random.Hexadecimal()
