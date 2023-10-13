@@ -100,7 +100,7 @@ $(IAAS)-services-*.brokerpak: *.yml terraform/*/*/*.tf terraform/*/*/*/*.tf prov
 
 
 .PHONY: providers
-providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion providers/build/cloudfoundry.org/cloud-service-broker/csbsqlserver # build custom providers
+providers: providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion providers/build/cloudfoundry.org/cloud-service-broker/csbsqlserver ## build custom providers
 
 providers/build/cloudfoundry.org/cloud-service-broker/csbdynamodbns:
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) build
