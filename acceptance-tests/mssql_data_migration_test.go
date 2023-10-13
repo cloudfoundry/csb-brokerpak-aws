@@ -60,7 +60,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		apps.Start(golangAppOne)
 		By("creating a schema using the app")
 		schema := random.Name(random.WithMaxLength(10))
-		golangAppOne.PUT("", "%s?tls=disable", schema)
+		golangAppOne.PUT("", "%s?dbo=false&tls=disable", schema)
 
 		By("setting a key-value using the app")
 		key := random.Hexadecimal()
