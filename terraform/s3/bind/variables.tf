@@ -14,3 +14,7 @@
 
 variable "arn" { type = string }
 variable "user_name" { type = string }
+variable "sse_default_kms_key_id" {
+  sensitive = true
+  type      = string
+}

@@ -306,6 +306,11 @@ var _ = Describe("S3", Label("s3"), func() {
 					Type:  "string",
 					Value: "arn:aws:s3:::examplebucket/developers/design_info.doc",
 				},
+				{
+					Name:  "sse_default_kms_key_id",
+					Type:  "string",
+					Value: "some-kms-key-id",
+				},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -327,6 +332,8 @@ var _ = Describe("S3", Label("s3"), func() {
 					"secret_access_key": "subsequent.secret.access.key.test",
 					"region":            "ap-northeast-3",
 					"arn":               "arn:aws:s3:::examplebucket/developers/design_info.doc",
+
+					"sse_default_kms_key_id": "some-kms-key-id",
 				}),
 			)
 		})

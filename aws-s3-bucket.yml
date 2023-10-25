@@ -179,6 +179,9 @@ provision:
   - field_name: bucket_name
     type: string
     details: Name of created bucket
+  - field_name: sse_default_kms_key_id
+    type: string
+    details: The AWS KMS key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
 bind:
   plan_inputs: []
   user_inputs:
@@ -201,6 +204,10 @@ bind:
     type: string
   - name: user_name
     default: csb-${request.binding_id}
+    overwrite: true
+    type: string
+  - name: sse_default_kms_key_id
+    default: ${instance.details["sse_default_kms_key_id"]}
     overwrite: true
     type: string
   template_refs:
