@@ -16,4 +16,4 @@ output "arn" { value = aws_s3_bucket.b.arn }
 output "bucket_domain_name" { value = aws_s3_bucket.b.bucket_domain_name }
 output "region" { value = aws_s3_bucket.b.region }
 output "bucket_name" { value = aws_s3_bucket.b.bucket }
-output "sse_default_kms_key_id" { value = try(coalesce(var.sse_default_kms_key_id, ""), "") }
+output "sse_all_kms_key_ids" { value = local.sse_all_kms_key_ids }

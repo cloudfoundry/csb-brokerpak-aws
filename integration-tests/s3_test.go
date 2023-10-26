@@ -307,9 +307,9 @@ var _ = Describe("S3", Label("s3"), func() {
 					Value: "arn:aws:s3:::examplebucket/developers/design_info.doc",
 				},
 				{
-					Name:  "sse_default_kms_key_id",
+					Name:  "sse_all_kms_key_ids",
 					Type:  "string",
-					Value: "some-kms-key-id",
+					Value: "some-default-kms-key-id,some-extra-kms-key-id",
 				},
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -333,7 +333,7 @@ var _ = Describe("S3", Label("s3"), func() {
 					"region":            "ap-northeast-3",
 					"arn":               "arn:aws:s3:::examplebucket/developers/design_info.doc",
 
-					"sse_default_kms_key_id": "some-kms-key-id",
+					"sse_all_kms_key_ids": "some-default-kms-key-id,some-extra-kms-key-id",
 				}),
 			)
 		})

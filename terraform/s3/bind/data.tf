@@ -14,6 +14,8 @@
 
 locals {
   user_policy_with_or_without_encryption = try(data.aws_iam_policy_document.user_policy_sse[0], data.aws_iam_policy_document.user_policy)
+
+  key_ids_list = try(split(",", var.sse_all_kms_key_ids), [])
 }
 
 
@@ -75,13 +77,13 @@ data "aws_iam_policy_document" "user_policy" {
   }
 }
 
-data "aws_kms_key" "customer_provided_key" {
-  count  = try(length(var.sse_default_kms_key_id), 0) == 0 ? 0 : 1
-  key_id = var.sse_default_kms_key_id
+data "aws_kms_key" "customer_provided_keys" {
+  count  = length(local.key_ids_list) == 0 ? 0 : length(local.key_ids_list)
+  key_id = local.key_ids_list[count.index]
 }
 
 data "aws_iam_policy_document" "user_policy_sse" {
-  count = try(length(var.sse_default_kms_key_id), 0) == 0 ? 0 : 1
+  count = length(local.key_ids_list) == 0 ? 0 : 1
 
   source_policy_documents = [data.aws_iam_policy_document.user_policy.json]
 
@@ -92,6 +94,6 @@ data "aws_iam_policy_document" "user_policy_sse" {
       "kms:Encrypt",
       "kms:GenerateDataKey",
     ]
-    resources = [data.aws_kms_key.customer_provided_key[0].arn]
+    resources = [for key in data.aws_kms_key.customer_provided_keys : key.arn]
   }
 }
