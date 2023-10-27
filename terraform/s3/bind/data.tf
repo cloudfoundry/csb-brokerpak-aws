@@ -15,7 +15,7 @@
 locals {
   user_policy_with_or_without_encryption = try(data.aws_iam_policy_document.user_policy_sse[0], data.aws_iam_policy_document.user_policy)
 
-  key_ids_list = try(split(",", var.sse_all_kms_key_ids), [])
+  key_ids_list = try(compact(split(",", var.sse_all_kms_key_ids)), [])
 }
 
 
