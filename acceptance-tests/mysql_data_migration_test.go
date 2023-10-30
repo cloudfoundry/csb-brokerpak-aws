@@ -100,7 +100,7 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 		defer targetEndpoint.Cleanup()
 
 		By("running the replication task")
-		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, "%")
+		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, sourceReceiver.DBName)
 
 		By("deleting the target service key to trigger data ownership update")
 		csbKey.Delete()
