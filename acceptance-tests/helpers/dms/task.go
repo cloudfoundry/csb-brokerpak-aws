@@ -70,7 +70,7 @@ func waitForReplicationTaskCompletion(taskID, region string) {
 			gomega.Expect(statusReceiver.Percentages[0]).To(gomega.Equal(100))
 			return
 		default:
-			ginkgo.Fail("unexpected status")
+			ginkgo.Fail(fmt.Sprintf("unexpected status: %q", statusReceiver.Status[0]))
 		}
 
 		time.Sleep(taskPollPeriod)
