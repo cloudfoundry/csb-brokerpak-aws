@@ -158,7 +158,6 @@ run-modified-tests: providers custom.tfrc
 .PHONY: run-provider-tests
 run-provider-tests:  ## run the integration tests associated with providers
 	cd providers/terraform-provider-csbdynamodbns; $(MAKE) test
-	cd providers/terraform-provider-csbmajorengineversion; $(MAKE) test
 
 custom.tfrc:
 	sed "s#BROKERPAK_PATH#$(PWD)#" custom.tfrc.template > $@
