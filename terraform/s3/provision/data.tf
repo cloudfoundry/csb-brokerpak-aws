@@ -7,4 +7,8 @@ locals {
   # When creating a bucket with Object Lock enabled, Amazon S3 automatically enables versioning for the bucket.
   # To avoid differences between the local state and the AWS state, we will enable versioning when enabling Object Lock.
   is_versioning_enabled = var.enable_versioning ? true : var.ol_enabled
+
+  default_kms_key_as_list = try([coalesce(var.sse_default_kms_key_id)], [])
+  extra_kms_keys_as_list  = try(split(",", var.sse_extra_kms_key_ids), [])
+  sse_all_kms_key_ids     = join(",", compact(distinct(concat(local.default_kms_key_as_list, local.extra_kms_keys_as_list))))
 }

@@ -26,5 +26,5 @@ resource "aws_iam_user_policy" "user_policy" {
 
   user = aws_iam_user.user.name
 
-  policy = data.aws_iam_policy_document.user_policy.json
+  policy = local.user_policy_with_or_without_encryption.json
 }
