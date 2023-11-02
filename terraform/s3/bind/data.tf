@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+locals {
+  user_policy_with_or_without_encryption = try(data.aws_iam_policy_document.user_policy_sse[0], data.aws_iam_policy_document.user_policy)
+
+  key_ids_list = try(compact(split(",", var.sse_all_kms_key_ids)), [])
+}
+
+
 data "aws_iam_policy_document" "user_policy" {
   statement {
     sid = "bucketAccess"
@@ -67,5 +74,26 @@ data "aws_iam_policy_document" "user_policy" {
     resources = [
       format("%s/*", var.arn)
     ]
+  }
+}
+
+data "aws_kms_key" "customer_provided_keys" {
+  count  = length(local.key_ids_list) == 0 ? 0 : length(local.key_ids_list)
+  key_id = local.key_ids_list[count.index]
+}
+
+data "aws_iam_policy_document" "user_policy_sse" {
+  count = length(local.key_ids_list) == 0 ? 0 : 1
+
+  source_policy_documents = [data.aws_iam_policy_document.user_policy.json]
+
+  statement {
+    sid = "kmsperms"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [for key in data.aws_kms_key.customer_provided_keys : key.arn]
   }
 }

@@ -98,6 +98,11 @@ provision:
     nullable: true
     details: The AWS KMS key ID used for the SSE-KMS encryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
     default: null
+  - field_name: sse_extra_kms_key_ids
+    type: string
+    nullable: true
+    details: A comma-separated list of AWS KMS key IDs used for the SSE-KMS decryption. This can only be used when you set the value of `sse_default_algorithm` as `aws:kms`.
+    default: null
   - field_name: sse_default_algorithm
     type: string
     nullable: true
@@ -179,6 +184,9 @@ provision:
   - field_name: bucket_name
     type: string
     details: Name of created bucket
+  - field_name: sse_all_kms_key_ids
+    type: string
+    details: The default and extra AWS KMS key IDs used for SSE-KMS encryption and decryption.
 bind:
   plan_inputs: []
   user_inputs:
@@ -201,6 +209,10 @@ bind:
     type: string
   - name: user_name
     default: csb-${request.binding_id}
+    overwrite: true
+    type: string
+  - name: sse_all_kms_key_ids
+    default: ${instance.details["sse_all_kms_key_ids"]}
     overwrite: true
     type: string
   template_refs:

@@ -31,6 +31,7 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 		"pab_ignore_public_acls":                     false,
 		"pab_restrict_public_buckets":                false,
 		"sse_default_kms_key_id":                     nil,
+		"sse_extra_kms_key_ids":                      nil,
 		"sse_default_algorithm":                      nil,
 		"sse_bucket_key_enabled":                     false,
 		"ol_enabled":                                 false,
