@@ -25,6 +25,12 @@ updates:
     day: "saturday"
     time: "06:00"
 - package-ecosystem: gomod
+  directory: "/acceptance-tests/apps/mssqlapp"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
   directory: "/acceptance-tests/apps/redisapp"
   schedule:
     interval: "weekly"
@@ -38,6 +44,24 @@ updates:
     time: "06:00"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/providers/terraform-provider-csbdynamodbns"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/providers/terraform-provider-csbsqlserver"
+  schedule:
+    interval: "weekly"
+    day: "saturday"
+    time: "06:00"
+- package-ecosystem: gomod
+  directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
     interval: "weekly"
     day: "saturday"
