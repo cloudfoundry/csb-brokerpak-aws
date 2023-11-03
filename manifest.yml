@@ -46,8 +46,8 @@ terraform_binaries:
   source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
   default: true
 - name: terraform-provider-aws
-  version: 5.23.1
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.23.1.zip
+  version: 5.24.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.24.0.zip
 - name: terraform-provider-random
   version: 3.5.1
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.5.1.zip
@@ -60,13 +60,13 @@ terraform_binaries:
   provider: cyrilgdn/postgresql
   url_template: https://github.com/cyrilgdn/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbpg
-  version: 1.2.9
-  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.9.zip
+  version: 1.2.10
+  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.10.zip
   provider: cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
-  version: 1.2.14
-  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.14.zip
+  version: 1.2.15
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.15.zip
   provider: cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
@@ -78,8 +78,8 @@ terraform_binaries:
   provider: cloudfoundry.org/cloud-service-broker/csbmajorengineversion
   url_template: ./providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/${version}/${os}_${arch}/${name}_v${version}
 - name: terraform-provider-csbsqlserver
-  version: 1.0.0
-  provider: cloudfoundry.org/cloud-service-broker/csbsqlserver
+  version: 1.0.1
+  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.1.zip
   source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.0.zip
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 env_config_mapping:
