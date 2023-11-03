@@ -11,7 +11,7 @@ terraform {
     }
     csbsqlserver = {
       source  = "cloudfoundry.org/cloud-service-broker/csbsqlserver"
-      version = "1.0.0"
+      version = ">=1.0.0"
     }
   }
 }
