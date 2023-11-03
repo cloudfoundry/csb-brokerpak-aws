@@ -12,8 +12,8 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.5
-	golang.org/x/tools v0.7.0
-	honnef.co/go/tools v0.4.3
+	golang.org/x/tools v0.12.1-0.20230825192346-2191a27a6dc5
+	honnef.co/go/tools v0.4.6
 )
 
 require (
@@ -71,7 +71,7 @@ require (
 	golang.org/x/crypto v0.13.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.13.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
