@@ -14,8 +14,8 @@ require (
 	github.com/onsi/ginkgo/v2 v2.13.0
 	github.com/onsi/gomega v1.29.0
 	github.com/pborman/uuid v1.2.1
-	golang.org/x/tools v0.12.0
-	honnef.co/go/tools v0.4.3
+	golang.org/x/tools v0.12.1-0.20230825192346-2191a27a6dc5
+	honnef.co/go/tools v0.4.6
 )
 
 require (
