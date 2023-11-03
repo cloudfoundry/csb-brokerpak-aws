@@ -55,12 +55,6 @@ updates:
     day: "saturday"
     time: "06:00"
 - package-ecosystem: gomod
-  directory: "/providers/terraform-provider-csbsqlserver"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
-- package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
     interval: "weekly"
