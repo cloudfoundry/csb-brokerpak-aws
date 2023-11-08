@@ -20,6 +20,7 @@ terraform_upgrade_path:
 - version: 1.1.9
 - version: 1.4.2
 - version: 1.4.4
+- version: 1.5.7
 terraform_binaries:
 - name: terraform
   version: 0.12.30
@@ -36,14 +37,15 @@ terraform_binaries:
 - name: terraform
   version: 1.1.9
   source: https://github.com/hashicorp/terraform/archive/v1.1.9.zip
-  default: false
 - name: terraform
   version: 1.4.2
   source: https://github.com/hashicorp/terraform/archive/v1.4.2.zip
-  default: false
 - name: terraform
   version: 1.4.4
   source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
+- name: terraform
+  version: 1.5.7
+  source: https://github.com/hashicorp/terraform/archive/v1.5.7.zip
   default: true
 - name: terraform-provider-aws
   version: 5.24.0
