@@ -12,30 +12,87 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "bucket_name" { type = string }
-variable "acl" { type = string }
-variable "labels" { type = map(any) }
-variable "enable_versioning" { type = bool }
-variable "ol_enabled" { type = bool }
-variable "boc_object_ownership" { type = string }
+variable "bucket_name" {
+  type    = string
+  default = null
+}
+variable "acl" {
+  type    = string
+  default = null
+}
+variable "labels" {
+  type    = map(any)
+  default = null
+}
+variable "enable_versioning" {
+  type    = bool
+  default = null
+}
+variable "ol_enabled" {
+  type    = bool
+  default = null
+}
+variable "boc_object_ownership" {
+  type    = string
+  default = null
+}
 
 # Resource aws_s3_bucket_public_access_block
-variable "pab_block_public_acls" { type = bool }
-variable "pab_block_public_policy" { type = bool }
-variable "pab_ignore_public_acls" { type = bool }
-variable "pab_restrict_public_buckets" { type = bool }
+variable "pab_block_public_acls" {
+  type    = bool
+  default = null
+}
+variable "pab_block_public_policy" {
+  type    = bool
+  default = null
+}
+variable "pab_ignore_public_acls" {
+  type    = bool
+  default = null
+}
+variable "pab_restrict_public_buckets" {
+  type    = bool
+  default = null
+}
 
 # Resource aws_s3_bucket_server_side_encryption_configuration
-variable "sse_default_kms_key_id" { type = string }
-variable "sse_extra_kms_key_ids" { type = string }
-variable "sse_default_algorithm" { type = string }
-variable "sse_bucket_key_enabled" { type = bool }
+variable "sse_default_kms_key_id" {
+  type    = string
+  default = null
+}
+variable "sse_extra_kms_key_ids" {
+  type    = string
+  default = null
+}
+variable "sse_default_algorithm" {
+  type    = string
+  default = null
+}
+variable "sse_bucket_key_enabled" {
+  type    = bool
+  default = null
+}
 
 # Resource aws_s3_bucket_object_lock_configuration
-variable "ol_configuration_default_retention_enabled" { type = bool }
-variable "ol_configuration_default_retention_mode" { type = string }
-variable "ol_configuration_default_retention_days" { type = number }
-variable "ol_configuration_default_retention_years" { type = number }
+variable "ol_configuration_default_retention_enabled" {
+  type    = bool
+  default = null
+}
+variable "ol_configuration_default_retention_mode" {
+  type    = string
+  default = null
+}
+variable "ol_configuration_default_retention_days" {
+  type    = number
+  default = null
+}
+variable "ol_configuration_default_retention_years" {
+  type    = number
+  default = null
+}
 
-variable "require_tls" { type = bool }
+variable "require_tls" {
+  type    = bool
+  default = null
+}
 
