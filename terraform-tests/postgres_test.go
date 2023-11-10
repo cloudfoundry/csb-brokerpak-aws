@@ -11,8 +11,13 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
+func init() {
+	Describe("postgres", Label("postgres-terraform", "GovCloud"), Ordered, func() { testTerraformPostgres("us-gov-west-1") })
+	Describe("postgres", Label("postgres-terraform", "NonGovCloud"), Ordered, func() { testTerraformPostgres("us-west-2") })
+}
+
 // To execute this test individually: `TF_CLI_CONFIG_FILE="$(pwd)/custom.tfrc" ginkgo --label-filter=postgres-terraform  -v terraform-tests`
-var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
+func testTerraformPostgres(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -42,7 +47,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		"maintenance_end_min":                   nil,
 		"maintenance_start_min":                 nil,
 		"maintenance_day":                       nil,
-		"region":                                "us-west-2",
+		"region":                                region,
 		"backup_window":                         nil,
 		"copy_tags_to_snapshot":                 true,
 		"delete_automated_backups":              true,
@@ -99,7 +104,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					"enable_export_upgrade_logs":                        true,
 					"cloudwatch_postgresql_log_group_retention_in_days": 1,
 					"cloudwatch_upgrade_log_group_retention_in_days":    1,
-					"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+					"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 				}))
 			})
 
@@ -115,14 +120,14 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 				Expect(GroupAfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
 					ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-postgresql-test/postgresql"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
 							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 						}),
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-postgresql-test/upgrade"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
@@ -486,4 +491,4 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 		})
 	})
 
-})
+}

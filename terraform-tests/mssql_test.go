@@ -14,7 +14,12 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
+func init() {
+	Describe("mssql", Label("mssql-terraform", "GovCloud"), Ordered, func() { testTerraformMssql("us-gov-west-1") })
+	Describe("mssql", Label("mssql-terraform", "NonGovCloud"), Ordered, func() { testTerraformMssql("us-west-2") })
+}
+
+func testTerraformMssql(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -23,7 +28,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	defaultVars := map[string]any{
 		"aws_access_key_id":     awsAccessKeyID,
 		"aws_secret_access_key": awsSecretAccessKey,
-		"region":                "us-west-2",
+		"region":                region,
 		"instance_name":         "csb-mssql-test",
 		"storage_encrypted":     true,
 		"kms_key_id":            "",
@@ -661,13 +666,13 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("works as expected", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
 					"performance_insights_enabled":          true,
-					"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+					"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 					"performance_insights_retention_period": 93,
 				}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"performance_insights_enabled":          BeTrue(),
-						"performance_insights_kms_key_id":       Equal("arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+						"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 						"performance_insights_retention_period": BeNumerically("==", 93),
 					}),
 				)
@@ -678,7 +683,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			It("causes kms_key_id and retention_period to be ignored", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
 					"performance_insights_enabled":          false,
-					"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+					"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 					"performance_insights_retention_period": 93,
 				}))
 				Expect(maps.Keys(AfterValuesForType(plan, "aws_db_instance").(map[string]any))).To(
@@ -748,7 +753,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					"enable_export_error_logs":                     true,
 					"cloudwatch_agent_log_group_retention_in_days": 1,
 					"cloudwatch_error_log_group_retention_in_days": 1,
-					"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+					"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 				}))
 			})
 
@@ -764,14 +769,14 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				Expect(GroupAfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
 					ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-mssql-test/agent"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
 							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 						}),
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-mssql-test/error"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
@@ -871,4 +876,4 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			})
 		})
 	})
-})
+}

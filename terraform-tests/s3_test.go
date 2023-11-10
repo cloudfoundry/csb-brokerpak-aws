@@ -11,7 +11,12 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
+func init() {
+	Describe("S3", Label("S3-terraform", "GovCloud"), Ordered, func() { testTerraformS3("us-gov-west-1") })
+	Describe("S3", Label("S3-terraform", "NonGovCloud"), Ordered, func() { testTerraformS3("us-west-2") })
+}
+
+func testTerraformS3(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -22,7 +27,7 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 		"aws_access_key_id":                          awsAccessKeyID,
 		"aws_secret_access_key":                      awsSecretAccessKey,
 		"bucket_name":                                bucketName,
-		"region":                                     "us-west-2",
+		"region":                                     region,
 		"acl":                                        "public-read",
 		"enable_versioning":                          true,
 		"boc_object_ownership":                       "BucketOwnerEnforced",
@@ -137,4 +142,4 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 			))
 		})
 	})
-})
+}

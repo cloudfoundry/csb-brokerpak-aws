@@ -11,7 +11,12 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
+func init() {
+	Describe("mysql", Label("mysql-terraform", "GovCloud"), Ordered, func() { testTerraformMysql("us-gov-west-1") })
+	Describe("mysql", Label("mysql-terraform", "NonGovCloud"), Ordered, func() { testTerraformMysql("us-west-2") })
+}
+
+func testTerraformMysql(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -52,7 +57,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 		"delete_automated_backups":              true,
 		"aws_access_key_id":                     awsAccessKeyID,
 		"aws_secret_access_key":                 awsSecretAccessKey,
-		"region":                                "us-west-2",
+		"region":                                region,
 		"option_group_name":                     "",
 		"monitoring_interval":                   0,
 		"monitoring_role_arn":                   "",
@@ -366,4 +371,4 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			})
 		})
 	})
-})
+}

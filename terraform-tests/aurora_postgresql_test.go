@@ -11,7 +11,12 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Ordered, func() {
+func init() {
+	Describe("Aurora postgresql", Label("aurora-postgresql-terraform", "GovCloud"), Ordered, func() { testTerraformAuroraPostgresql("us-gov-west-1") })
+	Describe("Aurora postgresql", Label("aurora-postgresql-terraform", "NonGovCloud"), Ordered, func() { testTerraformAuroraPostgresql("us-west-2") })
+}
+
+func testTerraformAuroraPostgresql(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -21,7 +26,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		"instance_name":                         "csb-aurorapg-test",
 		"db_name":                               "csbdb",
 		"labels":                                map[string]any{"key1": "some-postgres-value"},
-		"region":                                "us-west-2",
+		"region":                                region,
 		"aws_access_key_id":                     awsAccessKeyID,
 		"aws_secret_access_key":                 awsSecretAccessKey,
 		"aws_vpc_id":                            awsVPCID,
@@ -235,7 +240,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"performance_insights_enabled":          true,
-				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 7,
 			}))
 		})
@@ -244,7 +249,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"performance_insights_enabled":          BeTrue(),
-					"performance_insights_kms_key_id":       Equal("arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					"performance_insights_retention_period": BeNumerically("==", 7),
 				}),
 			)
@@ -398,4 +403,4 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			})
 		})
 	})
-})
+}

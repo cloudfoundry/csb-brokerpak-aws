@@ -13,7 +13,12 @@ import (
 	. "csbbrokerpakaws/terraform-tests/helpers"
 )
 
-var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
+func init() {
+	Describe("Redis", Label("redis-terraform", "GovCloud"), Ordered, func() { testTerraformRedis("us-gov-west-1") })
+	Describe("Redis", Label("redis-terraform", "NonGovCloud"), Ordered, func() { testTerraformRedis("us-west-2") })
+}
+
+func testTerraformRedis(region string) {
 	const resource = "aws_elasticache_replication_group"
 
 	var (
@@ -30,7 +35,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 		"node_count":                                 2,
 		"elasticache_subnet_group":                   "",
 		"elasticache_vpc_security_group_ids":         "",
-		"region":                                     "us-west-2",
+		"region":                                     region,
 		"aws_access_key_id":                          awsAccessKeyID,
 		"aws_secret_access_key":                      awsSecretAccessKey,
 		"aws_vpc_id":                                 awsVPCID,
@@ -437,7 +442,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			)
 		})
 	})
-})
+}
 
 func getExpectedResources() []string {
 	// This tries to be equivalent to a constant slice.
