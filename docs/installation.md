@@ -289,7 +289,7 @@ Add your custom plans to the `config.yml` file, for example, plans for MySQL
 ```yaml
 service:
   csb-aws-mysql:
-    plans: '[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class":"db.m6i.large","mysql_version":"8.0","storage_gb":100}]'
+    plans: '[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class":"db.m6g.large","mysql_version":"8.0","storage_gb":100}]'
 ```
 
 ### Push and Register the Broker
@@ -358,7 +358,7 @@ api:
 
 service:
   csb-aws-mysql:
-    plans: '[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class":"db.m6i.large","mysql_version":"8.0","storage_gb":100}]'
+    plans: '[{"name":"default","id":"0f3522b2-f040-443b-bc53-4aed25284840","description":"Default MySQL plan","display_name":"default","instance_class":"db.m6g.large","mysql_version":"8.0","storage_gb":100}]'
 ```
 
 Add your custom plans to the `config.yml` file, for example, plans for MySQL
