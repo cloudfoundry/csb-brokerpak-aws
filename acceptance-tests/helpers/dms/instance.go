@@ -49,7 +49,7 @@ func createReplicationInstance(replicationSubnetGroupID, envName, region string)
 	var receiver struct {
 		ARN string `jsonry:"ReplicationInstance.ReplicationInstanceArn"`
 	}
-	AWSToJSON(&receiver, "dms", "create-replication-instance", "--replication-instance-identifier", random.Name(random.WithPrefix(envName)), "--replication-instance-class", "dms.t2.micro", "--region", region, "--replication-subnet-group-identifier", replicationSubnetGroupID)
+	AWSToJSON(&receiver, "dms", "create-replication-instance", "--replication-instance-identifier", random.Name(random.WithPrefix(envName)), "--replication-instance-class", "dms.t3.micro", "--region", region, "--replication-subnet-group-identifier", replicationSubnetGroupID)
 
 	return receiver.ARN
 }
