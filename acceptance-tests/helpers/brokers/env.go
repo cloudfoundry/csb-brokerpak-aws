@@ -51,7 +51,7 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "BROKERPAK_UPDATES_ENABLED", Value: true},
 		apps.EnvVar{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
 		apps.EnvVar{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
-		apps.EnvVar{Name: "CSB_DISABLE_TF_UPGRADE_PROVIDER_RENAMES", Value: true},
+		apps.EnvVar{Name: "CSB_DISABLE_TF_UPGRADE_PROVIDER_RENAMES", Value: false},
 	)
 
 	return append(result, b.envExtras...)
