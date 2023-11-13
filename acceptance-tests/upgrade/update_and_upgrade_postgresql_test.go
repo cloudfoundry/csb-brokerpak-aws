@@ -14,7 +14,7 @@ var _ = Describe("UpgradePostgreSQLTest", Label("postgresql", "upgrade"), func()
 	When("upgrading broker version", func() {
 		It("should continue to work", func() {
 			const (
-				postgreSQLPlanToUpgradeEngine = `[{"name":"default_postgres_version14","id":"77de3441-1096-48aa-8909-a7dc5e457fa2","description":"Default Postgres plan with version 14.x","display_name":"default_postgres_version14.x","instance_class":"db.m6i.large","postgres_version":"14","storage_gb":100},{"name":"default_postgres_version13","id":"95989511-5e6f-4845-ae26-1401e077c193","description":"Default Postgres plan with version 13.x","display_name":"default_postgres_version13","instance_class":"db.m6i.large","postgres_version":"13","storage_gb":100}]`
+				postgreSQLPlanToUpgradeEngine = `[{"name":"default_postgres_version14","id":"77de3441-1096-48aa-8909-a7dc5e457fa2","description":"Default Postgres plan with version 14.x","display_name":"default_postgres_version14.x","instance_class":"db.m6g.large","postgres_version":"14","storage_gb":100},{"name":"default_postgres_version13","id":"95989511-5e6f-4845-ae26-1401e077c193","description":"Default Postgres plan with version 13.x","display_name":"default_postgres_version13","instance_class":"db.m6g.large","postgres_version":"13","storage_gb":100}]`
 				plansVar                      = `GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS`
 			)
 

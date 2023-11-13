@@ -13,6 +13,9 @@ import (
 
 func (b Broker) env() []apps.EnvVar {
 	var result []apps.EnvVar
+	defaultValues := map[string]string{
+		"GSB_PROVISION_DEFAULTS": fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID")),
+	}
 
 	for name, required := range map[string]bool{
 		"AWS_ACCESS_KEY_ID":                      true,
@@ -24,13 +27,18 @@ func (b Broker) env() []apps.EnvVar {
 		"CH_UAA_CLIENT_SECRET":                   false,
 		"CH_SKIP_SSL_VALIDATION":                 false,
 		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES": false,
+		"GSB_PROVISION_DEFAULTS":                 false,
 	} {
 		val, ok := os.LookupEnv(name)
+		defaultValue, hasDefaultValue := defaultValues[name]
+
 		switch {
 		case ok:
 			result = append(result, apps.EnvVar{Name: name, Value: val})
-		case !ok && required:
+		case !ok && required && !hasDefaultValue:
 			ginkgo.Fail(fmt.Sprintf("You must set the %s environment variable", name))
+		default:
+			result = append(result, apps.EnvVar{Name: name, Value: defaultValue})
 		}
 	}
 
@@ -41,7 +49,6 @@ func (b Broker) env() []apps.EnvVar {
 		apps.EnvVar{Name: "ENCRYPTION_ENABLED", Value: true},
 		apps.EnvVar{Name: "ENCRYPTION_PASSWORDS", Value: b.secrets},
 		apps.EnvVar{Name: "BROKERPAK_UPDATES_ENABLED", Value: true},
-		apps.EnvVar{Name: "GSB_PROVISION_DEFAULTS", Value: fmt.Sprintf(`{"aws_vpc_id": %q}`, os.Getenv("AWS_PAS_VPC_ID"))},
 		apps.EnvVar{Name: "GSB_COMPATIBILITY_ENABLE_BETA_SERVICES", Value: true},
 		apps.EnvVar{Name: "TERRAFORM_UPGRADES_ENABLED", Value: true},
 		apps.EnvVar{Name: "CSB_DISABLE_TF_UPGRADE_PROVIDER_RENAMES", Value: false},
