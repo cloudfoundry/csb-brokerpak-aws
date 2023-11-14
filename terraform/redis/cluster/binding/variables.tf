@@ -4,5 +4,5 @@ variable "password" {
   type      = string
   sensitive = true
 }
-variable "tls_port" { type = string }
+variable "tls_port" { type = number }
 variable "reader_endpoint" { type = string }
