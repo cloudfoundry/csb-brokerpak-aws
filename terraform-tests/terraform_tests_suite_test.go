@@ -22,7 +22,7 @@ var (
 
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	awsAccessKeyID     = os.Getenv("AWS_ACCESS_KEY_ID")
-	awsVPCID           = "vpc-72464617"
+	awsVPCID           = getAWSVPCID()
 	awsRegion          = getAWSRegion()
 )
 
@@ -55,4 +55,13 @@ func getAWSRegionFromCSBDefaults() string {
 		return matches[1]
 	}
 	return ""
+}
+
+func getAWSVPCID() string {
+	envVPCID, defined := os.LookupEnv("AWS_PAS_VPC_ID")
+	if defined {
+		return envVPCID
+	}
+
+	return "vpc-72464617"
 }
