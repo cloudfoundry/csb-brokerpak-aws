@@ -22,7 +22,7 @@ var (
 
 	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 	awsAccessKeyID     = os.Getenv("AWS_ACCESS_KEY_ID")
-	awsVPCID           = "vpc-72464617"
+	awsVPCID           = os.Getenv("AWS_PAS_VPC_ID")
 	awsRegion          = getAWSRegion()
 )
 
