@@ -329,13 +329,13 @@ func testTerraformAuroraMysql(region string) {
 
 				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": true,
-					"engine_version":             "5.7.mysql_aurora.2.07.0",
+					"engine_version":             "5.7.mysql_aurora.2.07.10",
 				}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				msgs = string(session.Out.Contents())
 				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
-				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 5.7 - got: 5.7.mysql_aurora.2.07.0`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 5.7 - got: 5.7.mysql_aurora.2.07.10`))
 			})
 		})
 
@@ -365,19 +365,19 @@ func testTerraformAuroraMysql(region string) {
 			It("should not complain about postcondition and create the instance", func() {
 				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": false,
-					"engine_version":             "5.7.mysql_aurora.2.07.0",
+					"engine_version":             "5.7.mysql_aurora.2.07.10",
 				}))
 
 				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"engine_version": Equal("5.7.mysql_aurora.2.07.0"),
+						"engine_version": Equal("5.7.mysql_aurora.2.07.10"),
 					}),
 				)
 
 				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"auto_minor_version_upgrade": BeFalse(),
-						"engine_version":             Equal("5.7.mysql_aurora.2.07.0"),
+						"engine_version":             Equal("5.7.mysql_aurora.2.07.10"),
 					}),
 				)
 			})
