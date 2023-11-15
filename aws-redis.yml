@@ -320,9 +320,46 @@ provision:
 bind:
   plan_inputs: []
   user_inputs: []
-  computed_inputs: []
-  template: ''
-  outputs: []
+  computed_inputs:
+    - name: name
+      type: string
+      default: ${instance.details["name"]}
+      overwrite: true
+    - name: host
+      type: string
+      default: ${instance.details["host"]}
+      overwrite: true
+    - name: tls_port
+      type: integer
+      default: ${instance.details["tls_port"]}
+      overwrite: true
+    - name: password
+      type: string
+      default: ${instance.details["password"]}
+      overwrite: true
+    - name: reader_endpoint
+      type: string
+      default: ${instance.details["reader_endpoint"]}
+      overwrite: true
+  template_refs:
+    variables: terraform/redis/cluster/binding/variables.tf
+    outputs: terraform/redis/cluster/binding/outputs.tf
+  outputs:
+    - field_name: name
+      type: string
+      details: The name of the redis.
+    - field_name: host
+      type: string
+      details: Hostname or IP address of the exposed redis endpoint used by clients to connect to the service.
+    - field_name: tls_port
+      type: integer
+      details: The TLS port number of the exposed redis instance.
+    - field_name: password
+      type: string
+      details: The password to authenticate to the redis instance.
+    - field_name: reader_endpoint
+      type: string
+      details: Address used by clients to read from the service. It splits incoming connections between all read replicas.
 examples:
 - name: example
   description: Create an example-plan Redis instance

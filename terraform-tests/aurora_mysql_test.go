@@ -11,7 +11,12 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func() {
+func init() {
+	Describe("Aurora mysql", Label("aurora-mysql-terraform", "GovCloud"), Ordered, func() { testTerraformAuroraMysql("us-gov-west-1") })
+	Describe("Aurora mysql", Label("aurora-mysql-terraform", "NonGovCloud"), Ordered, func() { testTerraformAuroraMysql("us-west-2") })
+}
+
+func testTerraformAuroraMysql(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
@@ -21,7 +26,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		"instance_name":                          "csb-auroramysql-test",
 		"db_name":                                "csbdb",
 		"labels":                                 map[string]any{"key1": "some-mysql-value"},
-		"region":                                 "us-west-2",
+		"region":                                 region,
 		"aws_access_key_id":                      awsAccessKeyID,
 		"aws_secret_access_key":                  awsSecretAccessKey,
 		"aws_vpc_id":                             awsVPCID,
@@ -215,7 +220,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"performance_insights_enabled":          true,
-				"performance_insights_kms_key_id":       "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 7,
 			}))
 		})
@@ -224,7 +229,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"performance_insights_enabled":          BeTrue(),
-					"performance_insights_kms_key_id":       Equal("arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					"performance_insights_retention_period": BeNumerically("==", 7),
 				}),
 			)
@@ -324,13 +329,13 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": true,
-					"engine_version":             "5.7.mysql_aurora.2.07.0",
+					"engine_version":             "5.7.mysql_aurora.2.07.10",
 				}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				msgs = string(session.Out.Contents())
 				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
-				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 5.7 - got: 5.7.mysql_aurora.2.07.0`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 5.7 - got: 5.7.mysql_aurora.2.07.10`))
 			})
 		})
 
@@ -360,19 +365,19 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			It("should not complain about postcondition and create the instance", func() {
 				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": false,
-					"engine_version":             "5.7.mysql_aurora.2.07.0",
+					"engine_version":             "5.7.mysql_aurora.2.07.10",
 				}))
 
 				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"engine_version": Equal("5.7.mysql_aurora.2.07.0"),
+						"engine_version": Equal("5.7.mysql_aurora.2.07.10"),
 					}),
 				)
 
 				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"auto_minor_version_upgrade": BeFalse(),
-						"engine_version":             Equal("5.7.mysql_aurora.2.07.0"),
+						"engine_version":             Equal("5.7.mysql_aurora.2.07.10"),
 					}),
 				)
 			})
@@ -418,4 +423,4 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			})
 		})
 	})
-})
+}

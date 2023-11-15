@@ -42,8 +42,9 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 			services.WithBrokerName("aws-services-broker"),
 			services.WithParameters(map[string]any{
 				"CreateDbInstance": map[string]any{
-					"EngineVersion": "14.00.3401.7.v1",
-					"MultiAZ":       false,
+					"EngineVersion":   "14.00.3401.7.v1",
+					"MultiAZ":         false,
+					"DBInstanceClass": "db.m5.large",
 				},
 			}),
 		)
