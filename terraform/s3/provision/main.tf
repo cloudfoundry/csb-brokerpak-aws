@@ -13,10 +13,10 @@
 # limitations under the License.
 
 resource "aws_s3_bucket" "b" {
-  bucket              = local.bucket_name
-  object_lock_enabled = local.ol_enabled
+  bucket              = local.inputs.bucket_name
+  object_lock_enabled = local.inputs.ol_enabled
 
-  tags = local.labels
+  tags = local.inputs.labels
 
   lifecycle {
     prevent_destroy = true
@@ -24,9 +24,9 @@ resource "aws_s3_bucket" "b" {
 }
 
 resource "aws_s3_bucket_acl" "bucket_acl" {
-  count  = (local.acl != null) ? 1 : 0
+  count  = (local.inputs.acl != null) ? 1 : 0
   bucket = aws_s3_bucket.b.id
-  acl    = local.acl
+  acl    = local.inputs.acl
 
   depends_on = [
     aws_s3_bucket_ownership_controls.bucket_ownership_controls
@@ -44,33 +44,33 @@ resource "aws_s3_bucket_ownership_controls" "bucket_ownership_controls" {
   bucket = aws_s3_bucket.b.id
 
   rule {
-    object_ownership = local.boc_object_ownership
+    object_ownership = local.inputs.boc_object_ownership
   }
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
   bucket = aws_s3_bucket.b.id
 
-  block_public_acls       = local.pab_block_public_acls
-  block_public_policy     = local.pab_block_public_policy
-  ignore_public_acls      = local.pab_ignore_public_acls
-  restrict_public_buckets = local.pab_restrict_public_buckets
+  block_public_acls       = local.inputs.pab_block_public_acls
+  block_public_policy     = local.inputs.pab_block_public_policy
+  ignore_public_acls      = local.inputs.pab_ignore_public_acls
+  restrict_public_buckets = local.inputs.pab_restrict_public_buckets
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "server_side_encryption_configuration" {
-  count  = (local.sse_default_algorithm != null || local.sse_bucket_key_enabled != false) ? 1 : 0
+  count  = (local.inputs.sse_default_algorithm != null || local.inputs.sse_bucket_key_enabled != false) ? 1 : 0
   bucket = aws_s3_bucket.b.bucket
 
   rule {
     dynamic "apply_server_side_encryption_by_default" {
-      for_each = local.sse_default_algorithm[*]
+      for_each = local.inputs.sse_default_algorithm[*]
       content {
-        kms_master_key_id = local.sse_default_kms_key_id
-        sse_algorithm     = local.sse_default_algorithm
+        kms_master_key_id = local.inputs.sse_default_kms_key_id
+        sse_algorithm     = local.inputs.sse_default_algorithm
       }
     }
 
-    bucket_key_enabled = local.sse_bucket_key_enabled
+    bucket_key_enabled = local.inputs.sse_bucket_key_enabled
   }
 }
 
@@ -83,15 +83,15 @@ resource "aws_s3_bucket_object_lock_configuration" "bucket_object_lock_configura
 
   rule {
     default_retention {
-      mode  = local.ol_configuration_default_retention_mode
-      days  = local.ol_configuration_default_retention_days
-      years = local.ol_configuration_default_retention_years
+      mode  = local.inputs.ol_configuration_default_retention_mode
+      days  = local.inputs.ol_configuration_default_retention_days
+      years = local.inputs.ol_configuration_default_retention_years
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "bucket_require_tls_policy" {
-  count  = local.require_tls ? 1 : 0
+  count  = local.inputs.require_tls ? 1 : 0
   bucket = aws_s3_bucket.b.id
   policy = jsonencode({
     "Version" : "2012-10-17",

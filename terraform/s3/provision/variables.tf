@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "inputs" {
+variable "types" {
+  default = {}
   type = object({
+    region                                     = optional(string)
     bucket_name                                = optional(string)
     acl                                        = optional(string)
     labels                                     = optional(map(any))
@@ -35,5 +37,10 @@ variable "inputs" {
     ol_configuration_default_retention_years   = optional(number)
     require_tls                                = optional(bool)
   })
+}
+
+variable "inputs" {
+  type = any
+  default = {}
 }
 
