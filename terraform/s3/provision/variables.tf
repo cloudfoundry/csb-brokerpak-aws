@@ -40,7 +40,7 @@ variable "types" {
 }
 
 variable "inputs" {
-  type = any
+  type    = any
   default = {}
 }
 
