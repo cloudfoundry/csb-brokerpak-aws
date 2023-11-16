@@ -11,10 +11,8 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-func init() {
-	Describe("postgres", Label("postgres-terraform", "GovCloud"), Ordered, func() { testTerraformPostgres("us-gov-west-1") })
-	Describe("postgres", Label("postgres-terraform", "NonGovCloud"), Ordered, func() { testTerraformPostgres("us-west-2") })
-}
+var _ = Describe("postgres", Label("postgres-terraform", "GovCloud"), Ordered, func() { testTerraformPostgres("us-gov-west-1") })
+var _ = Describe("postgres", Label("postgres-terraform", "AwsGlobal"), Ordered, func() { testTerraformPostgres("us-west-2") })
 
 // To execute this test individually: `TF_CLI_CONFIG_FILE="$(pwd)/custom.tfrc" ginkgo --label-filter=postgres-terraform  -v terraform-tests`
 func testTerraformPostgres(region string) {

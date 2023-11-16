@@ -11,10 +11,8 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-func init() {
-	Describe("Aurora mysql", Label("aurora-mysql-terraform", "GovCloud"), Ordered, func() { testTerraformAuroraMysql("us-gov-west-1") })
-	Describe("Aurora mysql", Label("aurora-mysql-terraform", "NonGovCloud"), Ordered, func() { testTerraformAuroraMysql("us-west-2") })
-}
+var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform", "GovCloud"), Ordered, func() { testTerraformAuroraMysql("us-gov-west-1") })
+var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform", "AwsGlobal"), Ordered, func() { testTerraformAuroraMysql("us-west-2") })
 
 func testTerraformAuroraMysql(region string) {
 	var (
