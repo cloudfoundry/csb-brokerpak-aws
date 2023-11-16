@@ -13,10 +13,8 @@ import (
 	. "csbbrokerpakaws/terraform-tests/helpers"
 )
 
-func init() {
-	Describe("Redis", Label("redis-terraform", "GovCloud"), Ordered, func() { testTerraformRedis("us-gov-west-1") })
-	Describe("Redis", Label("redis-terraform", "NonGovCloud"), Ordered, func() { testTerraformRedis("us-west-2") })
-}
+var _ = Describe("Redis", Label("redis-terraform", "GovCloud"), Ordered, func() { testTerraformRedis("us-gov-west-1") })
+var _ = Describe("Redis", Label("redis-terraform", "AwsGlobal"), Ordered, func() { testTerraformRedis("us-west-2") })
 
 func testTerraformRedis(region string) {
 	const resource = "aws_elasticache_replication_group"
