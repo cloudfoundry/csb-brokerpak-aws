@@ -11,10 +11,8 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-func init() {
-	Describe("S3", Label("S3-terraform", "GovCloud"), Ordered, func() { testTerraformS3("us-gov-west-1") })
-	Describe("S3", Label("S3-terraform", "NonGovCloud"), Ordered, func() { testTerraformS3("us-west-2") })
-}
+var _ = Describe("S3", Label("S3-terraform", "GovCloud"), Ordered, func() { testTerraformS3("us-gov-west-1") })
+var _ = Describe("S3", Label("S3-terraform", "AwsGlobal"), Ordered, func() { testTerraformS3("us-west-2") })
 
 func testTerraformS3(region string) {
 	var (
