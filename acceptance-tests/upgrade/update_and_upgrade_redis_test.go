@@ -60,7 +60,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 			Expect(appTwo.GET("/primary/%s", key).String()).To(Equal(value))
 
 			By("updating the instance plan")
-			serviceInstance.Update(services.WithParameters(map[string]any{"node_type": "cache.t4g.medium"}))
+			serviceInstance.Update(services.WithParameters(map[string]any{"node_type": "cache.t3.medium"}))
 
 			By("getting the value using the second app")
 			Expect(appTwo.GET("/primary/%s", key).String()).To(Equal(value))
