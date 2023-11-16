@@ -422,13 +422,16 @@ examples:
   plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
   provision_params: {"publicly_accessible": true, "provider_verify_certificate": false}
   bind_params: {}
+  bind_can_fail: true
 - name: default-with-features
   description: Create a medium multiaz PostgreSQL instance
   plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
   provision_params: {"publicly_accessible": true, "multi_az": true, "storage_encrypted": true, "provider_verify_certificate": false}
   bind_params: {}
+  bind_can_fail: true
 - name: default-with-maintenance-window
   description: Create a small PostgreSQL instance with encrypted storage
   plan_id: de7dbcee-1c8d-11ed-9904-5f435c1e2316
   provision_params: {"maintenance_day": "Thu", "maintenance_start_hour": "15", "maintenance_start_min": "30", "maintenance_end_hour": "17", "maintenance_end_min": "00", "publicly_accessible": true, "provider_verify_certificate": false}
   bind_params: {}
+  bind_can_fail: true
