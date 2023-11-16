@@ -14,7 +14,7 @@ import (
 )
 
 var _ = Describe("MSSQL", Label("mssql"), func() {
-	It("can be accessed by a JAVA app using the JDBC URL", Label("JDBC-mssql"), func() {
+	It("can be accessed by a JAVA app using the JDBC URL", Label("mssql-JDBC-tls"), func() {
 		var (
 			userIn  jdbcapp.AppResponseUser
 			userOut jdbcapp.AppResponseUser
@@ -93,7 +93,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		golangAppTwo.DELETE(schema)
 	})
 
-	It("can be accessed by a JAVA app using the JDBC URL when require ssl is disabled", Label("JDBC-mssql"), func() {
+	It("can be accessed by a JAVA app using the JDBC URL when require ssl is disabled", Label("mssql-JDBC-notls"), func() {
 		var (
 			userIn  jdbcapp.AppResponseUser
 			userOut jdbcapp.AppResponseUser
@@ -133,7 +133,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		Expect(userOut.Name).To(Equal(value))
 	})
 
-	It("can't be destroyed if `deletion_protection: true`", func() {
+	It("can't be destroyed if `deletion_protection: true`", Label("mssql-deletion-protection"), func() {
 		By("creating a service instance")
 		serviceInstance := services.CreateInstance(
 			"csb-aws-mssql",
