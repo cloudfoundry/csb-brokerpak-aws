@@ -24,7 +24,7 @@ func HandleUploadWithACL(client *credentials.Client, acl string) http.HandlerFun
 				Bucket:        aws.String(client.Credentials.BucketName),
 				Key:           aws.String(filename),
 				Body:          r.Body,
-				ContentLength: r.ContentLength,
+				ContentLength: &r.ContentLength,
 				ACL:           types.ObjectCannedACL(acl),
 			})
 			if err != nil {
