@@ -3,11 +3,11 @@ module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns
 go 1.21
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.22.2
+	github.com/aws/aws-sdk-go-v2 v1.23.0
 	github.com/aws/aws-sdk-go-v2/config v1.23.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.15.2
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.25.0
-	github.com/aws/smithy-go v1.16.0
+	github.com/aws/smithy-go v1.17.0
 	github.com/cloudfoundry/cloud-service-broker v0.20.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.30.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
