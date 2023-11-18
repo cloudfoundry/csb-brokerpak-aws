@@ -17,7 +17,7 @@ func handleUpload(w http.ResponseWriter, r *http.Request, filename string, clien
 		Bucket:        aws.String(client.Credentials.BucketName),
 		Key:           aws.String(filename),
 		Body:          r.Body,
-		ContentLength: r.ContentLength,
+		ContentLength: &r.ContentLength,
 	})
 	if err != nil {
 		fail(w, http.StatusFailedDependency, "Error uploading file part %q: %s", filename, err)
