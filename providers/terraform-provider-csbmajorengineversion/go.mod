@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.23.0
 	github.com/aws/aws-sdk-go-v2/config v1.25.3
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.2
-	github.com/aws/aws-sdk-go-v2/service/rds v1.62.3
+	github.com/aws/aws-sdk-go-v2/service/rds v1.63.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.30.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
