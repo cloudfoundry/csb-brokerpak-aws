@@ -27,6 +27,14 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 
 		postgresTestMultipleApps(serviceInstance)
 	})
+
+	It("works with postgres 16", Label("Postgres16"), func() {
+		By("creating a service instance")
+		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("pg16"))
+		defer serviceInstance.Delete()
+
+		postgresTestMultipleApps(serviceInstance)
+	})
 })
 
 func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
