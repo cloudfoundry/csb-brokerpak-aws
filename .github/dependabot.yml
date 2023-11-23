@@ -3,66 +3,79 @@ updates:
 - package-ecosystem: gomod
   directory: "/"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
+  groups:
+    aws-sdk-go-v2:
+      patterns:
+        - "aws-sdk-go-v2"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/s3app"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
+  groups:
+    aws-sdk-go-v2:
+      patterns:
+        - "aws-sdk-go-v2"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mssqlapp"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/redisapp"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbtableapp"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
+  groups:
+    aws-sdk-go-v2:
+      patterns:
+        - "aws-sdk-go-v2"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
+  groups:
+    aws-sdk-go-v2:
+      patterns:
+        - "aws-sdk-go-v2"
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbdynamodbns"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
+  groups:
+    aws-sdk-go-v2:
+      patterns:
+        - "aws-sdk-go-v2"
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
+  groups:
+    aws-sdk-go-v2:
+      patterns:
+        - "aws-sdk-go-v2"
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
-    interval: "weekly"
-    day: "saturday"
-    time: "06:00"
+    interval: "daily"
+    time: "22:00"
