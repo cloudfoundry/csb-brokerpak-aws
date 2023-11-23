@@ -8,7 +8,7 @@ updates:
   groups:
     aws-sdk-go-v2:
       patterns:
-        - "aws-sdk-go-v2"
+        - "*aws-sdk-go-v2*"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
@@ -22,7 +22,7 @@ updates:
   groups:
     aws-sdk-go-v2:
       patterns:
-        - "aws-sdk-go-v2"
+        - "*aws-sdk-go-v2*"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
@@ -46,7 +46,7 @@ updates:
   groups:
     aws-sdk-go-v2:
       patterns:
-        - "aws-sdk-go-v2"
+        - "*aws-sdk-go-v2*"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
@@ -55,7 +55,7 @@ updates:
   groups:
     aws-sdk-go-v2:
       patterns:
-        - "aws-sdk-go-v2"
+        - "*aws-sdk-go-v2*"
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbdynamodbns"
   schedule:
@@ -64,7 +64,7 @@ updates:
   groups:
     aws-sdk-go-v2:
       patterns:
-        - "aws-sdk-go-v2"
+        - "*aws-sdk-go-v2*"
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
@@ -73,7 +73,7 @@ updates:
   groups:
     aws-sdk-go-v2:
       patterns:
-        - "aws-sdk-go-v2"
+        - "*aws-sdk-go-v2*"
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
