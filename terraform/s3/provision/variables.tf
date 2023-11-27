@@ -13,7 +13,14 @@
 # limitations under the License.
 
 variable "types" {
-  default = {}
+  default = {
+      ready : false,
+      labels : {},
+      enable_versioning : false,
+      ol_enabled : false,
+      boc_object_ownership : "BucketOwnerEnforced",
+      require_tls : false,
+ }
   type = object({
     ready                                      = optional(bool)
     region                                     = optional(string)

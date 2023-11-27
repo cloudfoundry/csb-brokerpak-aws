@@ -4,30 +4,7 @@ data "terraform_remote_state" "prev_state" {
     path = "./terraform.tfstate"
   }
   defaults = {
-    inputs : {
-      ready : false,
-      region : null,
-      bucket_name : null,
-      acl : null,
-      labels : {},
-      enable_versioning : false,
-      ol_enabled : false,
-      boc_object_ownership : "BucketOwnerEnforced",
-      pab_block_public_acls : null,
-      pab_block_public_policy : null,
-      pab_ignore_public_acls : null,
-      pab_restrict_public_buckets : null,
-      sse_default_kms_key_id : null,
-      sse_extra_kms_key_ids : null,
-      sse_default_algorithm : null,
-      sse_bucket_key_enabled : null,
-      aws_s3_bucket_object_lock_configuration : null,
-      ol_configuration_default_retention_enabled : null,
-      ol_configuration_default_retention_mode : null,
-      ol_configuration_default_retention_days : null,
-      ol_configuration_default_retention_years : null,
-      require_tls : false,
-    }
+    inputs : var.types
   }
 }
 
