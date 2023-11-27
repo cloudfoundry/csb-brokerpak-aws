@@ -32,8 +32,9 @@ data "terraform_remote_state" "prev_state" {
 }
 
 locals {
+  default_inputs    = data.terraform_remote_state.prev_state.defaults.inputs
   last_inputs       = data.terraform_remote_state.prev_state.outputs.inputs
-  inputs            = merge(local.last_inputs, var.inputs)
+  inputs            = merge(local.default_inputs, local.last_inputs, var.inputs)
   unsupported_props = join(",", setsubtract(keys(var.inputs), keys(var.types)))
 }
 
