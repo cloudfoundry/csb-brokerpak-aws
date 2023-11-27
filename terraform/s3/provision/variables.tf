@@ -19,10 +19,16 @@ variable "prohibit_updates" {
 variable "types" {
   default = {
     ready : false,
+    region : "us-west-2",
     labels : {},
     enable_versioning : false,
     ol_enabled : false,
     boc_object_ownership : "BucketOwnerEnforced",
+    pab_block_public_acls : false,
+    pab_block_public_policy : false,
+    pab_ignore_public_acls : false,
+    pab_restrict_public_buckets : false,
+    sse_bucket_key_enabled : false,
     require_tls : false,
   }
   type = object({
