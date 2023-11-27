@@ -17,6 +17,8 @@ locals {
 
   inputs            = merge(local.default_inputs, local.last_valid_inputs, var.inputs)
   unsupported_props = join(",", setsubtract(keys(local.inputs), keys(var.types)))
+
+  invalid_prohibit_updates = join(",", setsubtract(toset(var.prohibit_updates), keys(var.types)))
 }
 
 resource "terraform_data" "strongly_typed_inputs" {
@@ -25,37 +27,22 @@ resource "terraform_data" "strongly_typed_inputs" {
       condition     = length(local.unsupported_props) == 0
       error_message = "unsupported properties specified as inputs: ${local.unsupported_props}"
     }
+
+    precondition {
+      condition     = length(local.invalid_prohibit_updates) == 0
+      error_message = "unsupported properties specified as prohibit_updates: ${local.invalid_prohibit_updates}"
+    }
   }
 }
 
 resource "terraform_data" "prohibit_update" {
   # Don't run prohibit_update during instance creation
-  count = local.last_inputs.ready ? 1 : 0
+  count = local.last_inputs.ready ? length(var.prohibit_updates) : 0
 
   lifecycle {
     precondition {
-      condition     = local.inputs.bucket_name == local.last_inputs.bucket_name
-      error_message = "bucket_name can't be modified after creation"
-    }
-
-    precondition {
-      condition     = local.inputs.acl == local.last_inputs.acl
-      error_message = "acl can't be modified after creation"
-    }
-
-    precondition {
-      condition     = local.inputs.region == local.last_inputs.region
-      error_message = "region can't be modified after creation"
-    }
-
-    precondition {
-      condition     = local.inputs.boc_object_ownership == local.last_inputs.boc_object_ownership
-      error_message = "boc_object_ownership can't be modified after creation"
-    }
-
-    precondition {
-      condition     = local.inputs.ol_enabled == local.last_inputs.ol_enabled
-      error_message = "ol_enabled can't be modified after creation"
+      condition     = local.inputs[var.prohibit_updates[count.index]] == local.last_inputs[var.prohibit_updates[count.index]]
+      error_message = "${var.prohibit_updates[count.index]} can't be modified after creation"
     }
   }
 }
