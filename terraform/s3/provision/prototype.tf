@@ -35,7 +35,7 @@ locals {
   default_inputs    = data.terraform_remote_state.prev_state.defaults.inputs
   last_inputs       = data.terraform_remote_state.prev_state.outputs.inputs
   inputs            = merge(local.default_inputs, local.last_inputs, var.inputs)
-  unsupported_props = join(",", setsubtract(keys(var.inputs), keys(var.types)))
+  unsupported_props = join(",", setsubtract(keys(local.inputs), keys(var.types)))
 }
 
 resource "terraform_data" "strongly_typed_inputs" {

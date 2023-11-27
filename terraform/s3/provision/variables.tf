@@ -15,6 +15,7 @@
 variable "types" {
   default = {}
   type = object({
+    ready                                      = optional(bool)
     region                                     = optional(string)
     bucket_name                                = optional(string)
     acl                                        = optional(string)
