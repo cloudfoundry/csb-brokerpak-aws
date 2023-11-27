@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable prohibit_updates {
+variable "prohibit_updates" {
   default = ["bucket_name", "acl", "region", "boc_object_ownership", "ol_enabled"]
 }
 
 variable "types" {
   default = {
-      ready : false,
-      labels : {},
-      enable_versioning : false,
-      ol_enabled : false,
-      boc_object_ownership : "BucketOwnerEnforced",
-      require_tls : false,
- }
+    ready : false,
+    labels : {},
+    enable_versioning : false,
+    ol_enabled : false,
+    boc_object_ownership : "BucketOwnerEnforced",
+    require_tls : false,
+  }
   type = object({
     ready                                      = optional(bool)
     region                                     = optional(string)
