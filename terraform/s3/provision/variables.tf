@@ -16,7 +16,7 @@ variable "prohibit_updates" {
   default = ["bucket_name", "acl", "region", "boc_object_ownership", "ol_enabled"]
 }
 
-variable "types" {
+variable "properties" {
   default = {
     ready : false,
     region : "us-west-2",
@@ -55,10 +55,5 @@ variable "types" {
     ol_configuration_default_retention_years   = optional(number)
     require_tls                                = optional(bool)
   })
-}
-
-variable "inputs" {
-  type    = any
-  default = {}
 }
 

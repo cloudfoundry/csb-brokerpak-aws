@@ -4,7 +4,7 @@ data "terraform_remote_state" "prev_state" {
     path = "./terraform.tfstate"
   }
   defaults = {
-    inputs : var.types
+    inputs : var.properties
   }
 }
 
@@ -16,9 +16,9 @@ locals {
   last_valid_inputs = { for k, v in local.last_inputs : k => v if !contains(local.deprecated_inputs, k) }
 
   inputs            = merge(local.default_inputs, local.last_valid_inputs, var.inputs)
-  unsupported_props = join(",", setsubtract(keys(local.inputs), keys(var.types)))
+  unsupported_props = join(",", setsubtract(keys(local.inputs), keys(var.properties)))
 
-  invalid_prohibit_updates = join(",", setsubtract(toset(var.prohibit_updates), keys(var.types)))
+  invalid_prohibit_updates = join(",", setsubtract(toset(var.prohibit_updates), keys(var.properties)))
 }
 
 resource "terraform_data" "strongly_typed_inputs" {
@@ -45,6 +45,11 @@ resource "terraform_data" "prohibit_update" {
       error_message = "${var.prohibit_updates[count.index]} can't be modified after creation"
     }
   }
+}
+
+variable "inputs" {
+  type    = any
+  default = {}
 }
 
 output "inputs" {
