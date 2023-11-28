@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "deprecated_inputs" {
+  default = []
+}
+
 variable "prohibit_updates" {
   default = ["bucket_name", "acl", "region", "boc_object_ownership", "ol_enabled"]
 }

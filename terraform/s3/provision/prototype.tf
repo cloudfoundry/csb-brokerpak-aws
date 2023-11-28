@@ -9,11 +9,9 @@ data "terraform_remote_state" "prev_state" {
 }
 
 locals {
-  deprecated_inputs = []
-
   default_inputs    = data.terraform_remote_state.prev_state.defaults.inputs
   last_inputs       = data.terraform_remote_state.prev_state.outputs.inputs
-  last_valid_inputs = { for k, v in local.last_inputs : k => v if !contains(local.deprecated_inputs, k) }
+  last_valid_inputs = { for k, v in local.last_inputs : k => v if !contains(var.deprecated_inputs, k) }
 
   inputs            = merge(local.default_inputs, local.last_valid_inputs, var.inputs)
   unsupported_props = join(",", setsubtract(keys(local.inputs), keys(var.properties)))
