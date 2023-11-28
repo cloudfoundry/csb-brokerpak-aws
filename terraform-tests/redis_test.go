@@ -115,6 +115,7 @@ func testTerraformRedis(region string) {
 					"tags_all":                   BeAssignableToTypeOf(map[string]any{}),
 					"user_group_ids":             BeNil(),
 					"data_tiering_enabled":       BeFalse(),
+					"auth_token_update_strategy": BeAssignableToTypeOf("string"),
 				}))
 		})
 	})
