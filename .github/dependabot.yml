@@ -4,7 +4,7 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "20:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -13,12 +13,12 @@ updates:
   directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "20:30"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/s3app"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "21:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -27,7 +27,7 @@ updates:
   directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "21:30"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mssqlapp"
   schedule:
@@ -37,12 +37,12 @@ updates:
   directory: "/acceptance-tests/apps/redisapp"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "22:30"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbtableapp"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "23:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -51,7 +51,7 @@ updates:
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "23:30"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -60,7 +60,7 @@ updates:
   directory: "/providers/terraform-provider-csbdynamodbns"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "00:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -69,7 +69,7 @@ updates:
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "00:30"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -78,4 +78,4 @@ updates:
   directory: "/"
   schedule:
     interval: "daily"
-    time: "22:00"
+    time: "01:00"
