@@ -12,13 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-provider "mysql" {
-  endpoint = format("%s:%d", var.hostname, local.port)
-  username = var.admin_username
-  password = var.admin_password
-  tls      = true
-}
-
 provider "csbmysql" {
   database = var.db_name
   password = var.admin_password
