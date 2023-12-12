@@ -14,34 +14,6 @@
 
 dependencies:
     - name: terraform
-      version: 0.12.30
-      source: https://github.com/hashicorp/terraform/archive/v0.12.30.zip
-      source_sha256: d93afe75708f706f416a7968f65af8302ac9c492a21aa958ffb2202bd9390e4d
-    - name: terraform
-      version: 0.13.7
-      source: https://github.com/hashicorp/terraform/archive/v0.13.7.zip
-      source_sha256: 88ab5b2da31fc44dfd5fb0356b3a10e4b7a7bc2dd8cc1e212ae584a42aa13bd5
-    - name: terraform
-      version: 0.14.11
-      source: https://github.com/hashicorp/terraform/archive/v0.14.11.zip
-      source_sha256: 473db90326f53d99403783ef897b36378f3edea748825986126311cb2ba140ae
-    - name: terraform
-      version: 1.0.11
-      source: https://github.com/hashicorp/terraform/archive/v1.0.11.zip
-      source_sha256: 1b75df24c49d0839ad1ea35215ab5ad1d44b365bae7079a578a030b04da9281b
-    - name: terraform
-      version: 1.1.9
-      source: https://github.com/hashicorp/terraform/archive/v1.1.9.zip
-      source_sha256: 98e4d48e2703cff237d64a865bffba56dec597d72e40e8c978e1beccbe49c27b
-    - name: terraform
-      version: 1.4.2
-      source: https://github.com/hashicorp/terraform/archive/v1.4.2.zip
-      source_sha256: d04b859b3ca87f16fc31f5573c03b710631e8533493e4f1885c1eb795ebeddfa
-    - name: terraform
-      version: 1.4.4
-      source: https://github.com/hashicorp/terraform/archive/v1.4.4.zip
-      source_sha256: d5101d32158e2f4b67804a78d23008e964674df167c99964f35fab6560e71e5e
-    - name: terraform
       version: 1.5.7
       source: https://github.com/hashicorp/terraform/archive/v1.5.7.zip
       source_sha256: 67ceb2f009313c076a6bf8a063443da5ea97d75bac18fc22a6861e9f73712155
@@ -61,14 +33,6 @@ dependencies:
       version: 1.0.3
       source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.3.zip
       source_sha256: e2eac8294d9e172c8aef18f3d2180f9ce4f40ed3236bf1c90e12b3628b2fad5e
-    - name: terraform-provider-mysql
-      version: 1.9.0
-      source: https://github.com/terraform-providers/terraform-provider-mysql/archive/v1.9.0.zip
-      source_sha256: 8cd135baba86b5568f7685152201b3f73300aa1fe455c6873da05bff1418b707
-    - name: terraform-provider-postgresql
-      version: 1.21.0
-      source: https://github.com/cyrilgdn/terraform-provider-postgresql/archive/v1.21.0.zip
-      source_sha256: 4667d08e0adede183ef30dcec6f551cdf72b1167f112b0191ed2e8b2c3067a7c
     - name: terraform-provider-random
       version: 3.6.0
       source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.0.zip
