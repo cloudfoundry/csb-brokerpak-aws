@@ -12,7 +12,7 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
-	golang.org/x/tools v0.16.0
+	golang.org/x/tools v0.16.1
 	honnef.co/go/tools v0.4.6
 )
 
