@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.13
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.26.7
 	github.com/aws/smithy-go v1.19.0
-	github.com/cloudfoundry/cloud-service-broker v0.21.2
+	github.com/cloudfoundry/cloud-service-broker v0.21.3
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.31.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/onsi/ginkgo/v2 v2.13.2
