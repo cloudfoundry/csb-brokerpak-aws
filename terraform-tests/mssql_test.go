@@ -318,6 +318,37 @@ func testTerraformMssql(region string) {
 				Expect(session).To(gbytes.Say("no matching EC2 VPC found"))
 			})
 		})
+
+		When("a vpc with more than 20 subnets is passed", func() {
+			It("should fail and return a descriptive error message", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": "vpc-066fae2eced5df2fb"}))
+
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say("the specified aws_vpc_id contains more than 20 subnets. please specify a different aws_vpc_id or a valid rds_subnet_group containing the desired subnets"))
+			})
+		})
+
+		When("a valid rds_subnet_group is passed", func() {
+			It("should succeed even if the vpc has more than 20 subnets", func() {
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "sg-in-vpc-more-than-20-subnets", "aws_vpc_id": "vpc-066fae2eced5df2fb"}))
+
+				Expect(AfterValuesForType(plan, "aws_security_group")).To(MatchKeys(IgnoreExtras, Keys{"vpc_id": Equal("vpc-066fae2eced5df2fb")}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"db_subnet_group_name": Equal("sg-in-vpc-more-than-20-subnets")}))
+
+				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+					"aws_db_instance",
+					"random_password",
+					"random_string",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
+					"aws_security_group_rule",
+					"aws_security_group",
+					"aws_db_parameter_group",
+				))
+			})
+		})
 	})
 
 	Context("subnet group", func() {
