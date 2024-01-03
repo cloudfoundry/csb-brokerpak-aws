@@ -85,6 +85,11 @@ func testTerraformMssql(region string) {
 
 	validVPC := awsVPCID
 
+	// The following two resources were manually created
+	// in the AWS console to be able to test some corner-cases
+	vpcWithMoreThan20Subnets := "vpc-066fae2eced5df2fb"
+	rdsSubnetGroupInVPCWithMoreThan20Subnets := "sg-in-vpc-more-than-20-subnets"
+
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "mssql/provision")
 		Init(terraformProvisionDir)
@@ -321,7 +326,7 @@ func testTerraformMssql(region string) {
 
 		When("a vpc with more than 20 subnets is passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": "vpc-066fae2eced5df2fb"}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": vpcWithMoreThan20Subnets}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session).To(gbytes.Say("the specified aws_vpc_id contains more than 20 subnets. please specify a different aws_vpc_id or a valid rds_subnet_group containing the desired subnets"))
@@ -330,10 +335,10 @@ func testTerraformMssql(region string) {
 
 		When("a valid rds_subnet_group is passed", func() {
 			It("should succeed even if the vpc has more than 20 subnets", func() {
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "sg-in-vpc-more-than-20-subnets", "aws_vpc_id": "vpc-066fae2eced5df2fb"}))
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": rdsSubnetGroupInVPCWithMoreThan20Subnets, "aws_vpc_id": vpcWithMoreThan20Subnets}))
 
-				Expect(AfterValuesForType(plan, "aws_security_group")).To(MatchKeys(IgnoreExtras, Keys{"vpc_id": Equal("vpc-066fae2eced5df2fb")}))
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"db_subnet_group_name": Equal("sg-in-vpc-more-than-20-subnets")}))
+				Expect(AfterValuesForType(plan, "aws_security_group")).To(MatchKeys(IgnoreExtras, Keys{"vpc_id": Equal(vpcWithMoreThan20Subnets)}))
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"db_subnet_group_name": Equal(rdsSubnetGroupInVPCWithMoreThan20Subnets)}))
 
 				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
 					"aws_db_instance",
