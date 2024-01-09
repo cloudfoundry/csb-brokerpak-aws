@@ -1,20 +1,25 @@
 package terraformtests
 
 import (
-	"path"
-
-	"golang.org/x/exp/maps"
-
+	"context"
 	. "csbbrokerpakaws/terraform-tests/helpers"
+	"fmt"
+	"path"
+	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	"github.com/aws/aws-sdk-go-v2/service/rds"
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
 	. "github.com/onsi/gomega/gstruct"
+	"golang.org/x/exp/maps"
 )
 
 var _ = Describe("mssql", Label("mssql-terraform", "GovCloud"), Ordered, func() { testTerraformMssql("us-gov-west-1") })
+
 var _ = Describe("mssql", Label("mssql-terraform", "AwsGlobal"), Ordered, func() { testTerraformMssql("us-west-2") })
 
 func testTerraformMssql(region string) {
@@ -84,11 +89,6 @@ func testTerraformMssql(region string) {
 	}
 
 	validVPC := awsVPCID
-
-	// The following two resources were manually created
-	// in the AWS console to be able to test some corner-cases
-	vpcWithMoreThan20Subnets := "vpc-066fae2eced5df2fb"
-	rdsSubnetGroupInVPCWithMoreThan20Subnets := "sg-in-vpc-more-than-20-subnets"
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "mssql/provision")
@@ -225,6 +225,7 @@ func testTerraformMssql(region string) {
 			})
 		})
 	})
+
 	Context("instance_name", func() {
 		When("invalid instance_name is passed", func() {
 			It("fails and returns a descriptive message", func() {
@@ -325,6 +326,14 @@ func testTerraformMssql(region string) {
 		})
 
 		When("a vpc with more than 20 subnets is passed", func() {
+			var vpcWithMoreThan20Subnets string
+
+			BeforeEach(func() {
+				var cleanup func()
+				vpcWithMoreThan20Subnets, _, cleanup = createVPCWithMoreThan20Subnets()
+				DeferCleanup(cleanup)
+			})
+
 			It("should fail and return a descriptive error message", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": vpcWithMoreThan20Subnets}))
 
@@ -334,6 +343,17 @@ func testTerraformMssql(region string) {
 		})
 
 		When("a valid rds_subnet_group is passed", func() {
+			var (
+				vpcWithMoreThan20Subnets                 string
+				rdsSubnetGroupInVPCWithMoreThan20Subnets string
+			)
+
+			BeforeEach(func() {
+				var cleanup func()
+				vpcWithMoreThan20Subnets, rdsSubnetGroupInVPCWithMoreThan20Subnets, cleanup = createVPCWithMoreThan20Subnets()
+				DeferCleanup(cleanup)
+			})
+
 			It("should succeed even if the vpc has more than 20 subnets", func() {
 				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": rdsSubnetGroupInVPCWithMoreThan20Subnets, "aws_vpc_id": vpcWithMoreThan20Subnets}))
 
@@ -888,4 +908,86 @@ func testTerraformMssql(region string) {
 			})
 		})
 	})
+}
+
+// createVPCWithMoreThan20Subnets creates some VPC, subnet, and RDS subnet groups required by some tests
+// NOTE: when added this proved controversial because ideally these Terraform tests should not actually
+// create anything in the IaaS, so that they are fast and cheap. Because creating these resources is also fast
+// and cheap, it was decided that this tradeoff was worth it in order to gain test coverage. But in general
+// we don't want to copy this approach, as it would make Terraform tests slower and more expensive.
+func createVPCWithMoreThan20Subnets() (string, string, func()) {
+	ec2Client := ec2.NewFromConfig(getAWSConfig())
+	rdsClient := rds.NewFromConfig(getAWSConfig())
+
+	// VPC
+	GinkgoWriter.Println("Creating a VPC")
+	createVPCResult, err := ec2Client.CreateVpc(context.Background(), &ec2.CreateVpcInput{
+		CidrBlock: pointer("10.0.0.0/16"),
+		TagSpecifications: []types.TagSpecification{{Tags: []types.Tag{
+			{
+				Key:   pointer("Name"),
+				Value: pointer(fmt.Sprintf("vpc-test-%d-%d", GinkgoRandomSeed(), time.Now().Unix())),
+			},
+		}}},
+	})
+	Expect(err).NotTo(HaveOccurred())
+	GinkgoWriter.Printf("VPC %s created\n", safe(createVPCResult.Vpc.VpcId))
+
+	// Subnets
+	const numSubnets = 21
+	GinkgoWriter.Printf("Creating %d subnets in the VPC\n", numSubnets)
+	azs, err := ec2Client.DescribeAvailabilityZones(context.Background(), nil)
+	Expect(err).NotTo(HaveOccurred())
+
+	var subnetIDs []string
+	for i := 0; i < numSubnets; i++ {
+		createSubnetResult, err := ec2Client.CreateSubnet(context.Background(), &ec2.CreateSubnetInput{
+			VpcId:              createVPCResult.Vpc.VpcId,
+			CidrBlock:          pointer(fmt.Sprintf("10.0.%d.0/24", i)),
+			AvailabilityZoneId: azs.AvailabilityZones[i%len(azs.AvailabilityZones)].ZoneId, // round-robin AZs
+		})
+
+		Expect(err).NotTo(HaveOccurred())
+		subnetIDs = append(subnetIDs, safe(createSubnetResult.Subnet.SubnetId))
+	}
+	GinkgoWriter.Println("subnets created")
+
+	// DB subnet group
+	const dbSubnetGroupLimit = 20
+	GinkgoWriter.Printf("Creating DB subnet group with %d subnets\n", dbSubnetGroupLimit)
+	createResult, err := rdsClient.CreateDBSubnetGroup(context.Background(), &rds.CreateDBSubnetGroupInput{
+		DBSubnetGroupDescription: pointer(fmt.Sprintf("test subnet created at %s", time.Now().String())),
+		DBSubnetGroupName:        pointer(fmt.Sprintf("rdssubnet-test-%d-%d", GinkgoRandomSeed(), time.Now().Unix())),
+		SubnetIds:                subnetIDs[0:dbSubnetGroupLimit],
+	})
+	Expect(err).NotTo(HaveOccurred())
+	GinkgoWriter.Printf("Created DB subnet group %s\n", safe(createResult.DBSubnetGroup.DBSubnetGroupName))
+
+	cleanup := func() {
+		// DB subnet group
+		GinkgoWriter.Printf("Cleaning up DB subnet group %s\n", safe(createResult.DBSubnetGroup.DBSubnetGroupName))
+		_, err := rdsClient.DeleteDBSubnetGroup(context.Background(), &rds.DeleteDBSubnetGroupInput{
+			DBSubnetGroupName: createResult.DBSubnetGroup.DBSubnetGroupName,
+		})
+		Expect(err).NotTo(HaveOccurred())
+		GinkgoWriter.Println("Cleaned up DB subnet group")
+
+		// Subnets
+		GinkgoWriter.Printf("Cleaning up %d subnets\n", len(subnetIDs))
+		for _, s := range subnetIDs {
+			_, err := ec2Client.DeleteSubnet(context.Background(), &ec2.DeleteSubnetInput{
+				SubnetId: pointer(s),
+			})
+			Expect(err).NotTo(HaveOccurred())
+		}
+		GinkgoWriter.Println("subnets cleaned up")
+
+		// VPC
+		GinkgoWriter.Printf("cleaning up VPC %d\n", createVPCResult.Vpc.VpcId)
+		_, err = ec2Client.DeleteVpc(context.Background(), &ec2.DeleteVpcInput{VpcId: createVPCResult.Vpc.VpcId})
+		Expect(err).NotTo(HaveOccurred())
+		GinkgoWriter.Println("VPC cleaned up")
+	}
+
+	return safe(createVPCResult.Vpc.VpcId), safe(createResult.DBSubnetGroup.DBSubnetGroupName), cleanup
 }
