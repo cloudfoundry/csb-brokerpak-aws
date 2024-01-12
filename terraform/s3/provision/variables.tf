@@ -12,30 +12,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-variable "bucket_name" { type = string }
-variable "acl" { type = string }
-variable "labels" { type = map(any) }
-variable "enable_versioning" { type = bool }
-variable "ol_enabled" { type = bool }
-variable "boc_object_ownership" { type = string }
+variable "deprecated_inputs" {
+  default = []
+}
 
-# Resource aws_s3_bucket_public_access_block
-variable "pab_block_public_acls" { type = bool }
-variable "pab_block_public_policy" { type = bool }
-variable "pab_ignore_public_acls" { type = bool }
-variable "pab_restrict_public_buckets" { type = bool }
+variable "prohibit_updates" {
+  default = ["bucket_name", "acl", "region", "boc_object_ownership", "ol_enabled"]
+}
 
-# Resource aws_s3_bucket_server_side_encryption_configuration
-variable "sse_default_kms_key_id" { type = string }
-variable "sse_extra_kms_key_ids" { type = string }
-variable "sse_default_algorithm" { type = string }
-variable "sse_bucket_key_enabled" { type = bool }
-
-# Resource aws_s3_bucket_object_lock_configuration
-variable "ol_configuration_default_retention_enabled" { type = bool }
-variable "ol_configuration_default_retention_mode" { type = string }
-variable "ol_configuration_default_retention_days" { type = number }
-variable "ol_configuration_default_retention_years" { type = number }
-
-variable "require_tls" { type = bool }
+variable "properties" {
+  default = {
+    ready : false,
+    region : "us-west-2",
+    labels : {},
+    enable_versioning : false,
+    ol_enabled : false,
+    boc_object_ownership : "BucketOwnerEnforced",
+    pab_block_public_acls : false,
+    pab_block_public_policy : false,
+    pab_ignore_public_acls : false,
+    pab_restrict_public_buckets : false,
+    sse_bucket_key_enabled : false,
+    require_tls : false,
+  }
+  type = object({
+    ready                                      = optional(bool)
+    region                                     = optional(string)
+    bucket_name                                = optional(string)
+    acl                                        = optional(string)
+    labels                                     = optional(map(any))
+    enable_versioning                          = optional(bool)
+    ol_enabled                                 = optional(bool)
+    boc_object_ownership                       = optional(string)
+    pab_block_public_acls                      = optional(bool)
+    pab_block_public_policy                    = optional(bool)
+    pab_ignore_public_acls                     = optional(bool)
+    pab_restrict_public_buckets                = optional(bool)
+    sse_default_kms_key_id                     = optional(string)
+    sse_extra_kms_key_ids                      = optional(string)
+    sse_default_algorithm                      = optional(string)
+    sse_bucket_key_enabled                     = optional(bool)
+    aws_s3_bucket_object_lock_configuration    = optional(bool)
+    ol_configuration_default_retention_enabled = optional(bool)
+    ol_configuration_default_retention_mode    = optional(string)
+    ol_configuration_default_retention_days    = optional(number)
+    ol_configuration_default_retention_years   = optional(number)
+    require_tls                                = optional(bool)
+  })
+}
 
