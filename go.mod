@@ -11,14 +11,14 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.143.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.66.2
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cloudfoundry/cloud-service-broker v0.21.3
+	github.com/cloudfoundry/cloud-service-broker v0.21.4
 	github.com/hashicorp/terraform-json v0.20.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/onsi/ginkgo/v2 v2.13.2
+	github.com/onsi/ginkgo/v2 v2.14.0
 	github.com/onsi/gomega v1.30.0
 	github.com/otiai10/copy v1.14.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
-	golang.org/x/tools v0.16.1
+	golang.org/x/tools v0.17.0
 	gopkg.in/yaml.v3 v3.0.1
 	honnef.co/go/tools v0.4.6
 )
@@ -79,7 +79,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/mattn/go-sqlite3 v1.14.16 // indirect
+	github.com/mattn/go-sqlite3 v1.14.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
@@ -112,13 +112,13 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/oauth2 v0.15.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
