@@ -923,12 +923,15 @@ func createVPCWithMoreThan20Subnets() (string, string, func()) {
 	GinkgoWriter.Println("Creating a VPC")
 	createVPCResult, err := ec2Client.CreateVpc(context.Background(), &ec2.CreateVpcInput{
 		CidrBlock: pointer("10.0.0.0/16"),
-		TagSpecifications: []types.TagSpecification{{Tags: []types.Tag{
-			{
-				Key:   pointer("Name"),
-				Value: pointer(fmt.Sprintf("vpc-test-%d-%d", GinkgoRandomSeed(), time.Now().Unix())),
+		TagSpecifications: []types.TagSpecification{{
+			ResourceType: types.ResourceTypeVpc,
+			Tags: []types.Tag{
+				{
+					Key:   pointer("Name"),
+					Value: pointer(fmt.Sprintf("vpc-test-%d-%d", GinkgoRandomSeed(), time.Now().Unix())),
+				},
 			},
-		}}},
+		}},
 	})
 	Expect(err).NotTo(HaveOccurred())
 	GinkgoWriter.Printf("VPC %s created\n", safe(createVPCResult.Vpc.VpcId))
