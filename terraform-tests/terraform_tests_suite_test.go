@@ -1,15 +1,18 @@
 package terraformtests
 
 import (
+	"context"
+	"encoding/json"
 	"os"
-	"regexp"
 	"testing"
 
-	"golang.org/x/exp/maps"
-
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	cp "github.com/otiai10/copy"
+	"golang.org/x/exp/maps"
 )
 
 func TestTerraformTests(t *testing.T) {
@@ -45,14 +48,34 @@ func getAWSRegion() string {
 		return envRegion
 	}
 
-	return getAWSRegionFromCSBDefaults()
+	var receiver struct {
+		Region string `json:"region"`
+	}
+	Expect(json.Unmarshal([]byte(os.Getenv("GSB_PROVISION_DEFAULTS")), &receiver)).To(Succeed())
+	if receiver.Region == "" {
+		Fail("unable to determine region")
+	}
+
+	return receiver.Region
 }
 
-func getAWSRegionFromCSBDefaults() string {
-	r := regexp.MustCompile(`"region":\s*"([a-z0-9-]+)"`)
-	matches := r.FindStringSubmatch(os.Getenv("GSB_PROVISION_DEFAULTS"))
-	if matches != nil {
-		return matches[1]
+func getAWSConfig() aws.Config {
+	cfg, err := config.LoadDefaultConfig(
+		context.Background(),
+		config.WithCredentialsProvider(aws.NewCredentialsCache(credentials.NewStaticCredentialsProvider(awsAccessKeyID, awsSecretAccessKey, ""))),
+		config.WithRegion(awsRegion),
+	)
+	Expect(err).NotTo(HaveOccurred())
+	return cfg
+}
+
+func pointer[A any](input A) *A {
+	return &input
+}
+
+func safe[A any](input *A) (result A) {
+	if input == nil {
+		return
 	}
-	return ""
+	return *input
 }

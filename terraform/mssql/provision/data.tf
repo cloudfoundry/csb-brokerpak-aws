@@ -63,7 +63,7 @@ data "aws_vpc" "provided" {
 }
 
 data "aws_subnets" "in_provided_vpc" {
-  count = length(var.aws_vpc_id) > 0 ? 1 : 0
+  count = length(var.rds_subnet_group) == 0 && length(var.aws_vpc_id) > 0 ? 1 : 0
   filter {
     name   = "vpc-id"
     values = [var.aws_vpc_id]
