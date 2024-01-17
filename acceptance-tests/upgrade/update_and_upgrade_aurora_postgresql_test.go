@@ -27,7 +27,9 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 				services.WithPlan("default"),
 				services.WithParameters(
 					map[string]any{
-						"engine_version":          "13",
+						"auto_minor_version_upgrade": false,
+
+						"engine_version":          "13.10",
 						"cluster_instances":       1,
 						"serverless_min_capacity": 0.5,
 						"serverless_max_capacity": 2,
