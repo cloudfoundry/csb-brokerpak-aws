@@ -36,12 +36,11 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 			serviceInstance := services.CreateInstance(
 				"csb-aws-aurora-mysql",
 				services.WithPlan("default"),
-				services.WithParameters(
-					map[string]any{
-						"cluster_instances": 1,
-						"instance_class":    "db.r5.large",
-						"engine_version":    "5.7",
-					}),
+				services.WithParameters(map[string]any{
+					"cluster_instances": 1,
+					"instance_class":    "db.t3.medium",
+					"engine_version":    "5.7",
+				}),
 				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
