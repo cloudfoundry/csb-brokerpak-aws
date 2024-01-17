@@ -39,7 +39,7 @@ var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"),
 		By("creating a target service instance using the CSB")
 		params := map[string]any{
 			"cluster_instances":          2,
-			"instance_class":             "db.r5.large",
+			"instance_class":             "db.t3.medium",
 			"auto_minor_version_upgrade": false,
 		}
 		csbServiceInstance := services.CreateInstance(

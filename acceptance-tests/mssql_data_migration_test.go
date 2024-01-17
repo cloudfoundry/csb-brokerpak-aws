@@ -44,7 +44,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 				"CreateDbInstance": map[string]any{
 					"EngineVersion":   "14.00.3401.7.v1",
 					"MultiAZ":         false,
-					"DBInstanceClass": "db.m5.large",
+					"DBInstanceClass": "db.t3.micro",
 				},
 			}),
 		)

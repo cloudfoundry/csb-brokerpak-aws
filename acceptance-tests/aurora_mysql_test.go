@@ -23,10 +23,9 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		)
 
 		By("creating a service instance")
-
 		params := map[string]any{
 			"cluster_instances":          2,
-			"instance_class":             "db.r5.large",
+			"instance_class":             "db.t3.medium",
 			"engine_version":             "8.0.mysql_aurora.3.02.2",
 			"auto_minor_version_upgrade": false,
 		}
