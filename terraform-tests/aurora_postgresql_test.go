@@ -11,51 +11,51 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform", "GovCloud"), Ordered, func() { testTerraformAuroraPostgresql("us-gov-west-1") })
-var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform", "AwsGlobal"), Ordered, func() { testTerraformAuroraPostgresql("us-west-2") })
-
-func testTerraformAuroraPostgresql(region string) {
+var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
+		defaultVars           map[string]any
 	)
 
-	defaultVars := map[string]any{
-		"instance_name":                         "csb-aurorapg-test",
-		"db_name":                               "csbdb",
-		"labels":                                map[string]any{"key1": "some-postgres-value"},
-		"region":                                region,
-		"aws_access_key_id":                     awsAccessKeyID,
-		"aws_secret_access_key":                 awsSecretAccessKey,
-		"aws_vpc_id":                            awsVPCID,
-		"cluster_instances":                     3,
-		"serverless_min_capacity":               nil,
-		"serverless_max_capacity":               nil,
-		"rds_subnet_group":                      "",
-		"rds_vpc_security_group_ids":            "",
-		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            true,
-		"backup_retention_period":               1,
-		"preferred_backup_window":               "23:26-23:56",
-		"copy_tags_to_snapshot":                 true,
-		"deletion_protection":                   false,
-		"require_ssl":                           false,
-		"db_cluster_parameter_group_name":       "",
-		"engine_version":                        "14",
-		"monitoring_interval":                   0,
-		"monitoring_role_arn":                   "",
-		"performance_insights_enabled":          false,
-		"performance_insights_kms_key_id":       "",
-		"performance_insights_retention_period": 7,
-		"storage_encrypted":                     true,
-		"kms_key_id":                            "",
-		"instance_class":                        "db.r5.large",
-		"preferred_maintenance_end_hour":        nil,
-		"preferred_maintenance_start_hour":      nil,
-		"preferred_maintenance_end_min":         nil,
-		"preferred_maintenance_start_min":       nil,
-		"preferred_maintenance_day":             nil,
-	}
+	BeforeEach(func() {
+		defaultVars = map[string]any{
+			"instance_name":                         "csb-aurorapg-test",
+			"db_name":                               "csbdb",
+			"labels":                                map[string]any{"key1": "some-postgres-value"},
+			"region":                                awsRegion,
+			"aws_access_key_id":                     awsAccessKeyID,
+			"aws_secret_access_key":                 awsSecretAccessKey,
+			"aws_vpc_id":                            awsVPCID,
+			"cluster_instances":                     3,
+			"serverless_min_capacity":               nil,
+			"serverless_max_capacity":               nil,
+			"rds_subnet_group":                      "",
+			"rds_vpc_security_group_ids":            "",
+			"allow_major_version_upgrade":           true,
+			"auto_minor_version_upgrade":            true,
+			"backup_retention_period":               1,
+			"preferred_backup_window":               "23:26-23:56",
+			"copy_tags_to_snapshot":                 true,
+			"deletion_protection":                   false,
+			"require_ssl":                           false,
+			"db_cluster_parameter_group_name":       "",
+			"engine_version":                        "14",
+			"monitoring_interval":                   0,
+			"monitoring_role_arn":                   "",
+			"performance_insights_enabled":          false,
+			"performance_insights_kms_key_id":       "",
+			"performance_insights_retention_period": 7,
+			"storage_encrypted":                     true,
+			"kms_key_id":                            "",
+			"instance_class":                        "db.r5.large",
+			"preferred_maintenance_end_hour":        nil,
+			"preferred_maintenance_start_hour":      nil,
+			"preferred_maintenance_end_min":         nil,
+			"preferred_maintenance_start_min":       nil,
+			"preferred_maintenance_day":             nil,
+		}
+	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "aurora-postgresql/provision")
@@ -238,7 +238,7 @@ func testTerraformAuroraPostgresql(region string) {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"performance_insights_enabled":          true,
-				"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+				"performance_insights_kms_key_id":       "arn:aws:kms:" + awsRegion + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"performance_insights_retention_period": 7,
 			}))
 		})
@@ -247,7 +247,7 @@ func testTerraformAuroraPostgresql(region string) {
 			Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"performance_insights_enabled":          BeTrue(),
-					"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+					"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + awsRegion + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					"performance_insights_retention_period": BeNumerically("==", 7),
 				}),
 			)
@@ -401,4 +401,4 @@ func testTerraformAuroraPostgresql(region string) {
 			})
 		})
 	})
-}
+})

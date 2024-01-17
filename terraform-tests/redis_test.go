@@ -13,57 +13,57 @@ import (
 	. "csbbrokerpakaws/terraform-tests/helpers"
 )
 
-var _ = Describe("Redis", Label("redis-terraform", "GovCloud"), Ordered, func() { testTerraformRedis("us-gov-west-1") })
-var _ = Describe("Redis", Label("redis-terraform", "AwsGlobal"), Ordered, func() { testTerraformRedis("us-west-2") })
-
-func testTerraformRedis(region string) {
+var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 	const resource = "aws_elasticache_replication_group"
 
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
+		defaultVars           map[string]any
 	)
 
-	defaultVars := map[string]any{
-		"cache_size":                                 nil,
-		"redis_version":                              "6.0",
-		"instance_name":                              "csb-redis-test",
-		"labels":                                     map[string]any{"key1": "some-redis-value"},
-		"node_type":                                  "cache.t3.medium",
-		"node_count":                                 2,
-		"elasticache_subnet_group":                   "",
-		"elasticache_vpc_security_group_ids":         "",
-		"region":                                     region,
-		"aws_access_key_id":                          awsAccessKeyID,
-		"aws_secret_access_key":                      awsSecretAccessKey,
-		"aws_vpc_id":                                 awsVPCID,
-		"at_rest_encryption_enabled":                 true,
-		"kms_key_id":                                 "fake-encryption-at-rest-key",
-		"maintenance_end_hour":                       nil,
-		"maintenance_start_hour":                     nil,
-		"maintenance_end_min":                        nil,
-		"maintenance_start_min":                      nil,
-		"maintenance_day":                            nil,
-		"data_tiering_enabled":                       false,
-		"automatic_failover_enabled":                 true,
-		"multi_az_enabled":                           true,
-		"backup_retention_limit":                     12,
-		"final_backup_identifier":                    "tortoise",
-		"backup_name":                                "turtle",
-		"backup_end_hour":                            nil,
-		"backup_start_hour":                          nil,
-		"backup_end_min":                             nil,
-		"backup_start_min":                           nil,
-		"parameter_group_name":                       "fake-param-group-name",
-		"preferred_azs":                              nil,
-		"logs_slow_log_loggroup_kms_key_id":          "",
-		"logs_slow_log_loggroup_retention_in_days":   0,
-		"logs_slow_log_enabled":                      false,
-		"logs_engine_log_loggroup_kms_key_id":        "",
-		"logs_engine_log_loggroup_retention_in_days": 0,
-		"logs_engine_log_enabled":                    false,
-		"auto_minor_version_upgrade":                 false,
-	}
+	BeforeEach(func() {
+		defaultVars = map[string]any{
+			"cache_size":                                 nil,
+			"redis_version":                              "6.0",
+			"instance_name":                              "csb-redis-test",
+			"labels":                                     map[string]any{"key1": "some-redis-value"},
+			"node_type":                                  "cache.t3.medium",
+			"node_count":                                 2,
+			"elasticache_subnet_group":                   "",
+			"elasticache_vpc_security_group_ids":         "",
+			"region":                                     awsRegion,
+			"aws_access_key_id":                          awsAccessKeyID,
+			"aws_secret_access_key":                      awsSecretAccessKey,
+			"aws_vpc_id":                                 awsVPCID,
+			"at_rest_encryption_enabled":                 true,
+			"kms_key_id":                                 "fake-encryption-at-rest-key",
+			"maintenance_end_hour":                       nil,
+			"maintenance_start_hour":                     nil,
+			"maintenance_end_min":                        nil,
+			"maintenance_start_min":                      nil,
+			"maintenance_day":                            nil,
+			"data_tiering_enabled":                       false,
+			"automatic_failover_enabled":                 true,
+			"multi_az_enabled":                           true,
+			"backup_retention_limit":                     12,
+			"final_backup_identifier":                    "tortoise",
+			"backup_name":                                "turtle",
+			"backup_end_hour":                            nil,
+			"backup_start_hour":                          nil,
+			"backup_end_min":                             nil,
+			"backup_start_min":                           nil,
+			"parameter_group_name":                       "fake-param-group-name",
+			"preferred_azs":                              nil,
+			"logs_slow_log_loggroup_kms_key_id":          "",
+			"logs_slow_log_loggroup_retention_in_days":   0,
+			"logs_slow_log_enabled":                      false,
+			"logs_engine_log_loggroup_kms_key_id":        "",
+			"logs_engine_log_loggroup_retention_in_days": 0,
+			"logs_engine_log_enabled":                    false,
+			"auto_minor_version_upgrade":                 false,
+		}
+	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "redis/cluster/provision")
@@ -441,7 +441,7 @@ func testTerraformRedis(region string) {
 			)
 		})
 	})
-}
+})
 
 func getExpectedResources() []string {
 	// This tries to be equivalent to a constant slice.

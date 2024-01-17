@@ -11,40 +11,41 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("S3", Label("S3-terraform", "GovCloud"), Ordered, func() { testTerraformS3("us-gov-west-1") })
-var _ = Describe("S3", Label("S3-terraform", "AwsGlobal"), Ordered, func() { testTerraformS3("us-west-2") })
+var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
+	const bucketName = "csb-s3-test"
 
-func testTerraformS3(region string) {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
+		defaultVars           map[string]any
 	)
 
-	bucketName := "csb-s3-test"
-	defaultVars := map[string]any{
-		"aws_access_key_id":                          awsAccessKeyID,
-		"aws_secret_access_key":                      awsSecretAccessKey,
-		"bucket_name":                                bucketName,
-		"region":                                     region,
-		"acl":                                        "public-read",
-		"enable_versioning":                          true,
-		"boc_object_ownership":                       "BucketOwnerEnforced",
-		"pab_block_public_acls":                      false,
-		"pab_block_public_policy":                    false,
-		"pab_ignore_public_acls":                     false,
-		"pab_restrict_public_buckets":                false,
-		"sse_default_kms_key_id":                     nil,
-		"sse_extra_kms_key_ids":                      nil,
-		"sse_default_algorithm":                      nil,
-		"sse_bucket_key_enabled":                     false,
-		"ol_enabled":                                 false,
-		"ol_configuration_default_retention_enabled": nil,
-		"ol_configuration_default_retention_mode":    nil,
-		"ol_configuration_default_retention_days":    nil,
-		"ol_configuration_default_retention_years":   nil,
-		"labels":      map[string]any{"k1": "v1"},
-		"require_tls": false,
-	}
+	BeforeEach(func() {
+		defaultVars = map[string]any{
+			"aws_access_key_id":                          awsAccessKeyID,
+			"aws_secret_access_key":                      awsSecretAccessKey,
+			"bucket_name":                                bucketName,
+			"region":                                     awsRegion,
+			"acl":                                        "public-read",
+			"enable_versioning":                          true,
+			"boc_object_ownership":                       "BucketOwnerEnforced",
+			"pab_block_public_acls":                      false,
+			"pab_block_public_policy":                    false,
+			"pab_ignore_public_acls":                     false,
+			"pab_restrict_public_buckets":                false,
+			"sse_default_kms_key_id":                     nil,
+			"sse_extra_kms_key_ids":                      nil,
+			"sse_default_algorithm":                      nil,
+			"sse_bucket_key_enabled":                     false,
+			"ol_enabled":                                 false,
+			"ol_configuration_default_retention_enabled": nil,
+			"ol_configuration_default_retention_mode":    nil,
+			"ol_configuration_default_retention_days":    nil,
+			"ol_configuration_default_retention_years":   nil,
+			"labels":      map[string]any{"k1": "v1"},
+			"require_tls": false,
+		}
+	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "s3/provision")
@@ -140,4 +141,4 @@ func testTerraformS3(region string) {
 			))
 		})
 	})
-}
+})
