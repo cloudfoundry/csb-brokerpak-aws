@@ -45,6 +45,8 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 					"EngineVersion":   "14.00.3401.7.v1",
 					"MultiAZ":         false,
 					"DBInstanceClass": "db.t3.micro",
+
+					"StorageEncrypted": false,
 				},
 			}),
 		)
