@@ -18,21 +18,21 @@ dependencies:
       source: https://github.com/hashicorp/terraform/archive/v1.5.7.zip
       source_sha256: 67ceb2f009313c076a6bf8a063443da5ea97d75bac18fc22a6861e9f73712155
     - name: terraform-provider-aws
-      version: 5.32.1
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.32.1.zip
-      source_sha256: 4506baa156cea1d5ac6caf81fa58e801bb15fb7a2c6a5ab69297af43259629ab
+      version: 5.33.0
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.33.0.zip
+      source_sha256: 7578719b1054ecb45353165f1c4e5fcc677b186eac524ae7ed479bafabf4c31d
     - name: terraform-provider-csbmysql
-      version: 1.2.19
-      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.19.zip
-      source_sha256: 806b48d9c4cc16f5f1ae10d7266bef2d0ae27dceede5095cc64f121a7d704603
+      version: 1.2.20
+      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.20.zip
+      source_sha256: e7af108f91659fa736139dc416af1d3f843a792bf1869e46de6f07fcc6b72fef
     - name: terraform-provider-csbpg
-      version: 1.2.14
-      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.14.zip
-      source_sha256: 84e7e6bc38c29a7b2c1c828efce48b51917d3b27537aaf737967f3d064c821b5
+      version: 1.2.15
+      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.15.zip
+      source_sha256: e55ad3dd2f0e36af6f88e41e9e55e635390281307ed7590d555f7581821bb600
     - name: terraform-provider-csbsqlserver
-      version: 1.0.5
-      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.5.zip
-      source_sha256: c4f026c880619ecc5b34c038ff574afbb0ee8311b0296002e8d682c2611a2270
+      version: 1.0.6
+      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.6.zip
+      source_sha256: 7f19b0e7769ed95a451970472f28c22979b36b7ccaf8cea198c6b79104aad653
     - name: terraform-provider-random
       version: 3.6.0
       source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.0.zip
