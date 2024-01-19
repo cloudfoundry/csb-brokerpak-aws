@@ -29,14 +29,14 @@ var _ = Describe("Resource dynamodbns_instance", func() {
 		localDynamoDBURL = fmt.Sprintf("http://127.0.0.1:%d", port)
 		prefix = fmt.Sprintf("csb-%s-", uuid.New())
 
-		pullCMD := exec.Command("docker", "pull", "amazon/dynamodb-local")
+		pullCMD := exec.Command("docker", "pull", "harbor-repo.vmware.com/dockerhub-proxy-cache/amazon/dynamodb-local")
 		sessionDockerPull, err := gexec.Start(pullCMD, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(sessionDockerPull).WithTimeout(time.Minute).WithPolling(time.Second).Should(gexec.Exit(0))
 
 		cmd := exec.Command("docker", "run",
 			"-p", fmt.Sprintf("%d:8000", port),
-			"-t", "amazon/dynamodb-local")
+			"-t", "harbor-repo.vmware.com/dockerhub-proxy-cache/amazon/dynamodb-local")
 
 		GinkgoWriter.Printf("running command: %s\n", cmd)
 		session, err = gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
