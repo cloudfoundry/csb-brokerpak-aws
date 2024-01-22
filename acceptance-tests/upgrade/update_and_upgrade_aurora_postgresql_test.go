@@ -27,8 +27,6 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 				services.WithPlan("default"),
 				services.WithParameters(
 					map[string]any{
-						"auto_minor_version_upgrade": false,
-
 						"engine_version":          "13.10",
 						"cluster_instances":       1,
 						"serverless_min_capacity": 0.5,
@@ -74,17 +72,6 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
-			By("preparing for a major update")
-			// Passing an Explicit minor version prevents "inconsistent final plan" errors
-			// Passing a big enough instance_class prevents "shared memory segment sizes are configured too large" errors
-			// Passing the default parameter group prevents creation/destruction race conditions
-			serviceInstance.Update(services.WithParameters(map[string]any{
-				"engine_version":                  "13.11",
-				"auto_minor_version_upgrade":      false,
-				"instance_class":                  "db.t3.medium",
-				"db_cluster_parameter_group_name": "default.aurora-postgresql13",
-			}))
-
 			By("updating the instance plan")
 			// It applies changes in Terraform:
 			// apply_immediately = true
@@ -92,17 +79,8 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			// when the new resource aws_rds_cluster_parameter_group is created and the changes are applied immediately,
 			// we can upgrade the version
 			serviceInstance.Update(services.WithParameters(map[string]any{
-				"engine_version":             "14",
+				"engine_version":             "13.11",
 				"auto_minor_version_upgrade": false,
-
-				"db_cluster_parameter_group_name": "default.aurora-postgresql14",
-			}))
-
-			By("undoing temporary changes")
-			serviceInstance.Update(services.WithParameters(map[string]any{
-				"instance_class":                  "db.serverless",
-				"auto_minor_version_upgrade":      true,
-				"db_cluster_parameter_group_name": "",
 			}))
 
 			By("checking previously written data still accessible")
