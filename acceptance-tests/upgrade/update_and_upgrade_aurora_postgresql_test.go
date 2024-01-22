@@ -32,6 +32,8 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 						"serverless_min_capacity": 0.5,
 						"serverless_max_capacity": 2,
 						"instance_class":          "db.serverless",
+
+						"auto_minor_version_upgrade": false,
 					}),
 				services.WithBroker(serviceBroker),
 			)
