@@ -11,60 +11,60 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("mysql", Label("mysql-terraform", "GovCloud"), Ordered, func() { testTerraformMysql("us-gov-west-1") })
-var _ = Describe("mysql", Label("mysql-terraform", "AwsGlobal"), Ordered, func() { testTerraformMysql("us-west-2") })
-
-func testTerraformMysql(region string) {
+var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
+		defaultVars           map[string]any
 	)
 
-	defaultVars := map[string]any{
-		"cores":                                 nil,
-		"instance_name":                         "csb-mysql-test",
-		"db_name":                               "vsbdb",
-		"labels":                                map[string]string{"label1": "value1"},
-		"storage_gb":                            5,
-		"storage_type":                          "io1",
-		"iops":                                  3000,
-		"publicly_accessible":                   false,
-		"multi_az":                              false,
-		"instance_class":                        "an-instance-class",
-		"engine":                                "mysql",
-		"engine_version":                        5.7,
-		"aws_vpc_id":                            awsVPCID,
-		"storage_autoscale":                     false,
-		"storage_autoscale_limit_gb":            0,
-		"storage_encrypted":                     false,
-		"kms_key_id":                            "",
-		"parameter_group_name":                  "",
-		"rds_subnet_group":                      "",
-		"rds_vpc_security_group_ids":            "",
-		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            true,
-		"maintenance_end_hour":                  nil,
-		"maintenance_start_hour":                nil,
-		"maintenance_end_min":                   nil,
-		"maintenance_start_min":                 nil,
-		"maintenance_day":                       nil,
-		"deletion_protection":                   false,
-		"backup_retention_period":               7,
-		"backup_window":                         nil,
-		"copy_tags_to_snapshot":                 true,
-		"delete_automated_backups":              true,
-		"aws_access_key_id":                     awsAccessKeyID,
-		"aws_secret_access_key":                 awsSecretAccessKey,
-		"region":                                region,
-		"option_group_name":                     "",
-		"monitoring_interval":                   0,
-		"monitoring_role_arn":                   "",
-		"performance_insights_enabled":          true,
-		"performance_insights_kms_key_id":       "",
-		"performance_insights_retention_period": 7,
-		"enable_audit_logging":                  false,
-		"cloudwatch_log_group_kms_key_id":       "",
-	}
+	BeforeEach(func() {
+		defaultVars = map[string]any{
+			"cores":                                 nil,
+			"instance_name":                         "csb-mysql-test",
+			"db_name":                               "vsbdb",
+			"labels":                                map[string]string{"label1": "value1"},
+			"storage_gb":                            5,
+			"storage_type":                          "io1",
+			"iops":                                  3000,
+			"publicly_accessible":                   false,
+			"multi_az":                              false,
+			"instance_class":                        "an-instance-class",
+			"engine":                                "mysql",
+			"engine_version":                        5.7,
+			"aws_vpc_id":                            awsVPCID,
+			"storage_autoscale":                     false,
+			"storage_autoscale_limit_gb":            0,
+			"storage_encrypted":                     false,
+			"kms_key_id":                            "",
+			"parameter_group_name":                  "",
+			"rds_subnet_group":                      "",
+			"rds_vpc_security_group_ids":            "",
+			"allow_major_version_upgrade":           true,
+			"auto_minor_version_upgrade":            true,
+			"maintenance_end_hour":                  nil,
+			"maintenance_start_hour":                nil,
+			"maintenance_end_min":                   nil,
+			"maintenance_start_min":                 nil,
+			"maintenance_day":                       nil,
+			"deletion_protection":                   false,
+			"backup_retention_period":               7,
+			"backup_window":                         nil,
+			"copy_tags_to_snapshot":                 true,
+			"delete_automated_backups":              true,
+			"aws_access_key_id":                     awsAccessKeyID,
+			"aws_secret_access_key":                 awsSecretAccessKey,
+			"region":                                awsRegion,
+			"option_group_name":                     "",
+			"monitoring_interval":                   0,
+			"monitoring_role_arn":                   "",
+			"performance_insights_enabled":          true,
+			"performance_insights_kms_key_id":       "",
+			"performance_insights_retention_period": 7,
+			"enable_audit_logging":                  false,
+			"cloudwatch_log_group_kms_key_id":       "",
+		}
+	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "mysql/provision")
@@ -369,4 +369,4 @@ func testTerraformMysql(region string) {
 			})
 		})
 	})
-}
+})

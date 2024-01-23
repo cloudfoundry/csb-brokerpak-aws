@@ -11,64 +11,64 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-var _ = Describe("postgres", Label("postgres-terraform", "GovCloud"), Ordered, func() { testTerraformPostgres("us-gov-west-1") })
-var _ = Describe("postgres", Label("postgres-terraform", "AwsGlobal"), Ordered, func() { testTerraformPostgres("us-west-2") })
-
 // To execute this test individually: `TF_CLI_CONFIG_FILE="$(pwd)/custom.tfrc" ginkgo --label-filter=postgres-terraform  -v terraform-tests`
-func testTerraformPostgres(region string) {
+var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
+		defaultVars           map[string]any
 	)
 
-	defaultVars := map[string]any{
-		"instance_name":                         "csb-postgresql-test",
-		"db_name":                               "vsbdb",
-		"cores":                                 nil,
-		"labels":                                map[string]string{"label1": "value1"},
-		"storage_gb":                            5,
-		"publicly_accessible":                   false,
-		"multi_az":                              false,
-		"instance_class":                        "db.r5.large",
-		"postgres_version":                      "14",
-		"aws_vpc_id":                            awsVPCID,
-		"storage_autoscale":                     false,
-		"storage_autoscale_limit_gb":            0,
-		"storage_encrypted":                     false,
-		"parameter_group_name":                  "",
-		"rds_subnet_group":                      "",
-		"rds_vpc_security_group_ids":            "",
-		"allow_major_version_upgrade":           true,
-		"auto_minor_version_upgrade":            true,
-		"maintenance_end_hour":                  nil,
-		"maintenance_start_hour":                nil,
-		"maintenance_end_min":                   nil,
-		"maintenance_start_min":                 nil,
-		"maintenance_day":                       nil,
-		"region":                                region,
-		"backup_window":                         nil,
-		"copy_tags_to_snapshot":                 true,
-		"delete_automated_backups":              true,
-		"deletion_protection":                   false,
-		"iops":                                  3000,
-		"kms_key_id":                            "",
-		"monitoring_interval":                   0,
-		"monitoring_role_arn":                   "",
-		"performance_insights_enabled":          false,
-		"performance_insights_kms_key_id":       "",
-		"performance_insights_retention_period": 7,
-		"provider_verify_certificate":           true,
-		"require_ssl":                           false,
-		"storage_type":                          "io1",
-		"backup_retention_period":               7,
-		"aws_access_key_id":                     awsAccessKeyID,
-		"aws_secret_access_key":                 awsSecretAccessKey,
-		"enable_export_postgresql_logs":         false,
-		"cloudwatch_postgresql_log_group_retention_in_days": 30,
-		"enable_export_upgrade_logs":                        false,
-		"cloudwatch_upgrade_log_group_retention_in_days":    30,
-		"cloudwatch_log_groups_kms_key_id":                  "",
-	}
+	BeforeEach(func() {
+		defaultVars = map[string]any{
+			"instance_name":                         "csb-postgresql-test",
+			"db_name":                               "vsbdb",
+			"cores":                                 nil,
+			"labels":                                map[string]string{"label1": "value1"},
+			"storage_gb":                            5,
+			"publicly_accessible":                   false,
+			"multi_az":                              false,
+			"instance_class":                        "db.r5.large",
+			"postgres_version":                      "14",
+			"aws_vpc_id":                            awsVPCID,
+			"storage_autoscale":                     false,
+			"storage_autoscale_limit_gb":            0,
+			"storage_encrypted":                     false,
+			"parameter_group_name":                  "",
+			"rds_subnet_group":                      "",
+			"rds_vpc_security_group_ids":            "",
+			"allow_major_version_upgrade":           true,
+			"auto_minor_version_upgrade":            true,
+			"maintenance_end_hour":                  nil,
+			"maintenance_start_hour":                nil,
+			"maintenance_end_min":                   nil,
+			"maintenance_start_min":                 nil,
+			"maintenance_day":                       nil,
+			"region":                                awsRegion,
+			"backup_window":                         nil,
+			"copy_tags_to_snapshot":                 true,
+			"delete_automated_backups":              true,
+			"deletion_protection":                   false,
+			"iops":                                  3000,
+			"kms_key_id":                            "",
+			"monitoring_interval":                   0,
+			"monitoring_role_arn":                   "",
+			"performance_insights_enabled":          false,
+			"performance_insights_kms_key_id":       "",
+			"performance_insights_retention_period": 7,
+			"provider_verify_certificate":           true,
+			"require_ssl":                           false,
+			"storage_type":                          "io1",
+			"backup_retention_period":               7,
+			"aws_access_key_id":                     awsAccessKeyID,
+			"aws_secret_access_key":                 awsSecretAccessKey,
+			"enable_export_postgresql_logs":         false,
+			"cloudwatch_postgresql_log_group_retention_in_days": 30,
+			"enable_export_upgrade_logs":                        false,
+			"cloudwatch_upgrade_log_group_retention_in_days":    30,
+			"cloudwatch_log_groups_kms_key_id":                  "",
+		}
+	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "postgresql/provision")
@@ -102,7 +102,7 @@ func testTerraformPostgres(region string) {
 					"enable_export_upgrade_logs":                        true,
 					"cloudwatch_postgresql_log_group_retention_in_days": 1,
 					"cloudwatch_upgrade_log_group_retention_in_days":    1,
-					"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+					"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:" + awsRegion + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 				}))
 			})
 
@@ -118,14 +118,14 @@ func testTerraformPostgres(region string) {
 				Expect(GroupAfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
 					ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + awsRegion + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-postgresql-test/postgresql"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
 							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 						}),
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + awsRegion + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-postgresql-test/upgrade"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
@@ -488,5 +488,4 @@ func testTerraformPostgres(region string) {
 			})
 		})
 	})
-
-}
+})
