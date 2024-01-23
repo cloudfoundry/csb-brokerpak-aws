@@ -3,6 +3,7 @@ package terraformtests
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
 
@@ -23,15 +24,20 @@ func TestTerraformTests(t *testing.T) {
 var (
 	workingDir string
 
-	awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	awsAccessKeyID     = os.Getenv("AWS_ACCESS_KEY_ID")
-	awsVPCID           = os.Getenv("AWS_PAS_VPC_ID")
-	awsRegion          = getAWSRegion()
+	awsSecretAccessKey string
+	awsAccessKeyID     string
+	awsVPCID           string
+	awsRegion          string
 )
 
 var _ = BeforeSuite(func() {
 	workingDir = GinkgoT().TempDir()
 	Expect(cp.Copy("../terraform", workingDir)).NotTo(HaveOccurred())
+
+	awsSecretAccessKey = getenv("AWS_SECRET_ACCESS_KEY")
+	awsAccessKeyID = getenv("AWS_ACCESS_KEY_ID")
+	awsVPCID = getenv("AWS_PAS_VPC_ID")
+	awsRegion = getAWSRegion()
 })
 
 func buildVars(varOverrides ...map[string]any) map[string]any {
@@ -52,10 +58,7 @@ func getAWSRegion() string {
 		Region string `json:"region"`
 	}
 	Expect(json.Unmarshal([]byte(os.Getenv("GSB_PROVISION_DEFAULTS")), &receiver)).To(Succeed())
-	if receiver.Region == "" {
-		Fail("unable to determine region")
-	}
-
+	Expect(receiver.Region).NotTo(BeEmpty(), "unable to determine region")
 	return receiver.Region
 }
 
@@ -67,6 +70,14 @@ func getAWSConfig() aws.Config {
 	)
 	Expect(err).NotTo(HaveOccurred())
 	return cfg
+}
+
+func getenv(name string) string {
+	GinkgoHelper()
+
+	result := os.Getenv(name)
+	Expect(result).NotTo(BeEmpty(), fmt.Sprintf("environment variable %s needs a value", name))
+	return result
 }
 
 func pointer[A any](input A) *A {

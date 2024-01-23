@@ -18,77 +18,75 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-var _ = Describe("mssql", Label("mssql-terraform", "GovCloud"), Ordered, func() { testTerraformMssql("us-gov-west-1") })
-
-var _ = Describe("mssql", Label("mssql-terraform", "AwsGlobal"), Ordered, func() { testTerraformMssql("us-west-2") })
-
-func testTerraformMssql(region string) {
+var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 	var (
 		plan                  tfjson.Plan
 		terraformProvisionDir string
+		defaultVars           map[string]any
+		requiredVars          map[string]any
 	)
 
-	defaultVars := map[string]any{
-		"aws_access_key_id":     awsAccessKeyID,
-		"aws_secret_access_key": awsSecretAccessKey,
-		"region":                region,
-		"instance_name":         "csb-mssql-test",
-		"storage_encrypted":     true,
-		"kms_key_id":            "",
-		"db_name":               "vsbdb",
-		"labels":                map[string]string{"label1": "value1"},
-		"max_allocated_storage": 0,
-		"deletion_protection":   true,
-		"publicly_accessible":   false,
+	BeforeEach(func() {
+		defaultVars = map[string]any{
+			"aws_access_key_id":     awsAccessKeyID,
+			"aws_secret_access_key": awsSecretAccessKey,
+			"region":                awsRegion,
+			"instance_name":         "csb-mssql-test",
+			"storage_encrypted":     true,
+			"kms_key_id":            "",
+			"db_name":               "vsbdb",
+			"labels":                map[string]string{"label1": "value1"},
+			"max_allocated_storage": 0,
+			"deletion_protection":   true,
+			"publicly_accessible":   false,
 
-		"aws_vpc_id":                 "",
-		"rds_subnet_group":           "",
-		"rds_vpc_security_group_ids": "",
-		"option_group_name":          "",
-		"parameter_group_name":       "",
+			"aws_vpc_id":                 "",
+			"rds_subnet_group":           "",
+			"rds_vpc_security_group_ids": "",
+			"option_group_name":          "",
+			"parameter_group_name":       "",
 
-		"storage_type": "io1",
-		"iops":         1000,
-		"multi_az":     true,
+			"storage_type": "io1",
+			"iops":         1000,
+			"multi_az":     true,
 
-		"backup_window":            nil,
-		"copy_tags_to_snapshot":    true,
-		"backup_retention_period":  7,
-		"delete_automated_backups": true,
-		"maintenance_end_hour":     nil,
-		"maintenance_start_hour":   nil,
-		"maintenance_end_min":      nil,
-		"maintenance_start_min":    nil,
-		"maintenance_day":          nil,
-		"character_set_name":       nil,
+			"backup_window":            nil,
+			"copy_tags_to_snapshot":    true,
+			"backup_retention_period":  7,
+			"delete_automated_backups": true,
+			"maintenance_end_hour":     nil,
+			"maintenance_start_hour":   nil,
+			"maintenance_end_min":      nil,
+			"maintenance_start_min":    nil,
+			"maintenance_day":          nil,
+			"character_set_name":       nil,
 
-		"allow_major_version_upgrade": true,
-		"auto_minor_version_upgrade":  true,
-		"require_ssl":                 true,
+			"allow_major_version_upgrade": true,
+			"auto_minor_version_upgrade":  true,
+			"require_ssl":                 true,
 
-		"performance_insights_enabled":          false,
-		"performance_insights_kms_key_id":       "",
-		"performance_insights_retention_period": 7,
+			"performance_insights_enabled":          false,
+			"performance_insights_kms_key_id":       "",
+			"performance_insights_retention_period": 7,
 
-		"enable_export_agent_logs":                     false,
-		"cloudwatch_agent_log_group_retention_in_days": 30,
-		"enable_export_error_logs":                     false,
-		"cloudwatch_error_log_group_retention_in_days": 30,
-		"cloudwatch_log_groups_kms_key_id":             "",
-	}
+			"enable_export_agent_logs":                     false,
+			"cloudwatch_agent_log_group_retention_in_days": 30,
+			"enable_export_error_logs":                     false,
+			"cloudwatch_error_log_group_retention_in_days": 30,
+			"cloudwatch_log_groups_kms_key_id":             "",
+		}
 
-	requiredVars := map[string]any{
-		"engine":        "sqlserver-ee",
-		"mssql_version": "15.00",
-		"storage_gb":    20,
+		requiredVars = map[string]any{
+			"engine":        "sqlserver-ee",
+			"mssql_version": "15.00",
+			"storage_gb":    20,
 
-		"instance_class": "some-instance-class",
+			"instance_class": "some-instance-class",
 
-		"monitoring_interval": 0,
-		"monitoring_role_arn": "",
-	}
-
-	validVPC := awsVPCID
+			"monitoring_interval": 0,
+			"monitoring_role_arn": "",
+		}
+	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "mssql/provision")
@@ -397,7 +395,7 @@ func testTerraformMssql(region string) {
 
 		When("invalid subnet group passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "THIS-SUBNET-GROUP-DOESNT-EXIST", "aws_vpc_id": validVPC}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_subnet_group": "THIS-SUBNET-GROUP-DOESNT-EXIST", "aws_vpc_id": awsVPCID}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session).To(gbytes.Say(`no matching RDS DB Subnet Group found`))
@@ -417,10 +415,10 @@ func testTerraformMssql(region string) {
 
 		When("no security group ids passed and a valid vpc passed", func() {
 			It("should create a new security group in the specified vpc", func() {
-				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": validVPC}))
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"aws_vpc_id": awsVPCID}))
 				Expect(ResourceCreationForType(plan, "aws_security_group")).To(HaveLen(1))
 				Expect(UnknownValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{"vpc_security_group_ids": BeTrue()}))
-				Expect(AfterValuesForType(plan, "aws_security_group")).To(MatchKeys(IgnoreExtras, Keys{"name": Equal("csb-mssql-test-sg"), "vpc_id": Equal(validVPC)}))
+				Expect(AfterValuesForType(plan, "aws_security_group")).To(MatchKeys(IgnoreExtras, Keys{"name": Equal("csb-mssql-test-sg"), "vpc_id": Equal(awsVPCID)}))
 			})
 		})
 
@@ -435,7 +433,7 @@ func testTerraformMssql(region string) {
 
 		When("invalid security group ids passed", func() {
 			It("should fail and return a descriptive error message", func() {
-				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_vpc_security_group_ids": "THESE,SECURITY-GROUPS,DONT-EXIST", "aws_vpc_id": validVPC}))
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"rds_vpc_security_group_ids": "THESE,SECURITY-GROUPS,DONT-EXIST", "aws_vpc_id": awsVPCID}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				Expect(session).To(gbytes.Say(`the specified security groups don't exist or don't correspond to the specified vpc \(1\)`))
@@ -698,13 +696,13 @@ func testTerraformMssql(region string) {
 			It("works as expected", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
 					"performance_insights_enabled":          true,
-					"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+					"performance_insights_kms_key_id":       "arn:aws:kms:" + awsRegion + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 					"performance_insights_retention_period": 93,
 				}))
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"performance_insights_enabled":          BeTrue(),
-						"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
+						"performance_insights_kms_key_id":       Equal("arn:aws:kms:" + awsRegion + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 						"performance_insights_retention_period": BeNumerically("==", 93),
 					}),
 				)
@@ -715,7 +713,7 @@ func testTerraformMssql(region string) {
 			It("causes kms_key_id and retention_period to be ignored", func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
 					"performance_insights_enabled":          false,
-					"performance_insights_kms_key_id":       "arn:aws:kms:" + region + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
+					"performance_insights_kms_key_id":       "arn:aws:kms:" + awsRegion + ":649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 					"performance_insights_retention_period": 93,
 				}))
 				Expect(maps.Keys(AfterValuesForType(plan, "aws_db_instance").(map[string]any))).To(
@@ -785,7 +783,7 @@ func testTerraformMssql(region string) {
 					"enable_export_error_logs":                     true,
 					"cloudwatch_agent_log_group_retention_in_days": 1,
 					"cloudwatch_error_log_group_retention_in_days": 1,
-					"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+					"cloudwatch_log_groups_kms_key_id":             "arn:aws:kms:" + awsRegion + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 				}))
 			})
 
@@ -801,14 +799,14 @@ func testTerraformMssql(region string) {
 				Expect(GroupAfterValuesForType(plan, "aws_cloudwatch_log_group")).To(
 					ConsistOf(
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + awsRegion + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-mssql-test/agent"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
 							"tags":              MatchKeys(IgnoreExtras, Keys{"label1": Equal("value1")}),
 						}),
 						MatchKeys(IgnoreExtras, Keys{
-							"kms_key_id":        Equal("arn:aws:kms:" + region + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+							"kms_key_id":        Equal("arn:aws:kms:" + awsRegion + ":xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 							"name":              Equal("/aws/rds/instance/csb-mssql-test/error"),
 							"retention_in_days": BeNumerically("==", 1),
 							"skip_destroy":      BeFalse(),
@@ -908,7 +906,7 @@ func testTerraformMssql(region string) {
 			})
 		})
 	})
-}
+})
 
 // createVPCWithMoreThan20Subnets creates some VPC, subnet, and RDS subnet groups required by some tests
 // NOTE: when added this proved controversial because ideally these Terraform tests should not actually
