@@ -8,8 +8,8 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/config v1.26.6
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.16
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.145.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.68.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.146.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.69.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cloudfoundry/cloud-service-broker v0.21.5
 	github.com/hashicorp/terraform-json v0.21.0
