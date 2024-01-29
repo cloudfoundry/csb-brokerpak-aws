@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.16
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.27.0
 	github.com/aws/smithy-go v1.19.0
-	github.com/cloudfoundry/cloud-service-broker v0.21.4
+	github.com/cloudfoundry/cloud-service-broker v0.21.5
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.31.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/onsi/ginkgo/v2 v2.15.0
@@ -76,7 +76,7 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	github.com/zclconf/go-cty v1.14.1 // indirect
+	github.com/zclconf/go-cty v1.14.2 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/mod v0.14.0 // indirect
