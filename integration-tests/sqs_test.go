@@ -1,0 +1,156 @@
+package integration_test
+
+import (
+	"fmt"
+
+	testframework "github.com/cloudfoundry/cloud-service-broker/brokerpaktestframework"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gstruct"
+)
+
+const (
+	sqsServiceID                  = "2198d694-bf85-11ee-a918-a7bdfa69a96d"
+	sqsServiceName                = "csb-aws-sqs"
+	sqsServiceDescription         = "CSB AWS SQS"
+	sqsServiceDisplayName         = "CSB AWS SQS"
+	sqsServiceSupportURL          = "https://aws.amazon.com/sqs/"
+	sqsServiceProviderDisplayName = "VMware"
+	sqsCustomStandardPlanName     = "custom-standard"
+	sqsCustomStandardPlanID       = "4c206ad6-bf89-11ee-8900-2f8e8940fc0d"
+)
+
+var customSQSPlans = []map[string]any{
+	customSQSPlan,
+}
+
+var customSQSPlan = map[string]any{
+	"name":        sqsCustomStandardPlanName,
+	"id":          sqsCustomStandardPlanID,
+	"description": "Custom SQS standard queue plan",
+	"metadata": map[string]any{
+		"displayName": "custom-standard",
+	},
+}
+
+var _ = Describe("SQS", Label("SQS"), func() {
+	BeforeEach(func() {
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
+
+		DeferCleanup(func() {
+			Expect(mockTerraform.Reset()).To(Succeed())
+		})
+	})
+
+	It("should publish AWS SQS in the catalog", func() {
+		catalog, err := broker.Catalog()
+		Expect(err).NotTo(HaveOccurred())
+
+		service := testframework.FindService(catalog, sqsServiceName)
+		Expect(service.ID).To(Equal(sqsServiceID))
+		Expect(service.Description).To(Equal(sqsServiceDescription))
+		Expect(service.Tags).To(ConsistOf("aws", "sqs", "beta"))
+		Expect(service.Metadata.DisplayName).To(Equal(sqsServiceDisplayName))
+		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
+		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
+		Expect(service.Metadata.SupportUrl).To(Equal(sqsServiceSupportURL))
+		Expect(service.Metadata.ProviderDisplayName).To(Equal(sqsServiceProviderDisplayName))
+		Expect(service.Plans).To(
+			ConsistOf(
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal(sqsCustomStandardPlanName),
+					ID:   Equal(sqsCustomStandardPlanID),
+				}),
+			),
+		)
+	})
+
+	Describe("provisioning", func() {
+		DescribeTable("property constraints",
+			func(params map[string]any, expectedErrorMsg string) {
+				_, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, params)
+
+				Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
+			},
+			Entry(
+				"invalid region",
+				map[string]any{"region": "-Asia-northeast1"},
+				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
+			),
+		)
+
+		It("should provision a plan", func() {
+			instanceID, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
+						"pcf-instance-id": Equal(instanceID),
+						"key1":            Equal("value1"),
+						"key2":            Equal("value2"),
+					})),
+					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-sqs-%s", instanceID)),
+					HaveKeyWithValue("region", fakeRegion),
+					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
+					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
+				),
+			)
+		})
+
+		It("should allow properties to be set on provision", func() {
+			_, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, map[string]any{
+				"region":                "africa-north-4",
+				"aws_access_key_id":     "fake-aws-access-key-id",
+				"aws_secret_access_key": "fake-aws-secret-access-key",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("region", "africa-north-4"),
+					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
+					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
+				),
+			)
+		})
+	})
+
+	Describe("updating instance", func() {
+		var instanceID string
+
+		BeforeEach(func() {
+			var err error
+			instanceID, err = broker.Provision(sqsServiceName, sqsCustomStandardPlanName, nil)
+
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		DescribeTable("should prevent updating properties flagged as `prohibit_update` because it can result in the recreation of the service instance",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, sqsServiceName, sqsCustomStandardPlanName, map[string]any{prop: value})
+
+				Expect(err).To(MatchError(
+					ContainSubstring(
+						"attempt to update parameter that may result in service instance re-creation and data loss",
+					),
+				))
+
+				const initialProvisionInvocation = 1
+				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
+			},
+			Entry("update region", "region", "no-matter-what-region"),
+		)
+
+		DescribeTable(
+			"some allowed updates",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, sqsServiceName, sqsCustomStandardPlanName, map[string]any{prop: value})
+
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry(nil, "aws_access_key_id", "fake-aws-access-key-id"),
+			Entry(nil, "aws_secret_access_key", "fake-aws-secret-access-key"),
+		)
+	})
+})
