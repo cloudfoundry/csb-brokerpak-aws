@@ -1,0 +1,59 @@
+version: 1
+name: csb-aws-sqs
+id: 2198d694-bf85-11ee-a918-a7bdfa69a96d
+description: CSB AWS SQS
+display_name: CSB AWS SQS
+image_url: file://service-images/csb.png
+documentation_url: https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html
+provider_display_name: VMware
+support_url: https://aws.amazon.com/sqs/
+tags: [aws, sqs, beta]
+plan_updateable: true
+provision:
+  user_inputs:
+    - field_name: region
+      type: string
+      details: The region of AWS.
+      default: us-west-2
+      constraints:
+        examples:
+          - us-west-2
+          - eu-west-1
+        pattern: ^[a-z][a-z0-9-]+$
+      prohibit_update: true
+    - field_name: aws_access_key_id
+      type: string
+      details: AWS access key
+      default: ${config("aws.access_key_id")}
+    - field_name: aws_secret_access_key
+      type: string
+      details: AWS secret key
+      default: ${config("aws.secret_access_key")}
+  computed_inputs:
+    - name: instance_name
+      default: csb-sqs-${request.instance_id}
+      overwrite: true
+      type: string
+    - name: labels
+      default: ${json.marshal(request.default_labels)}
+      overwrite: true
+      type: object
+  template_refs:
+    main: terraform/sqs/provision/main.tf
+    outputs: terraform/sqs/provision/outputs.tf
+    provider: terraform/sqs/provision/providers.tf
+    versions: terraform/sqs/provision/versions.tf
+    variables: terraform/sqs/provision/variables.tf
+  outputs:
+    - field_name: arn
+      type: string
+      details: ARN for the queue
+    - field_name: url
+      type: string
+      details: URL for the queue
+    - field_name: name
+      type: string
+      details: name for the queue
+    - field_name: region
+      type: string
+      details: AWS region for the queue
