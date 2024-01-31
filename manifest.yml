@@ -57,6 +57,7 @@ service_definitions:
 - aws-aurora-postgresql.yml
 - aws-aurora-mysql.yml
 - aws-mssql.yml
+- aws-sqs.yml
 
 
 
