@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+variable "aws_access_key_id" {
+  type      = string
+  sensitive = true
+}
+
+variable "aws_secret_access_key" {
+  type      = string
+  sensitive = true
+}
+variable "region" { type = string }
 variable "dynamodb_table_arn" { type = string }
 variable "dynamodb_table_id" { type = string }
 variable "user_name" { type = string }
