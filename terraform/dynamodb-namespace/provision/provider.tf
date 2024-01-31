@@ -1,6 +1,3 @@
-variable "aws_access_key_id" { type = string }
-variable "aws_secret_access_key" { type = string }
-
 provider "aws" {
   region     = var.region
   access_key = var.aws_access_key_id

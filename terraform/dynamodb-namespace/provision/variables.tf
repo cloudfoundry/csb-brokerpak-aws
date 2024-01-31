@@ -11,6 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+variable "aws_access_key_id" {
+  type      = string
+  sensitive = true
+}
 
+variable "aws_secret_access_key" {
+  type      = string
+  sensitive = true
+}
 variable "prefix" { type = string }
 variable "region" { type = string }
