@@ -2,23 +2,8 @@
 
 GO-VERSION = 1.22.0
 GO-VER = go$(GO-VERSION)
-GO_OK :=  $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; echo $$?))
-DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
-ifeq ($(GO_OK), 0)
   GO = go
   GOFMT = gofmt
-else ifeq ($(DOCKER_OK), 0)
-  GO_DOCKER_OPTS = --rm \
-  		-v $(PWD)/../..:/src \
-  		--workdir /src/providers/terraform-provider-csbmajorengineversion \
-  		--network=host \
-  		-e AWS_ACCESS_KEY_ID \
-		-e AWS_SECRET_ACCESS_KEY
-  GO = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) go
-  GOFMT = docker run $(GO_DOCKER_OPTS) golang:$(GO-VERSION) gofmt
-else
-  $(error either Go or Docker must be installed)
-endif
 
 VERSION = 1.0.0
 

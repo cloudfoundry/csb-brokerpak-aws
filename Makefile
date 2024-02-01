@@ -12,16 +12,11 @@ GO-VER = go$(GO-VERSION)
 CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
 CSB_RELEASE_VERSION := $(CSB_VERSION) # this doesnt work well if we did make latest-csb.
 
-CSB_DOCKER_IMAGE := $(or $(CSB), cfplatformeng/csb:$(CSB_VERSION))
-GO_OK := $(or $(USE_GO_CONTAINERS), $(shell which go 1>/dev/null 2>/dev/null; echo $$?))
-DOCKER_OK := $(shell which docker 1>/dev/null 2>/dev/null; echo $$?)
-
 ####### broker environment variables
 SECURITY_USER_NAME := $(or $(SECURITY_USER_NAME), aws-broker)
 SECURITY_USER_PASSWORD := $(or $(SECURITY_USER_PASSWORD), aws-broker-pw)
 GSB_PROVISION_DEFAULTS := $(or $(GSB_PROVISION_DEFAULTS), {"aws_vpc_id": "$(AWS_PAS_VPC_ID)"})
 
-ifeq ($(GO_OK), 0)  # use local go binary
 GO=go
 GOFMT=gofmt
 BROKER_GO_OPTS=PORT=8080 \
@@ -47,42 +42,6 @@ PAK_PATH=$(PWD)
 RUN_CSB=$(BROKER_GO_OPTS) go run github.com/cloudfoundry/cloud-service-broker
 LDFLAGS="-X github.com/cloudfoundry/cloud-service-broker/utils.Version=$(CSB_VERSION)"
 GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker"
-else ifeq ($(DOCKER_OK), 0)
-BROKER_DOCKER_OPTS=--rm -v $(PAK_BUILD_CACHE_PATH):$(PAK_BUILD_CACHE_PATH) -v $(PWD):/brokerpak -w /brokerpak --network=host  \
-    -p 8080:8080 \
-		-e SECURITY_USER_NAME \
-		-e SECURITY_USER_PASSWORD \
-		-e AWS_ACCESS_KEY_ID \
-		-e AWS_SECRET_ACCESS_KEY \
-		-e "DB_TYPE=sqlite3" \
-		-e "DB_PATH=/tmp/csb-db" \
-		-e BROKERPAK_UPDATES_ENABLED \
-		-e PAK_BUILD_CACHE_PATH=$(PAK_BUILD_CACHE_PATH) \
-		-e GSB_PROVISION_DEFAULTS \
-		-e GSB_SERVICE_CSB_AWS_S3_BUCKET_PLANS \
-		-e GSB_SERVICE_CSB_AWS_POSTGRESQL_PLANS \
-		-e GSB_SERVICE_CSB_AWS_AURORA_POSTGRESQL_PLANS \
-		-e GSB_SERVICE_CSB_AWS_AURORA_MYSQL_PLANS \
-		-e GSB_SERVICE_CSB_AWS_MYSQL_PLANS \
-		-e GSB_SERVICE_CSB_AWS_REDIS_PLANS \
-		-e GSB_SERVICE_CSB_AWS_SQS_PLANS \
-		-e GSB_COMPATIBILITY_ENABLE_BETA_SERVICES
-
-RUN_CSB=docker run $(BROKER_DOCKER_OPTS) $(CSB_DOCKER_IMAGE)
-
-#### running go inside a container, this is for integration tests and push-broker
-# path inside the container
-PAK_PATH=/brokerpak
-
-GO_DOCKER_OPTS=--rm -v $(PAK_BUILD_CACHE_PATH):$(PAK_BUILD_CACHE_PATH) -v $(PWD):/brokerpak -w /brokerpak --network=host
-GO=docker run $(GO_DOCKER_OPTS) golang:latest go
-GOFMT=docker run $(GO_DOCKER_OPTS) golang:latest gofmt
-
-# this doesnt work well if we did make latest-csb. We should build it instead, with go inside a container.
-GET_CSB="wget -O cloud-service-broker https://github.com/cloudfoundry/cloud-service-broker/releases/download/v$(CSB_RELEASE_VERSION)/cloud-service-broker.linux && chmod +x cloud-service-broker"
-else
-$(error either Go or Docker must be installed)
-endif
 
 ###### Targets ################################################################
 
