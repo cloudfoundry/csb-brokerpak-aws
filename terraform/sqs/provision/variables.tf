@@ -10,3 +10,4 @@ variable "region" { type = string }
 
 variable "instance_name" { type = string }
 variable "labels" { type = map(any) }
+variable "fifo" { type = bool }
