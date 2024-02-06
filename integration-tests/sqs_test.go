@@ -18,18 +18,26 @@ const (
 	sqsServiceProviderDisplayName = "VMware"
 	sqsCustomStandardPlanName     = "custom-standard"
 	sqsCustomStandardPlanID       = "4c206ad6-bf89-11ee-8900-2f8e8940fc0d"
+	sqsCustomFIFOPlanName         = "custom-fifo"
+	sqsCustomFIFOPlanID           = "720feea2-c1bd-11ee-82ff-e3c9f193c356"
 )
 
 var customSQSPlans = []map[string]any{
-	customSQSPlan,
-}
-
-var customSQSPlan = map[string]any{
-	"name":        sqsCustomStandardPlanName,
-	"id":          sqsCustomStandardPlanID,
-	"description": "Custom SQS standard queue plan",
-	"metadata": map[string]any{
-		"displayName": "custom-standard",
+	{
+		"name":        sqsCustomStandardPlanName,
+		"id":          sqsCustomStandardPlanID,
+		"description": "Custom SQS standard queue plan",
+		"metadata": map[string]any{
+			"displayName": "custom-standard",
+		},
+	},
+	{
+		"name":        sqsCustomFIFOPlanName,
+		"id":          sqsCustomFIFOPlanID,
+		"description": "Custom SQS FIFO queue plan",
+		"metadata": map[string]any{
+			"displayName": "custom-fifo",
+		},
 	},
 }
 
@@ -55,14 +63,16 @@ var _ = Describe("SQS", Label("SQS"), func() {
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
 		Expect(service.Metadata.SupportUrl).To(Equal(sqsServiceSupportURL))
 		Expect(service.Metadata.ProviderDisplayName).To(Equal(sqsServiceProviderDisplayName))
-		Expect(service.Plans).To(
-			ConsistOf(
-				MatchFields(IgnoreExtras, Fields{
-					Name: Equal(sqsCustomStandardPlanName),
-					ID:   Equal(sqsCustomStandardPlanID),
-				}),
-			),
-		)
+		Expect(service.Plans).To(ConsistOf(
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal(sqsCustomStandardPlanName),
+				ID:   Equal(sqsCustomStandardPlanID),
+			}),
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal(sqsCustomFIFOPlanName),
+				ID:   Equal(sqsCustomFIFOPlanID),
+			}),
+		))
 	})
 
 	Describe("provisioning", func() {
@@ -79,7 +89,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			),
 		)
 
-		It("should provision a plan", func() {
+		It("should provision a queue", func() {
 			instanceID, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, nil)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -91,6 +101,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 						"key2":            Equal("value2"),
 					})),
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-sqs-%s", instanceID)),
+					HaveKeyWithValue("fifo", BeFalse()),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
@@ -101,6 +112,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, map[string]any{
 				"region":                "africa-north-4",
+				"fifo":                  true,
 				"aws_access_key_id":     "fake-aws-access-key-id",
 				"aws_secret_access_key": "fake-aws-secret-access-key",
 			})
@@ -109,6 +121,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("region", "africa-north-4"),
+					HaveKeyWithValue("fifo", BeTrue()),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 				),
@@ -140,6 +153,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
 			Entry("update region", "region", "no-matter-what-region"),
+			Entry("update fifo", "fifo", true),
 		)
 
 		DescribeTable(
