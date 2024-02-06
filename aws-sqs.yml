@@ -21,6 +21,11 @@ provision:
           - eu-west-1
         pattern: ^[a-z][a-z0-9-]+$
       prohibit_update: true
+    - field_name: fifo
+      type: boolean
+      details: Whether to create a FIFO queue. Cannot be altered once a queue is created.
+      prohibit_update: true
+      default: false
     - field_name: aws_access_key_id
       type: string
       details: AWS access key
