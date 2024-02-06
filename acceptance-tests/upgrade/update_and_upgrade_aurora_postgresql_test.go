@@ -27,13 +27,11 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 				services.WithPlan("default"),
 				services.WithParameters(
 					map[string]any{
-						"engine_version":          "13.10",
+						"engine_version":          "13",
 						"cluster_instances":       1,
 						"serverless_min_capacity": 0.5,
-						"serverless_max_capacity": 2,
+						"serverless_max_capacity": 4,
 						"instance_class":          "db.serverless",
-
-						"auto_minor_version_upgrade": false,
 					}),
 				services.WithBroker(serviceBroker),
 			)
@@ -74,15 +72,9 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
-			By("updating the instance plan")
-			// It applies changes in Terraform:
-			// apply_immediately = true
-			// changes the lifecycle of the resource aws_rds_cluster_parameter_group
-			// when the new resource aws_rds_cluster_parameter_group is created and the changes are applied immediately,
-			// we can upgrade the version
+			By("updating the instance version")
 			serviceInstance.Update(services.WithParameters(map[string]any{
-				"engine_version":             "13.11",
-				"auto_minor_version_upgrade": false,
+				"engine_version": "14",
 			}))
 
 			By("checking previously written data still accessible")
