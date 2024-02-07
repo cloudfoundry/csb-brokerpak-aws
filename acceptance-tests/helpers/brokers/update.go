@@ -3,10 +3,11 @@ package brokers
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
+	"slices"
 )
 
 func (b *Broker) UpdateBroker(dir string, env ...apps.EnvVar) {
-	WithEnv(append(b.latestEnv(), env...)...)(b)
+	b.envExtras = slices.Concat(b.envExtras, b.latestEnv(), env)
 
 	b.app.Push(
 		apps.WithName(b.Name),
