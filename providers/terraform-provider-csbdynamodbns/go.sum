@@ -47,8 +47,8 @@ github.com/bwesterb/go-ristretto v1.2.3/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7N
 github.com/cloudflare/circl v1.3.3/go.mod h1:5XYMA4rFBvNIrhs50XuiBJ15vF2pZn4nnUKZrLbUZFA=
 github.com/cloudflare/circl v1.3.7 h1:qlCDlTPz2n9fu58M0Nh1J/JzcFpfgkFHHX3O35r5vcU=
 github.com/cloudflare/circl v1.3.7/go.mod h1:sRTcRWXGLrKw6yIGJ+l7amYJFfAXbZG0kBSc8r4zxgA=
-github.com/cloudfoundry/cloud-service-broker v0.21.5 h1:zC23BUG5uB1aLzoRIb1WogjTkVsQ2jWOqRvLCFauPv8=
-github.com/cloudfoundry/cloud-service-broker v0.21.5/go.mod h1:Zdj+GpwM7YeGI/IIUlZqjMdIF58d7/FytdZHLOgNxSM=
+github.com/cloudfoundry/cloud-service-broker v0.21.8 h1:N8DhHGmkRWPG7rPHmqP7lAT0x2i93S0o4nxozLS0OKU=
+github.com/cloudfoundry/cloud-service-broker v0.21.8/go.mod h1:CQT+O5wJgDut7zNli7gooY3xVs33BCc6AYt3TF6dhf8=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/cyphar/filepath-securejoin v0.2.4 h1:Ugdm7cg7i6ZK6x3xDF1oEu1nfkyfH53EtKeQYTC3kyg=
 github.com/cyphar/filepath-securejoin v0.2.4/go.mod h1:aPGpWjXOXUn2NCNjFvBE6aRxGGx79pTxQpKOJNYHHl4=
