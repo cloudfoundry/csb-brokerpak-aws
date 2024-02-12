@@ -53,12 +53,12 @@ provision:
     - field_name: arn
       type: string
       details: ARN for the queue
-    - field_name: url
-      type: string
-      details: URL for the queue
-    - field_name: name
-      type: string
-      details: name for the queue
     - field_name: region
       type: string
       details: AWS region for the queue
+    - field_name: queue_name
+      type: string
+      details: name for the queue
+    - field_name: queue_url
+      type: string
+      details: URL for the queue
