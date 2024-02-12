@@ -1,7 +1,5 @@
 .DEFAULT_GOAL = help
 
-GO-VERSION = 1.22.0
-GO-VER = go$(GO-VERSION)
   GO = go
   GOFMT = gofmt
 
@@ -14,10 +12,10 @@ help: ## list Makefile targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test
-test: version download checkfmt checkimports vet ginkgo ## run all build, static analysis, and test steps
+test: download checkfmt checkimports vet ginkgo ## run all build, static analysis, and test steps
 
 .PHONY: build
-build: version download checkfmt checkimports vet ../build/cloudfoundry.org ## build the provider
+build: download checkfmt checkimports vet ../build/cloudfoundry.org ## build the provider
 
 ../build/cloudfoundry.org: *.go */*.go
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64
@@ -70,10 +68,3 @@ ginkgo-coverage: ## ginkgo tests coverage score
 generate: ## generate test fakes
 	cd csbdynamodbns; $(GO) generate; cd ..
 
-.PHONY: version
-version:
-	@@$(GO) version
-	@@if [ "$$(${GO} version | awk '{print $$3}')" != "${GO-VER}" ]; then \
-		echo "Go version does not match: expected: ${GO-VER}, got $$(${GO} version | awk '{print $$3}')"; \
-		exit 1; \
-	fi
