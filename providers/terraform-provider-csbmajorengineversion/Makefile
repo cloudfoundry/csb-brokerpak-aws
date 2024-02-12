@@ -1,7 +1,5 @@
 .DEFAULT_GOAL = help
 
-GO-VERSION = 1.22.0
-GO-VER = go$(GO-VERSION)
   GO = go
   GOFMT = gofmt
 
@@ -12,10 +10,10 @@ help: ## list Makefile targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test
-test: version download checkfmt checkimports vet ginkgo ## run all build, static analysis, and test steps
+test: download checkfmt checkimports vet ginkgo ## run all build, static analysis, and test steps
 
 .PHONY: build
-build: version download checkfmt checkimports vet build_binaries_in_cloudfoundry_namespace ## build the provider
+build: download checkfmt checkimports vet build_binaries_in_cloudfoundry_namespace ## build the provider
 
 
 .PHONY: build_binaries_in_cloudfoundry_namespace
@@ -60,11 +58,3 @@ ginkgo: ## run the tests with Ginkgo
 ginkgo-coverage: ## ginkgo tests coverage score
 	go test -coverprofile=/tmp/csbmajorengineversion-coverage.out ./...
 	go tool cover -func /tmp/csbmajorengineversion-coverage.out | grep total
-
-.PHONY: version
-version:
-	@@$(GO) version
-	@@if [ "$$(${GO} version | awk '{print $$3}')" != "${GO-VER}" ]; then \
-		echo "Go version does not match: expected: ${GO-VER}, got $$(${GO} version | awk '{print $$3}')"; \
-		exit 1; \
-	fi
