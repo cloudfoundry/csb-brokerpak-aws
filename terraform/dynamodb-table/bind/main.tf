@@ -12,19 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "aws_iam_user" "user" {
-  name = var.user_name
-  path = "/cf/"
+resource "aws_iam_role" "new_role" {
+  count = length(var.role_name) == 0 ? 1 : 0
+
+  path               = "/cf/"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-resource "aws_iam_access_key" "access_key" {
-  user = aws_iam_user.user.name
+resource "aws_iam_role_policy" "add_allow_dynamodb_policy" {
+  role   = local.binding_role.name
+  policy = data.aws_iam_policy_document.dynamo_access.json
 }
 
-resource "aws_iam_user_policy" "user_policy" {
-  name = format("%s-p", var.user_name)
-
-  user = aws_iam_user.user.name
-
-  policy = data.aws_iam_policy_document.user_policy.json
-}

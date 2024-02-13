@@ -13,13 +13,14 @@
 # limitations under the License.
 
 output "access_key_id" {
-  value     = aws_iam_access_key.access_key.id
+  value     = local.binding_role.arn
   sensitive = true
 }
 output "secret_access_key" {
-  value     = aws_iam_access_key.access_key.secret
+  value     = random_password.source_identity.result
   sensitive = true
 }
 output "dynamodb_table_arn" { value = var.dynamodb_table_arn }
 output "dynamodb_table_id" { value = var.dynamodb_table_arn }
 output "region" { value = var.region }
+output "creds_endpoint" { value = var.creds_endpoint }

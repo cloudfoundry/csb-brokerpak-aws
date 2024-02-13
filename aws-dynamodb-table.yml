@@ -131,6 +131,24 @@ provision:
     type: string
     details: VPC ID for instance
     default: ""
+  - field_name: iam_arn
+    type: string
+    prohibit_update: true
+    required: true
+    default: ""
+    details: An existing IAM user with permission to 'assumerole' the specified `role_name`.
+  - field_name: role_name
+    type: string
+    prohibit_update: true
+    default: ""
+    details: |
+      If an existing role is passed, a new policy condition will be added to it.
+      If empty, a new role for each binding will be created.
+  - field_name: creds_endpoint
+    type: string
+    required: true
+    prohibit_update: true
+    details: The endpoint for fetching the binding creds
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -159,6 +177,17 @@ provision:
   - field_name: region
     type: string
     details: AWS region for the bucket
+  - field_name: iam_arn
+    type: string
+    details: An existing IAM user with permission to 'assumerole' the specified `role_name`.
+  - field_name: role_name
+    type: string
+    details: |
+      If an existing role is passed, a new policy condition will be added to it.
+      If empty, a new role for each binding will be created.
+  - field_name: creds_endpoint
+    type: string
+    details: The endpoint for fetching the binding creds
 bind:
   plan_inputs: []
   user_inputs:
@@ -183,14 +212,22 @@ bind:
     type: string
     default: ${instance.details["dynamodb_table_name"]}
     overwrite: true
-  - name: user_name
-    default: csb-${request.binding_id}
-    overwrite: true
-    type: string
   - name: region
     default: ${instance.details["region"]}
     overwrite: true
     type: string
+  - name: iam_arn
+    type: string
+    default: ${instance.details["iam_arn"]}
+    overwrite: true
+  - name: role_name
+    type: string
+    default: ${instance.details["role_name"]}
+    overwrite: true
+  - name: creds_endpoint
+    type: string
+    default: ${instance.details["creds_endpoint"]}
+    overwrite: true
   template_refs:
     data: terraform/dynamodb-table/bind/data.tf
     main: terraform/dynamodb-table/bind/main.tf
@@ -211,9 +248,15 @@ bind:
   - field_name: secret_access_key
     type: string
     details: AWS secret access key
+  - field_name: creds_endpoint
+    type: string
+    details: The endpoint for fetching the binding creds
   - field_name: region
     type: string
     details: AWS region for the bucket
+  - field_name: creds_endpoint
+    type: string
+    details: The endpoint for fetching the binding creds
 examples:
 - name: ondemand
   description: Create a dynamodb instance
