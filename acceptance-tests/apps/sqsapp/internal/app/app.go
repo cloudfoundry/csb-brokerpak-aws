@@ -1,9 +1,11 @@
+// Package app provides functionality for receiving messages from an SQS queue.
 package app
 
 import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"sqsapp/internal/credentials"
 )
 

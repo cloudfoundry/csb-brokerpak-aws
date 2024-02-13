@@ -63,10 +63,9 @@ func (c Credentials) validate() error {
 		}
 	}
 
-	switch len(invalid) {
-	case 0:
-		return nil
-	default:
+	if len(invalid) > 0 {
 		return fmt.Errorf("parsed credentials are not valid, missing: %s", strings.Join(invalid, ", "))
 	}
+
+	return nil
 }

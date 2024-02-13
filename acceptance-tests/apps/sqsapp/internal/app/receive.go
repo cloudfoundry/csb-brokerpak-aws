@@ -3,6 +3,9 @@ package app
 import (
 	"log"
 	"net/http"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+
 	"sqsapp/internal/credentials"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -45,8 +48,8 @@ func handleReceive(creds credentials.Credentials) http.HandlerFunc {
 
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(*message.Body))
+		w.Write([]byte(aws.ToString(message.Body)))
 
-		log.Printf("Message %q received.\n", *message.Body)
+		log.Printf("Message %q received.\n", aws.ToString(message.Body))
 	}
 }

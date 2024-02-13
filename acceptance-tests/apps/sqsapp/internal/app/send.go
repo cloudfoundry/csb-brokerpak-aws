@@ -5,6 +5,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+
 	"sqsapp/internal/credentials"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -37,7 +40,7 @@ func handleSend(creds credentials.Credentials) http.HandlerFunc {
 			return
 		}
 
-		id := *output.MessageId
+		id := aws.ToString(output.MessageId)
 
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
