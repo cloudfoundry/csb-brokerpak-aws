@@ -22,7 +22,7 @@
         - Configure each standard queue to point to the same DLQ.
         - Adjust visibility timeouts and retry policies according to the workload.
         - Monitor and manage DLQ to prevent overaccumulation of messages.
-    - **Policy Example**: [see example here](#sqs-dlq-policy-example)
+    - **Policy Example**: see example below for more context about permissions and actions associated with a queue
 
 - **Comparison between a DLQ used by multiple queues vs one queue**:
   - **Single Queue**: 
@@ -42,7 +42,7 @@
 
 
 - **SQS DLQ Policy Example**:
-  - **Principal**: "*". We can adjust the Principal section to include specific user IDs, roles, or AWS services.
+  - **Principal**: "*". We could adjust the Principal section to include specific user IDs, roles, or AWS services.
   - **Condition**:
     - **SourceArn**: ARN of the source queues
   - **Objective**: This policy allows sourceQueue1 and sourceQueue2 to send messages to the DLQ.
@@ -77,6 +77,9 @@
               "maxReceiveCount": 5
             }
             ```
+  - In the examples below **we change the indirection** by creating a user who can execute actions on one or several
+  queues, that is, the policy is associated with the user created.
+
 - **Analyze Terraform and/or GoLang code for a more in-depth view**:
   - **One Standard Queue To One DLQ Example**: [See code here](./dlq_one_to_one/README.md)
   - **Two Standard Queues To One DLQ Example**: [See code here](./dlq_many_to_one/README.md)
