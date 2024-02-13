@@ -64,16 +64,14 @@ provision:
       details: URL for the queue
 bind:
   plan_inputs: []
-  user_inputs:
-    - field_name: aws_access_key_id
-      type: string
-      details: AWS access key
-      default: ${config("aws.access_key_id")}
-    - field_name: aws_secret_access_key
-      type: string
-      details: AWS secret key
-      default: ${config("aws.secret_access_key")}
+  user_inputs: []
   computed_inputs:
+    - name: aws_access_key_id
+      type: string
+      default: ${config("aws.access_key_id")}
+    - name: aws_secret_access_key
+      type: string
+      default: ${config("aws.secret_access_key")}
     - name: arn
       default: ${instance.details["arn"]}
       overwrite: true
