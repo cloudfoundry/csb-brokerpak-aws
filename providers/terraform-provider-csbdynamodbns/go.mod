@@ -14,7 +14,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.15.0
 	github.com/onsi/gomega v1.31.1
 	github.com/pborman/uuid v1.2.1
-	golang.org/x/tools v0.17.0
+	golang.org/x/tools v0.18.0
 	honnef.co/go/tools v0.4.6
 )
 
@@ -79,7 +79,7 @@ require (
 	github.com/zclconf/go-cty v1.14.2 // indirect
 	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
-	golang.org/x/mod v0.14.0 // indirect
+	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
