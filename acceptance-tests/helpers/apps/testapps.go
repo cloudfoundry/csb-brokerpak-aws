@@ -7,16 +7,16 @@ import (
 type AppCode string
 
 const (
-	MySQL               AppCode = "mysqlapp"
-	PostgreSQL          AppCode = "postgresqlapp"
-	Redis               AppCode = "redisapp"
-	S3                  AppCode = "s3app"
-	MSSQL               AppCode = "mssqlapp"
-	DynamoDBTable       AppCode = "dynamodbtableapp"
-	DynamoDBNamespace   AppCode = "dynamodbnsapp"
-	JDBCTestAppPostgres AppCode = "jdbctestapp/jdbctestapp-postgres-1.0.0.jar"
-	JDBCTestAppMysql    AppCode = "jdbctestapp/jdbctestapp-mysql-1.0.0.jar"
-
+	MySQL                AppCode = "mysqlapp"
+	PostgreSQL           AppCode = "postgresqlapp"
+	Redis                AppCode = "redisapp"
+	S3                   AppCode = "s3app"
+	MSSQL                AppCode = "mssqlapp"
+	DynamoDBTable        AppCode = "dynamodbtableapp"
+	DynamoDBNamespace    AppCode = "dynamodbnsapp"
+	SQS                  AppCode = "sqsapp"
+	JDBCTestAppPostgres  AppCode = "jdbctestapp/jdbctestapp-postgres-1.0.0.jar"
+	JDBCTestAppMysql     AppCode = "jdbctestapp/jdbctestapp-mysql-1.0.0.jar"
 	JDBCTestAppSQLServer AppCode = "jdbctestapp/jdbctestapp-sqlserver-1.0.0.jar"
 )
 
