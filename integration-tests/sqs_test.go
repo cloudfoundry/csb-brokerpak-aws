@@ -167,4 +167,59 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			Entry(nil, "aws_secret_access_key", "fake-aws-secret-access-key"),
 		)
 	})
+
+	Describe("bind a service ", func() {
+		It("return the bind values from terraform output", func() {
+			err := mockTerraform.SetTFState([]testframework.TFStateValue{
+				{
+					Name:  "access_key_id",
+					Type:  "string",
+					Value: "initial.access.key.id.test",
+				},
+				{
+					Name:  "secret_access_key",
+					Type:  "string",
+					Value: "initial.secret.access.key.test",
+				},
+				{
+					Name:  "region",
+					Type:  "string",
+					Value: "ap-northeast-3",
+				},
+				{
+					Name:  "arn",
+					Type:  "string",
+					Value: "arn:aws:sqs::ap-northeast-3::example",
+				},
+				{
+					Name:  "queue_name",
+					Type:  "string",
+					Value: "example_name",
+				},
+				{
+					Name:  "queue_url",
+					Type:  "string",
+					Value: "example_url",
+				},
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			instanceID, err := broker.Provision(sqsServiceName, sqsCustomFIFOPlanName, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			bindResult, err := broker.Bind(sqsServiceName, sqsCustomFIFOPlanName, instanceID, nil)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(bindResult).To(
+				Equal(map[string]any{
+					"access_key_id":     "initial.access.key.id.test",
+					"secret_access_key": "initial.secret.access.key.test",
+					"region":            "ap-northeast-3",
+					"arn":               "arn:aws:sqs::ap-northeast-3::example",
+					"queue_name":        "example_name",
+					"queue_url":         "example_url",
+				}),
+			)
+		})
+	})
 })
