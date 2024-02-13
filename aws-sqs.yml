@@ -62,3 +62,39 @@ provision:
     - field_name: queue_url
       type: string
       details: URL for the queue
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+    - name: aws_access_key_id
+      type: string
+      default: ${config("aws.access_key_id")}
+    - name: aws_secret_access_key
+      type: string
+      default: ${config("aws.secret_access_key")}
+    - name: arn
+      default: ${instance.details["arn"]}
+      overwrite: true
+      type: string
+    - name: region
+      default: ${instance.details["region"]}
+      overwrite: true
+      type: string
+    - name: user_name
+      default: csb-${request.binding_id}
+      overwrite: true
+      type: string
+  template_refs:
+    data: terraform/sqs/bind/data.tf
+    main: terraform/sqs/bind/main.tf
+    outputs: terraform/sqs/bind/outputs.tf
+    provider: terraform/sqs/bind/provider.tf
+    versions: terraform/sqs/bind/versions.tf
+    variables: terraform/sqs/bind/variables.tf
+  outputs:
+    - field_name: access_key_id
+      type: string
+      details: AWS access key
+    - field_name: secret_access_key
+      type: string
+      details: AWS secret access key
