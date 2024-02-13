@@ -15,20 +15,24 @@ import (
 )
 
 var (
-	awsSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
-	awsAccessKeyID     = "AWS_ACCESS_KEY_ID"
-	myQueueURL         = "MY_QUEUE_URL"
-	myQueueTwoURL      = "MY_QUEUE_TWO_URL"
-	myDlqURL           = "MY_DLQ_URL"
+	myQueueURL                           = "MY_QUEUE_URL"
+	myQueueTwoURL                        = "MY_QUEUE_TWO_URL"
+	myDlqURL                             = "MY_DLQ_URL"
+	awsUserAccessKeyIdStandardQueues     = "USER_ACCESS_KEY_ID_STANDARD_QUEUES"
+	awsUserSecretAccessKeyStandardQueues = "USER_SECRET_ACCESS_KEY_STANDARD_QUEUES"
+	awsUserAccessKeyIDDLQ                = "USER_ACCESS_KEY_ID_DLQ"
+	awsUserSecretAccessKeyDLQ            = "USER_SECRET_ACCESS_KEY_DLQ"
 )
 
 func main() {
 	var envs = map[string]string{
-		awsSecretAccessKey: "",
-		awsAccessKeyID:     "",
-		myQueueURL:         "",
-		myQueueTwoURL:      "",
-		myDlqURL:           "",
+		myQueueURL:                           "",
+		myQueueTwoURL:                        "",
+		myDlqURL:                             "",
+		awsUserAccessKeyIdStandardQueues:     "",
+		awsUserSecretAccessKeyStandardQueues: "",
+		awsUserAccessKeyIDDLQ:                "",
+		awsUserSecretAccessKeyDLQ:            "",
 	}
 
 	for k := range envs {
@@ -38,13 +42,13 @@ func main() {
 		}
 	}
 
-	c, err := config.LoadDefaultConfig(
+	cfgStandardQueues, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithCredentialsProvider(
 			aws.NewCredentialsCache(
 				credentials.NewStaticCredentialsProvider(
-					envs[awsAccessKeyID],
-					envs[awsSecretAccessKey],
+					envs[awsUserAccessKeyIdStandardQueues],
+					envs[awsUserSecretAccessKeyStandardQueues],
 					"",
 				),
 			),
@@ -56,7 +60,26 @@ func main() {
 		log.Fatalf("invalid AWS configuration %s", err.Error())
 	}
 
-	svc := sqs.NewFromConfig(c)
+	cfgDLQ, err := config.LoadDefaultConfig(
+		context.Background(),
+		config.WithCredentialsProvider(
+			aws.NewCredentialsCache(
+				credentials.NewStaticCredentialsProvider(
+					envs[awsUserAccessKeyIDDLQ],
+					envs[awsUserSecretAccessKeyDLQ],
+					"",
+				),
+			),
+		),
+		config.WithRegion("us-west-2"),
+	)
+
+	if err != nil {
+		log.Fatalf("invalid AWS configuration for DLQ %s", err.Error())
+	}
+
+	svc := sqs.NewFromConfig(cfgStandardQueues)
+	svcDLQ := sqs.NewFromConfig(cfgDLQ)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
@@ -70,7 +93,7 @@ func main() {
 	go subscriber(ctx, svc, envs[myQueueTwoURL])
 
 	// Same DLQ
-	go dlqSubscriber(ctx, svc, envs[myDlqURL])
+	go dlqSubscriber(ctx, svcDLQ, envs[myDlqURL])
 
 	<-ctx.Done()
 	switch ctx.Err() {

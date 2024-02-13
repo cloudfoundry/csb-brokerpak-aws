@@ -14,18 +14,18 @@ import (
 )
 
 var (
-	awsSecretAccessKey = "AWS_SECRET_ACCESS_KEY"
-	awsAccessKeyID     = "AWS_ACCESS_KEY_ID"
-	myQueueURL         = "MY_QUEUE_URL"
-	myDlqURL           = "MY_DLQ_URL"
+	myQueueURL          = "MY_QUEUE_URL"
+	myDlqURL            = "MY_DLQ_URL"
+	userAccessKeyID     = "USER_ACCESS_KEY_ID"
+	userSecretAccessKey = "USER_SECRET_ACCESS_KEY"
 )
 
 func main() {
 	var envs = map[string]string{
-		awsSecretAccessKey: "",
-		awsAccessKeyID:     "",
-		myQueueURL:         "",
-		myDlqURL:           "",
+		myQueueURL:          "",
+		myDlqURL:            "",
+		userAccessKeyID:     "",
+		userSecretAccessKey: "",
 	}
 
 	for k := range envs {
@@ -40,8 +40,8 @@ func main() {
 		config.WithCredentialsProvider(
 			aws.NewCredentialsCache(
 				credentials.NewStaticCredentialsProvider(
-					envs[awsAccessKeyID],
-					envs[awsSecretAccessKey],
+					envs[userAccessKeyID],
+					envs[userSecretAccessKey],
 					"",
 				),
 			),

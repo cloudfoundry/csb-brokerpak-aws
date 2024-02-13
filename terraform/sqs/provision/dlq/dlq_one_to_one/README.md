@@ -20,42 +20,17 @@ bash ./create_infra.sh
 ```
 Output:
 ```shell                        
-Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with the following symbols:
-  + create
 
-Terraform will perform the following actions:
+....
 
-  # aws_sqs_queue.my_dlq will be created
-  + resource "aws_sqs_queue" "my_dlq" {
-      ....
-      + visibility_timeout_seconds        = 30
-    }
-
-  # aws_sqs_queue.my_queue will be created
-  + resource "aws_sqs_queue" "my_queue" {
-      ...
-      + redrive_policy                    = (known after apply)
-      ...
-    }
-
-Plan: 2 to add, 0 to change, 0 to destroy.
-
-Changes to Outputs:
-  + my_dlq_url   = (known after apply)
-  + my_queue_url = (known after apply)
-aws_sqs_queue.my_dlq: Creating...
-aws_sqs_queue.my_dlq: Still creating... [10s elapsed]
-aws_sqs_queue.my_dlq: Creation complete after 27s [id=https://sqs.us-west-2.amazonaws.com/XXXXXXXX/my-dlq]
-aws_sqs_queue.my_queue: Creating...
-aws_sqs_queue.my_queue: Still creating... [10s elapsed]
-aws_sqs_queue.my_queue: Creation complete after 27s [id=https://sqs.us-west-2.amazonaws.com/XXXXXXXX/my-queue]
-
-Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
 
 Outputs:
 
 my_dlq_url = "https://sqs.us-west-2.amazonaws.com/XXXXXXXX/my-dlq"
 my_queue_url = "https://sqs.us-west-2.amazonaws.com/XXXXXXXX/my-queue"
+user_access_key_id = <sensitive>
+user_secret_access_key = <sensitive>
 
 ```
 

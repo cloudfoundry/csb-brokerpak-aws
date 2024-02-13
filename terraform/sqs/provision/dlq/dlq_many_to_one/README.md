@@ -23,21 +23,18 @@ Output:
 ....
 
 
-Plan: 3 to add, 0 to change, 0 to destroy.
-
-Changes to Outputs:
-  + my_dlq_url       = (known after apply)
-  + my_queue_two_url = (known after apply)
-  + my_queue_url     = (known after apply)
-.....
-
-Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
 
 Outputs:
 
 my_dlq_url = "https://sqs.us-west-2.amazonaws.com/XXXXXXXXX/my-dlq-several-subscribers"
 my_queue_two_url = "https://sqs.us-west-2.amazonaws.com/XXXXXXXXX/my-queue-two-several-subscribers"
 my_queue_url = "https://sqs.us-west-2.amazonaws.com/XXXXXXXXX/my-queue-several-subscribers"
+user_access_key_id_dlq = <sensitive>
+user_access_key_id_standard_queues = <sensitive>
+user_secret_access_key_dlq = <sensitive>
+user_secret_access_key_standard_queues = <sensitive>
+
 
 
 ```
