@@ -77,10 +77,15 @@
               "maxReceiveCount": 5
             }
             ```
-- **One Standard Queue To One DLQ Example**: [See code here](./dlq_one_to_one/README.md)
-- **Two Standard Queues To One DLQ Example**: [See code here](./dlq_many_to_one/README.md)
-- **Bindings in examples**:
-  - A binding is a IAM User with a key/secret and a policy.
-  - Using an AWS key/secret is no longer considered the best way to give access to an AWS resource. Legacy broker follows this approach, we replicate it for maximum compatibility.
-  - The policies are hard-coded and minimal. 
-  - The aim is that for an action that a user should do via the broker (e.g. delete the queue), that permission is not accessible via a binding.
+- **Analyze Terraform and/or GoLang code for a more in-depth view**:
+  - **One Standard Queue To One DLQ Example**: [See code here](./dlq_one_to_one/README.md)
+  - **Two Standard Queues To One DLQ Example**: [See code here](./dlq_many_to_one/README.md)
+  - **Bindings in examples**:
+    - A binding is a IAM User with a key/secret and a policy.
+    - Using an AWS key/secret is no longer considered the best way to give access to an AWS resource. Legacy broker follows this approach, we replicate it for maximum compatibility.
+    - The policies are hard-coded and minimal. 
+    - The aim is that for an action that a user should do via the broker (e.g. delete the queue), that permission is not accessible via a binding.
+
+- **Conclusion**:
+  Opting for the most pragmatic, direct and simple solution as the first iteration seems to be the 
+  right option while waiting for customer feedback and iterating towards something more sophisticated if necessary.
