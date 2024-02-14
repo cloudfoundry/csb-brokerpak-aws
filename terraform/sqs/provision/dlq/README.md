@@ -8,8 +8,8 @@
 - **Legacy Broker**: 
   - **DLQ**: No explicit mention of DLQ
   - **Sample Plan**: Empty redrive_policy
-  - **Provisioning**: Among the properties accepted by the AWS API is RedrivePolicy, therefore, if it is possible to configure the queue as DLQ.
-  - **Create Service Key**: Creates an IAM user and accepts a `policy_name`. This policy is associated with the user. So, we could configure such a poliza to have read access to the DLQ.
+  - **Provisioning**: Among the properties accepted by the AWS API is `RedrivePolicy`; therefore, it is possible to configure the queue as a DLQ.
+  - **Create Service Key**: Creates an IAM user and accepts a `policy_name`. This policy is associated with the user. Thus, we could configure such a policy to have read access to the DLQ.
 
 
 - **Is it possible to use a DLQ with multiple queues?**
