@@ -16,7 +16,7 @@
   - **Yes. Multiple standard or FIFO queues can be configured to direct their failed messages to a single DLQ.**
   - **It adds a common point of failure**
   - **It centralizes monitoring and managing errors across these queues**
-  - **It necessary consider configuration, permissions, error analysis, DLQ thresholds, scalability**:
+  - **It's necessary consider configuration, permissions, error analysis, DLQ thresholds, scalability**:
     - **Permissions and Configuration**: 
         - Ensure DLQ has appropriate IAM policies for access from multiple queues.
         - Configure each standard queue to point to the same DLQ.
