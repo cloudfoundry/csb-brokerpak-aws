@@ -32,7 +32,7 @@ resource "aws_sqs_queue" "my_dlq" {
 }
 
 resource "aws_sqs_queue" "my_queue" {
-  name           = "my-queue"
+  name = "my-queue"
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.my_dlq.arn
     maxReceiveCount     = 5
@@ -66,7 +66,7 @@ resource "aws_iam_user_policy" "user_policy" {
 
 data "aws_iam_policy_document" "user_policy" {
   statement {
-    sid     = "sqsAccess"
+    sid = "sqsAccess"
     actions = [
       "sqs:SendMessage",
       "sqs:ReceiveMessage",
@@ -80,7 +80,7 @@ data "aws_iam_policy_document" "user_policy" {
   }
 
   statement {
-    sid     = "sqsDLQAllowUserToReceiveDeletePurgeMessagesAndGetAttr"
+    sid = "sqsDLQAllowUserToReceiveDeletePurgeMessagesAndGetAttr"
     actions = [
       "sqs:ReceiveMessage",
       "sqs:DeleteMessage",

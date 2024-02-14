@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-west-2"
+  region     = "us-west-2"
   access_key = var.aws_access_key_id
   secret_key = var.aws_secret_access_key
 }
@@ -37,18 +37,18 @@ resource "aws_sqs_queue" "my_dlq" {
 }
 
 resource "aws_sqs_queue" "my_queue" {
-  name                        = "my-queue-several-subscribers"
-  redrive_policy              = jsonencode({
-    deadLetterTargetArn       = aws_sqs_queue.my_dlq.arn
-    maxReceiveCount           = 5
+  name = "my-queue-several-subscribers"
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.my_dlq.arn
+    maxReceiveCount     = 5
   })
 }
 
 resource "aws_sqs_queue" "my_queue_two" {
-  name                        = "my-queue-two-several-subscribers"
-  redrive_policy              = jsonencode({
-    deadLetterTargetArn       = aws_sqs_queue.my_dlq.arn
-    maxReceiveCount           = 5
+  name = "my-queue-two-several-subscribers"
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.my_dlq.arn
+    maxReceiveCount     = 5
   })
 }
 
@@ -84,7 +84,7 @@ resource "aws_iam_user_policy" "user_policy_standard_queues" {
 
 data "aws_iam_policy_document" "user_policy_standard_queues" {
   statement {
-    sid     = "sqsAccess"
+    sid = "sqsAccess"
     actions = [
       "sqs:SendMessage",
       "sqs:ReceiveMessage",
@@ -129,7 +129,7 @@ resource "aws_iam_user_policy" "user_policy_dlq" {
 
 data "aws_iam_policy_document" "user_policy_dlq" {
   statement {
-    sid     = "sqsDLQAllowUserToReceiveDeletePurgeMessagesAndGetAttr"
+    sid = "sqsDLQAllowUserToReceiveDeletePurgeMessagesAndGetAttr"
     actions = [
       "sqs:ReceiveMessage",
       "sqs:DeleteMessage",
