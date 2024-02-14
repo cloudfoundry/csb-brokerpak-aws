@@ -89,6 +89,9 @@
     - The policies are hard-coded and minimal. 
     - The aim is that for an action that a user should do via the broker (e.g. delete the queue), that permission is not accessible via a binding.
 
+- **GitHub Terraform module**: [terraform-aws-sql](https://github.com/terraform-aws-modules/terraform-aws-sqs)
+  The Terraform module follows a similar approach, as seen in the examples, but it dynamically configures resources based on a map of properties.
+
 - **Conclusion**:
   Opting for the most pragmatic, direct and simple solution as the first iteration seems to be the 
   right option while waiting for customer feedback and iterating towards something more sophisticated if necessary.
