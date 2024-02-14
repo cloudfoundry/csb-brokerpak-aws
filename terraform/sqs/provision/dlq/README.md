@@ -33,6 +33,8 @@
   - **Multiple Queues**: 
     - If it is delivered to the end user as a single service:
       - It requires appropriate configuration to generate N queues at the same time as generating the DLQ.
+      - Or it requires appropriate conditional Terraform code and configuration to generate the DLQ or the Standard queue
+        - Requires at least two bindings to connect to the Standard Queue and the DLQ. It depends on the number of s-queues. 
     - If it is delivered as an **independent** service in CSB
       - Requires synchronization with the Standard Queue/s when creating the redrive policy.
       - Requires at least two bindings to connect to the Standard Queue and the DLQ. It depends on the number of s-queues.
