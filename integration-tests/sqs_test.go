@@ -105,6 +105,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
+					HaveKeyWithValue("dlq_arn", Equal("")),
 				),
 			)
 		})
@@ -115,6 +116,8 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				"fifo":                  true,
 				"aws_access_key_id":     "fake-aws-access-key-id",
 				"aws_secret_access_key": "fake-aws-secret-access-key",
+				"dlq_arn":               "fake-arn",
+				"max_receive_count":     5,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -124,6 +127,8 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("fifo", BeTrue()),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
+					HaveKeyWithValue("dlq_arn", "fake-arn"),
+					HaveKeyWithValue("max_receive_count", 5),
 				),
 			)
 		})
@@ -164,6 +169,9 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				Expect(err).NotTo(HaveOccurred())
 			},
 			Entry(nil, "aws_access_key_id", "fake-aws-access-key-id"),
+			Entry(nil, "aws_secret_access_key", "fake-aws-secret-access-key"),
+			Entry(nil, "max_receive_count", 5),
+			Entry(nil, "dlq_arn", "fake-arn"),
 			Entry(nil, "aws_secret_access_key", "fake-aws-secret-access-key"),
 		)
 	})
