@@ -13,39 +13,37 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
-func handleSend(creds credentials.Credentials) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Handling send.")
+func handleSend(creds credentials.Credentials) func(r *http.Request) (int, string) {
+	return func(r *http.Request) (int, string) {
+		binding := r.PathValue("binding_name")
+		log.Printf("Handling send on binding %q\n", binding)
+
+		cred, ok := creds[binding]
+		if !ok {
+			return http.StatusBadRequest, fmt.Sprintf("no creds found for binding: %q", binding)
+		}
+		cfg, err := cred.Config()
+		if err != nil {
+			return http.StatusInternalServerError, fmt.Sprintf("could not read AWS config: %q", err)
+		}
 
 		data, err := io.ReadAll(r.Body)
 		if err != nil {
-			fail(w, http.StatusBadRequest, "could not read body: %q", err)
-			return
+			return http.StatusBadRequest, fmt.Sprintf("could not read body: %q", err)
 		}
 		defer r.Body.Close()
 		body := string(data)
 
-		cfg, err := creds.Config()
-		if err != nil {
-			fail(w, http.StatusInternalServerError, "could not read AWS config: %q", err)
-			return
-		}
-
 		output, err := sqs.NewFromConfig(cfg).SendMessage(r.Context(), &sqs.SendMessageInput{
 			MessageBody: &body,
-			QueueUrl:    &creds.URL,
+			QueueUrl:    &cred.URL,
 		})
 		if err != nil {
-			fail(w, http.StatusBadRequest, "error sending message: %q", err)
-			return
+			return http.StatusBadRequest, fmt.Sprintf("error sending message: %q", err)
 		}
 
 		id := aws.ToString(output.MessageId)
-
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(fmt.Sprintf(`{"id":"%s"}`, id)))
-
 		log.Printf("sent message ID: %q\n", id)
+		return http.StatusOK, fmt.Sprintf(`{"id":"%s"}`, id)
 	}
 }

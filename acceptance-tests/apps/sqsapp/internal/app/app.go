@@ -2,7 +2,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -13,8 +12,8 @@ func App(creds credentials.Credentials) http.Handler {
 	r := http.NewServeMux()
 
 	r.HandleFunc("GET /", aliveness)
-	r.HandleFunc("GET /receive", handleReceive(creds))
-	r.HandleFunc("POST /send", handleSend(creds))
+	r.HandleFunc("GET /receive/{binding_name}", writeResponse(handleReceive(creds)))
+	r.HandleFunc("POST /send/{binding_name}", writeResponse(handleSend(creds)))
 
 	return r
 }
@@ -24,8 +23,20 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func fail(w http.ResponseWriter, code int, format string, a ...any) {
-	msg := fmt.Sprintf(format, a...)
-	log.Println(msg)
-	http.Error(w, msg, code)
+// writeResponse allows handler functions to simply return an HTTP code and a message
+// avoiding repeated boilerplate code for dealing with the http.ResponseWriter
+func writeResponse(h func(r *http.Request) (int, string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		code, msg := h(r)
+		switch code {
+		case http.StatusOK:
+			w.WriteHeader(code)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(msg))
+		case http.StatusNoContent:
+			w.WriteHeader(code)
+		default:
+			http.Error(w, msg, code)
+		}
+	}
 }
