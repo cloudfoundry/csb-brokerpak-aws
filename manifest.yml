@@ -16,8 +16,8 @@ terraform_binaries:
   source: https://github.com/hashicorp/terraform/archive/v1.5.7.zip
   default: true
 - name: terraform-provider-aws
-  version: 5.36.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.36.0.zip
+  version: 5.37.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.37.0.zip
 - name: terraform-provider-random
   version: 3.6.0
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.0.zip
