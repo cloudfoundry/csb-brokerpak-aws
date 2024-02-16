@@ -128,7 +128,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 					HaveKeyWithValue("dlq_arn", "fake-arn"),
-					HaveKeyWithValue("max_receive_count", 5),
+					HaveKeyWithValue("max_receive_count", BeNumerically("5", 5)),
 				),
 			)
 		})
