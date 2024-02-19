@@ -159,6 +159,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			},
 			Entry("update region", "region", "no-matter-what-region"),
 			Entry("update fifo", "fifo", true),
+			Entry("update dlq", "dlq", true),
 		)
 
 		DescribeTable(
@@ -209,6 +210,11 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					Type:  "string",
 					Value: "example_url",
 				},
+				{
+					Name:  "dlq",
+					Type:  "boolean",
+					Value: false,
+				},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -226,6 +232,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					"arn":               "arn:aws:sqs::ap-northeast-3::example",
 					"queue_name":        "example_name",
 					"queue_url":         "example_url",
+					"dlq":               false,
 				}),
 			)
 		})

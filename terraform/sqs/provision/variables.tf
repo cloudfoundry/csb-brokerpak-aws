@@ -13,3 +13,4 @@ variable "labels" { type = map(any) }
 variable "fifo" { type = bool }
 variable "dlq_arn" { type = string }
 variable "max_receive_count" { type = number }
+variable "dlq" { type = bool }
