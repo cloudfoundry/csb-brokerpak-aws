@@ -102,6 +102,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					})),
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-sqs-%s", instanceID)),
 					HaveKeyWithValue("fifo", BeFalse()),
+					HaveKeyWithValue("visibility_timeout_seconds", BeNumerically("==", 30)),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
@@ -111,10 +112,11 @@ var _ = Describe("SQS", Label("SQS"), func() {
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, map[string]any{
-				"region":                "africa-north-4",
-				"fifo":                  true,
-				"aws_access_key_id":     "fake-aws-access-key-id",
-				"aws_secret_access_key": "fake-aws-secret-access-key",
+				"region":                     "africa-north-4",
+				"fifo":                       true,
+				"visibility_timeout_seconds": 60,
+				"aws_access_key_id":          "fake-aws-access-key-id",
+				"aws_secret_access_key":      "fake-aws-secret-access-key",
 			})
 			Expect(err).NotTo(HaveOccurred())
 

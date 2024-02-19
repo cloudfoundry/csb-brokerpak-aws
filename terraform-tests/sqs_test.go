@@ -29,12 +29,13 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"instance_name":         name,
-			"fifo":                  false,
-			"labels":                map[string]string{"label1": "value1"},
-			"aws_access_key_id":     awsAccessKeyID,
-			"aws_secret_access_key": awsSecretAccessKey,
-			"region":                awsRegion,
+			"instance_name":              name,
+			"fifo":                       false,
+			"visibility_timeout_seconds": 30,
+			"labels":                     map[string]string{"label1": "value1"},
+			"aws_access_key_id":          awsAccessKeyID,
+			"aws_secret_access_key":      awsSecretAccessKey,
+			"region":                     awsRegion,
 		}
 	})
 
@@ -54,8 +55,9 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		It("should create an SQS queue with the correct properties", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"name":       Equal(name),
-					"fifo_queue": BeFalse(),
+					"name":                       Equal(name),
+					"fifo_queue":                 BeFalse(),
+					"visibility_timeout_seconds": BeNumerically("==", 30),
 					"tags": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -79,5 +81,23 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 				}),
 			)
 		})
+	})
+
+	Context("visibility_timeout_seconds", func() {
+		When("visibility timeout is set", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
+			})
+
+			It("should not be passed", func() {
+				Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"name":       Equal(fmt.Sprintf("%s.fifo", name)),
+						"fifo_queue": BeTrue(),
+					}),
+				)
+			})
+		})
+
 	})
 })
