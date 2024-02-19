@@ -36,6 +36,12 @@ provision:
         The number of seconds Amazon SQS retains a message. Integer representing seconds, from 60 (1 minute) to 1209600 (14 days). 
         The default for this attribute is 345600 (4 days).
       default: 345600
+    - field_name: max_message_size
+      type: integer
+      details: |
+        The limit of how many bytes a message can contain before Amazon SQS rejects it. 
+        An integer from 1024 bytes (1 KiB) up to 262144 bytes (256 KiB). The default for this attribute is 262144 (256 KiB).
+      default: 262144
     - field_name: aws_access_key_id
       type: string
       details: AWS access key

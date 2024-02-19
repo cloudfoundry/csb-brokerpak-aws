@@ -3,6 +3,7 @@ resource "aws_sqs_queue" "queue" {
   fifo_queue                 = var.fifo
   visibility_timeout_seconds = var.visibility_timeout_seconds
   message_retention_seconds  = var.message_retention_seconds
+  max_message_size           = var.max_message_size
 
   redrive_policy = var.dlq_arn != "" ? jsonencode({
     deadLetterTargetArn = var.dlq_arn,

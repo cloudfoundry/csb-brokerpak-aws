@@ -34,6 +34,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			"fifo":                       false,
 			"visibility_timeout_seconds": 30,
 			"message_retention_seconds":  345600,
+			"max_message_size":           262144,
 			"labels":                     map[string]string{"label1": "value1"},
 			"aws_access_key_id":          awsAccessKeyID,
 			"aws_secret_access_key":      awsSecretAccessKey,
@@ -63,6 +64,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"fifo_queue":                 BeFalse(),
 					"visibility_timeout_seconds": BeNumerically("==", 30),
 					"message_retention_seconds":  BeNumerically("==", 345600),
+					"max_message_size":           BeNumerically("==", 262144),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -133,6 +135,22 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"message_retention_seconds": BeNumerically("==", 1209600),
+				}),
+			)
+		})
+	})
+
+	Context("with message size set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"max_message_size": 1024,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"max_message_size": BeNumerically("==", 1024),
 				}),
 			)
 		})
