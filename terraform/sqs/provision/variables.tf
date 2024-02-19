@@ -11,3 +11,5 @@ variable "region" { type = string }
 variable "instance_name" { type = string }
 variable "labels" { type = map(any) }
 variable "fifo" { type = bool }
+variable "dlq_arn" { type = string }
+variable "max_receive_count" { type = number }
