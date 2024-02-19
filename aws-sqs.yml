@@ -34,6 +34,14 @@ provision:
       type: string
       details: AWS secret key
       default: ${config("aws.secret_access_key")}
+    - field_name: dlq_arn
+      type: string
+      details: ARN of the Dead Letter Queue. If provided, configures redrive_policy for the queue.
+      default: ""
+    - field_name: max_receive_count
+      type: integer
+      details: The number of times a message is delivered to the source queue before being moved to the DLQ.
+      default: 5
   computed_inputs:
     - name: instance_name
       default: csb-sqs-${request.instance_id}
