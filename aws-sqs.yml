@@ -30,6 +30,12 @@ provision:
       type: integer
       details: The visibility timeout for the queue. An integer from 0 to 43200 (12 hours). The default for this attribute is 30.
       default: 30
+    - field_name: message_retention_seconds
+      type: integer
+      details: |
+        The number of seconds Amazon SQS retains a message. Integer representing seconds, from 60 (1 minute) to 1209600 (14 days). 
+        The default for this attribute is 345600 (4 days).
+      default: 345600
     - field_name: aws_access_key_id
       type: string
       details: AWS access key

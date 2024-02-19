@@ -103,6 +103,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("instance_name", fmt.Sprintf("csb-sqs-%s", instanceID)),
 					HaveKeyWithValue("fifo", BeFalse()),
 					HaveKeyWithValue("visibility_timeout_seconds", BeNumerically("==", 30)),
+					HaveKeyWithValue("message_retention_seconds", BeNumerically("==", 345600)),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
@@ -116,6 +117,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				"region":                     "africa-north-4",
 				"fifo":                       true,
 				"visibility_timeout_seconds": 60,
+				"message_retention_seconds":  60,
 				"aws_access_key_id":          "fake-aws-access-key-id",
 				"aws_secret_access_key":      "fake-aws-secret-access-key",
 				"dlq_arn":                    "fake-arn",
@@ -128,6 +130,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("region", "africa-north-4"),
 					HaveKeyWithValue("fifo", BeTrue()),
 					HaveKeyWithValue("visibility_timeout_seconds", BeNumerically("==", 60)),
+					HaveKeyWithValue("message_retention_seconds", BeNumerically("==", 60)),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 					HaveKeyWithValue("dlq_arn", "fake-arn"),
@@ -176,6 +179,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			Entry(nil, "max_receive_count", 5),
 			Entry(nil, "dlq_arn", "fake-arn"),
 			Entry(nil, "visibility_timeout_seconds", 120),
+			Entry(nil, "message_retention_seconds", 60),
 		)
 	})
 

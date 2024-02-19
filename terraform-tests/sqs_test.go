@@ -33,6 +33,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			"instance_name":              name,
 			"fifo":                       false,
 			"visibility_timeout_seconds": 30,
+			"message_retention_seconds":  345600,
 			"labels":                     map[string]string{"label1": "value1"},
 			"aws_access_key_id":          awsAccessKeyID,
 			"aws_secret_access_key":      awsSecretAccessKey,
@@ -61,6 +62,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"name":                       Equal(name),
 					"fifo_queue":                 BeFalse(),
 					"visibility_timeout_seconds": BeNumerically("==", 30),
+					"message_retention_seconds":  BeNumerically("==", 345600),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -104,7 +106,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("with isibility timeout set", func() {
+	Context("with visibility timeout set", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"visibility_timeout_seconds": 120,
@@ -115,6 +117,22 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"visibility_timeout_seconds": BeNumerically("==", 120),
+				}),
+			)
+		})
+	})
+
+	Context("with message retantion set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"message_retention_seconds": 1209600,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"message_retention_seconds": BeNumerically("==", 1209600),
 				}),
 			)
 		})
