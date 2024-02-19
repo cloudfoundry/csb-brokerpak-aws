@@ -56,7 +56,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 				MatchKeys(IgnoreExtras, Keys{
 					"name":       Equal(name),
 					"fifo_queue": BeFalse(),
-					"tags": MatchAllKeys(Keys{
+					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
 				}),
