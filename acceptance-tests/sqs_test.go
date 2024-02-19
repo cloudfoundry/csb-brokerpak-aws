@@ -21,8 +21,10 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		defer apps.Delete(appOne, appTwo)
 
 		By("binding the apps to the service instance")
-		binding := serviceInstance.Bind(appOne)
-		serviceInstance.Bind(appTwo)
+		bindingOneName := random.Name(random.WithPrefix("producer"))
+		binding := serviceInstance.Bind(appOne, services.WithBindingName(bindingOneName))
+		bindingTwoName := random.Name(random.WithPrefix("consumer"))
+		serviceInstance.Bind(appTwo, services.WithBindingName(bindingTwoName))
 
 		By("starting the apps")
 		apps.Start(appOne, appTwo)
@@ -32,10 +34,10 @@ var _ = Describe("SQS", Label("sqs"), func() {
 
 		By("sending a message using the first app")
 		message := random.Hexadecimal()
-		appOne.POST(message, "/send")
+		appOne.POST(message, "/send/%s", bindingOneName)
 
 		By("receiving the message using the second app")
-		got := appTwo.GET("/receive").String()
+		got := appTwo.GET("/receive/%s", bindingTwoName).String()
 		Expect(got).To(Equal(message))
 	})
 })
