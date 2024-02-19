@@ -26,6 +26,10 @@ provision:
       details: Whether to create a FIFO queue. Cannot be altered once a queue is created.
       prohibit_update: true
       default: false
+    - field_name: visibility_timeout_seconds
+      type: integer
+      details: The visibility timeout for the queue. An integer from 0 to 43200 (12 hours). The default for this attribute is 30.
+      default: 30
     - field_name: aws_access_key_id
       type: string
       details: AWS access key

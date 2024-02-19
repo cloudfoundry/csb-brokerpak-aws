@@ -30,14 +30,15 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"instance_name":         name,
-			"fifo":                  false,
-			"labels":                map[string]string{"label1": "value1"},
-			"aws_access_key_id":     awsAccessKeyID,
-			"aws_secret_access_key": awsSecretAccessKey,
-			"region":                awsRegion,
-			"dlq_arn":               "",
-			"max_receive_count":     5,
+			"instance_name":              name,
+			"fifo":                       false,
+			"visibility_timeout_seconds": 30,
+			"labels":                     map[string]string{"label1": "value1"},
+			"aws_access_key_id":          awsAccessKeyID,
+			"aws_secret_access_key":      awsSecretAccessKey,
+			"region":                     awsRegion,
+			"dlq_arn":                    "",
+			"max_receive_count":          5,
 		}
 	})
 
@@ -57,8 +58,9 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		It("should create an SQS queue with the correct properties", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"name":       Equal(name),
-					"fifo_queue": BeFalse(),
+					"name":                       Equal(name),
+					"fifo_queue":                 BeFalse(),
+					"visibility_timeout_seconds": BeNumerically("==", 30),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -97,6 +99,22 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"redrive_policy": Equal(`{"deadLetterTargetArn":"arn:aws:sqs:us-west-2:123456789012:dlq","maxReceiveCount":3}`),
+				}),
+			)
+		})
+	})
+
+	Context("with isibility timeout set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"visibility_timeout_seconds": 120,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"visibility_timeout_seconds": BeNumerically("==", 120),
 				}),
 			)
 		})
