@@ -106,6 +106,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("message_retention_seconds", BeNumerically("==", 345600)),
 					HaveKeyWithValue("max_message_size", BeNumerically("==", 262144)),
 					HaveKeyWithValue("delay_seconds", BeZero()),
+					HaveKeyWithValue("receive_wait_time_seconds", BeZero()),
 					HaveKeyWithValue("region", fakeRegion),
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
@@ -122,6 +123,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				"message_retention_seconds":  60,
 				"max_message_size":           1024,
 				"delay_seconds":              600,
+				"receive_wait_time_seconds":  20,
 				"aws_access_key_id":          "fake-aws-access-key-id",
 				"aws_secret_access_key":      "fake-aws-secret-access-key",
 				"dlq_arn":                    "fake-arn",
@@ -137,6 +139,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("message_retention_seconds", BeNumerically("==", 60)),
 					HaveKeyWithValue("max_message_size", BeNumerically("==", 1024)),
 					HaveKeyWithValue("delay_seconds", BeNumerically("==", 600)),
+					HaveKeyWithValue("receive_wait_time_seconds", BeNumerically("==", 20)),
 					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 					HaveKeyWithValue("dlq_arn", "fake-arn"),
@@ -188,6 +191,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			Entry(nil, "message_retention_seconds", 60),
 			Entry(nil, "max_message_size", 1024),
 			Entry(nil, "delay_seconds", 300),
+			Entry(nil, "receive_wait_time_seconds", 15),
 		)
 	})
 
