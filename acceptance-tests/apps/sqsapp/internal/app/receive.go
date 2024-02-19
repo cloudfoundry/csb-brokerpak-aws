@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -11,45 +12,43 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
-func handleReceive(creds credentials.Credentials) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Handling receive.")
+func handleReceive(creds credentials.Credentials) func(r *http.Request) (int, string) {
+	return func(r *http.Request) (int, string) {
+		binding := r.PathValue("binding_name")
+		log.Printf("Handling receive on binding %q\n", binding)
 
-		cfg, err := creds.Config()
+		cred, ok := creds[binding]
+		if !ok {
+			return http.StatusBadRequest, fmt.Sprintf("no creds found for binding: %q", binding)
+		}
+		cfg, err := cred.Config()
 		if err != nil {
-			fail(w, http.StatusInternalServerError, "could not read AWS config: %q", err)
-			return
+			return http.StatusInternalServerError, fmt.Sprintf("could not read AWS config: %q", err)
 		}
 
 		client := sqs.NewFromConfig(cfg)
 		output, err := client.ReceiveMessage(r.Context(), &sqs.ReceiveMessageInput{
-			QueueUrl:          &creds.URL,
+			QueueUrl:          &cred.URL,
 			VisibilityTimeout: 5, // we delete the message immediately below
 			WaitTimeSeconds:   20,
 		})
 		switch {
 		case err != nil:
-			fail(w, http.StatusBadRequest, "error receiving message: %q", err)
-			return
+			return http.StatusBadRequest, fmt.Sprintf("error receiving message: %q", err)
 		case len(output.Messages) == 0:
-			fail(w, http.StatusTooEarly, "no messages received")
-			return
+			return http.StatusTooEarly, "no messages received"
 		}
 
 		message := output.Messages[0]
 		_, err = client.DeleteMessage(r.Context(), &sqs.DeleteMessageInput{
-			QueueUrl:      &creds.URL,
+			QueueUrl:      &cred.URL,
 			ReceiptHandle: message.ReceiptHandle,
 		})
 		if err != nil {
-			fail(w, http.StatusNotAcceptable, "failed to delete message: %q", err)
-			return
+			return http.StatusNotAcceptable, fmt.Sprintf("failed to delete message: %q", err)
 		}
 
-		w.WriteHeader(http.StatusOK)
-		w.Header().Set("Content-Type", "text/html")
-		w.Write([]byte(aws.ToString(message.Body)))
-
 		log.Printf("Message %q received.\n", aws.ToString(message.Body))
+		return http.StatusOK, aws.ToString(message.Body)
 	}
 }
