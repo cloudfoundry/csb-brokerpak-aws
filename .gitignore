@@ -6,3 +6,4 @@ cloud-service-broker
 **/.tmp
 providers/build
 custom.tfrc
+integration-tests/integration-tests.test
