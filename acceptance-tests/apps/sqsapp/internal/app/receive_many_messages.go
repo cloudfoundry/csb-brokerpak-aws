@@ -68,7 +68,7 @@ func handleReceiveManyMessages(ctx context.Context, creds credentials.Credential
 
 			log.Printf("Message received: %s - binding name: %s\n", body, binding)
 
-			// Hack to simulate a message that is incorrectly formatted and
+			// Hack to simulate a message that is incorrectly formatted
 			if strings.Contains(body, "incorrectly formatted") {
 				log.Printf("incorrectly formatted message receive on binding %q, leaving in queue for DLQ\n", binding)
 				continue
