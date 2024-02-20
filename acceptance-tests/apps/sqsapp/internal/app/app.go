@@ -24,7 +24,6 @@ func App(creds credentials.Credentials) http.Handler {
 		return dlqSubscriber(ctx, creds, r.PathValue("binding_name"))
 	}))
 
-
 	r.HandleFunc("GET /receive_many_messages/{binding_name}", writeResponse(func(r *http.Request) (int, string) {
 		timeoutDuration := 10 * time.Second
 		ctx, cancel := context.WithTimeout(r.Context(), timeoutDuration)
