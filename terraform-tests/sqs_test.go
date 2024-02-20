@@ -30,14 +30,19 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"instance_name":         name,
-			"fifo":                  false,
-			"labels":                map[string]string{"label1": "value1"},
-			"aws_access_key_id":     awsAccessKeyID,
-			"aws_secret_access_key": awsSecretAccessKey,
-			"region":                awsRegion,
-			"dlq_arn":               "",
-			"max_receive_count":     5,
+			"instance_name":              name,
+			"fifo":                       false,
+			"visibility_timeout_seconds": 30,
+			"message_retention_seconds":  345600,
+			"max_message_size":           262144,
+			"delay_seconds":              0,
+			"receive_wait_time_seconds":  0,
+			"labels":                     map[string]string{"label1": "value1"},
+			"aws_access_key_id":          awsAccessKeyID,
+			"aws_secret_access_key":      awsSecretAccessKey,
+			"region":                     awsRegion,
+			"dlq_arn":                    "",
+			"max_receive_count":          5,
 		}
 	})
 
@@ -57,8 +62,13 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		It("should create an SQS queue with the correct properties", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"name":       Equal(name),
-					"fifo_queue": BeFalse(),
+					"name":                       Equal(name),
+					"fifo_queue":                 BeFalse(),
+					"visibility_timeout_seconds": BeNumerically("==", 30),
+					"message_retention_seconds":  BeNumerically("==", 345600),
+					"max_message_size":           BeNumerically("==", 262144),
+					"delay_seconds":              BeZero(),
+					"receive_wait_time_seconds":  BeZero(),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -97,6 +107,86 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
 					"redrive_policy": Equal(`{"deadLetterTargetArn":"arn:aws:sqs:us-west-2:123456789012:dlq","maxReceiveCount":3}`),
+				}),
+			)
+		})
+	})
+
+	Context("with visibility timeout set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"visibility_timeout_seconds": 120,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"visibility_timeout_seconds": BeNumerically("==", 120),
+				}),
+			)
+		})
+	})
+
+	Context("with message retantion set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"message_retention_seconds": 1209600,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"message_retention_seconds": BeNumerically("==", 1209600),
+				}),
+			)
+		})
+	})
+
+	Context("with message size set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"max_message_size": 1024,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"max_message_size": BeNumerically("==", 1024),
+				}),
+			)
+		})
+	})
+
+	Context("with delay set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"delay_seconds": 300,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"delay_seconds": BeNumerically("==", 300),
+				}),
+			)
+		})
+	})
+
+	Context("with receive wait time set", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"receive_wait_time_seconds": 15,
+			}))
+		})
+
+		It("should not be passed", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"receive_wait_time_seconds": BeNumerically("==", 15),
 				}),
 			)
 		})
