@@ -44,34 +44,32 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		Expect(got).To(Equal(message))
 	})
 
-	FIt("should work with DLQ", func() {
+	It("should work with DLQ", func() {
 		By("creating a DLS service instance")
-		// dlqServiceInstance := services.CreateInstance(
-		// 	"csb-aws-sqs",
-		// 	services.WithPlan("standard"),
-		// 	services.WithParameters(map[string]any{"dlq": true}),
-		// )
-		dlqServiceInstance := services.ServiceInstance{Name: "dlq1"}
-		// defer dlqServiceInstance.Delete()
+		dlqServiceInstance := services.CreateInstance(
+			"csb-aws-sqs",
+			services.WithPlan("standard"),
+			services.WithParameters(map[string]any{"dlq": true}),
+		)
+		defer dlqServiceInstance.Delete()
 
-		// csbKey := dlqServiceInstance.CreateServiceKey()
-		// defer csbKey.Delete()
-		// var skReceiver struct {
-		// 	ARN string `json:"arn"`
-		// }
-		// csbKey.Get(&skReceiver)
+		csbKey := dlqServiceInstance.CreateServiceKey()
+		defer csbKey.Delete()
+		var skReceiver struct {
+			ARN string `json:"arn"`
+		}
+		csbKey.Get(&skReceiver)
 
 		By("creating a Standard Queue")
-		// standardQueueServiceInstance := services.CreateInstance(
-		// 	"csb-aws-sqs",
-		// 	services.WithPlan("standard"),
-		// 	services.WithParameters(map[string]any{
-		// 		"dlq_arn":           skReceiver.ARN,
-		// 		"max_receive_count": 5,
-		// 	}),
-		// )
-		standardQueueServiceInstance := services.ServiceInstance{Name: "producer1"}
-		// defer standardQueueServiceInstance.Delete()
+		standardQueueServiceInstance := services.CreateInstance(
+			"csb-aws-sqs",
+			services.WithPlan("standard"),
+			services.WithParameters(map[string]any{
+				"dlq_arn":           skReceiver.ARN,
+				"max_receive_count": 5,
+			}),
+		)
+		defer standardQueueServiceInstance.Delete()
 
 		By("pushing the unstarted apps")
 		producerApp := apps.Push(apps.WithName(random.Name(random.WithPrefix("producer"))), apps.WithApp(apps.SQS))
