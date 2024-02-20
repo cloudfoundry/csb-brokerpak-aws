@@ -43,7 +43,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			"region":                     awsRegion,
 			"dlq_arn":                    "",
 			"max_receive_count":          5,
-      "dlq":                        false,
+			"dlq":                        false,
 		}
 	})
 
