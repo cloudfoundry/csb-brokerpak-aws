@@ -1,7 +1,6 @@
 package acceptance_tests_test
 
 import (
-	"io"
 	"net/http"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
@@ -40,12 +39,12 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		appOne.POST(message, "/send/%s", bindingOneName)
 
 		By("receiving the message using the second app")
-		got := appTwo.GET("/receive/%s", bindingTwoName).String()
+		got := appTwo.GET("/retrieve_and_delete/%s", bindingTwoName).String()
 		Expect(got).To(Equal(message))
 	})
 
 	It("should work with DLQ", func() {
-		By("creating a DLS service instance")
+		By("creating a DLQ service instance")
 		dlqServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
 			services.WithPlan("standard"),
@@ -74,8 +73,7 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		By("pushing the unstarted apps")
 		producerApp := apps.Push(apps.WithName(random.Name(random.WithPrefix("producer"))), apps.WithApp(apps.SQS))
 		consumerApp := apps.Push(apps.WithName(random.Name(random.WithPrefix("consumer"))), apps.WithApp(apps.SQS))
-		dlqConsumerApp := apps.Push(apps.WithName(random.Name(random.WithPrefix("dlq"))), apps.WithApp(apps.SQS))
-		defer apps.Delete(producerApp, consumerApp, dlqConsumerApp)
+		defer apps.Delete(producerApp, consumerApp)
 
 		By("binding the apps to the service instance - producer/consumer")
 		producerBindingName := random.Name(random.WithPrefix("producer"))
@@ -88,33 +86,26 @@ var _ = Describe("SQS", Label("sqs"), func() {
 
 		By("binding the app to the service instance - DLQ consumer")
 		bindingDLQName := random.Name(random.WithPrefix("dlq"))
-		dlqBinding := dlqServiceInstance.Bind(dlqConsumerApp, services.WithBindingName(bindingDLQName))
+		dlqBinding := dlqServiceInstance.Bind(consumerApp, services.WithBindingName(bindingDLQName))
 		defer dlqBinding.Unbind()
 
 		By("starting the apps")
-		apps.Start(producerApp, consumerApp, dlqConsumerApp)
+		apps.Start(producerApp, consumerApp)
 
-		// TEST:
-		// send from producer app
-		// rename receive to retreiveanddelete
-		// create retrieve endpoint (that doesn't delete the message after reading)
-		// consumer app calls retrieve doesnt delte the message
-		// dlq app calls retreive and delete
+		By("sending a message - producer")
+		message := random.Hexadecimal()
+		producerApp.POST(message, "/send/%s", producerBindingName)
 
-		By("sending an incorrect message - producer")
-		incorrectlyFormattedMessage := "incorrectly formatted"
-		producerApp.POST(incorrectlyFormattedMessage, "/send/%s", producerBindingName)
+		By("read a message without delete it - consumer")
+		got := consumerApp.GET("/retrieve/%s", consumerBindingName).String()
+		Expect(got).To(Equal(message))
 
-		By("reading an incorrect message - consumer")
-		getResponse := consumerApp.GETResponse("/receive_many_messages/%s", consumerBindingName)
-		Expect(getResponse).To(HaveHTTPStatus(http.StatusRequestTimeout))
-		b, err := io.ReadAll(getResponse.Body)
-		Expect(err).ToNot(HaveOccurred(), "error reading response body")
-		Expect(string(b)).To(ContainSubstring("context deadline exceeded"), "context deadline exceeded after sending message to the DLQ")
-		defer getResponse.Body.Close()
+		By("attempts retrieving from the queue again so transferring the message to the DLQ is triggerd - consumer")
+		response := consumerApp.GETResponse("/retrieve/%s", consumerBindingName)
+		Expect(response).To(HaveHTTPStatus(http.StatusTooEarly))
 
-		By("reading message in DLQ - DLQ consumer")
-		got := dlqConsumerApp.GET("/receive/%s", bindingDLQName).String()
-		Expect(got).To(Equal(incorrectlyFormattedMessage))
+		By("reading message from DLQ - DLQ consumer")
+		got = consumerApp.GET("/retrieve_and_delete/%s", bindingDLQName).String()
+		Expect(got).To(Equal(message))
 	})
 })

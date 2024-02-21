@@ -2,10 +2,8 @@
 package app
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"time"
 
 	"sqsapp/internal/credentials"
 )
@@ -14,18 +12,9 @@ func App(creds credentials.Credentials) http.Handler {
 	r := http.NewServeMux()
 
 	r.HandleFunc("GET /", aliveness)
-	r.HandleFunc("GET /receive/{binding_name}", writeResponse(handleReceive(creds)))
-	// r.HandleFunc("GET /retrieveanddelete/{binding_name}", writeResponse(handleReceive(creds)))
-	// r.HandleFunc("GET /retrieve/{binding_name}", writeResponse(handleReceive(creds)))
+	r.HandleFunc("GET /retrieve_and_delete/{binding_name}", writeResponse(handleRetrieveAndDelete(creds)))
+	r.HandleFunc("GET /retrieve/{binding_name}", writeResponse(handleRetrieve(creds)))
 	r.HandleFunc("POST /send/{binding_name}", writeResponse(handleSend(creds)))
-
-	r.HandleFunc("GET /receive_many_messages/{binding_name}", writeResponse(func(r *http.Request) (int, string) {
-		timeoutDuration := 10 * time.Second
-		ctx, cancel := context.WithTimeout(r.Context(), timeoutDuration)
-		defer cancel()
-
-		return handleReceiveManyMessages(ctx, creds, r.PathValue("binding_name"))
-	}))
 
 	return r
 }
