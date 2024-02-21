@@ -12,7 +12,8 @@ func App(creds credentials.Credentials) http.Handler {
 	r := http.NewServeMux()
 
 	r.HandleFunc("GET /", aliveness)
-	r.HandleFunc("GET /receive/{binding_name}", writeResponse(handleReceive(creds)))
+	r.HandleFunc("GET /retrieve_and_delete/{binding_name}", writeResponse(handleRetrieveAndDelete(creds)))
+	r.HandleFunc("GET /retrieve/{binding_name}", writeResponse(handleRetrieve(creds)))
 	r.HandleFunc("POST /send/{binding_name}", writeResponse(handleSend(creds)))
 
 	return r
