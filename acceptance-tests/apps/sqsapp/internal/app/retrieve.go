@@ -5,17 +5,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-
 	"sqsapp/internal/credentials"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
 
-func handleReceive(creds credentials.Credentials) func(r *http.Request) (int, string) {
+func handleRetrieve(creds credentials.Credentials) func(r *http.Request) (int, string) {
 	return func(r *http.Request) (int, string) {
 		binding := r.PathValue("binding_name")
-		log.Printf("Handling receive on binding %q\n", binding)
+		log.Printf("Handling retrieve on binding %q\n", binding)
 
 		cred, ok := creds[binding]
 		if !ok {
@@ -28,9 +27,11 @@ func handleReceive(creds credentials.Credentials) func(r *http.Request) (int, st
 
 		client := sqs.NewFromConfig(cfg)
 		output, err := client.ReceiveMessage(r.Context(), &sqs.ReceiveMessageInput{
-			QueueUrl:          &cred.URL,
-			VisibilityTimeout: 5, // we delete the message immediately below
-			WaitTimeSeconds:   20,
+			QueueUrl: &cred.URL,
+			// The duration (in seconds) that the received messages are hidden from subsequent
+			// retrieve requests after being retrieved by a ReceiveMessage request.
+			VisibilityTimeout: 1,
+			WaitTimeSeconds:   10,
 		})
 		switch {
 		case err != nil:
@@ -40,14 +41,6 @@ func handleReceive(creds credentials.Credentials) func(r *http.Request) (int, st
 		}
 
 		message := output.Messages[0]
-		_, err = client.DeleteMessage(r.Context(), &sqs.DeleteMessageInput{
-			QueueUrl:      &cred.URL,
-			ReceiptHandle: message.ReceiptHandle,
-		})
-		if err != nil {
-			return http.StatusNotAcceptable, fmt.Sprintf("failed to delete message: %q", err)
-		}
-
 		log.Printf("Message %q received.\n", aws.ToString(message.Body))
 		return http.StatusOK, aws.ToString(message.Body)
 	}
