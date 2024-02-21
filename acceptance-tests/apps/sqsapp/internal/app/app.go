@@ -15,14 +15,9 @@ func App(creds credentials.Credentials) http.Handler {
 
 	r.HandleFunc("GET /", aliveness)
 	r.HandleFunc("GET /receive/{binding_name}", writeResponse(handleReceive(creds)))
+	// r.HandleFunc("GET /retrieveanddelete/{binding_name}", writeResponse(handleReceive(creds)))
+	// r.HandleFunc("GET /retrieve/{binding_name}", writeResponse(handleReceive(creds)))
 	r.HandleFunc("POST /send/{binding_name}", writeResponse(handleSend(creds)))
-	r.HandleFunc("GET /dlq/{binding_name}", writeResponse(func(r *http.Request) (int, string) {
-		timeoutDuration := 5 * time.Second
-		ctx, cancel := context.WithTimeout(r.Context(), timeoutDuration)
-		defer cancel()
-
-		return dlqSubscriber(ctx, creds, r.PathValue("binding_name"))
-	}))
 
 	r.HandleFunc("GET /receive_many_messages/{binding_name}", writeResponse(func(r *http.Request) (int, string) {
 		timeoutDuration := 10 * time.Second

@@ -43,22 +43,19 @@ func handleReceiveManyMessages(ctx context.Context, creds credentials.Credential
 			return http.StatusInternalServerError, "unknown error"
 
 		default:
-			receiveInput := &sqs.ReceiveMessageInput{
-				QueueUrl:            &cred.URL,
-				MaxNumberOfMessages: 1,
-				WaitTimeSeconds:     10,
+			output, err := client.ReceiveMessage(ctx, &sqs.ReceiveMessageInput{
+				QueueUrl: &cred.URL,
+				// MaxNumberOfMessages: 1, => this is the default
+				WaitTimeSeconds: 10,
 				// The duration (in seconds) that the received messages are hidden from subsequent
 				// retrieve requests after being retrieved by a ReceiveMessage request.
 				VisibilityTimeout: 1,
-			}
-
-			var output *sqs.ReceiveMessageOutput
-			if output, err = client.ReceiveMessage(ctx, receiveInput); err != nil {
-				log.Printf("Error receiving message: %s\n", err)
-				continue
-			}
-
-			if len(output.Messages) == 0 {
+			})
+			switch {
+			case err != nil:
+				log.Printf("error receiving message: %q", err)
+				continue // Why dont we error?
+			case len(output.Messages) == 0:
 				log.Print("No messages found\n")
 				continue
 			}

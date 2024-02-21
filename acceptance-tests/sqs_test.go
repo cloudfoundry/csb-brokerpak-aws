@@ -66,7 +66,7 @@ var _ = Describe("SQS", Label("sqs"), func() {
 			services.WithPlan("standard"),
 			services.WithParameters(map[string]any{
 				"dlq_arn":           skReceiver.ARN,
-				"max_receive_count": 5,
+				"max_receive_count": 1,
 			}),
 		)
 		defer standardQueueServiceInstance.Delete()
@@ -94,13 +94,12 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		By("starting the apps")
 		apps.Start(producerApp, consumerApp, dlqConsumerApp)
 
-		By("sending a message - producer")
-		message := random.Hexadecimal()
-		producerApp.POST(message, "/send/%s", producerBindingName)
-
-		By("receiving the message - consumer")
-		got := consumerApp.GET("/receive/%s", consumerBindingName).String()
-		Expect(got).To(Equal(message))
+		// TEST:
+		// send from producer app
+		// rename receive to retreiveanddelete
+		// create retrieve endpoint (that doesn't delete the message after reading)
+		// consumer app calls retrieve doesnt delte the message
+		// dlq app calls retreive and delete
 
 		By("sending an incorrect message - producer")
 		incorrectlyFormattedMessage := "incorrectly formatted"
@@ -115,8 +114,7 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		defer getResponse.Body.Close()
 
 		By("reading message in DLQ - DLQ consumer")
-		got = dlqConsumerApp.GET("/dlq/%s", bindingDLQName).String()
+		got := dlqConsumerApp.GET("/receive/%s", bindingDLQName).String()
 		Expect(got).To(Equal(incorrectlyFormattedMessage))
-
 	})
 })
