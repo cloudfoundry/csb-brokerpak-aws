@@ -44,6 +44,8 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			"dlq_arn":                    "",
 			"max_receive_count":          5,
 			"dlq":                        false,
+			"deduplication_scope":        "queue",
+			"fifo_throughput_limit":      "perQueue",
 		}
 	})
 
@@ -192,4 +194,23 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			)
 		})
 	})
+
+	Context("FIFO queues with custom deduplication scope and throughput limit", func() {
+		It("should create a FIFO SQS queue with the specified throughput limit and deduplication scope", func() {
+			customFIFOVars := map[string]any{
+				"fifo":                  true,
+				"deduplication_scope":   "messageGroup",
+				"fifo_throughput_limit": "perMessageGroupId",
+			}
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, customFIFOVars))
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"fifo_queue":            BeTrue(),
+					"deduplication_scope":   Equal("messageGroup"),
+					"fifo_throughput_limit": Equal("perMessageGroupId"),
+				}),
+			)
+		})
+	})
+
 })
