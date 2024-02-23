@@ -15,7 +15,7 @@ require (
 	github.com/onsi/gomega v1.31.1
 	github.com/pborman/uuid v1.2.1
 	golang.org/x/tools v0.18.0
-	honnef.co/go/tools v0.4.6
+	honnef.co/go/tools v0.4.7
 )
 
 require (
