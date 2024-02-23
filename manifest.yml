@@ -16,19 +16,19 @@ terraform_binaries:
   source: https://github.com/hashicorp/terraform/archive/v1.5.7.zip
   default: true
 - name: terraform-provider-aws
-  version: 5.37.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.37.0.zip
+  version: 5.38.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.38.0.zip
 - name: terraform-provider-random
   version: 3.6.0
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.0.zip
 - name: terraform-provider-csbpg
-  version: 1.2.18
-  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.18.zip
+  version: 1.2.19
+  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.19.zip
   provider: cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
-  version: 1.2.23
-  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.23.zip
+  version: 1.2.24
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.24.zip
   provider: cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
@@ -40,8 +40,8 @@ terraform_binaries:
   provider: cloudfoundry.org/cloud-service-broker/csbmajorengineversion
   url_template: ./providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/${version}/${os}_${arch}/${name}_v${version}
 - name: terraform-provider-csbsqlserver
-  version: 1.0.9
-  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.9.zip
+  version: 1.0.10
+  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.10.zip
   provider: cloudfoundry.org/cloud-service-broker/csbsqlserver
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 env_config_mapping:
