@@ -739,19 +739,13 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 		})
 
 		When("an invalid retention period is passed", func() {
-			It("doesn't detect any errors and plan finishes succesfully", func() {
-				// invalid values for the retention_period are handled by the IAAS not Terraform
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
+			It("should fail and return a descriptive error message", func() {
+				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{
 					"performance_insights_enabled":          true,
 					"performance_insights_retention_period": 13,
 				}))
-
-				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"performance_insights_enabled":          BeTrue(),
-						"performance_insights_retention_period": BeNumerically("==", 13),
-					}),
-				)
+				Expect(session.ExitCode()).NotTo(Equal(0))
+				Expect(session).To(gbytes.Say("expected performance_insights_retention_period to be divisible by 31, got: 13"))
 			})
 		})
 	})
