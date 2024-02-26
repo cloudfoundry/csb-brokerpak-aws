@@ -147,6 +147,23 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				),
 			)
 		})
+
+		It("should allow FIFO specific properties to be set on provision", func() {
+			_, err := broker.Provision(sqsServiceName, sqsCustomFIFOPlanName, map[string]any{
+				"fifo":                  true,
+				"deduplication_scope":   "messageGroup",
+				"fifo_throughput_limit": "perMessageGroupId",
+			})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("fifo", BeTrue()),
+					HaveKeyWithValue("deduplication_scope", Equal("messageGroup")),
+					HaveKeyWithValue("fifo_throughput_limit", Equal("perMessageGroupId")),
+				),
+			)
+		})
 	})
 
 	Describe("updating instance", func() {
@@ -193,6 +210,17 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			Entry(nil, "max_message_size", 1024),
 			Entry(nil, "delay_seconds", 300),
 			Entry(nil, "receive_wait_time_seconds", 15),
+		)
+
+		DescribeTable(
+			"allowed FIFO updates",
+			func(prop string, value any) {
+				err := broker.Update(instanceID, sqsServiceName, sqsCustomFIFOPlanName, map[string]any{prop: value})
+
+				Expect(err).NotTo(HaveOccurred())
+			},
+			Entry("update deduplication_scope", "deduplication_scope", "messageGroup"),
+			Entry("update fifo_throughput_limit", "fifo_throughput_limit", "perMessageGroupId"),
 		)
 	})
 

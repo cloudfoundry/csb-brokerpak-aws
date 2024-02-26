@@ -12,6 +12,9 @@ resource "aws_sqs_queue" "queue" {
     maxReceiveCount     = var.max_receive_count
   }) : null
 
+  deduplication_scope   = var.deduplication_scope
+  fifo_throughput_limit = var.fifo_throughput_limit
+
   lifecycle {
     prevent_destroy = true
   }
