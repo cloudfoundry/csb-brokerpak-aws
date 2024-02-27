@@ -72,8 +72,6 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"max_message_size":           BeNumerically("==", 262144),
 					"delay_seconds":              BeZero(),
 					"receive_wait_time_seconds":  BeZero(),
-					"deduplication_scope":        BeNil(),
-					"fifo_throughput_limit":      BeNil(),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -116,6 +114,26 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"fifo_throughput_limit": Equal("perMessageGroupId"),
 				}),
 			)
+		})
+	})
+
+	Context("Standard Queue", func() {
+		When("parameters exclusive to FIFO queues are passed to an standard queue", func() {
+			It("doesn't detect any errors and plan finishes succesfully", func() {
+				// invalid values for these properties are handled by the IAAS not Terraform
+				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"fifo":                  false,
+					"deduplication_scope":   "queue",
+					"fifo_throughput_limit": "perQueue",
+				}))
+				Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"fifo_queue":            BeFalse(),
+						"deduplication_scope":   Equal("queue"),
+						"fifo_throughput_limit": Equal("perQueue"),
+					}),
+				)
+			})
 		})
 	})
 
