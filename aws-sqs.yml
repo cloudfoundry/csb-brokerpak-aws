@@ -77,21 +77,25 @@ provision:
       default: 5
     - field_name: deduplication_scope
       type: string
+      default: null
+      nullable: true
       details: |
         Determines the scope of deduplication for messages within the FIFO queue.
         Allowed values:
         * `messageGroup`: deduplication is performed within each message group
         * `queue`: deduplication across the entire queue
-      default: queue
+        If not defined for a FIFO queue it defaults to `queue`.
     - field_name: fifo_throughput_limit
       type: string
+      default: null
+      nullable: true
       details: |
         Manages the throughput limit for the FIFO queue to optimize processing capabilities.
         Allowed values: 
         * `perQueue`: standard throughput limits
         * `perMessageGroupId`: for high throughput mode
-        When High throughput Mode is ON, the value for `deduplication_scope` must be `messageGroup` or the operation fails
-      default: perQueue
+        When High throughput Mode is ON, the value for `deduplication_scope` must be `messageGroup` or the operation fails.
+        If not defined for a FIFO queue it defaults to `perQueue`.
   computed_inputs:
     - name: instance_name
       default: csb-sqs-${request.instance_id}
@@ -172,5 +176,5 @@ examples:
 - name: fifo
   description: FIFO queue
   plan_id: 093c1060-c1c0-11ee-8b97-ff07a1127dae
-  provision_params: {}
+  provision_params: {"fifo_throughput_limit": "perMessageGroupId", "deduplication_scope": "messageGroup"}
   bind_params: {}
