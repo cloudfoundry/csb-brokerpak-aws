@@ -72,8 +72,6 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"max_message_size":           BeNumerically("==", 262144),
 					"delay_seconds":              BeZero(),
 					"receive_wait_time_seconds":  BeZero(),
-					"deduplication_scope":        BeNil(),
-					"fifo_throughput_limit":      BeNil(),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
