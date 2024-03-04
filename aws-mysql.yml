@@ -54,6 +54,7 @@ provision:
       or "io1" (provisioned IOPS SSD).
     default: "io1"
   - field_name: iops
+    nullable: true
     type: integer
     details: |
       The amount of provisioned IOPS. For this property to take effect, `storage_type` must be

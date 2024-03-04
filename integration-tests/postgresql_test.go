@@ -258,6 +258,24 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				),
 			)
 		})
+
+		Context("should allow null values", func() {
+			It("iops", func() {
+				_, err := broker.Provision(postgreSQLServiceName, "custom-sample", map[string]any{
+					"storage_type": "gp3",
+					"iops":         nil,
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+					SatisfyAll(
+						HaveKeyWithValue("iops", BeNil()),
+						HaveKeyWithValue("storage_type", "gp3"),
+					),
+				)
+			})
+		})
+
 	})
 
 	Describe("updating instance", func() {
