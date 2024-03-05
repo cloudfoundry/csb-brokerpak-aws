@@ -105,7 +105,7 @@ provision:
       nullable: true
       details: | 
         Specify the AWS KMS customer master key (CMK) for encryption.
-        A non empty string invalidates the `sqs_managed_sse_enabled` property value.
+        The `sqs_managed_sse_enabled` property must be set to `false` if a KMS master key ID is provided.
       default: null
     - field_name: kms_data_key_reuse_period_seconds
       type: integer
