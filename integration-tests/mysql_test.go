@@ -253,6 +253,23 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				),
 			)
 		})
+
+		Context("should allow null values", func() {
+			It("iops", func() {
+				_, err := broker.Provision(mySQLServiceName, mySQLCustomPlanName, map[string]any{
+					"storage_type": "gp3",
+					"iops":         nil,
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+					SatisfyAll(
+						HaveKeyWithValue("iops", BeNil()),
+						HaveKeyWithValue("storage_type", "gp3"),
+					),
+				)
+			})
+		})
 	})
 
 	Describe("updating instance", func() {
