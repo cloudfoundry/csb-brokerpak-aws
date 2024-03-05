@@ -96,6 +96,24 @@ provision:
         * `perMessageGroupId`: for high throughput mode
         When High throughput Mode is ON, the value for `deduplication_scope` must be `messageGroup` or the operation fails.
         If not defined for a FIFO queue it defaults to `perQueue`.
+    - field_name: sqs_managed_sse_enabled
+      type: boolean
+      details: Enable SQS-managed encryption keys for encrypting messages.
+      default: true
+    - field_name: kms_master_key_id
+      type: string
+      nullable: true
+      details: | 
+        Specify the AWS KMS customer master key (CMK) for encryption.
+        A non empty string invalidates the `sqs_managed_sse_enabled` property value.
+      default: null
+    - field_name: kms_data_key_reuse_period_seconds
+      type: integer
+      details: Duration in seconds for reuse of a data key for encrypting messages.
+      default: 300  # 5 minutes
+      constraints:
+        minimum: 60  # Minimum 1 minute
+        maximum: 86400  # Maximum 24 hours
   computed_inputs:
     - name: instance_name
       default: csb-sqs-${request.instance_id}

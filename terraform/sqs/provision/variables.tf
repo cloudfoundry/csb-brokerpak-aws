@@ -21,4 +21,6 @@ variable "max_receive_count" { type = number }
 variable "dlq" { type = bool }
 variable "deduplication_scope" { type = string }
 variable "fifo_throughput_limit" { type = string }
-
+variable "sqs_managed_sse_enabled" { type = bool }
+variable "kms_master_key_id" { type = string }
+variable "kms_data_key_reuse_period_seconds" { type = number }

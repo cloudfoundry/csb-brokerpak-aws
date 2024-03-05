@@ -15,6 +15,15 @@ resource "aws_sqs_queue" "queue" {
   deduplication_scope   = var.deduplication_scope
   fifo_throughput_limit = var.fifo_throughput_limit
 
+  # Server-side encryption settings
+  kms_master_key_id                 = var.kms_master_key_id
+  kms_data_key_reuse_period_seconds = var.kms_data_key_reuse_period_seconds
+
+  # Conflicting configuration arguments: `sqs_managed_sse_enabled` conflicts with `kms_master_key_id`
+  # We could use nullable boolean type, but the UX would not be ideal:
+  # E.g: {"kms_master_key_id": "alias/aws/sqs", "sqs_managed_sse_enabled": null}
+  sqs_managed_sse_enabled = !var.sqs_managed_sse_enabled ? null : var.sqs_managed_sse_enabled
+
   lifecycle {
     prevent_destroy = true
   }
