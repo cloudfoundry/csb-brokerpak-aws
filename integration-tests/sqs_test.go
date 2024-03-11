@@ -12,8 +12,8 @@ import (
 const (
 	sqsServiceID                  = "2198d694-bf85-11ee-a918-a7bdfa69a96d"
 	sqsServiceName                = "csb-aws-sqs"
-	sqsServiceDescription         = "CSB AWS SQS"
-	sqsServiceDisplayName         = "CSB AWS SQS"
+	sqsServiceDescription         = "Beta - CSB AWS SQS"
+	sqsServiceDisplayName         = "CSB AWS SQS (Beta)"
 	sqsServiceSupportURL          = "https://aws.amazon.com/sqs/"
 	sqsServiceProviderDisplayName = "VMware"
 	sqsCustomStandardPlanName     = "custom-standard"
