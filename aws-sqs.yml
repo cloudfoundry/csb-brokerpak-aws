@@ -1,8 +1,8 @@
 version: 1
 name: csb-aws-sqs
 id: 2198d694-bf85-11ee-a918-a7bdfa69a96d
-description: CSB AWS SQS
-display_name: CSB AWS SQS
+description: Beta - CSB AWS SQS
+display_name: CSB AWS SQS (Beta)
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html
 provider_display_name: VMware
