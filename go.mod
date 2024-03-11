@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.150.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.75.1
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cloudfoundry/cloud-service-broker v0.22.1
+	github.com/cloudfoundry/cloud-service-broker v0.22.2
 	github.com/hashicorp/terraform-json v0.21.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.16.0
@@ -128,7 +128,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
 	google.golang.org/grpc v1.59.0 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/driver/mysql v1.5.4 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
