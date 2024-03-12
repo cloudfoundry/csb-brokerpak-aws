@@ -43,11 +43,11 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		Expect(got).To(Equal(message))
 	})
 
-	It("should work with FIFO and DLQ", func() {
-		By("creating a FIFO DLQ service instance")
+	It("should work with DLQ", func() {
+		By("creating a DLQ service instance")
 		dlqServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
-			services.WithPlan("fifo"),
+			services.WithPlan("standard"),
 			services.WithParameters(map[string]any{"dlq": true}),
 		)
 		defer dlqServiceInstance.Delete()
@@ -59,10 +59,10 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		}
 		csbKey.Get(&skReceiver)
 
-		By("creating a FIFO Queue")
+		By("creating a Standard Queue")
 		standardQueueServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
-			services.WithPlan("fifo"),
+			services.WithPlan("standard"),
 			services.WithParameters(map[string]any{
 				"dlq_arn":           skReceiver.ARN,
 				"max_receive_count": 1,
