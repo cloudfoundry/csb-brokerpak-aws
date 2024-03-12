@@ -43,11 +43,11 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		Expect(got).To(Equal(message))
 	})
 
-	It("should work with DLQ", func() {
-		By("creating a DLQ service instance")
+	It("should work with FIFO DLQ", func() {
+		By("creating a FIFO DLQ service instance")
 		dlqServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
-			services.WithPlan("standard"),
+			services.WithPlan("fifo"),
 			services.WithParameters(map[string]any{"dlq": true}),
 		)
 		defer dlqServiceInstance.Delete()
@@ -59,10 +59,10 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		}
 		csbKey.Get(&skReceiver)
 
-		By("creating a Standard Queue")
+		By("creating a FIFO Queue")
 		standardQueueServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
-			services.WithPlan("standard"),
+			services.WithPlan("fifo"),
 			services.WithParameters(map[string]any{
 				"dlq_arn":           skReceiver.ARN,
 				"max_receive_count": 1,
@@ -94,7 +94,9 @@ var _ = Describe("SQS", Label("sqs"), func() {
 
 		By("sending a message - producer")
 		message := random.Hexadecimal()
-		producerApp.POST(message, "/send/%s", producerBindingName)
+		messageGroupID := random.Hexadecimal()
+		messageDeduplicationID := random.Hexadecimal()
+		producerApp.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", producerBindingName, messageGroupID, messageDeduplicationID)
 
 		By("read a message without delete it - consumer")
 		got := consumerApp.GET("/retrieve/%s", consumerBindingName).String()
