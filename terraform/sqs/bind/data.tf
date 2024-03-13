@@ -38,5 +38,5 @@ locals {
     resources : [var.dlq_arn]
   }
 
-  queue_policy = length(var.dlq_arn) > 0 ? concat([local.standard_access], [local.dql_redrive_access]) : [ local.standard_access ]
+  queue_policy = length(var.dlq_arn) > 0 ? concat([local.standard_access], [local.dql_redrive_access]) : [local.standard_access]
 }
