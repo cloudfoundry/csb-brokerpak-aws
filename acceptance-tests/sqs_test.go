@@ -12,9 +12,9 @@ import (
 )
 
 var _ = Describe("SQS", Label("sqs"), func() {
-	It("can be accessed by an app", func() {
+	It("uses a FIFO queue in two apps", func() {
 		By("creating a service instance")
-		serviceInstance := services.CreateInstance("csb-aws-sqs", services.WithPlan("standard"))
+		serviceInstance := services.CreateInstance("csb-aws-sqs", services.WithPlan("fifo"))
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
@@ -34,20 +34,22 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(HaveKey("credhub-ref"))
 
-		By("sending a message using the first app")
+		By("sending a message - producer")
 		message := random.Hexadecimal()
-		appOne.POST(message, "/send/%s", bindingOneName)
+		messageGroupID := random.Hexadecimal()
+		messageDeduplicationID := random.Hexadecimal()
+		appOne.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", bindingOneName, messageGroupID, messageDeduplicationID)
 
 		By("receiving the message using the second app")
 		got := appTwo.GET("/retrieve_and_delete/%s", bindingTwoName).String()
 		Expect(got).To(Equal(message))
 	})
 
-	It("should work with FIFO DLQ", func() {
-		By("creating a FIFO DLQ service instance")
+	It("uses a Standard queue with accociated DLQ and triggers redrive", func() {
+		By("creating a DLQ service instance")
 		dlqServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
-			services.WithPlan("fifo"),
+			services.WithPlan("standard"),
 			services.WithParameters(map[string]any{"dlq": true}),
 		)
 		defer dlqServiceInstance.Delete()
@@ -59,16 +61,18 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		}
 		csbKey.Get(&skReceiver)
 
-		By("creating a FIFO Queue")
+		By("creating a Standard Queue")
 		standardQueueServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
-			services.WithPlan("fifo"),
+			services.WithPlan("standard"),
 			services.WithParameters(map[string]any{
 				"dlq_arn":           skReceiver.ARN,
 				"max_receive_count": 1,
 			}),
 		)
 		defer standardQueueServiceInstance.Delete()
+
+		GinkgoWriter.Printf("DLQ ARN: %s\n", skReceiver.ARN)
 
 		By("pushing the unstarted apps")
 		producerApp := apps.Push(apps.WithName(random.Name(random.WithPrefix("producer"))), apps.WithApp(apps.SQS))
@@ -92,22 +96,31 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		By("starting the apps")
 		apps.Start(producerApp, consumerApp)
 
-		By("sending a message - producer")
+		By("sending a message using producer app")
 		message := random.Hexadecimal()
-		messageGroupID := random.Hexadecimal()
-		messageDeduplicationID := random.Hexadecimal()
-		producerApp.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", producerBindingName, messageGroupID, messageDeduplicationID)
+		producerApp.POST(message, "/send/%s", producerBindingName)
 
-		By("read a message without delete it - consumer")
-		got := consumerApp.GET("/retrieve/%s", consumerBindingName).String()
+		By("reading message using consumer app")
+		got := consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
 		Expect(got).To(Equal(message))
 
-		By("attempts retrieving from the queue again so transferring the message to the DLQ is triggerd - consumer")
+		By("sending another message using producer app")
+		message = random.Hexadecimal()
+		producerApp.POST(message, "/send/%s", producerBindingName)
+
+		By("read a message without delete it using consumer app")
+		got = consumerApp.GET("/retrieve/%s", consumerBindingName).String()
+		Expect(got).To(Equal(message))
+
+		By("triggering move to DLQ by attempting to retrieve from the queue again using consumer app")
 		response := consumerApp.GETResponse("/retrieve/%s", consumerBindingName)
 		Expect(response).To(HaveHTTPStatus(http.StatusTooEarly))
 
-		By("reading message from DLQ - DLQ consumer")
-		got = consumerApp.GET("/retrieve_and_delete/%s", bindingDLQName).String()
+		By("triggering redrive from DLQ to original queue using consumer app")
+		consumerApp.POST("", "/redrive/%s?dlq_binding=%s", consumerBindingName, bindingDLQName)
+
+		By("reading message in the original queue using consumer app")
+		got = consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
 		Expect(got).To(Equal(message))
 	})
 })

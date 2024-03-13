@@ -127,6 +127,9 @@ provision:
     - field_name: dlq
       type: boolean
       details: Whether to create a DLQ queue. Cannot be altered once a queue is created.
+    - field_name: dlq_arn
+      type: string
+      details: The ARN of the associated DLQ.
 bind:
   plan_inputs: []
   user_inputs: []
@@ -153,6 +156,10 @@ bind:
       default: ${instance.details["dlq"]}
       overwrite: true
       type: boolean
+    - name: dlq_arn
+      default: ${instance.details["dlq_arn"]}
+      overwrite: true
+      type: string
   template_refs:
     data: terraform/sqs/bind/data.tf
     main: terraform/sqs/bind/main.tf
