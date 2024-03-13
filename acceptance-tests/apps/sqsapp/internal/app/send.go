@@ -34,7 +34,7 @@ func handleSend(creds credentials.Credentials) func(r *http.Request) (int, strin
 		defer r.Body.Close()
 		body := string(data)
 
-		sendMessageInput := &sqs.SendMessageInput{
+		sendMessageInput := sqs.SendMessageInput{
 			MessageBody: &body,
 			QueueUrl:    &cred.URL,
 		}
@@ -42,15 +42,11 @@ func handleSend(creds credentials.Credentials) func(r *http.Request) (int, strin
 		messageDeduplicationID := r.URL.Query().Get("messageDeduplicationId")
 
 		if messageGroupID != "" || messageDeduplicationID != "" {
-			sendMessageInput = &sqs.SendMessageInput{
-				MessageBody:            &body,
-				QueueUrl:               &cred.URL,
-				MessageGroupId:         &messageGroupID,
-				MessageDeduplicationId: &messageDeduplicationID,
-			}
+			sendMessageInput.MessageGroupId = &messageGroupID  
+			sendMessageInput.MessageDeduplicationId = &messageDeduplicationID 
 		}
 
-		output, err := sqs.NewFromConfig(cfg).SendMessage(r.Context(), sendMessageInput)
+		output, err := sqs.NewFromConfig(cfg).SendMessage(r.Context(), &sendMessageInput)
 		if err != nil {
 			return http.StatusBadRequest, fmt.Sprintf("error sending message: %q", err)
 		}
