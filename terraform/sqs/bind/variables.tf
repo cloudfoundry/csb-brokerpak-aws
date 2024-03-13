@@ -9,5 +9,4 @@ variable "aws_secret_access_key" {
 variable "region" { type = string }
 variable "arn" { type = string }
 variable "user_name" { type = string }
-variable "dlq" { type = bool }
 variable "dlq_arn" { type = string }
