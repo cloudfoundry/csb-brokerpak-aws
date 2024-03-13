@@ -8,7 +8,8 @@ variable "admin_username" {
   type = string
 }
 variable "admin_password" {
-  type = string
+  type      = string
+  sensitive = true
 }
 variable "require_ssl" {
   type = bool
