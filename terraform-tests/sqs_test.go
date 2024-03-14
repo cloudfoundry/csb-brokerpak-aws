@@ -46,7 +46,8 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			"deduplication_scope":               nil,
 			"fifo_throughput_limit":             nil,
 			"sqs_managed_sse_enabled":           true,
-			"kms_master_key_id":                 nil,
+			"kms_master_key_id":                 "",
+			"kms_extra_key_ids":                 "",
 			"kms_data_key_reuse_period_seconds": 300,
 		}
 	})
@@ -67,13 +68,15 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		It("should create an SQS queue with the correct properties", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"name":                       Equal(name),
-					"fifo_queue":                 BeFalse(),
-					"visibility_timeout_seconds": BeNumerically("==", 30),
-					"message_retention_seconds":  BeNumerically("==", 345600),
-					"max_message_size":           BeNumerically("==", 262144),
-					"delay_seconds":              BeZero(),
-					"receive_wait_time_seconds":  BeZero(),
+					"name":                              Equal(name),
+					"fifo_queue":                        BeFalse(),
+					"visibility_timeout_seconds":        BeNumerically("==", 30),
+					"message_retention_seconds":         BeNumerically("==", 345600),
+					"max_message_size":                  BeNumerically("==", 262144),
+					"delay_seconds":                     BeZero(),
+					"receive_wait_time_seconds":         BeZero(),
+					"kms_master_key_id":                 BeNil(),
+					"kms_data_key_reuse_period_seconds": BeNumerically("==", 300),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),

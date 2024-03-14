@@ -97,11 +97,10 @@ provision:
       default: true
     - field_name: kms_master_key_id
       type: string
-      nullable: true
       details: | 
         Specify the AWS KMS customer master key (CMK) for encryption.
         The `sqs_managed_sse_enabled` property must be set to `false` if a KMS master key ID is provided.
-      default: null
+      default: ""
     - field_name: kms_data_key_reuse_period_seconds
       type: integer
       details: Duration in seconds for reuse of a data key for encrypting messages.
@@ -109,6 +108,12 @@ provision:
       constraints:
         minimum: 60  # Minimum 1 minute
         maximum: 86400  # Maximum 24 hours
+    - field_name: kms_extra_key_ids
+      type: string
+      details: |
+        A comma-separated list of AWS KMS key IDs used for SSE-KMS operations.
+        Since a DLQ can receive messages from multiple sources, all the KMS key IDs used as sources must be included.
+      default: ""
   computed_inputs:
     - name: instance_name
       default: csb-sqs-${request.instance_id}
@@ -119,6 +124,7 @@ provision:
       overwrite: true
       type: object
   template_refs:
+    data: terraform/sqs/provision/data.tf
     main: terraform/sqs/provision/main.tf
     outputs: terraform/sqs/provision/outputs.tf
     provider: terraform/sqs/provision/providers.tf
@@ -140,6 +146,9 @@ provision:
     - field_name: dlq_arn
       type: string
       details: The ARN of the associated DLQ.
+    - field_name: kms_all_key_ids
+      type: string
+      details: The `kms_master_key_id` and `kms_extra_key_ids` AWS KMS key IDs used for SSE-KMS operations.
 bind:
   plan_inputs: []
   user_inputs: []
@@ -164,6 +173,10 @@ bind:
       type: string
     - name: dlq_arn
       default: ${instance.details["dlq_arn"]}
+      overwrite: true
+      type: string
+    - name: kms_all_key_ids
+      default: ${instance.details["kms_all_key_ids"]}
       overwrite: true
       type: string
   template_refs:

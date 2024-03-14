@@ -1,15 +1,7 @@
-data "aws_iam_policy_document" "user_policy" {
-  dynamic "statement" {
-    for_each = local.queue_policy
-    content {
-      sid       = try(statement.value.sid, null)
-      actions   = try(statement.value.actions, null)
-      resources = try(statement.value.resources, null)
-    }
-  }
-}
-
 locals {
+  key_ids_list = compact(split(",", var.kms_all_key_ids))
+  has_key_ids  = length(local.key_ids_list) != 0
+
   standard_access = {
     sid : "sqsAccess",
     actions : [
@@ -25,6 +17,7 @@ locals {
     ],
     resources : [var.arn]
   }
+
   dql_redrive_access = {
     sid : "sqsAccessDLQ",
     actions : [
@@ -38,5 +31,34 @@ locals {
     resources : [var.dlq_arn]
   }
 
-  queue_policy = length(var.dlq_arn) > 0 ? concat([local.standard_access], [local.dql_redrive_access]) : [local.standard_access]
+  kms_statement = {
+    sid : "kmsAccess",
+    actions : [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [for key in data.aws_kms_key.customer_provided_keys : key.arn]
+  }
+
+  queue_policy = concat(
+    [local.standard_access],
+    length(var.dlq_arn) > 0 ? [local.dql_redrive_access] : [],
+    local.has_key_ids ? [local.kms_statement] : []
+  )
+}
+
+data "aws_iam_policy_document" "user_policy" {
+  dynamic "statement" {
+    for_each = local.queue_policy
+    content {
+      sid       = statement.value.sid
+      actions   = statement.value.actions
+      resources = statement.value.resources
+    }
+  }
+}
+
+data "aws_kms_key" "customer_provided_keys" {
+  count  = local.has_key_ids ? length(local.key_ids_list) : 0
+  key_id = local.key_ids_list[count.index]
 }

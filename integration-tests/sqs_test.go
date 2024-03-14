@@ -122,7 +122,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
 					HaveKeyWithValue("dlq_arn", Equal("")),
 					HaveKeyWithValue("sqs_managed_sse_enabled", BeTrue()),
-					HaveKeyWithValue("kms_master_key_id", BeNil()),
+					HaveKeyWithValue("kms_master_key_id", Equal("")),
 					HaveKeyWithValue("kms_data_key_reuse_period_seconds", BeNumerically("==", 300)),
 				),
 			)
@@ -283,6 +283,11 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					Type:  "string",
 					Value: "arn:aws:sqs::ap-northeast-3::example-dlq",
 				},
+				{
+					Name:  "kms_all_key_ids",
+					Type:  "string",
+					Value: "alias_kms_id1,alias_kms_id2",
+				},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -301,6 +306,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					"queue_name":        "example_name",
 					"queue_url":         "example_url",
 					"dlq_arn":           "arn:aws:sqs::ap-northeast-3::example-dlq",
+					"kms_all_key_ids":   "alias_kms_id1,alias_kms_id2",
 				}),
 			)
 		})

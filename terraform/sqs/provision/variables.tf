@@ -23,3 +23,4 @@ variable "fifo_throughput_limit" { type = string }
 variable "sqs_managed_sse_enabled" { type = bool }
 variable "kms_master_key_id" { type = string }
 variable "kms_data_key_reuse_period_seconds" { type = number }
+variable "kms_extra_key_ids" { type = string }
