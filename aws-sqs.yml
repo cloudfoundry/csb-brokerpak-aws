@@ -71,7 +71,7 @@ provision:
       details: The number of times a message is delivered to the source queue before being moved to the DLQ.
       default: 5
     - field_name: content_based_deduplication
-      type: bool
+      type: boolean
       default: false
       details: Enables content-based deduplication for FIFO queues.
     - field_name: deduplication_scope
