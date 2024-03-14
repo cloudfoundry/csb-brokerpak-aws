@@ -45,7 +45,7 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		Expect(got).To(Equal(message))
 	})
 
-	FIt("uses a Standard queue with accociated DLQ and triggers redrive", func() {
+	It("uses a Standard queue with accociated DLQ and triggers redrive", func() {
 		By("creating a DLQ service instance")
 		dlqServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
