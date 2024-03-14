@@ -26,19 +26,14 @@ func handleRedrive(creds credentials.Credentials) func(r *http.Request) (int, st
 			return http.StatusInternalServerError, fmt.Sprintf("could not read AWS config: %q", err)
 		}
 
-		dlqBinding := r.URL.Query().Get("dlq_binding")
-		if dlqBinding == "" {
-			return http.StatusBadRequest, "Should include dlq_binding query param."
-		}
-
-		dlqCred, ok := creds[dlqBinding]
-		if !ok {
-			return http.StatusBadRequest, fmt.Sprintf("no creds found for dlq_binding: %q", dlqBinding)
+		dlqARN := r.URL.Query().Get("dlq_arn")
+		if dlqARN == "" {
+			return http.StatusBadRequest, "Should include dlq_arn query param."
 		}
 
 		client := sqs.NewFromConfig(cfg)
 		output, err := client.StartMessageMoveTask(r.Context(), &sqs.StartMessageMoveTaskInput{
-			SourceArn:      &dlqCred.ARN,
+			SourceArn:      &dlqARN,
 			DestinationArn: &cred.ARN,
 		})
 		if err != nil {

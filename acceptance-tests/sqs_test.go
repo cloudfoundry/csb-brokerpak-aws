@@ -45,7 +45,7 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		Expect(got).To(Equal(message))
 	})
 
-	It("uses a Standard queue with accociated DLQ and triggers redrive", func() {
+	FIt("uses a Standard queue with accociated DLQ and triggers redrive", func() {
 		By("creating a DLQ service instance")
 		dlqServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
@@ -59,13 +59,14 @@ var _ = Describe("SQS", Label("sqs"), func() {
 			ARN string `json:"arn"`
 		}
 		csbKey.Get(&skReceiver)
+		dlqARN := skReceiver.ARN
 
 		By("creating a Standard Queue")
 		standardQueueServiceInstance := services.CreateInstance(
 			"csb-aws-sqs",
 			services.WithPlan("standard"),
 			services.WithParameters(map[string]any{
-				"dlq_arn":           skReceiver.ARN,
+				"dlq_arn":           dlqARN,
 				"max_receive_count": 1,
 			}),
 		)
@@ -135,7 +136,7 @@ var _ = Describe("SQS", Label("sqs"), func() {
 			Expect(response).To(HaveHTTPStatus(http.StatusTooEarly))
 
 			By("triggering redrive from DLQ to original queue using consumer app")
-			consumerApp.POST("", "/redrive/%s?dlq_binding=%s", consumerBindingName, bindingDLQName)
+			consumerApp.POST("", "/redrive/%s?dlq_arn=%s", consumerBindingName, dlqARN)
 
 			By("reading message in the original queue using consumer app")
 			got = consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
