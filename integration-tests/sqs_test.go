@@ -150,9 +150,10 @@ var _ = Describe("SQS", Label("SQS"), func() {
 
 		It("should allow FIFO specific properties to be set on provision", func() {
 			_, err := broker.Provision(sqsServiceName, sqsCustomFIFOPlanName, map[string]any{
-				"fifo":                  true,
-				"deduplication_scope":   "messageGroup",
-				"fifo_throughput_limit": "perMessageGroupId",
+				"fifo":                        true,
+				"deduplication_scope":         "messageGroup",
+				"fifo_throughput_limit":       "perMessageGroupId",
+				"content_based_deduplication": true,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -161,6 +162,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("fifo", BeTrue()),
 					HaveKeyWithValue("deduplication_scope", Equal("messageGroup")),
 					HaveKeyWithValue("fifo_throughput_limit", Equal("perMessageGroupId")),
+					HaveKeyWithValue("content_based_deduplication", BeTrue()),
 				),
 			)
 		})
@@ -220,6 +222,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			},
 			Entry("update deduplication_scope", "deduplication_scope", "messageGroup"),
 			Entry("update fifo_throughput_limit", "fifo_throughput_limit", "perMessageGroupId"),
+			Entry("update content_based_deduplication", "content_based_deduplication", true),
 		)
 	})
 
