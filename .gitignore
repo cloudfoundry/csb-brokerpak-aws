@@ -7,3 +7,4 @@ cloud-service-broker
 providers/build
 custom.tfrc
 integration-tests/integration-tests.test
+acceptance-tests/acceptance-tests.test

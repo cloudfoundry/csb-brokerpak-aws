@@ -15,6 +15,7 @@ func App(creds credentials.Credentials) http.Handler {
 	r.HandleFunc("GET /retrieve_and_delete/{binding_name}", writeResponse(handleRetrieveAndDelete(creds)))
 	r.HandleFunc("GET /retrieve/{binding_name}", writeResponse(handleRetrieve(creds)))
 	r.HandleFunc("POST /send/{binding_name}", writeResponse(handleSend(creds)))
+	r.HandleFunc("POST /redrive/{binding_name}", writeResponse(handleRedrive(creds)))
 
 	return r
 }

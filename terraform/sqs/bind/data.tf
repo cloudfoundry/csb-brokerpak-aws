@@ -1,33 +1,42 @@
 data "aws_iam_policy_document" "user_policy" {
   dynamic "statement" {
-    for_each = local.policy_statements
+    for_each = local.queue_policy
     content {
       sid       = try(statement.value.sid, null)
       actions   = try(statement.value.actions, null)
-      resources = [var.arn]
+      resources = try(statement.value.resources, null)
     }
   }
 }
 
 locals {
-  standard_user = {
+  standard_access = {
     sid : "sqsAccess",
     actions : [
       "sqs:SendMessage",
       "sqs:ReceiveMessage",
       "sqs:DeleteMessage",
       "sqs:PurgeQueue",
-      "sqs:GetQueueAttributes"
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ListQueues",
+      "sqs:ListQueueTags",
+      "sqs:ListDeadLetterSourceQueues",
     ],
+    resources : [var.arn]
   }
-  dlq_user = {
-    sid : "sqsDLQAllowUserToReceiveDeletePurgeMessagesAndGetAttr",
+  dql_redrive_access = {
+    sid : "sqsAccessDLQ",
     actions : [
+      "sqs:StartMessageMoveTask",
+      "sqs:CancelMessageMoveTask",
+      "sqs:ListMessageMoveTasks",
       "sqs:ReceiveMessage",
       "sqs:DeleteMessage",
-      "sqs:PurgeQueue",
       "sqs:GetQueueAttributes"
-    ]
+    ],
+    resources : [var.dlq_arn]
   }
-  policy_statements = var.dlq ? { policy : local.dlq_user } : { policy : local.standard_user }
+
+  queue_policy = length(var.dlq_arn) > 0 ? concat([local.standard_access], [local.dql_redrive_access]) : [local.standard_access]
 }
