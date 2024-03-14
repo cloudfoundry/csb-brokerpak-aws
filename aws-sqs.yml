@@ -1,8 +1,8 @@
 version: 1
 name: csb-aws-sqs
 id: 2198d694-bf85-11ee-a918-a7bdfa69a96d
-description: CSB AWS SQS
-display_name: CSB AWS SQS
+description: Beta - CSB AWS SQS
+display_name: CSB AWS SQS (Beta)
 image_url: file://service-images/csb.png
 documentation_url: https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html
 provider_display_name: VMware
@@ -20,11 +20,6 @@ provision:
           - us-west-2
           - eu-west-1
         pattern: ^[a-z][a-z0-9-]+$
-      prohibit_update: true
-    - field_name: dlq
-      type: boolean
-      details: Whether to create a DLQ queue. Cannot be altered once a queue is created.
-      default: false
       prohibit_update: true
     - field_name: fifo
       type: boolean
@@ -142,9 +137,9 @@ provision:
     - field_name: queue_url
       type: string
       details: URL for the queue
-    - field_name: dlq
-      type: boolean
-      details: Whether to create a DLQ queue. Cannot be altered once a queue is created.
+    - field_name: dlq_arn
+      type: string
+      details: The ARN of the associated DLQ.
 bind:
   plan_inputs: []
   user_inputs: []
@@ -167,10 +162,10 @@ bind:
       default: csb-${request.binding_id}
       overwrite: true
       type: string
-    - name: dlq
-      default: ${instance.details["dlq"]}
+    - name: dlq_arn
+      default: ${instance.details["dlq_arn"]}
       overwrite: true
-      type: boolean
+      type: string
   template_refs:
     data: terraform/sqs/bind/data.tf
     main: terraform/sqs/bind/main.tf

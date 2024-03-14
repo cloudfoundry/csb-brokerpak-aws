@@ -12,8 +12,8 @@ import (
 const (
 	sqsServiceID                  = "2198d694-bf85-11ee-a918-a7bdfa69a96d"
 	sqsServiceName                = "csb-aws-sqs"
-	sqsServiceDescription         = "CSB AWS SQS"
-	sqsServiceDisplayName         = "CSB AWS SQS"
+	sqsServiceDescription         = "Beta - CSB AWS SQS"
+	sqsServiceDisplayName         = "CSB AWS SQS (Beta)"
 	sqsServiceSupportURL          = "https://aws.amazon.com/sqs/"
 	sqsServiceProviderDisplayName = "VMware"
 	sqsCustomStandardPlanName     = "custom-standard"
@@ -210,7 +210,6 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			},
 			Entry("update region", "region", "no-matter-what-region"),
 			Entry("update fifo", "fifo", true),
-			Entry("update dlq", "dlq", true),
 		)
 
 		DescribeTable(
@@ -280,9 +279,9 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					Value: "example_url",
 				},
 				{
-					Name:  "dlq",
-					Type:  "boolean",
-					Value: false,
+					Name:  "dlq_arn",
+					Type:  "string",
+					Value: "arn:aws:sqs::ap-northeast-3::example-dlq",
 				},
 			})
 			Expect(err).NotTo(HaveOccurred())
@@ -301,7 +300,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					"arn":               "arn:aws:sqs::ap-northeast-3::example",
 					"queue_name":        "example_name",
 					"queue_url":         "example_url",
-					"dlq":               false,
+					"dlq_arn":           "arn:aws:sqs::ap-northeast-3::example-dlq",
 				}),
 			)
 		})
