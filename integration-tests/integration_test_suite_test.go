@@ -53,7 +53,6 @@ var _ = BeforeSuite(func() {
 		"AWS_SECRET_ACCESS_KEY=" + awsSecretAccessKey,
 		"CSB_LISTENER_HOST=localhost",
 		"GSB_COMPATIBILITY_ENABLE_BETA_SERVICES=true",
-		"TERRAFORM_UPGRADES_ENABLED=false",
 		"GSB_PROVISION_DEFAULTS=" + marshall(map[string]string{"region": fakeRegion}),
 		`GSB_BROKERPAK_CONFIG={"global_labels":[{"key":  "key1", "value":  "value1"},{"key":  "key2", "value":  "value2"}]}`,
 	})).To(Succeed())
