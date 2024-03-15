@@ -1,6 +1,4 @@
 locals {
-  key_ids_list = compact(split(",", var.kms_all_key_ids))
-  has_key_ids  = length(local.key_ids_list) != 0
 
   standard_access = {
     sid : "sqsAccess",
@@ -39,6 +37,9 @@ locals {
     ]
     resources = [for key in data.aws_kms_key.customer_provided_keys : key.arn]
   }
+
+  key_ids_list = compact(split(",", var.kms_all_key_ids))
+  has_key_ids  = length(local.key_ids_list) != 0
 
   queue_policy = concat(
     [local.standard_access],
