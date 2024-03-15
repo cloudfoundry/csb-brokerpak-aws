@@ -30,22 +30,26 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"instance_name":               name,
-			"fifo":                        false,
-			"visibility_timeout_seconds":  30,
-			"message_retention_seconds":   345600,
-			"max_message_size":            262144,
-			"delay_seconds":               0,
-			"receive_wait_time_seconds":   0,
-			"labels":                      map[string]string{"label1": "value1"},
-			"aws_access_key_id":           awsAccessKeyID,
-			"aws_secret_access_key":       awsSecretAccessKey,
-			"region":                      awsRegion,
-			"dlq_arn":                     "",
-			"max_receive_count":           5,
-			"deduplication_scope":         nil,
-			"fifo_throughput_limit":       nil,
-			"content_based_deduplication": false,
+			"instance_name":                     name,
+			"fifo":                              false,
+			"visibility_timeout_seconds":        30,
+			"message_retention_seconds":         345600,
+			"max_message_size":                  262144,
+			"delay_seconds":                     0,
+			"receive_wait_time_seconds":         0,
+			"labels":                            map[string]string{"label1": "value1"},
+			"aws_access_key_id":                 awsAccessKeyID,
+			"aws_secret_access_key":             awsSecretAccessKey,
+			"region":                            awsRegion,
+			"dlq_arn":                           "",
+			"max_receive_count":                 5,
+			"deduplication_scope":               nil,
+			"fifo_throughput_limit":             nil,
+			"content_based_deduplication":       false,
+			"sqs_managed_sse_enabled":           true,
+			"kms_master_key_id":                 "",
+			"kms_extra_key_ids":                 "",
+			"kms_data_key_reuse_period_seconds": 300,
 		}
 	})
 
@@ -65,13 +69,15 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		It("should create an SQS queue with the correct properties", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"name":                       Equal(name),
-					"fifo_queue":                 BeFalse(),
-					"visibility_timeout_seconds": BeNumerically("==", 30),
-					"message_retention_seconds":  BeNumerically("==", 345600),
-					"max_message_size":           BeNumerically("==", 262144),
-					"delay_seconds":              BeZero(),
-					"receive_wait_time_seconds":  BeZero(),
+					"name":                              Equal(name),
+					"fifo_queue":                        BeFalse(),
+					"visibility_timeout_seconds":        BeNumerically("==", 30),
+					"message_retention_seconds":         BeNumerically("==", 345600),
+					"max_message_size":                  BeNumerically("==", 262144),
+					"delay_seconds":                     BeZero(),
+					"receive_wait_time_seconds":         BeZero(),
+					"kms_master_key_id":                 BeNil(),
+					"kms_data_key_reuse_period_seconds": BeNumerically("==", 300),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
@@ -236,6 +242,56 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"receive_wait_time_seconds": BeNumerically("==", 15),
 				}),
 			)
+		})
+	})
+
+	Context("with SQS-managed SSE enabled", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"sqs_managed_sse_enabled": true,
+			}))
+		})
+
+		It("should enable SQS-managed server-side encryption", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"sqs_managed_sse_enabled": BeTrue(),
+				}),
+			)
+		})
+	})
+
+	Context("with KMS master key specified", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"kms_master_key_id":                 "alias/aws/sqs",
+				"kms_data_key_reuse_period_seconds": 300,
+				"sqs_managed_sse_enabled":           false,
+			}))
+		})
+
+		It("should use the specified KMS master key for encryption and data key reuse period specified", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"kms_master_key_id":                 Equal("alias/aws/sqs"),
+					"kms_data_key_reuse_period_seconds": BeNumerically("==", 300),
+				}),
+			)
+		})
+	})
+
+	Context("with KMS master key specified and sse enabled", func() {
+		It("should throw an error", func() {
+			session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"kms_master_key_id":                 "alias/aws/sqs",
+				"kms_data_key_reuse_period_seconds": 300,
+				"sqs_managed_sse_enabled":           true,
+			}))
+
+			Expect(session.ExitCode()).NotTo(Equal(0))
+			msgs := string(session.Out.Contents())
+			Expect(msgs).To(ContainSubstring(`Error: Conflicting configuration arguments`))
+			Expect(msgs).To(ContainSubstring(`\"sqs_managed_sse_enabled\": conflicts with kms_master_key_id`))
 		})
 	})
 })
