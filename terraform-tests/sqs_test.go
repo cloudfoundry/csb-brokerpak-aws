@@ -30,21 +30,22 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"instance_name":              name,
-			"fifo":                       false,
-			"visibility_timeout_seconds": 30,
-			"message_retention_seconds":  345600,
-			"max_message_size":           262144,
-			"delay_seconds":              0,
-			"receive_wait_time_seconds":  0,
-			"labels":                     map[string]string{"label1": "value1"},
-			"aws_access_key_id":          awsAccessKeyID,
-			"aws_secret_access_key":      awsSecretAccessKey,
-			"region":                     awsRegion,
-			"dlq_arn":                    "",
-			"max_receive_count":          5,
-			"deduplication_scope":        nil,
-			"fifo_throughput_limit":      nil,
+			"instance_name":               name,
+			"fifo":                        false,
+			"visibility_timeout_seconds":  30,
+			"message_retention_seconds":   345600,
+			"max_message_size":            262144,
+			"delay_seconds":               0,
+			"receive_wait_time_seconds":   0,
+			"labels":                      map[string]string{"label1": "value1"},
+			"aws_access_key_id":           awsAccessKeyID,
+			"aws_secret_access_key":       awsSecretAccessKey,
+			"region":                      awsRegion,
+			"dlq_arn":                     "",
+			"max_receive_count":           5,
+			"deduplication_scope":         nil,
+			"fifo_throughput_limit":       nil,
+			"content_based_deduplication": false,
 		}
 	})
 
@@ -82,35 +83,39 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 	Context("FIFO queues", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"fifo":                  true,
-				"deduplication_scope":   "queue",
-				"fifo_throughput_limit": "perQueue",
+				"fifo":                        true,
+				"deduplication_scope":         "queue",
+				"fifo_throughput_limit":       "perQueue",
+				"content_based_deduplication": true,
 			}))
 		})
 
 		It("should create an SQS FIFO queue with the correct properties", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"name":                  Equal(fmt.Sprintf("%s.fifo", name)),
-					"fifo_queue":            BeTrue(),
-					"deduplication_scope":   Equal("queue"),
-					"fifo_throughput_limit": Equal("perQueue"),
+					"name":                        Equal(fmt.Sprintf("%s.fifo", name)),
+					"fifo_queue":                  BeTrue(),
+					"deduplication_scope":         Equal("queue"),
+					"fifo_throughput_limit":       Equal("perQueue"),
+					"content_based_deduplication": BeTrue(),
 				}),
 			)
 		})
 
 		It("should create a FIFO SQS queue for high throughput mode", func() {
 			customFIFOVars := map[string]any{
-				"fifo":                  true,
-				"deduplication_scope":   "messageGroup",
-				"fifo_throughput_limit": "perMessageGroupId",
+				"fifo":                        true,
+				"deduplication_scope":         "messageGroup",
+				"fifo_throughput_limit":       "perMessageGroupId",
+				"content_based_deduplication": false,
 			}
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, customFIFOVars))
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"fifo_queue":            BeTrue(),
-					"deduplication_scope":   Equal("messageGroup"),
-					"fifo_throughput_limit": Equal("perMessageGroupId"),
+					"fifo_queue":                  BeTrue(),
+					"deduplication_scope":         Equal("messageGroup"),
+					"fifo_throughput_limit":       Equal("perMessageGroupId"),
+					"content_based_deduplication": BeFalse(),
 				}),
 			)
 		})
