@@ -18,6 +18,7 @@ variable "delay_seconds" { type = number }
 variable "receive_wait_time_seconds" { type = number }
 variable "dlq_arn" { type = string }
 variable "max_receive_count" { type = number }
+variable "content_based_deduplication" { type = bool }
 variable "deduplication_scope" { type = string }
 variable "fifo_throughput_limit" { type = string }
 
