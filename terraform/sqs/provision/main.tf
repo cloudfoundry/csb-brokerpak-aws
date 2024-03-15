@@ -12,8 +12,9 @@ resource "aws_sqs_queue" "queue" {
     maxReceiveCount     = var.max_receive_count
   }) : null
 
-  deduplication_scope   = var.deduplication_scope
-  fifo_throughput_limit = var.fifo_throughput_limit
+  content_based_deduplication = var.content_based_deduplication
+  deduplication_scope         = var.deduplication_scope
+  fifo_throughput_limit       = var.fifo_throughput_limit
 
   # Server-side encryption settings
   kms_master_key_id                 = var.kms_master_key_id == "" ? null : var.kms_master_key_id
