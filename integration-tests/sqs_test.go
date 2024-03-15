@@ -87,6 +87,16 @@ var _ = Describe("SQS", Label("SQS"), func() {
 				map[string]any{"region": "-Asia-northeast1"},
 				"region: Does not match pattern '^[a-z][a-z0-9-]+$'",
 			),
+			Entry(
+				"kms_data_key_reuse_period_seconds maximum value is 86400",
+				map[string]any{"kms_data_key_reuse_period_seconds": 86401},
+				"kms_data_key_reuse_period_seconds: Must be less than or equal to 86400",
+			),
+			Entry(
+				"kms_data_key_reuse_period_seconds minimum value is 60",
+				map[string]any{"kms_data_key_reuse_period_seconds": 10},
+				"kms_data_key_reuse_period_seconds: Must be greater than or equal to 60",
+			),
 		)
 
 		It("should provision a queue", func() {
@@ -111,23 +121,29 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
 					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
 					HaveKeyWithValue("dlq_arn", Equal("")),
+					HaveKeyWithValue("sqs_managed_sse_enabled", BeTrue()),
+					HaveKeyWithValue("kms_master_key_id", Equal("")),
+					HaveKeyWithValue("kms_data_key_reuse_period_seconds", BeNumerically("==", 300)),
 				),
 			)
 		})
 
 		It("should allow properties to be set on provision", func() {
 			_, err := broker.Provision(sqsServiceName, sqsCustomStandardPlanName, map[string]any{
-				"region":                     "africa-north-4",
-				"fifo":                       true,
-				"visibility_timeout_seconds": 60,
-				"message_retention_seconds":  60,
-				"max_message_size":           1024,
-				"delay_seconds":              600,
-				"receive_wait_time_seconds":  20,
-				"aws_access_key_id":          "fake-aws-access-key-id",
-				"aws_secret_access_key":      "fake-aws-secret-access-key",
-				"dlq_arn":                    "fake-arn",
-				"max_receive_count":          5,
+				"region":                            "africa-north-4",
+				"fifo":                              true,
+				"visibility_timeout_seconds":        60,
+				"message_retention_seconds":         60,
+				"max_message_size":                  1024,
+				"delay_seconds":                     600,
+				"receive_wait_time_seconds":         20,
+				"aws_access_key_id":                 "fake-aws-access-key-id",
+				"aws_secret_access_key":             "fake-aws-secret-access-key",
+				"dlq_arn":                           "fake-arn",
+				"max_receive_count":                 5,
+				"sqs_managed_sse_enabled":           false,
+				"kms_master_key_id":                 "xxxx",
+				"kms_data_key_reuse_period_seconds": 86_400,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -144,6 +160,9 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 					HaveKeyWithValue("dlq_arn", "fake-arn"),
 					HaveKeyWithValue("max_receive_count", BeNumerically("==", 5)),
+					HaveKeyWithValue("sqs_managed_sse_enabled", BeFalse()),
+					HaveKeyWithValue("kms_master_key_id", "xxxx"),
+					HaveKeyWithValue("kms_data_key_reuse_period_seconds", BeNumerically("==", 86_400)),
 				),
 			)
 		})
@@ -211,6 +230,9 @@ var _ = Describe("SQS", Label("SQS"), func() {
 			Entry(nil, "max_message_size", 1024),
 			Entry(nil, "delay_seconds", 300),
 			Entry(nil, "receive_wait_time_seconds", 15),
+			Entry(nil, "sqs_managed_sse_enabled", false),
+			Entry(nil, "kms_master_key_id", "xxxx"),
+			Entry(nil, "kms_data_key_reuse_period_seconds", 86_400),
 		)
 
 		DescribeTable(
@@ -264,6 +286,11 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					Type:  "string",
 					Value: "arn:aws:sqs::ap-northeast-3::example-dlq",
 				},
+				{
+					Name:  "kms_all_key_ids",
+					Type:  "string",
+					Value: "alias_kms_id1,alias_kms_id2",
+				},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -282,6 +309,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 					"queue_name":        "example_name",
 					"queue_url":         "example_url",
 					"dlq_arn":           "arn:aws:sqs::ap-northeast-3::example-dlq",
+					"kms_all_key_ids":   "alias_kms_id1,alias_kms_id2",
 				}),
 			)
 		})
