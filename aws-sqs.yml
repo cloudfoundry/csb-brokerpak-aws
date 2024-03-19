@@ -97,13 +97,13 @@ provision:
         If not defined for a FIFO queue it defaults to `perQueue`.
     - field_name: sqs_managed_sse_enabled
       type: boolean
-      details: Enable SQS-managed encryption keys for encrypting messages.
+      details: Enable SQS-managed encryption keys for encrypting messages. Overridden by `kms_master_key_id`.
       default: true
     - field_name: kms_master_key_id
       type: string
       details: | 
         Specify the AWS KMS customer master key (CMK) for encryption.
-        The `sqs_managed_sse_enabled` property must be set to `false` if a KMS master key ID is provided.
+        Overrides the `sqs_managed_sse_enabled` property.
       default: ""
     - field_name: kms_data_key_reuse_period_seconds
       type: integer
