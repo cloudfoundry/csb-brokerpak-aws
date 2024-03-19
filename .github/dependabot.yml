@@ -9,6 +9,8 @@ updates:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  ignore: 
+    - dependency-name: "github.com/cloudfoundry/cloud-service-broker"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
