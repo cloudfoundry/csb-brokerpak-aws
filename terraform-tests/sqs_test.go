@@ -76,222 +76,64 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"max_message_size":                  BeNumerically("==", 262144),
 					"delay_seconds":                     BeZero(),
 					"receive_wait_time_seconds":         BeZero(),
+					"content_based_deduplication":       BeFalse(),
 					"kms_master_key_id":                 BeNil(),
 					"kms_data_key_reuse_period_seconds": BeNumerically("==", 300),
+					"sqs_managed_sse_enabled":           BeTrue(),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
 				}),
 			)
+
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).NotTo(SatisfyAny(
+				HaveKey("redrive_policy"),
+				HaveKey("deduplication_scope"),
+				HaveKey("fifo_throughput_limit"),
+			))
 		})
 	})
 
-	Context("FIFO queues", func() {
+	Context("with non-default values", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"fifo":                        true,
-				"deduplication_scope":         "queue",
-				"fifo_throughput_limit":       "perQueue",
-				"content_based_deduplication": true,
-			}))
-		})
-
-		It("should create an SQS FIFO queue with the correct properties", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"name":                        Equal(fmt.Sprintf("%s.fifo", name)),
-					"fifo_queue":                  BeTrue(),
-					"deduplication_scope":         Equal("queue"),
-					"fifo_throughput_limit":       Equal("perQueue"),
-					"content_based_deduplication": BeTrue(),
-				}),
-			)
-		})
-
-		It("should create a FIFO SQS queue for high throughput mode", func() {
-			customFIFOVars := map[string]any{
-				"fifo":                        true,
-				"deduplication_scope":         "messageGroup",
-				"fifo_throughput_limit":       "perMessageGroupId",
-				"content_based_deduplication": false,
-			}
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, customFIFOVars))
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"fifo_queue":                  BeTrue(),
-					"deduplication_scope":         Equal("messageGroup"),
-					"fifo_throughput_limit":       Equal("perMessageGroupId"),
-					"content_based_deduplication": BeFalse(),
-				}),
-			)
-		})
-	})
-
-	Context("Standard Queue", func() {
-		When("parameters exclusive to FIFO queues are passed to an standard queue", func() {
-			It("doesn't detect any errors and plan finishes succesfully", func() {
-				// invalid values for these properties are handled by the IAAS not Terraform
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"fifo":                  false,
-					"deduplication_scope":   "queue",
-					"fifo_throughput_limit": "perQueue",
-				}))
-				Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"fifo_queue":            BeFalse(),
-						"deduplication_scope":   Equal("queue"),
-						"fifo_throughput_limit": Equal("perQueue"),
-					}),
-				)
-			})
-		})
-	})
-
-	Context("with DLQ enabled", func() {
-		BeforeAll(func() {
-			dlqARN := "arn:aws:sqs:us-west-2:123456789012:dlq"
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"dlq_arn":           dlqARN,
-				"max_receive_count": 3,
-			}))
-		})
-
-		It("should create an SQS queue with the correct redrive policy", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"redrive_policy": Equal(`{"deadLetterTargetArn":"arn:aws:sqs:us-west-2:123456789012:dlq","maxReceiveCount":3}`),
-				}),
-			)
-		})
-	})
-
-	Context("with visibility timeout set", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"visibility_timeout_seconds": 120,
-			}))
-		})
-
-		It("should not be passed", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"visibility_timeout_seconds": BeNumerically("==", 120),
-				}),
-			)
-		})
-	})
-
-	Context("with message retantion set", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"message_retention_seconds": 1209600,
-			}))
-		})
-
-		It("should not be passed", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"message_retention_seconds": BeNumerically("==", 1209600),
-				}),
-			)
-		})
-	})
-
-	Context("with message size set", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"max_message_size": 1024,
-			}))
-		})
-
-		It("should not be passed", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"max_message_size": BeNumerically("==", 1024),
-				}),
-			)
-		})
-	})
-
-	Context("with delay set", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"delay_seconds": 300,
-			}))
-		})
-
-		It("should not be passed", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"delay_seconds": BeNumerically("==", 300),
-				}),
-			)
-		})
-	})
-
-	Context("with receive wait time set", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"receive_wait_time_seconds": 15,
-			}))
-		})
-
-		It("should not be passed", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"receive_wait_time_seconds": BeNumerically("==", 15),
-				}),
-			)
-		})
-	})
-
-	Context("with SQS-managed SSE enabled", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"sqs_managed_sse_enabled": true,
-			}))
-		})
-
-		It("should enable SQS-managed server-side encryption", func() {
-			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"sqs_managed_sse_enabled": BeTrue(),
-				}),
-			)
-		})
-	})
-
-	Context("with KMS master key specified", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"kms_master_key_id":                 "alias/aws/sqs",
-				"kms_data_key_reuse_period_seconds": 300,
+				"fifo":                              true,
+				"visibility_timeout_seconds":        31,
+				"message_retention_seconds":         300000,
+				"max_message_size":                  200000,
+				"delay_seconds":                     1,
+				"receive_wait_time_seconds":         2,
+				"dlq_arn":                           "fake-dlq-arn",
+				"max_receive_count":                 4,
+				"deduplication_scope":               "messageGroup",
+				"fifo_throughput_limit":             "perMessageGroupId",
+				"content_based_deduplication":       true,
 				"sqs_managed_sse_enabled":           false,
+				"kms_master_key_id":                 "fake-key-id",
+				"kms_extra_key_ids":                 "fake-extra-key-id-1,fake-extra-key-id-2",
+				"kms_data_key_reuse_period_seconds": 231,
 			}))
 		})
 
-		It("should use the specified KMS master key for encryption and data key reuse period specified", func() {
+		It("should reflect the non-default values", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"kms_master_key_id":                 Equal("alias/aws/sqs"),
-					"kms_data_key_reuse_period_seconds": BeNumerically("==", 300),
+					"fifo_queue":                        BeTrue(),
+					"visibility_timeout_seconds":        BeNumerically("==", 31),
+					"message_retention_seconds":         BeNumerically("==", 300000),
+					"max_message_size":                  BeNumerically("==", 200000),
+					"delay_seconds":                     BeNumerically("==", 1),
+					"receive_wait_time_seconds":         BeNumerically("==", 2),
+					"redrive_policy":                    MatchJSON(`{"deadLetterTargetArn":"fake-dlq-arn","maxReceiveCount":4}`),
+					"content_based_deduplication":       BeTrue(),
+					"deduplication_scope":               Equal("messageGroup"),
+					"fifo_throughput_limit":             Equal("perMessageGroupId"),
+					"kms_master_key_id":                 Equal("fake-key-id"),
+					"kms_data_key_reuse_period_seconds": BeNumerically("==", 231),
 				}),
 			)
-		})
-	})
 
-	Context("with KMS master key specified and sse enabled", func() {
-		It("should throw an error", func() {
-			session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"kms_master_key_id":                 "alias/aws/sqs",
-				"kms_data_key_reuse_period_seconds": 300,
-				"sqs_managed_sse_enabled":           true,
-			}))
-
-			Expect(session.ExitCode()).NotTo(Equal(0))
-			msgs := string(session.Out.Contents())
-			Expect(msgs).To(ContainSubstring(`Error: Conflicting configuration arguments`))
-			Expect(msgs).To(ContainSubstring(`\"sqs_managed_sse_enabled\": conflicts with kms_master_key_id`))
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).NotTo(HaveKey("sqs_managed_sse_enabled"))
 		})
 	})
 })
