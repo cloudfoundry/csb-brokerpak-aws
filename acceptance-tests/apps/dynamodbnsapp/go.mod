@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.26.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.8
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.8
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.30.5
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.31.0
 	github.com/cloudfoundry-community/go-cfenv v1.18.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/render v1.0.3
