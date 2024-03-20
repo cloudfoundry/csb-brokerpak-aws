@@ -78,11 +78,19 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 					"receive_wait_time_seconds":         BeZero(),
 					"kms_master_key_id":                 BeNil(),
 					"kms_data_key_reuse_period_seconds": BeNumerically("==", 300),
+					"content_based_deduplication":       BeFalse(),
+					"sqs_managed_sse_enabled":           BeTrue(),
 					"tags_all": MatchAllKeys(Keys{
 						"label1": Equal("value1"),
 					}),
 				}),
 			)
+
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).NotTo(SatisfyAny(
+				HaveKey("redrive_policy"),
+				HaveKey("deduplication_scope"),
+				HaveKey("fifo_throughput_limit"),
+			))
 		})
 	})
 
@@ -127,31 +135,10 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("Standard Queue", func() {
-		When("parameters exclusive to FIFO queues are passed to an standard queue", func() {
-			It("doesn't detect any errors and plan finishes succesfully", func() {
-				// invalid values for these properties are handled by the IAAS not Terraform
-				plan := ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-					"fifo":                  false,
-					"deduplication_scope":   "queue",
-					"fifo_throughput_limit": "perQueue",
-				}))
-				Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
-					MatchKeys(IgnoreExtras, Keys{
-						"fifo_queue":            BeFalse(),
-						"deduplication_scope":   Equal("queue"),
-						"fifo_throughput_limit": Equal("perQueue"),
-					}),
-				)
-			})
-		})
-	})
-
-	Context("with DLQ enabled", func() {
+	Context("dead-letter queue", func() {
 		BeforeAll(func() {
-			dlqARN := "arn:aws:sqs:us-west-2:123456789012:dlq"
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"dlq_arn":           dlqARN,
+				"dlq_arn":           "arn:aws:sqs:us-west-2:123456789012:dlq",
 				"max_receive_count": 3,
 			}))
 		})
@@ -181,7 +168,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("with message retantion set", func() {
+	Context("with message retention set", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"message_retention_seconds": 1209600,
@@ -245,17 +232,17 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 		})
 	})
 
-	Context("with SQS-managed SSE enabled", func() {
+	Context("with SQS-managed SSE disabled", func() {
 		BeforeAll(func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"sqs_managed_sse_enabled": true,
+				"sqs_managed_sse_enabled": false,
 			}))
 		})
 
-		It("should enable SQS-managed server-side encryption", func() {
+		It("should disable SQS-managed server-side encryption", func() {
 			Expect(AfterValuesForType(plan, "aws_sqs_queue")).To(
 				MatchKeys(IgnoreExtras, Keys{
-					"sqs_managed_sse_enabled": BeTrue(),
+					"sqs_managed_sse_enabled": BeFalse(),
 				}),
 			)
 		})
@@ -266,7 +253,7 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 				"kms_master_key_id":                 "alias/aws/sqs",
 				"kms_data_key_reuse_period_seconds": 300,
-				"sqs_managed_sse_enabled":           false,
+				"sqs_managed_sse_enabled":           true,
 			}))
 		})
 
@@ -278,20 +265,9 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 				}),
 			)
 		})
-	})
 
-	Context("with KMS master key specified and sse enabled", func() {
-		It("should throw an error", func() {
-			session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"kms_master_key_id":                 "alias/aws/sqs",
-				"kms_data_key_reuse_period_seconds": 300,
-				"sqs_managed_sse_enabled":           true,
-			}))
-
-			Expect(session.ExitCode()).NotTo(Equal(0))
-			msgs := string(session.Out.Contents())
-			Expect(msgs).To(ContainSubstring(`Error: Conflicting configuration arguments`))
-			Expect(msgs).To(ContainSubstring(`\"sqs_managed_sse_enabled\": conflicts with kms_master_key_id`))
+		It("should override the value of `sqs_managed_sse_enabled`", func() {
+			Expect(AfterValuesForType(plan, "aws_sqs_queue")).NotTo(HaveKey("sqs_managed_sse_enabled"))
 		})
 	})
 })
