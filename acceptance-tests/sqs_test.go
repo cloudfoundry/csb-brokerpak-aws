@@ -18,18 +18,18 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing the unstarted app twice")
-		appOne := apps.Push(apps.WithApp(apps.SQS))
-		appTwo := apps.Push(apps.WithApp(apps.SQS))
-		defer apps.Delete(appOne, appTwo)
+		producerApp := apps.Push(apps.WithApp(apps.SQS))
+		consumerApp := apps.Push(apps.WithApp(apps.SQS))
+		defer apps.Delete(producerApp, consumerApp)
 
 		By("binding the apps to the service instance")
-		bindingOneName := random.Name(random.WithPrefix("producer"))
-		binding := serviceInstance.Bind(appOne, services.WithBindingName(bindingOneName))
-		bindingTwoName := random.Name(random.WithPrefix("consumer"))
-		serviceInstance.Bind(appTwo, services.WithBindingName(bindingTwoName))
+		producerBindingName := random.Name(random.WithPrefix("producer"))
+		binding := serviceInstance.Bind(producerApp, services.WithBindingName(producerBindingName))
+		consumerBindingName := random.Name(random.WithPrefix("consumer"))
+		serviceInstance.Bind(consumerApp, services.WithBindingName(consumerBindingName))
 
 		By("starting the apps")
-		apps.Start(appOne, appTwo)
+		apps.Start(producerApp, consumerApp)
 
 		By("checking that the app environment has a credhub reference for credentials")
 		Expect(binding.Credential()).To(HaveKey("credhub-ref"))
@@ -38,10 +38,10 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		message := random.Hexadecimal()
 		messageGroupID := random.Hexadecimal()
 		messageDeduplicationID := random.Hexadecimal()
-		appOne.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", bindingOneName, messageGroupID, messageDeduplicationID)
+		producerApp.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", producerBindingName, messageGroupID, messageDeduplicationID)
 
 		By("receiving the message using the consumer app")
-		got := appTwo.GET("/retrieve_and_delete/%s", bindingTwoName).String()
+		got := consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
 		Expect(got).To(Equal(message))
 	})
 
