@@ -12,8 +12,8 @@ import (
 const (
 	sqsServiceID                  = "2198d694-bf85-11ee-a918-a7bdfa69a96d"
 	sqsServiceName                = "csb-aws-sqs"
-	sqsServiceDescription         = "Beta - CSB AWS SQS"
-	sqsServiceDisplayName         = "CSB AWS SQS (Beta)"
+	sqsServiceDescription         = "CSB AWS SQS"
+	sqsServiceDisplayName         = "CSB AWS SQS"
 	sqsServiceSupportURL          = "https://aws.amazon.com/sqs/"
 	sqsServiceProviderDisplayName = "VMware"
 	sqsCustomStandardPlanName     = "custom-standard"
@@ -57,7 +57,7 @@ var _ = Describe("SQS", Label("SQS"), func() {
 		service := testframework.FindService(catalog, sqsServiceName)
 		Expect(service.ID).To(Equal(sqsServiceID))
 		Expect(service.Description).To(Equal(sqsServiceDescription))
-		Expect(service.Tags).To(ConsistOf("aws", "sqs", "beta"))
+		Expect(service.Tags).To(ConsistOf("aws", "sqs"))
 		Expect(service.Metadata.DisplayName).To(Equal(sqsServiceDisplayName))
 		Expect(service.Metadata.DocumentationUrl).To(Equal(documentationURL))
 		Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"))
