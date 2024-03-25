@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.152.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.76.0
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cloudfoundry/cloud-service-broker v0.22.2
+	github.com/cloudfoundry/cloud-service-broker v1.0.0
 	github.com/hashicorp/terraform-json v0.21.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.17.0
@@ -31,6 +31,7 @@ require (
 	cloud.google.com/go/storage v1.35.1 // indirect
 	code.cloudfoundry.org/credhub-cli v0.0.0-20220620130410-645eee56ecdb // indirect
 	code.cloudfoundry.org/lager/v3 v3.0.3 // indirect
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
@@ -53,7 +54,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-chi/chi/v5 v5.0.11 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
-	github.com/go-sql-driver/mysql v1.7.1 // indirect
+	github.com/go-sql-driver/mysql v1.8.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -130,7 +131,7 @@ require (
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gorm.io/driver/mysql v1.5.4 // indirect
+	gorm.io/driver/mysql v1.5.5 // indirect
 	gorm.io/driver/sqlite v1.4.4 // indirect
-	gorm.io/gorm v1.25.7 // indirect
+	gorm.io/gorm v1.25.8 // indirect
 )
