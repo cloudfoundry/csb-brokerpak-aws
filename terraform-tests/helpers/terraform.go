@@ -21,8 +21,10 @@ const (
 	defaultTimeout = 35 * time.Minute
 )
 
+const binaryName = "tofu"
+
 func Init(dir string) {
-	command := exec.Command("terraform", "-chdir="+dir, "init")
+	command := exec.Command(binaryName, "-chdir="+dir, "init")
 	CommandStart(command)
 }
 
@@ -68,11 +70,11 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 }
 
 func terraformPlanCMD(dir string, planFile string) *exec.Cmd {
-	return exec.Command("terraform", chdirFlag(dir), "plan", "-input=false", "-refresh=false", fmt.Sprintf("-out=%s", planFile), "-json")
+	return exec.Command(binaryName, chdirFlag(dir), "plan", "-input=false", "-refresh=false", fmt.Sprintf("-out=%s", planFile), "-json")
 }
 
 func decodePlan(dir, planFile string) []byte {
-	jsonPlan, err := CommandOutput(exec.Command("terraform", chdirFlag(dir), "show", "-json", planFile))
+	jsonPlan, err := CommandOutput(exec.Command(binaryName, chdirFlag(dir), "show", "-json", planFile))
 	Expect(err).ToNot(HaveOccurred())
 	return jsonPlan
 }
