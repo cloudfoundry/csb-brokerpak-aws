@@ -43,7 +43,7 @@ func FailPlan(dir string, vars map[string]any) (*gexec.Session, error) {
 	}
 	defer os.Remove(tmpFile.Name())
 
-	session, err := gexec.Start(terraformPlanCMD(dir, path.Base(tmpFile.Name())), GinkgoWriter, GinkgoWriter)
+	session, err := gexec.Start(createPlanCMD(dir, path.Base(tmpFile.Name())), GinkgoWriter, GinkgoWriter)
 	if err != nil {
 		return session, err
 	}
@@ -59,7 +59,7 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 
 	tmpFile, _ := os.CreateTemp(dir, "test-tf-plan")
 	defer os.Remove(tmpFile.Name())
-	CommandStart(terraformPlanCMD(dir, path.Base(tmpFile.Name())))
+	CommandStart(createPlanCMD(dir, path.Base(tmpFile.Name())))
 
 	jsonPlan := decodePlan(dir, path.Base(tmpFile.Name()))
 
@@ -69,7 +69,7 @@ func ShowPlan(dir string, vars map[string]any) tfjson.Plan {
 	return plan
 }
 
-func terraformPlanCMD(dir string, planFile string) *exec.Cmd {
+func createPlanCMD(dir string, planFile string) *exec.Cmd {
 	return exec.Command(binaryName, chdirFlag(dir), "plan", "-input=false", "-refresh=false", fmt.Sprintf("-out=%s", planFile), "-json")
 }
 
