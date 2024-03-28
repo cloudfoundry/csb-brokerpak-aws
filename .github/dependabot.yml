@@ -14,6 +14,8 @@ updates:
   schedule:
     interval: "daily"
     time: "20:30"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/s3app"
   schedule:
@@ -23,21 +25,29 @@ updates:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
     interval: "daily"
     time: "21:30"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mssqlapp"
   schedule:
     interval: "daily"
     time: "22:00"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/redisapp"
   schedule:
     interval: "daily"
     time: "22:30"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbtableapp"
   schedule:
@@ -47,6 +57,8 @@ updates:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
@@ -56,6 +68,8 @@ updates:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/sqsapp"
   schedule:
@@ -65,6 +79,8 @@ updates:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbdynamodbns"
   schedule:
@@ -74,6 +90,8 @@ updates:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:

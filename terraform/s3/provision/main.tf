@@ -46,6 +46,8 @@ resource "aws_s3_bucket_ownership_controls" "bucket_ownership_controls" {
   rule {
     object_ownership = var.boc_object_ownership
   }
+
+  depends_on = [aws_s3_bucket_public_access_block.bucket_public_access_block]
 }
 
 resource "aws_s3_bucket_public_access_block" "bucket_public_access_block" {
