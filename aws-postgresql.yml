@@ -68,7 +68,7 @@ provision:
     default: false
   - field_name: provider_verify_certificate
     type: boolean
-    details: Whether PostgreSQL Terraform provider should validate the server certificate. The AWS certificate bundle must be installed.
+    details: Whether CSB should validate the server certificate. The AWS certificate bundle must be installed.
     default: true
   - field_name: storage_autoscale
     type: boolean
@@ -365,7 +365,7 @@ provision:
     details: Require that connections use SSL
   - field_name: provider_verify_certificate
     type: boolean
-    details: Whether PostgreSQL Terraform provider should validate the server certificate. The AWS certificate bundle must be installed.
+    details: Whether CSB should validate the server certificate. The AWS certificate bundle must be installed.
 bind:
   plan_inputs: []
   user_inputs: []
