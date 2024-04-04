@@ -173,6 +173,13 @@ The AWS account represented by the access key needs the following permission pol
                 "s3:PutObjectRetention",
                 "sqs:CreateQueue",
                 "sqs:DeleteQueue",
+                "sqs:ListQueueTags",
+                "sqs:TagQueue",
+                "sqs:UntagQueue",
+                "sqs:GetQueueAttributes",
+                "sqs:SetQueueAttributes",
+                "sqs:GetQueueUrl",
+                "sqs:ListQueues",
                 "dms:CreateReplicationSubnetGroup"
             ],
             "Effect": "Allow",
