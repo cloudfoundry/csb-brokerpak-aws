@@ -8,6 +8,9 @@ platforms:
   arch: amd64
 # - os: darwin
 #   arch: amd64
+terraform_state_provider_replacements:
+  registry.terraform.io/cloud-service-broker/csbpg: "cloudfoundry.org/cloud-service-broker/csbpg"
+  registry.terraform.io/cloud-service-broker/csbmysql: "cloudfoundry.org/cloud-service-broker/csbmysql"
 terraform_upgrade_path:
 - version: 1.6.2
 terraform_binaries:
@@ -24,12 +27,12 @@ terraform_binaries:
 - name: terraform-provider-csbpg
   version: 1.2.23
   source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.23.zip
-  provider: cloud-service-broker/csbpg
+  provider: cloudfoundry.org/cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
   version: 1.2.29
   source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.29.zip
-  provider: cloud-service-broker/csbmysql
+  provider: cloudfoundry.org/cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
   version: 1.0.0
