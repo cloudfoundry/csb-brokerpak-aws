@@ -5,7 +5,7 @@ terraform {
       version = "1.0.0"
     }
     aws = {
-      source  = "hashicorp/aws"
+      source  = "registry.terraform.io/hashicorp/aws"
       version = ">= 5.0"
     }
   }
