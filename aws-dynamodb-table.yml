@@ -43,15 +43,6 @@ provision:
     type: string
     details: Controls how you are billed for read/write throughput and how you manage capacity.
   user_inputs:
-  - field_name: instance_name
-    type: string
-    details: Name of the DynamoDB table
-    default: csb-dynamodb-${request.instance_id}
-    constraints:
-      maxLength: 98
-      minLength: 6
-      pattern: ^[a-z][a-z0-9-]+$
-    prohibit_update: true
   - field_name: hash_key
     type: string
     details: The attribute to use as the hash (partition) key. Must also be defined as an attribute
