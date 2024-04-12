@@ -24,7 +24,6 @@ variable "aws_secret_access_key" {
 variable "region" { type = string }
 variable "labels" { type = map(any) }
 variable "aws_vpc_id" { type = string }
-variable "instance_name" { type = string }
 
 variable "billing_mode" { type = string }
 variable "hash_key" { type = string }
