@@ -9,7 +9,11 @@ platforms:
 # - os: darwin
 #   arch: amd64
 terraform_state_provider_replacements:
+  registry.opentofu.org/hashicorp/aws: "registry.terraform.io/hashicorp/aws"
+  registry.opentofu.org/hashicorp/random: "registry.terraform.io/hashicorp/random"
+  registry.opentofu.org/cloud-service-broker/csbpg: "cloudfoundry.org/cloud-service-broker/csbpg"
   registry.terraform.io/cloud-service-broker/csbpg: "cloudfoundry.org/cloud-service-broker/csbpg"
+  registry.opentofu.org/cloud-service-broker/csbmysql: "cloudfoundry.org/cloud-service-broker/csbmysql"
   registry.terraform.io/cloud-service-broker/csbmysql: "cloudfoundry.org/cloud-service-broker/csbmysql"
 terraform_upgrade_path:
 - version: 1.6.2
