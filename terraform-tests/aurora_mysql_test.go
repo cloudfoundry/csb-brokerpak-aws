@@ -317,13 +317,13 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			It("should complain about postcondition", func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": true,
-					"engine_version":             "8.0.mysql_aurora.3.02.0",
+					"engine_version":             "8.0.mysql_aurora.3.04.2",
 				}))
 
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				msgs := string(session.Out.Contents())
 				Expect(msgs).To(ContainSubstring(`Error: Resource postcondition failed`))
-				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 8.0 - got: 8.0.mysql_aurora.3.02.0`))
+				Expect(msgs).To(ContainSubstring(`A Major engine version should be specified when auto_minor_version_upgrade is enabled. Expected engine version: 8.0 - got: 8.0.mysql_aurora.3.04.2`))
 
 				session, _ = FailPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
 					"auto_minor_version_upgrade": true,
