@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.156.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.77.1
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cloudfoundry/cloud-service-broker/v2 v2.0.0
+	github.com/cloudfoundry/cloud-service-broker/v2 v2.0.1-0.20240411155733-73c60324221f
 	github.com/hashicorp/terraform-json v0.21.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.17.1
@@ -138,3 +138,5 @@ require (
 	gorm.io/driver/sqlite v1.5.5 // indirect
 	gorm.io/gorm v1.25.9 // indirect
 )
+
+replace github.com/cloudfoundry/cloud-service-broker/v2 => /Users/gblue/workspace/csb/csb-brokerpak-aws/../cloud-service-broker

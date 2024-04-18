@@ -38,6 +38,7 @@ resource "random_string" "username" {
   length  = 16
   special = false
   numeric = false
+  count = length(var.admin_username) == 0 ? 1 : 0
 }
 
 resource "random_password" "password" {
@@ -57,7 +58,7 @@ resource "aws_db_instance" "db_instance" {
   instance_class                        = local.instance_class
   identifier                            = var.instance_name
   db_name                               = var.db_name
-  username                              = random_string.username.result
+  username                              = length(var.admin_username) == 0 ? random_string.username[0].result : var.admin_username
   password                              = random_password.password.result
   parameter_group_name                  = local.parameter_group_name
   tags                                  = var.labels

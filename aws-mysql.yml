@@ -310,6 +310,11 @@ provision:
     type: string
     default: ""
     details: Used in conjunction with `enable_audit_logging`. If provided will set the KSM key to use for encrypting the Cloudwatch log group created for the RDS audit logs.
+  - field_name: admin_username
+    type: string
+    details: The username to use for the admin user of the database. When not specified a random username will be generated. This property should only be used when migrating data.
+    default: ""
+    prohibit_update: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
