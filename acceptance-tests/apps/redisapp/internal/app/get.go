@@ -6,7 +6,7 @@ import (
 	"redisapp/internal/credentials"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 )
 
 const (
