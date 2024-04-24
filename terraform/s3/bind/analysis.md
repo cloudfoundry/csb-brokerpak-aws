@@ -284,3 +284,32 @@ flexibility desired by the users, and the operational capacity of the Cloud Serv
 and troubleshooting. By considering customer feedback on existing configurations and the operational impact of each
 alternative, a more informed and effective decision can be made.
 
+#### Use Case 2: "Anonymous" Access for Web Files in Web Hosting
+
+> Note: This use case is currently under investigation to find a suitable solution. It is out of scope for the current
+> proof-of-concept.
+
+For Use Case 1, where users need to access public files like images or PDFs through presigned URLs, we might consider
+a policy that specifically allows the generation of presigned URLs. However, managing direct access via presigned URLs
+while enforcing VPC restrictions can be challenging since the URL can be accessed from any internet connection.
+
+One potential solution is to implement a server-side component within the VPC that handles the generation and
+distribution of these presigned URLs. This component would be the only entity allowed to generate URLs,
+ensuring that generation occurs in a controlled environment. The IAM policy for this component might look like this:
+
+```hcl
+statement {
+  sid = "PresignedURLGeneration"
+  actions = [
+    "s3:GetObject"
+  ]
+  resources = [
+    format("%s/*", var.arn)
+  ]
+  condition {
+    test     = "IpAddress"
+    variable = "aws:SourceIp"
+    values   = [var.server_ip]
+  }
+}
+```
