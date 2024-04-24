@@ -159,6 +159,12 @@ provision:
     details: |
       Whether this bucket explicitly denies access to HTTP requests, in other words, the bucket only accepts
       requests sent through HTTPS if enabled.
+  - field_name: allowed_aws_vpc_id
+    type: string
+    details: |
+      The VPC ID to restrict access exclusively to the designated VPC.
+      E.g: `vpc-01362976bd10dc099`.
+    default: ""
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -187,6 +193,9 @@ provision:
   - field_name: sse_all_kms_key_ids
     type: string
     details: The default and extra AWS KMS key IDs used for SSE-KMS encryption and decryption.
+  - field_name: allowed_aws_vpc_id
+    type: string
+    details: The VPC ID to restrict access exclusively to the designated VPC.
 bind:
   plan_inputs: []
   user_inputs:
@@ -213,6 +222,10 @@ bind:
     type: string
   - name: sse_all_kms_key_ids
     default: ${instance.details["sse_all_kms_key_ids"]}
+    overwrite: true
+    type: string
+  - name: allowed_aws_vpc_id
+    default: ${instance.details["allowed_aws_vpc_id"]}
     overwrite: true
     type: string
   template_refs:
