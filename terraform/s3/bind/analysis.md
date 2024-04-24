@@ -187,9 +187,9 @@ manage their VPC endpoints.
 
 ##### Alternative 2: Expose property for Bucket policy configuration
 
-This option allows for detailed control over S3 bucket access via bucket policies, incorporating provisions for
-administrative access through the AWS console. It offers precise access management but requires users to handle complex 
-policy configurations and create and manage their VPC endpoints.
+This option allows for detailed control over S3 bucket access via bucket policies, incorporating permission for
+administrative user access through the AWS console. It offers precise access management but requires to handle complex 
+policy configurations and users to create and manage their VPC endpoints.
 
 **Pros:**
 
@@ -199,7 +199,7 @@ policy configurations and create and manage their VPC endpoints.
 **Cons:**
 
 - More complex to implement and manage due to nuanced policy conditions.
-- Higher risk of misconfiguration leading to unintended access or denials.
+- Higher risk of misconfiguration leading to unintended access or denials. The console access can be blocked if the policy is not correct.
 - Increased complexity for customers who need to understand and manage VPC endpoints.
 
 ##### Alternative 3: Creation of VPC endpoint via Cloud Service Broker
@@ -216,6 +216,7 @@ through the Cloud Service Broker, thereby standardizing security and access conf
 
 - Increases maintenance and operational overhead for the Cloud Service Broker.
 - Potentially limits flexibility in how customers can configure their environments.
+- Alternative 1 or 2 must be implemented to allow access to the S3 bucket.
 
 ##### Alternative 4: Allow customers to configure raw JSON for bucket policies
 
@@ -234,10 +235,11 @@ manage their VPC endpoints.
 - Requires customers to have a deep understanding of AWS IAM and S3 policies.
 - Increased complexity for customers who need to understand and manage VPC endpoints.
 
-##### Alternative 5: Explore to ignore changes in policies during Terraform upgrades
+##### Alternative 5: Explore to ignore changes in policies properties or resources during Terraform upgrades
 
 Simplifies Terraform management by maintaining current policy configurations during upgrades, rely on customers 
-to ensure policies are secure and up-to-date, potentially leading to security risks if not managed properly.
+to add their policies to the bucket and ensure policies are secure and up-to-date, potentially leading to security
+risks if not managed properly.
 
 **Pros:**
 
@@ -251,7 +253,7 @@ to ensure policies are secure and up-to-date, potentially leading to security ri
 
 ##### Alternative 6: Explore using Gateway IP as a condition in IAM policies
 
-This method restricts S3 access based on the IP address of a gateway, offering a straightforward solution to secure 
+This method restricts S3 access based on the IP address of a gateway, offering a solution to secure 
 access based on network conditions. However, its effectiveness depends on stable network configurations and may not 
 accommodate dynamic environments.
 
