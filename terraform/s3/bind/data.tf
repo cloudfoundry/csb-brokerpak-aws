@@ -74,6 +74,22 @@ data "aws_iam_policy_document" "user_policy" {
       format("%s/*", var.arn)
     ]
   }
+
+  dynamic "statement" {
+    for_each = var.allowed_aws_vpc_id != "" ? [1] : []
+
+    content {
+      sid       = "VPCeOnly"
+      effect    = "Deny"
+      actions   = ["s3:*"]
+      resources = [var.arn, format("%s/*", var.arn)]
+      condition {
+        test     = "StringNotEquals"
+        variable = "aws:SourceVpc"
+        values   = [var.allowed_aws_vpc_id]
+      }
+    }
+  }
 }
 
 data "aws_kms_key" "customer_provided_keys" {
