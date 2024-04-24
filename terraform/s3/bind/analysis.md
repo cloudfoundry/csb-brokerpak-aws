@@ -1,8 +1,8 @@
 ## Use cases
 
-1. File storage of data, such as backups or other sensitive information
+1. File storage of data, such as backups or other sensitive information.
    For use case A, the user uses the credential binding and uploads, deletes or downloads the data via the API.
-2. “Anonymous” access for web files in web hosting
+2. “Anonymous” access for web files in web hosting.
    For use case B, the user uploads the data via the API, generates a pre-signed URL and publishes this to the end-user
    on the website, who can then access the image, PDF attachment or similar for a specified time-period.
    Due to general AWS account policy, public S3 buckets are already blocked and all created buckets in the AWS accounts
@@ -10,7 +10,7 @@
 
 In use case 1, a proof-of-concept was created where an IAM user has a condition, which limits the access to the
 VPC[0]. Now, someone with leaked credentials could not access the data from the internet, but only within the VPC, which
-would be enough for us.
+would be enough for customers.
 
 1. **File Storage for Data (e.g., Backups or Sensitive Information):**
     - In this use case, the user utilizes binding credentials to upload, delete, or download data via the API.
@@ -29,10 +29,9 @@ Unfortunately, any generated pre-signed URLs would not work, as access is also r
 an investigation is currently in progress to find a solution. It will likely involve creating different plans for bucket
 creation based on the use cases, along with distinct IAM policies tailored for each scenario.
 
+### Breakdown of the Use Cases
 
 > Note: None of the tested solutions that resulted in success worked without enabling the VPC endpoint.
-
-### Breakdown of the Use Cases
 
 #### Use Case 1: File Storage for Data (e.g., Backups or Sensitive Information)
 
