@@ -12,20 +12,36 @@ In use case 1, a proof-of-concept was created where an IAM user has a condition,
 VPC[0]. Now, someone with leaked credentials could not access the data from the internet, but only within the VPC, which
 would be enough for us.
 
-Unfortunately, any generated pre-signed URLs would not work, because the access is also limited by the VPC condition but
-there is an investigation in progress.
+1. **File Storage for Data (e.g., Backups or Sensitive Information):**
+    - In this use case, the user utilizes binding credentials to upload, delete, or download data via the API.
 
-The solution will probably be to create different plans to create buckets based on the uses cases and different IAM
-policies for that.
+2. **"Anonymous" Access for Web Files in Web Hosting:**
+    - In Use Case 2, the user uploads data via the API, generates a pre-signed URL, and publishes this on the website.
+      End-users can then access the image, PDF attachment, or similar files for a specified time period.
+    - Due to general AWS account policies, public S3 buckets are blocked, and all created buckets within the AWS
+      accounts are set to private.
 
-> Note: None of the tested solutions where the result was successful worked without enabling the VPC endpoint.
+In Use Case 1, a proof-of-concept was developed where an IAM user has a condition limiting access exclusively to the
+VPC. With this setup, even if credentials were leaked, the data could not be accessed from the internet, but only from
+within the VPC, which meets customer's security requirements.
 
-### Breakdown
+Unfortunately, any generated pre-signed URLs would not work, as access is also restricted by the VPC condition. However,
+an investigation is currently in progress to find a solution. It will likely involve creating different plans for bucket
+creation based on the use cases, along with distinct IAM policies tailored for each scenario.
 
-After reading the explanation it seems logic to think as a valid solution to add a statement to the IAM policy or the
-bucket policy that denies all S3 actions unless they are accessed via the specified VPC.
 
-Example 1 - Policy statement for the IAM User that denies all S3 actions unless they are accessed via the specified VPC:
+> Note: None of the tested solutions that resulted in success worked without enabling the VPC endpoint.
+
+### Breakdown of the Use Cases
+
+#### Use Case 1: File Storage for Data (e.g., Backups or Sensitive Information)
+
+After reviewing the use case number one and the customer requirements, it seems logical to consider a valid solution
+would be to add a statement to the IAM policy or the bucket policy that denies all S3 actions unless they are accessed
+via the specified VPC.
+
+Example 1 - Policy statement for the IAM User: This statement denies all S3 actions unless accessed via the specified
+VPC:
 
 ```json
 {
@@ -46,8 +62,8 @@ Example 1 - Policy statement for the IAM User that denies all S3 actions unless 
 }
 ```
 
-Example 2 - Policy statement fot the Bucket Policy that denies all S3 actions unless they are accessed via the specified
-VPC and does not block the access administrative IAM users (see `"aws:username": "csb-*"` condition) through the
+Example 2 - Policy Statement for the Bucket Policy: This statement denies all S3 actions unless accessed via the
+specified VPC and allows access for administrative IAM users (see the `"aws:username": "csb-*"` condition) through the
 AWS console:
 
 ```json
@@ -78,17 +94,17 @@ AWS console:
 }
 ```
 
-**Unfortunately, the solution is not working as expected.** An `AccessDenied` error is returned when trying to access
+**Unfortunately, the solution is not working as expected.** An `AccessDenied` error occurs when attempting to access
 from:
 
-- Local machine (outside the VPC)
-- EC2 instance (inside the VPC)
-- Lambda function (inside the VPC)
+- A local machine (outside the VPC)
+- An EC2 instance (inside the VPC)
+- A Lambda function (inside the VPC)
 
-Before passing to the next step in our analysis, let's explain some concepts focusing on the interaction between AWS
-services, VPC endpoints, and S3, along with the benefits of using endpoints:
+Before we proceed to the next step in our analysis, let's clarify some key concepts. This discussion will focus on the
+interaction between AWS services, VPC endpoints, and S3, and will highlight the benefits of using these endpoints:
 
-#### Endpoints
+##### Endpoints
 
 - **Endpoint Services**
     - Created by service providers (E.g: S3) to make services available in a specific AWS **Region** (within AWS
@@ -149,13 +165,13 @@ services, VPC endpoints, and S3, along with the benefits of using endpoints:
     - **S3 Integration**: Gateway endpoints enable direct, private connectivity to S3, enhancing security and
       performance for S3 interactions.
 
-### Alternatives
+#### Alternatives for Securing S3 Access via VPC Restrictions
 
 To evaluate the alternatives for addressing the issue of securing S3 access via VPC restrictions, we need to consider
 the balance between customer responsibility, security, ease of implementation, and management overhead. Below, each
 alternative is discussed along with its pros and cons based on these criteria.
 
-### Alternative 1: Expose property for IAM user policy configuration
+##### Alternative 1: Expose property for IAM user policy configuration
 
 This alternative offers direct control over VPC access by configuring the IAM user policies to specify VPC 
 access through our CSB, ensuring security is maintained at the user level while empowering users to create and
@@ -172,7 +188,7 @@ manage their VPC endpoints.
 - Increased complexity for customers who need to understand and manage VPC endpoints.
 - Reliance on customers to correctly configure endpoints and policies.
 
-### Alternative 2: Expose property for Bucket policy configuration
+##### Alternative 2: Expose property for Bucket policy configuration
 
 This option allows for detailed control over S3 bucket access via bucket policies, incorporating provisions for
 administrative access through the AWS console. It offers precise access management but requires users to handle complex 
@@ -189,7 +205,7 @@ policy configurations and create and manage their VPC endpoints.
 - Higher risk of misconfiguration leading to unintended access or denials.
 - Increased complexity for customers who need to understand and manage VPC endpoints.
 
-### Alternative 3: Creation of VPC endpoint via Cloud Service Broker
+##### Alternative 3: Creation of VPC endpoint via Cloud Service Broker
 
 This approach centralizes the management of VPC endpoints, simplifying the user experience by handling endpoint setup 
 through the Cloud Service Broker, thereby standardizing security and access configurations.
@@ -204,7 +220,7 @@ through the Cloud Service Broker, thereby standardizing security and access conf
 - Increases maintenance and operational overhead for the Cloud Service Broker.
 - Potentially limits flexibility in how customers can configure their environments.
 
-### Alternative 4: Allow customers to configure raw JSON for bucket policies
+##### Alternative 4: Allow customers to configure raw JSON for bucket policies
 
 Provides maximum customization flexibility by enabling users to input raw JSON for bucket policies. While it offers 
 precise control, it demands a high level of expertise from users to avoid misconfigurations create and
@@ -221,7 +237,7 @@ manage their VPC endpoints.
 - Requires customers to have a deep understanding of AWS IAM and S3 policies.
 - Increased complexity for customers who need to understand and manage VPC endpoints.
 
-### Alternative 5: Explore to ignore changes in policies during Terraform upgrades
+##### Alternative 5: Explore to ignore changes in policies during Terraform upgrades
 
 Simplifies Terraform management by maintaining current policy configurations during upgrades, rely on customers 
 to ensure policies are secure and up-to-date, potentially leading to security risks if not managed properly.
@@ -236,7 +252,7 @@ to ensure policies are secure and up-to-date, potentially leading to security ri
 - Potential security risks if users do not properly manage or update policies.
 - Lack of visibility and control over how bucket policies evolve over time.
 
-### Alternative 6: Explore using Gateway IP as a condition in IAM policies
+##### Alternative 6: Explore using Gateway IP as a condition in IAM policies
 
 This method restricts S3 access based on the IP address of a gateway, offering a straightforward solution to secure 
 access based on network conditions. However, its effectiveness depends on stable network configurations and may not 
@@ -255,13 +271,13 @@ accommodate dynamic environments.
 - Necessary to explore: lack of necessary knowledge about the infrastructure in AWS to know if the VPC endpoint
 would be necessary
 
-### Additional Consideration: Customer Feedback on VPC Endpoints
+#### Additional Consideration: Customer Feedback on VPC Endpoints
 
 - **Important Point:** It is crucial to inquire whether customers have tested the solutions with or without pre-existing
   VPC endpoints. This will provide insights into potential gaps in the current proof-of-concept and guide further
   development.
 
-### Reflection and Strategy Moving Forward
+#### Reflection and Strategy Moving Forward
 
 The chosen solution should align with the level of expertise of the customer base, the expected level of control and
 flexibility desired by the users, and the operational capacity of the Cloud Service Broker to support ongoing management
