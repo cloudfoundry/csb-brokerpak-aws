@@ -157,8 +157,6 @@ interaction between AWS services, VPC endpoints, and S3, and will highlight the 
 
 ![Endpoint example](./endpoint.png "Endpoint example")
 
-```
-
 - **Benefits of Using VPC Endpoints**
     - **Security**: Traffic between VPC and AWS services does not traverse the public internet, reducing exposure.
     - **S3 Integration**: Gateway endpoints enable direct, private connectivity to S3, enhancing security and
