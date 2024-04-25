@@ -134,30 +134,26 @@ interaction between AWS services, VPC endpoints, and S3, and will highlight the 
     - IAM resource policies attached to VPC endpoints to control access.
     - Default policy allows all actions by all principals, can be customized to restrict access.
     - Example policy to restrict access to a VPC and binding users:
-```json
- {
-    "Version": "2008-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "*",
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "aws:SourceVpc": "vpc-01362976bd10dc099"
-                },
-                "StringLike": {
-                    "aws:username": "csb-*"
+     ```json
+     {
+        "Version": "2008-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": "*",
+                "Resource": "*",
+                "Condition": {
+                    "StringEquals": {
+                        "aws:SourceVpc": "vpc-01362976bd10dc099"
+                    },
+                    "StringLike": {
+                        "aws:username": "csb-*"
+                    }
                 }
             }
-        }
-    ]
- }
-```
-
-
-See the visual representation of an endpoint in the AWS console below:
+        ]
+     }
 
 ![Endpoint example](./endpoint.png "Endpoint example")
 
