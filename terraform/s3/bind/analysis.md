@@ -135,26 +135,28 @@ interaction between AWS services, VPC endpoints, and S3, and will highlight the 
     - Default policy allows all actions by all principals, can be customized to restrict access.
     - Example policy to restrict access to a VPC and binding users:
      ```json
-     {
-        "Version": "2008-10-17",
-        "Statement": [
-            {
-                "Effect": "Allow",
-                "Principal": "*",
-                "Action": "*",
-                "Resource": "*",
-                "Condition": {
-                    "StringEquals": {
-                        "aws:SourceVpc": "vpc-01362976bd10dc099"
-                    },
-                    "StringLike": {
-                        "aws:username": "csb-*"
-                    }
+ {
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "*",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceVpc": "vpc-01362976bd10dc099"
+                },
+                "StringLike": {
+                    "aws:username": "csb-*"
                 }
             }
-        ]
-     }
+        }
+    ]
+ }
 ```
+
+
 
 ![Endpoint example](./endpoint.png "Endpoint example")
 
