@@ -154,6 +154,7 @@ interaction between AWS services, VPC endpoints, and S3, and will highlight the 
             }
         ]
      }
+```
 
 ![Endpoint example](./endpoint.png "Endpoint example")
 
