@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/cloudfoundry/cloud-service-broker/v2/utils/freeport"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,7 +24,7 @@ var _ = Describe("Resource dynamodbns_instance", func() {
 	BeforeEach(func() {
 		var err error
 
-		port = freeport.Must()
+		port = freePort()
 		localDynamoDBURL = fmt.Sprintf("http://127.0.0.1:%d", port)
 		prefix = fmt.Sprintf("csb-%s-", uuid.New())
 
