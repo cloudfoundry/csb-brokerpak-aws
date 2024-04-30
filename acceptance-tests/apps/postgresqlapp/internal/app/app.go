@@ -7,7 +7,6 @@ import (
 	"postgresqlapp/internal/connector"
 	"regexp"
 
-	"github.com/go-chi/chi/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -19,12 +18,12 @@ const (
 )
 
 func App(conn *connector.Connector) http.Handler {
-	r := chi.NewRouter()
-	r.Head("/", aliveness)
-	r.Put("/{schema}", handleCreateSchema(conn))
-	r.Delete("/{schema}", handleDropSchema(conn))
-	r.Put("/{schema}/{key}", handleSet(conn))
-	r.Get("/{schema}/{key}", handleGet(conn))
+	r := http.NewServeMux()
+	r.HandleFunc("GET /aliveness", aliveness)
+	r.HandleFunc("PUT /{schema}", handleCreateSchema(conn))
+	r.HandleFunc("DELETE /{schema}", handleDropSchema(conn))
+	r.HandleFunc("PUT /{schema}/{key}", handleSet(conn))
+	r.HandleFunc("GET /{schema}/{key}", handleGet(conn))
 
 	return r
 }
@@ -35,7 +34,7 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 }
 
 func schemaName(r *http.Request) (string, error) {
-	schema := chi.URLParam(r, "schema")
+	schema := r.PathValue("schema")
 
 	switch {
 	case schema == "":

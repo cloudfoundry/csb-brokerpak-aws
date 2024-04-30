@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 	"postgresqlapp/internal/connector"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func handleGet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Request) {
@@ -19,7 +17,7 @@ func handleGet(conn *connector.Connector) func(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		key := chi.URLParam(r, "key")
+		key := r.PathValue("key")
 		if key == "" {
 			fail(w, http.StatusBadRequest, "key must be supplied")
 			return
