@@ -19,7 +19,7 @@ const (
 
 func App(conn *connector.Connector) http.Handler {
 	r := http.NewServeMux()
-	r.HandleFunc("HEAD /aliveness", aliveness)
+	r.HandleFunc("GET /", aliveness)
 	r.HandleFunc("PUT /{schema}", handleCreateSchema(conn))
 	r.HandleFunc("DELETE /{schema}", handleDropSchema(conn))
 	r.HandleFunc("PUT /{schema}/{key}", handleSet(conn))
