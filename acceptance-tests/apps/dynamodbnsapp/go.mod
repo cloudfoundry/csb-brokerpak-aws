@@ -8,13 +8,10 @@ require (
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.11
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.31.1
 	github.com/cloudfoundry-community/go-cfenv v1.18.0
-	github.com/go-chi/chi/v5 v5.0.12
-	github.com/go-chi/render v1.0.3
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
 require (
-	github.com/ajg/form v1.5.1 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.5 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.5 // indirect
