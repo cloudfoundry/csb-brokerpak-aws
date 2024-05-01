@@ -5,15 +5,13 @@ import (
 	"log"
 	"net/http"
 	"redisapp/internal/credentials"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func handleSet(creds credentials.Credentials) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Handling set.")
 
-		key := chi.URLParam(r, "key")
+		key := r.PathValue("key")
 		if key == "" {
 			fail(w, http.StatusBadRequest, "url parameter 'key' is required")
 			return
