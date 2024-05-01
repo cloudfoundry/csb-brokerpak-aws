@@ -46,7 +46,6 @@ data "aws_iam_policy_document" "user_policy" {
       "s3:PutLifecycleConfiguration",
       "s3:PutReplicationConfiguration",
       "s3:GetReplicationConfiguration",
-      "s3:DeleteReplicationConfiguration",
     ]
     resources = [
       var.arn
