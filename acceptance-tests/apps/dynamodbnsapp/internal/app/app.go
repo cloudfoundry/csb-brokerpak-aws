@@ -8,8 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
 
 	appcreds "dynamodbnsapp/internal/credentials"
 )
@@ -18,7 +16,7 @@ const (
 	ddbClientKey = "ddbClient"
 )
 
-func App(creds appcreds.DynamoDBNamespaceService) chi.Router {
+func App(creds appcreds.DynamoDBNamespaceService) http.Handler {
 	cfg, err := config.LoadDefaultConfig(
 		context.Background(),
 		config.WithCredentialsProvider(
@@ -38,29 +36,21 @@ func App(creds appcreds.DynamoDBNamespaceService) chi.Router {
 
 	client := dynamodb.NewFromConfig(cfg)
 
-	r := chi.NewRouter()
-	r.Use(render.SetContentType(render.ContentTypeJSON))
-	r.With(ddbClient(client)).Route("/tables", func(rt chi.Router) {
-		rt.Post("/", createTable)
-		rt.With(tableCtx).Get("/{tableName}", getTable)
-		rt.With(tableCtx).Delete("/{tableName}", deleteTable)
-		rt.With(tableCtx, tableKeyCtx).Route("/{tableName}/values/{key}", func(rv chi.Router) {
-			rv.Post("/", createValue)
-			rv.With(tablePrimaryKeyCtx).Route("/{pk}", func(rp chi.Router) {
-				rp.Get("/", getValue)
-				rp.Delete("/", deleteValue)
-			})
-		})
-	})
+	r := http.NewServeMux()
+
+	r.HandleFunc("POST /tables", ddbClient(client, createTable))
+	r.HandleFunc("GET /tables/{tableName}", ddbClient(client, tableCtx(getTable)))
+	r.HandleFunc("DELETE /tables/{tableName}", ddbClient(client, tableCtx(deleteTable)))
+	r.HandleFunc("POST /tables/{tableName}/values/{key}", ddbClient(client, tableCtx(tableKeyCtx(createValue))))
+	r.HandleFunc("GET /tables/{tableName}/values/{key}/{pk}", ddbClient(client, tableCtx(tableKeyCtx(tablePrimaryKeyCtx(getValue)))))
+	r.HandleFunc("DELETE /tables/{tableName}/values/{key}/{pk}", ddbClient(client, tableCtx(tableKeyCtx(tablePrimaryKeyCtx(deleteValue)))))
 
 	return r
 }
 
-func ddbClient(client *dynamodb.Client) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := context.WithValue(r.Context(), ddbClientKey, client)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
+func ddbClient(client *dynamodb.Client, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), ddbClientKey, client)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

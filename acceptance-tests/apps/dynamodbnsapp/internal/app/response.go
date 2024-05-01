@@ -1,27 +1,27 @@
 package app
 
 import (
+	"encoding/json"
 	"net/http"
-
-	"github.com/go-chi/render"
 )
 
+func NewErrResponse(err error) ErrResponse {
+	return ErrResponse{err}
+}
+
 type ErrResponse struct {
-	Err            error `json:"-"` // low-level runtime error
-	HTTPStatusCode int   `json:"-"` // http response status code
-
-	StatusText string `json:"status"`          // user-level status message
-	AppCode    int64  `json:"code,omitempty"`  // application-specific error code
-	ErrorText  string `json:"error,omitempty"` // application-level error message, for debugging
+	error
 }
 
-func (e *ErrResponse) Render(_ http.ResponseWriter, r *http.Request) error {
-	render.Status(r, e.HTTPStatusCode)
-	return nil
+func (e ErrResponse) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]string{"status": e.Error()})
 }
 
-type RenderableResponse struct{}
-
-func (r *RenderableResponse) Render(_ http.ResponseWriter, _ *http.Request) error {
-	return nil
+func writeJSONResponse(w http.ResponseWriter, statusCode int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	err := json.NewEncoder(w).Encode(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
