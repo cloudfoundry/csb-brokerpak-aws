@@ -32,6 +32,7 @@ variable "publicly_accessible" { type = bool }
 variable "multi_az" { type = bool }
 variable "instance_class" { type = string }
 variable "postgres_version" { type = string }
+variable "use_managed_admin_password" { type = bool }
 variable "aws_vpc_id" { type = string }
 variable "storage_autoscale" { type = bool }
 variable "storage_autoscale_limit_gb" { type = number }

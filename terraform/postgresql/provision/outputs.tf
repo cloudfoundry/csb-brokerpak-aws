@@ -16,9 +16,17 @@ output "name" { value = aws_db_instance.db_instance.db_name }
 output "hostname" { value = aws_db_instance.db_instance.address }
 output "username" { value = aws_db_instance.db_instance.username }
 output "password" {
-  value     = aws_db_instance.db_instance.password
+  value     = var.use_managed_admin_password ? "" : aws_db_instance.db_instance.password
   sensitive = true
 }
+output "master_secret_arn" {
+  value = var.use_managed_admin_password ? aws_db_instance.db_instance.master_user_secret[0].secret_arn : ""
+  sensitive = true
+}
+output "use_managed_admin_password" {
+  value =  var.use_managed_admin_password
+}
+
 output "require_ssl" { value = var.require_ssl }
 output "provider_verify_certificate" { value = var.provider_verify_certificate }
 output "status" {
@@ -32,3 +40,5 @@ output "status" {
     aws_db_instance.db_instance.id,
   )
 }
+
+output "region" {   value = var.region  }

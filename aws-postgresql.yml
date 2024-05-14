@@ -61,6 +61,10 @@ provision:
       See the RDS User Guide for details:
       https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#gp3-storage.
     default: 3000
+  - field_name: use_managed_admin_password
+    type: boolean
+    default: true
+    details: Weather to use AWS managed credentials for admin credentials 
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
@@ -364,6 +368,15 @@ provision:
   - field_name: password
     type: string
     details: The password to authenticate to the database instance.
+  - field_name: use_managed_admin_password
+    type: boolean
+    details: Whether CSB should use AWS managed admin password
+  - field_name: master_secret_arn
+    type: string
+    details: The ARN of the master secret to authenticate to the database instance.
+  - field_name: region
+    type: string
+    details: AWS region for the Postgres
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL
@@ -372,8 +385,20 @@ provision:
     details: Whether CSB should validate the server certificate. The AWS certificate bundle must be installed.
 bind:
   plan_inputs: []
-  user_inputs: []
+  user_inputs:
+  - field_name: aws_access_key_id
+    type: string
+    details: AWS access key
+    default: ${config("aws.access_key_id")}
+  - field_name: aws_secret_access_key
+    type: string
+    details: AWS secret key
+    default: ${config("aws.secret_access_key")}
   computed_inputs:
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
   - name: db_name
     type: string
     default: ${instance.details["name"]}
@@ -389,6 +414,14 @@ bind:
   - name: admin_password
     type: string
     default: ${instance.details["password"]}
+    overwrite: true
+  - name: use_managed_admin_password
+    type: boolean
+    default: ${instance.details["use_managed_admin_password"]}
+    overwrite: true
+  - name: master_secret_arn
+    type: string
+    default: ${instance.details["master_secret_arn"]}
     overwrite: true
   - name: require_ssl
     type: boolean
