@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	code.cloudfoundry.org/jsonry v1.1.4
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-sdk-go-v2 v1.26.2
+	github.com/aws/aws-sdk-go-v2 v1.27.0
 	github.com/aws/aws-sdk-go-v2/config v1.27.14
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.14
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.161.2
