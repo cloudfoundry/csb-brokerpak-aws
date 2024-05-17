@@ -23,8 +23,8 @@ terraform_binaries:
   source: https://github.com/opentofu/opentofu/archive/v1.6.2.zip
   default: true
 - name: terraform-provider-aws
-  version: 5.49.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.49.0.zip
+  version: 5.50.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.50.0.zip
 - name: terraform-provider-random
   version: 3.6.1
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.1.zip
