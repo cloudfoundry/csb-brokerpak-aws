@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "user_policy" {
     for_each = var.allowed_aws_vpc_id != "" ? [1] : []
 
     content {
-      sid       = "VPCeOnly"
+      sid       = "VPCOnly"
       effect    = "Deny"
       actions   = ["s3:*"]
       resources = [var.arn, format("%s/*", var.arn)]
