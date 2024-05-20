@@ -1,4 +1,4 @@
-package acceptance_tests
+package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
