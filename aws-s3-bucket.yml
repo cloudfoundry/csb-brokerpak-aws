@@ -197,7 +197,7 @@ provision:
     details: The default and extra AWS KMS key IDs used for SSE-KMS encryption and decryption.
   - field_name: allowed_aws_vpc_id
     type: string
-    details: The VPC ID to restrict access exclusively to the designated VPC.
+    details: The ID of a pre-created VPC. When specified, the S3 bucket policy will only allow access from the specified VPC.
 bind:
   plan_inputs: []
   user_inputs:
