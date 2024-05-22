@@ -2,6 +2,7 @@ package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli/vpcendpoint"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 	"fmt"
@@ -14,10 +15,34 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), func() {
+var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), Ordered, func() {
+	var (
+		vpcEndpointID string
+		allowedVPCID  string
+		defaultRegion string
+	)
+
+	BeforeAll(func() {
+		allowedVPCID = os.Getenv("AWS_PAS_VPC_ID")
+		Expect(allowedVPCID).NotTo(
+			BeEmpty(),
+			"The environment variable AWS_PAS_VPC_ID is not set. This variable represents the VPC ID used in the VPC endpoint policy to allow connections from within the specified VPC.",
+		)
+
+		defaultRegion = os.Getenv("AWS_DEFAULT_REGION")
+		Expect(allowedVPCID).NotTo(
+			BeEmpty(),
+			"The environment variable AWS_DEFAULT_REGION is not set. This variable represents the region used in the VPC endpoint to allow connections from within the specified region.",
+		)
+
+		vpcEndpointID = vpcendpoint.CreateEndpoint(allowedVPCID, defaultRegion)
+	})
+
+	AfterAll(func() {
+		vpcendpoint.DeleteVPCEndpoint(vpcEndpointID)
+	})
+
 	It("should allow access from specified VPC", func() {
-		allowedVPCID := os.Getenv("ALLOWED_VPC_ID")
-		Expect(allowedVPCID).NotTo(BeEmpty(), "Environment variable ALLOWED_VPC_ID is not set")
 
 		By("creating a service instance with allowed_aws_vpc_id set")
 		serviceInstance := services.CreateInstance(

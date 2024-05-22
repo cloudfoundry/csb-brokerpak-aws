@@ -2,7 +2,7 @@ package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
-	"csbbrokerpakaws/acceptance-tests/helpers/dms"
+	dms2 "csbbrokerpakaws/acceptance-tests/helpers/awscli/dms"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 
@@ -14,7 +14,7 @@ import (
 var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 	It("can migrate data from the previous broker to the CSB", func() {
 		By("creating a replication instance")
-		replicationInstance := dms.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
+		replicationInstance := dms2.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
 		defer replicationInstance.Cleanup()
 
 		By("creating a legacy service instance with the previous broker to serve as source")
@@ -62,8 +62,8 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 			Port     int    `mapstructure:"port"`
 		}
 		Expect(mapstructure.Decode(sourceCreds, &sourceReceiver)).NotTo(HaveOccurred())
-		sourceEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
-			EndpointType:    dms.Source,
+		sourceEndpoint := dms2.CreateEndpoint(dms2.CreateEndpointParams{
+			EndpointType:    dms2.Source,
 			EnvironmentName: metadata.Name,
 			Username:        sourceReceiver.Username,
 			Password:        sourceReceiver.Password,
@@ -86,8 +86,8 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 			Port     int    `json:"port"`
 		}
 		csbKey.Get(&targetReceiver)
-		targetEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
-			EndpointType:    dms.Target,
+		targetEndpoint := dms2.CreateEndpoint(dms2.CreateEndpointParams{
+			EndpointType:    dms2.Target,
 			EnvironmentName: metadata.Name,
 			Username:        targetReceiver.Username,
 			Password:        targetReceiver.Password,
@@ -100,7 +100,7 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 		defer targetEndpoint.Cleanup()
 
 		By("running the replication task")
-		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, sourceReceiver.DBName)
+		dms2.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, sourceReceiver.DBName)
 
 		By("deleting the target service key to trigger data ownership update")
 		csbKey.Delete()
