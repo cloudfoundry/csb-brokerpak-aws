@@ -162,13 +162,10 @@ provision:
   - field_name: allowed_aws_vpc_id
     type: string
     details: |
-      The VPC ID to restrict access exclusively to the designated VPC.
+      The ID of a pre-created VPC. When specified, the S3 bucket policy will only allow access from the specified VPC.
       E.g: `vpc-01362976bd10dc099`.
-      CSB will create IAM users with a policy configuration to specify VPC access, enhancing security
-      controls at the user level but this configuration is not enough to ensure secure access to the S3 bucket. In order to
-      ensure secure access to the S3 bucket, a VPC endpoint must be properly configured.
-      Read official documentation for more information: https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html
-      and  https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html
+      For this feature to function correctly, a VPC endpoint must be properly configured.
+      For more information on VPC endpoints, visit https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints-s3.html
     default: ""
   computed_inputs:
   - name: labels
