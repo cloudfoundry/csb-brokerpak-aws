@@ -2,7 +2,7 @@ package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
-	dms2 "csbbrokerpakaws/acceptance-tests/helpers/awscli/dms"
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli/dms"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 
@@ -51,7 +51,7 @@ var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"),
 		defer csbServiceInstance.Delete()
 
 		By("creating a replication instance")
-		replicationInstance := dms2.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
+		replicationInstance := dms.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
 		defer replicationInstance.Cleanup()
 
 		By("waiting for the replication instance to be ready")
@@ -67,8 +67,8 @@ var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"),
 			Port     int    `mapstructure:"port"`
 		}
 		Expect(mapstructure.Decode(sourceCreds, &sourceReceiver)).NotTo(HaveOccurred())
-		sourceEndpoint := dms2.CreateEndpoint(dms2.CreateEndpointParams{
-			EndpointType:    dms2.Source,
+		sourceEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
+			EndpointType:    dms.Source,
 			EnvironmentName: metadata.Name,
 			Username:        sourceReceiver.Username,
 			Password:        sourceReceiver.Password,
@@ -91,8 +91,8 @@ var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"),
 			Port     int    `json:"port"`
 		}
 		csbKey.Get(&targetReceiver)
-		targetEndpoint := dms2.CreateEndpoint(dms2.CreateEndpointParams{
-			EndpointType:    dms2.Target,
+		targetEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
+			EndpointType:    dms.Target,
 			EnvironmentName: metadata.Name,
 			Username:        targetReceiver.Username,
 			Password:        targetReceiver.Password,
@@ -105,7 +105,7 @@ var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"),
 		defer targetEndpoint.Cleanup()
 
 		By("running the replication task")
-		dms2.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, "%")
+		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, "%")
 
 		By("deleting the target service key to trigger data ownership update")
 		csbKey.Delete()

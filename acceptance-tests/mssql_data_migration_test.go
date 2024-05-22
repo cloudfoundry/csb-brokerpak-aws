@@ -1,7 +1,7 @@
 package acceptance_tests_test
 
 import (
-	dms2 "csbbrokerpakaws/acceptance-tests/helpers/awscli/dms"
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli/dms"
 	"fmt"
 	"os"
 	"os/exec"
@@ -32,7 +32,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		Expect(sourceAdminUsername).NotTo(BeEmpty(), "The MasterUsername environment variable is mandatory")
 
 		By("creating a replication instance")
-		replicationInstance := dms2.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
+		replicationInstance := dms.CreateReplicationInstance(metadata.VPC, metadata.Name, metadata.Region)
 		defer replicationInstance.Cleanup()
 
 		By("creating a legacy service instance with the previous broker to serve as source")
@@ -96,8 +96,8 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 			Port     int    `mapstructure:"port"`
 		}
 		Expect(mapstructure.Decode(sourceCreds, &sourceReceiver)).NotTo(HaveOccurred())
-		sourceEndpoint := dms2.CreateEndpoint(dms2.CreateEndpointParams{
-			EndpointType:    dms2.Source,
+		sourceEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
+			EndpointType:    dms.Source,
 			EnvironmentName: metadata.Name,
 			Username:        sourceAdminUsername,
 			Password:        sourceAdminPassword,
@@ -134,8 +134,8 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 			Port     int    `json:"port"`
 		}
 		csbKey.Get(&targetReceiver)
-		targetEndpoint := dms2.CreateEndpoint(dms2.CreateEndpointParams{
-			EndpointType:    dms2.Target,
+		targetEndpoint := dms.CreateEndpoint(dms.CreateEndpointParams{
+			EndpointType:    dms.Target,
 			EnvironmentName: metadata.Name,
 			Username:        targetReceiver.Username,
 			Password:        targetReceiver.Password,
@@ -148,7 +148,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		defer targetEndpoint.Cleanup()
 
 		By("running the replication task")
-		dms2.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, schema)
+		dms.RunReplicationTask(replicationInstance, sourceEndpoint, targetEndpoint, metadata.Region, schema)
 
 		By("switching the app data source from the legacy MSSQL to the new CSB created MSSQL")
 		legacyBinding.Unbind()
