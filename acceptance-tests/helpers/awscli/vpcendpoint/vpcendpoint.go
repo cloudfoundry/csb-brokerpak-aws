@@ -1,3 +1,4 @@
+// Package vpcendpoint provides test helpers for setting up an AWS VPC Endpoint
 package vpcendpoint
 
 import (
@@ -10,7 +11,7 @@ type CallerIdentity struct {
 }
 
 type RouteTable struct {
-	RouteTableId string `json:"RouteTableId"`
+	RouteTableID string `json:"RouteTableId"`
 }
 
 type RouteTables struct {
@@ -18,7 +19,7 @@ type RouteTables struct {
 }
 
 type VpcEndpoint struct {
-	VpcEndpointId string `json:"VpcEndpointId"`
+	VpcEndpointID string `json:"VpcEndpointId"`
 }
 
 type VpcEndpointResponse struct {
@@ -85,7 +86,7 @@ func CreateEndpoint(allowedVPCID, defaultRegion string) string {
 
 	routeTableIDs := make([]string, len(routesTables.RouteTables))
 	for i, rt := range routesTables.RouteTables {
-		routeTableIDs[i] = rt.RouteTableId
+		routeTableIDs[i] = rt.RouteTableID
 	}
 
 	createEndpointCommand := []string{
@@ -101,7 +102,7 @@ func CreateEndpoint(allowedVPCID, defaultRegion string) string {
 
 	var response VpcEndpointResponse
 	awscli.AWSToJSON(&response, createEndpointCommand...)
-	return response.VpcEndpoint.VpcEndpointId
+	return response.VpcEndpoint.VpcEndpointID
 }
 
 func DeleteVPCEndpoint(vpcEndpointID string) {
