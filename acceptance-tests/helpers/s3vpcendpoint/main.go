@@ -182,5 +182,3 @@ func deleteVPCEndpoint(svc *ec2.Client, vpcEndpointID string) {
 
 	fmt.Println("VPC Endpoint deleted: ", vpcEndpointID)
 }
-
-// arn:aws:iam::649758297924:user/automation-admin-user
