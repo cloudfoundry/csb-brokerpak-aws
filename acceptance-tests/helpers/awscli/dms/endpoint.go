@@ -1,6 +1,7 @@
 package dms
 
 import (
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"fmt"
 )
@@ -36,7 +37,7 @@ func CreateEndpoint(params CreateEndpointParams) *Endpoint {
 		ARN string `jsonry:"Endpoint.EndpointArn"`
 	}
 
-	AWSToJSON(
+	awscli.AWSToJSON(
 		&receiver,
 		"dms",
 		"create-endpoint",
@@ -58,5 +59,5 @@ func CreateEndpoint(params CreateEndpointParams) *Endpoint {
 }
 
 func (e *Endpoint) Cleanup() {
-	AWS("dms", "delete-endpoint", "--region", e.region, "--endpoint-arn", e.arn)
+	awscli.AWS("dms", "delete-endpoint", "--region", e.region, "--endpoint-arn", e.arn)
 }

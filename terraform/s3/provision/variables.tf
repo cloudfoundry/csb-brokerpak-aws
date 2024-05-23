@@ -48,3 +48,5 @@ variable "ol_configuration_default_retention_years" { type = number }
 
 variable "require_tls" { type = bool }
 
+variable "allowed_aws_vpc_id" { type = string }
+

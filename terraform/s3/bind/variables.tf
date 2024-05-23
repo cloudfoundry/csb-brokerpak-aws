@@ -24,3 +24,4 @@ variable "region" { type = string }
 variable "arn" { type = string }
 variable "user_name" { type = string }
 variable "sse_all_kms_key_ids" { type = string }
+variable "allowed_aws_vpc_id" { type = string }

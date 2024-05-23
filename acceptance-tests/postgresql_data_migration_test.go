@@ -2,7 +2,7 @@ package acceptance_tests_test
 
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
-	"csbbrokerpakaws/acceptance-tests/helpers/dms"
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli/dms"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 

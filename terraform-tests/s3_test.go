@@ -42,8 +42,9 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 			"ol_configuration_default_retention_mode":    nil,
 			"ol_configuration_default_retention_days":    nil,
 			"ol_configuration_default_retention_years":   nil,
-			"labels":      map[string]any{"k1": "v1"},
-			"require_tls": false,
+			"labels":             map[string]any{"k1": "v1"},
+			"require_tls":        false,
+			"allowed_aws_vpc_id": "",
 		}
 	})
 
