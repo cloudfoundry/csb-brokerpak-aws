@@ -1,4 +1,5 @@
-package dms
+// Package awscli provides test helpers for setting up AWS resources
+package awscli
 
 import (
 	"fmt"

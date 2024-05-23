@@ -311,6 +311,11 @@ var _ = Describe("S3", Label("s3"), func() {
 					Type:  "string",
 					Value: "some-default-kms-key-id,some-extra-kms-key-id",
 				},
+				{
+					Name:  "allowed_aws_vpc_id",
+					Type:  "string",
+					Value: "fake-vpc-id",
+				},
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -328,12 +333,12 @@ var _ = Describe("S3", Label("s3"), func() {
 
 			Expect(bindResult).To(
 				Equal(map[string]any{
-					"access_key_id":     "subsequent.access.key.id.test",
-					"secret_access_key": "subsequent.secret.access.key.test",
-					"region":            "ap-northeast-3",
-					"arn":               "arn:aws:s3:::examplebucket/developers/design_info.doc",
-
+					"access_key_id":       "subsequent.access.key.id.test",
+					"secret_access_key":   "subsequent.secret.access.key.test",
+					"region":              "ap-northeast-3",
+					"arn":                 "arn:aws:s3:::examplebucket/developers/design_info.doc",
 					"sse_all_kms_key_ids": "some-default-kms-key-id,some-extra-kms-key-id",
+					"allowed_aws_vpc_id":  "fake-vpc-id",
 				}),
 			)
 		})
