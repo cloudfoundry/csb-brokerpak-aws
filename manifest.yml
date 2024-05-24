@@ -23,19 +23,19 @@ terraform_binaries:
   source: https://github.com/opentofu/opentofu/archive/v1.6.2.zip
   default: true
 - name: terraform-provider-aws
-  version: 5.50.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.50.0.zip
+  version: 5.51.0
+  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.51.0.zip
 - name: terraform-provider-random
   version: 3.6.2
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.2.zip
 - name: terraform-provider-csbpg
-  version: 1.2.27
-  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.27.zip
+  version: 1.2.28
+  source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.28.zip
   provider: cloudfoundry.org/cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
-  version: 1.2.33
-  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.33.zip
+  version: 1.2.34
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.34.zip
   provider: cloudfoundry.org/cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
@@ -47,8 +47,8 @@ terraform_binaries:
   provider: cloudfoundry.org/cloud-service-broker/csbmajorengineversion
   url_template: ./providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/${version}/${os}_${arch}/${name}_v${version}
 - name: terraform-provider-csbsqlserver
-  version: 1.0.18
-  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.18.zip
+  version: 1.0.19
+  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.19.zip
   provider: cloudfoundry.org/cloud-service-broker/csbsqlserver
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 env_config_mapping:
