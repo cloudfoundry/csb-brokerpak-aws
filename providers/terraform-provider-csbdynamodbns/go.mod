@@ -10,7 +10,7 @@ require (
 	github.com/aws/smithy-go v1.20.2
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.34.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
-	github.com/onsi/ginkgo/v2 v2.18.0
+	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
 	github.com/pborman/uuid v1.2.1
 	golang.org/x/tools v0.21.0
