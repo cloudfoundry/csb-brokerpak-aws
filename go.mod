@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.27.16
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.16
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.162.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.79.2
+	github.com/aws/aws-sdk-go-v2/service/rds v1.79.3
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cloudfoundry/cloud-service-broker/v2 v2.0.3
 	github.com/hashicorp/terraform-json v0.22.1
@@ -27,7 +27,6 @@ require (
 	cloud.google.com/go v0.114.0 // indirect
 	cloud.google.com/go/auth v0.5.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/compute v1.27.0 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect
 	cloud.google.com/go/storage v1.41.0 // indirect
