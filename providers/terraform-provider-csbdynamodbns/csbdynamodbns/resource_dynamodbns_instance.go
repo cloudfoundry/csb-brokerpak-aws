@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/aws/smithy-go/ptr"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -70,7 +70,7 @@ func ResourceDynamoDBMaintenanceDelete(ctx context.Context, data *schema.Resourc
 		}
 		for _, tableName := range page.TableNames {
 			if strings.HasPrefix(tableName, settings.GetPrefix()) {
-				_, err := client.DeleteTable(ctx, &dynamodb.DeleteTableInput{TableName: ptr.String(tableName)})
+				_, err := client.DeleteTable(ctx, &dynamodb.DeleteTableInput{TableName: aws.String(tableName)})
 				if err != nil {
 					d = append(d, diag.Diagnostic{Severity: diag.Error, Summary: err.Error()})
 				}
