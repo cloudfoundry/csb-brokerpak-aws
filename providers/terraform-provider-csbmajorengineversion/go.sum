@@ -11,8 +11,8 @@ github.com/agext/levenshtein v1.2.2/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki
 github.com/apparentlymart/go-textseg/v12 v12.0.0/go.mod h1:S/4uRK2UtaQttw1GenVJEynmyUenKwP++x/+DdGV/Ec=
 github.com/apparentlymart/go-textseg/v15 v15.0.0 h1:uYvfpb3DyLSCGWnctWKGj857c6ew1u1fNQOlOtuGxQY=
 github.com/apparentlymart/go-textseg/v15 v15.0.0/go.mod h1:K8XmNZdhEBkdlyDdvbmmsvpAG721bKi0joRfFdHIWJ4=
-github.com/aws/aws-sdk-go-v2 v1.27.1 h1:xypCL2owhog46iFxBKKpBcw+bPTX/RJzwNj8uSilENw=
-github.com/aws/aws-sdk-go-v2 v1.27.1/go.mod h1:ffIFB97e2yNsv4aTSGkqtHnppsIJzw7G7BReUZ3jCXM=
+github.com/aws/aws-sdk-go-v2 v1.27.2 h1:pLsTXqX93rimAOZG2FIYraDQstZaaGVVN4tNw65v0h8=
+github.com/aws/aws-sdk-go-v2 v1.27.2/go.mod h1:ffIFB97e2yNsv4aTSGkqtHnppsIJzw7G7BReUZ3jCXM=
 github.com/aws/aws-sdk-go-v2/config v1.27.17 h1:L0JZN7Gh7pT6u5CJReKsLhGKparqNKui+mcpxMXjDZc=
 github.com/aws/aws-sdk-go-v2/config v1.27.17/go.mod h1:MzM3balLZeaafYcPz8IihAmam/aCz6niPQI0FdprxW0=
 github.com/aws/aws-sdk-go-v2/credentials v1.17.17 h1:b3Dk9uxQByS9sc6r0sc2jmxsJKO75eOcb9nNEiaUBLM=
