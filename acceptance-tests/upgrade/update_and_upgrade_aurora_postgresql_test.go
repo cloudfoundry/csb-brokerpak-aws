@@ -72,6 +72,13 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
+			By("deleting bindings created before the upgrade")
+			bindingOne.Unbind()
+
+			By("creating new bindings and testing they still work")
+			serviceInstance.Bind(appOne)
+			apps.Restage(appOne)
+
 			By("updating the instance version")
 			serviceInstance.Update(services.WithParameters(map[string]any{
 				"engine_version": "14",
@@ -81,7 +88,7 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
 
-			By("deleting bindings created before the upgrade")
+			By("deleting bindings created before the update")
 			bindingOne.Unbind()
 			bindingTwo.Unbind()
 
