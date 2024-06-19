@@ -126,35 +126,3 @@ func config(tableName string) any {
 		},
 	}
 }
-
-func updatedConfig(tableName string) any {
-	return map[string]any{
-		"server_side_encryption_enabled": true,
-		"attributes": []map[string]any{
-			{
-				"name": "id",
-				"type": "S",
-			},
-			{
-				"name": "key",
-				"type": "S",
-			},
-			{
-				"name": "value",
-				"type": "S",
-			},
-		},
-		"hash_key":   "id",
-		"range_key":  "value",
-		"table_name": tableName,
-		"global_secondary_indexes": []map[string]any{
-			{
-				"name":               "KeyIndex",
-				"hash_key":           "key",
-				"range_key":          "value",
-				"projection_type":    "INCLUDE",
-				"non_key_attributes": []string{"id"},
-			},
-		},
-	}
-}
