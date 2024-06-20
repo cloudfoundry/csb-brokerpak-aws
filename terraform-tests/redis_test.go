@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 
-	. "terraformtests/helpers"
+	. "csbbrokerpakaws/terraform-tests/helpers"
 )
 
 var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {

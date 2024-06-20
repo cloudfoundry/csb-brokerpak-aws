@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	. "terraformtests/helpers"
+	. "csbbrokerpakaws/terraform-tests/helpers"
 )
 
 var _ = Describe("dynamodb-namespace", Label("dynamodb-ns-terraform"), Ordered, func() {
