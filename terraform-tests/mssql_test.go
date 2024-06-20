@@ -2,9 +2,9 @@ package terraformtests
 
 import (
 	"context"
-	. "csbbrokerpakaws/terraform-tests/helpers"
 	"fmt"
 	"path"
+	. "terraformtests/helpers"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"

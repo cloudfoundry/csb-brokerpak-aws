@@ -3,7 +3,7 @@ package terraformtests
 import (
 	"path"
 
-	. "csbbrokerpakaws/terraform-tests/helpers"
+	. "terraformtests/helpers"
 
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
