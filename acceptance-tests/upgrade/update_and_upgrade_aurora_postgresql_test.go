@@ -81,7 +81,7 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 
 			By("updating the instance version")
 			serviceInstance.Update(services.WithParameters(`{}`))
-			
+
 			By("checking previously written data still accessible")
 			got = appTwo.GET("%s/%s", schema, keyOne).String()
 			Expect(got).To(Equal(valueOne))
