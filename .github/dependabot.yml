@@ -10,6 +10,7 @@ updates:
   - dependency-name: "github.com/aws/aws-sdk-go-v2/*"
 - package-ecosystem: gomod
   directory: "/"
+  target-branch: main
   schedule:
     interval: "weekly"
     day: "saturday"
