@@ -58,14 +58,23 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			got = appTwo.GET(blobNameOne).String()
 			Expect(got).To(Equal(blobDataOne))
 
+			By("deleting bindings created before the upgrade")
+			bindingOne.Unbind()
+			bindingTwo.Unbind()
+
+			By("binding the app to the instance again")
+			serviceInstance.Bind(appOne)
+			serviceInstance.Bind(appTwo)
+			apps.Restage(appOne, appTwo)
+
 			By("updating the service instance")
-			serviceInstance.Update(services.WithParameters(`{"pab_block_public_policy": true}`))
+			serviceInstance.Update(services.WithParameters(`{}`))
 
 			By("checking that previously written data is accessible")
 			got = appTwo.GET(blobNameOne).String()
 			Expect(got).To(Equal(blobDataOne))
 
-			By("deleting bindings created before the upgrade")
+			By("deleting bindings created before the update")
 			bindingOne.Unbind()
 			bindingTwo.Unbind()
 
