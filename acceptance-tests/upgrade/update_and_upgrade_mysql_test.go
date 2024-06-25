@@ -25,7 +25,7 @@ var _ = Describe("UpgradeMySQLTest", Label("mysql", "upgrade"), func() {
 			By("creating a service")
 			serviceInstance := services.CreateInstance(
 				"csb-aws-mysql",
-				services.WithPlan("small"),
+				services.WithPlan("default"),
 				services.WithBroker(serviceBroker),
 			)
 			defer serviceInstance.Delete()
