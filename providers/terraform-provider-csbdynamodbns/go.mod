@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.34.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/onsi/ginkgo/v2 v2.19.1
-	github.com/onsi/gomega v1.34.0
+	github.com/onsi/gomega v1.34.1
 	github.com/pborman/uuid v1.2.1
 	golang.org/x/tools v0.23.0
 	honnef.co/go/tools v0.4.7
@@ -76,6 +76,7 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
