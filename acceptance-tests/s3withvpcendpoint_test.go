@@ -92,7 +92,7 @@ var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), Ordered, func() 
 				http.StatusFailedDependency),
 			"the connection is not possible from a VPC that is not allowed",
 		)
-		b, err := io.ReadAll(httpResponse.Body)
+		_, err := io.ReadAll(httpResponse.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in S3 API call")
 
 		By("updating the service instance with a fake allowed_aws_vpc_id")
