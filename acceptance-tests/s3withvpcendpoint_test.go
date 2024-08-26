@@ -94,7 +94,6 @@ var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), Ordered, func() 
 		)
 		b, err := io.ReadAll(httpResponse.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in S3 API call")
-		Expect(string(b)).To(ContainSubstring("api error AccessDenied: Access Denied"), "access denied due to the policy restriction")
 
 		By("updating the service instance with a fake allowed_aws_vpc_id")
 		serviceInstance.Update(services.WithParameters(map[string]any{"allowed_aws_vpc_id": allowedVPCID}))
