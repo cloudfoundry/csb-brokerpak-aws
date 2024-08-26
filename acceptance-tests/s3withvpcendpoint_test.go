@@ -115,7 +115,7 @@ var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), Ordered, func() 
 				http.StatusFailedDependency),
 			"there is not file to be retrieved",
 		)
-		b, err = io.ReadAll(httpResponse.Body)
+		b, err := io.ReadAll(httpResponse.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in S3 API call after deletion")
 		Expect(string(b)).To(ContainSubstring("operation error S3: GetObject, https response error StatusCode: 404"), "file does not exist in the bucket")
 	})
