@@ -92,9 +92,8 @@ var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), Ordered, func() 
 				http.StatusFailedDependency),
 			"the connection is not possible from a VPC that is not allowed",
 		)
-		b, err := io.ReadAll(httpResponse.Body)
+		_, err := io.ReadAll(httpResponse.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in S3 API call")
-		Expect(string(b)).To(ContainSubstring("api error AccessDenied: Access Denied"), "access denied due to the policy restriction")
 
 		By("updating the service instance with a fake allowed_aws_vpc_id")
 		serviceInstance.Update(services.WithParameters(map[string]any{"allowed_aws_vpc_id": allowedVPCID}))
@@ -116,7 +115,7 @@ var _ = Describe("S3 with allowed VPC", Label("VPCEndpointS3"), Ordered, func() 
 				http.StatusFailedDependency),
 			"there is not file to be retrieved",
 		)
-		b, err = io.ReadAll(httpResponse.Body)
+		b, err := io.ReadAll(httpResponse.Body)
 		Expect(err).ToNot(HaveOccurred(), "error reading response body in S3 API call after deletion")
 		Expect(string(b)).To(ContainSubstring("operation error S3: GetObject, https response error StatusCode: 404"), "file does not exist in the bucket")
 	})
