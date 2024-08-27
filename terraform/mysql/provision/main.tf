@@ -38,7 +38,7 @@ resource "random_string" "username" {
   length  = 16
   special = false
   numeric = false
-  count = length(var.admin_username) == 0 ? 1 : 0
+  count   = length(var.admin_username) == 0 ? 1 : 0
 }
 
 resource "random_password" "password" {
