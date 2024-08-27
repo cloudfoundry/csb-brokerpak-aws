@@ -212,7 +212,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 				SatisfyAll(
 					HaveKeyWithValue("engine", "mysql"),
-					HaveKeyWithValue("engine_version", "8"),
+					HaveKeyWithValue("engine_version", "8.0"),
 					HaveKeyWithValue("cores", float64(4)),
 					HaveKeyWithValue("storage_gb", float64(100)),
 					HaveKeyWithValue("storage_type", "gp2"),
