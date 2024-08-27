@@ -59,8 +59,15 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			got := app.GET("/retrieve_and_delete/%s", bindingName).String()
 			Expect(got).To(Equal(messageOne))
 
+			By("deleting bindings created before the upgrade")
+			binding.Unbind()
+
+			By("binding the app to the instance again")
+			serviceInstance.Bind(app, services.WithBindingName(bindingName))
+			apps.Restage(app)
+
 			By("updating the service instance")
-			serviceInstance.Update(services.WithParameters(`{"sqs_managed_sse_enabled":false}`))
+			serviceInstance.Update(services.WithParameters(`{}`))
 
 			By("receiving the previously written second message")
 			got = app.GET("/retrieve_and_delete/%s", bindingName).String()

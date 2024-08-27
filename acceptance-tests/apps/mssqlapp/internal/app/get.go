@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
-
 	"mssqlapp/internal/credentials"
 )
 
@@ -25,7 +23,7 @@ func handleGet(connector *credentials.Connector) func(w http.ResponseWriter, r *
 			return
 		}
 
-		key := chi.URLParam(r, "key")
+		key := r.PathValue("key")
 		if key == "" {
 			fail(w, http.StatusBadRequest, "key must be supplied")
 			return

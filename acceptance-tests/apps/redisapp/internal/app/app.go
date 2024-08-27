@@ -5,17 +5,15 @@ import (
 	"log"
 	"net/http"
 	"redisapp/internal/credentials"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func App(creds credentials.Credentials) http.Handler {
-	r := chi.NewRouter()
+	r := http.NewServeMux()
 
-	r.Head("/", aliveness)
-	r.Put("/primary/{key}", handleSet(creds))
-	r.Get("/primary/{key}", handleGet(creds, primaryNode))
-	r.Get("/replica/{key}", handleGet(creds, replicaNode))
+	r.HandleFunc("GET /", aliveness)
+	r.HandleFunc("PUT /primary/{key}", handleSet(creds))
+	r.HandleFunc("GET /primary/{key}", handleGet(creds, primaryNode))
+	r.HandleFunc("GET /replica/{key}", handleGet(creds, replicaNode))
 
 	return r
 }

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/go-chi/render"
 )
 
 const (
@@ -17,12 +17,14 @@ const (
 	tablePrimaryKeyNameKey = "pk"
 )
 
+var (
+	itemNotFoundErr = errors.New("item not found")
+)
+
 type ValueResponse struct {
 	Pk      int64  `json:"pk"`
 	Sorting string `json:"sorting"`
 	Value   string `json:"value"`
-
-	RenderableResponse
 }
 
 func deleteValue(w http.ResponseWriter, r *http.Request) {
@@ -38,17 +40,17 @@ func deleteValue(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		_ = render.Render(w, r, errorResponseFromAWSError(err))
+		writeJSONResponse(w, statusCodeFromAWSError(err), NewErrResponse(err))
 		return
 	}
 
 	if reply.Attributes == nil {
-		_ = render.Render(w, r, &ErrResponse{HTTPStatusCode: http.StatusNotFound, StatusText: "Item not found"})
+		writeJSONResponse(w, http.StatusNotFound, NewErrResponse(itemNotFoundErr))
 		return
 	}
 
 	pk, _ := strconv.ParseInt(reply.Attributes[tableKeyPrimary].(*types.AttributeValueMemberN).Value, 10, 32)
-	_ = render.Render(w, r, &ValueResponse{
+	writeJSONResponse(w, http.StatusOK, ValueResponse{
 		Pk:      pk,
 		Sorting: reply.Attributes[tableKeySorting].(*types.AttributeValueMemberS).Value,
 		Value:   reply.Attributes[tableValueColumnName].(*types.AttributeValueMemberS).Value,
@@ -58,7 +60,8 @@ func deleteValue(w http.ResponseWriter, r *http.Request) {
 func createValue(w http.ResponseWriter, r *http.Request) {
 	value, err := io.ReadAll(r.Body)
 	if err != nil {
-		_ = render.Render(w, r, &ErrResponse{HTTPStatusCode: http.StatusBadRequest, StatusText: err.Error()})
+		writeJSONResponse(w, http.StatusBadRequest, NewErrResponse(err))
+		return
 	}
 
 	tableName, key, _, client := extractValueContextValues(r)
@@ -74,12 +77,11 @@ func createValue(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		_ = render.Render(w, r, errorResponseFromAWSError(err))
+		writeJSONResponse(w, statusCodeFromAWSError(err), NewErrResponse(err))
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
-	_ = render.Render(w, r, &ValueResponse{
+	writeJSONResponse(w, http.StatusCreated, ValueResponse{
 		Pk:      primaryKeyValue,
 		Sorting: key,
 		Value:   string(value),
@@ -98,22 +100,22 @@ func getValue(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		_ = render.Render(w, r, errorResponseFromAWSError(err))
+		writeJSONResponse(w, statusCodeFromAWSError(err), NewErrResponse(err))
 		return
 	}
 
 	if reply.Item == nil {
-		_ = render.Render(w, r, &ErrResponse{HTTPStatusCode: http.StatusNotFound, StatusText: "Item not found"})
+		writeJSONResponse(w, http.StatusNotFound, NewErrResponse(itemNotFoundErr))
 		return
 	}
 
-	var pk int64
-	pk, err = strconv.ParseInt(reply.Item[tableKeyPrimary].(*types.AttributeValueMemberN).Value, 10, 64)
+	pk, err := strconv.ParseInt(reply.Item[tableKeyPrimary].(*types.AttributeValueMemberN).Value, 10, 64)
 	if err != nil {
-		_ = render.Render(w, r, &ErrResponse{HTTPStatusCode: http.StatusUnprocessableEntity, Err: err})
+		writeJSONResponse(w, http.StatusUnprocessableEntity, NewErrResponse(err))
+		return
 	}
 
-	_ = render.Render(w, r, &ValueResponse{
+	writeJSONResponse(w, http.StatusOK, ValueResponse{
 		Pk:      pk,
 		Sorting: reply.Item[tableKeySorting].(*types.AttributeValueMemberS).Value,
 		Value:   reply.Item[tableValueColumnName].(*types.AttributeValueMemberS).Value,

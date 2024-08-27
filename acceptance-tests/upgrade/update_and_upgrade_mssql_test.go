@@ -79,6 +79,16 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 
 			By("deleting bindings created before the upgrade")
 			bindingWriter.Unbind()
+
+			By("creating new bindings and testing they still work")
+			serviceInstance.Bind(appWriter)
+			apps.Restage(appWriter)
+
+			By("updating service instance")
+			serviceInstance.Update(services.WithParameters(`{}`))
+
+			By("deleting bindings created before the update")
+			bindingWriter.Unbind()
 			bindingReader.Unbind()
 
 			By("creating new bindings and testing they still work")

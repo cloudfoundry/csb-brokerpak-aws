@@ -59,13 +59,20 @@ var _ = Describe("Redis", Label("redis"), func() {
 			By("getting the value using the second app")
 			Expect(appTwo.GET("/primary/%s", key).String()).To(Equal(value))
 
+			By("deleting bindings created before the upgrade")
+			bindingOne.Unbind()
+
+			By("creating new bindings and testing they still work")
+			serviceInstance.Bind(appOne)
+			apps.Restage(appOne)
+
 			By("updating the instance plan")
-			serviceInstance.Update(services.WithParameters(map[string]any{"node_type": "cache.t3.medium"}))
+			serviceInstance.Update(services.WithParameters(`{}`))
 
 			By("getting the value using the second app")
 			Expect(appTwo.GET("/primary/%s", key).String()).To(Equal(value))
 
-			By("deleting bindings created before the upgrade")
+			By("deleting bindings created before the update")
 			bindingOne.Unbind()
 			bindingTwo.Unbind()
 

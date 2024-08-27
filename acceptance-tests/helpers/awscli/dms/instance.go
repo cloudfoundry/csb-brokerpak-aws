@@ -1,6 +1,7 @@
 package dms
 
 import (
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"fmt"
 	"time"
@@ -49,7 +50,7 @@ func createReplicationInstance(replicationSubnetGroupID, envName, region string)
 	var receiver struct {
 		ARN string `jsonry:"ReplicationInstance.ReplicationInstanceArn"`
 	}
-	AWSToJSON(&receiver, "dms", "create-replication-instance", "--replication-instance-identifier", random.Name(random.WithPrefix(envName)), "--replication-instance-class", "dms.t3.micro", "--region", region, "--replication-subnet-group-identifier", replicationSubnetGroupID)
+	awscli.AWSToJSON(&receiver, "dms", "create-replication-instance", "--replication-instance-identifier", random.Name(random.WithPrefix(envName)), "--replication-instance-class", "dms.t3.micro", "--region", region, "--replication-subnet-group-identifier", replicationSubnetGroupID)
 
 	return receiver.ARN
 }
@@ -58,7 +59,7 @@ func getReplicationInstanceState(arn, region string) string {
 	var receiver struct {
 		StatusStrings []string `jsonry:"ReplicationInstances.ReplicationInstanceStatus"`
 	}
-	AWSToJSON(&receiver, "dms", "describe-replication-instances", "--region", region, "--filters", fmt.Sprintf("Name=replication-instance-arn,Values=%s", arn))
+	awscli.AWSToJSON(&receiver, "dms", "describe-replication-instances", "--region", region, "--filters", fmt.Sprintf("Name=replication-instance-arn,Values=%s", arn))
 	switch len(receiver.StatusStrings) {
 	default:
 		ginkgo.Fail("matched more than one instance")
@@ -71,7 +72,7 @@ func getReplicationInstanceState(arn, region string) string {
 }
 
 func deleteReplicationInstance(arn, region string) {
-	AWS("dms", "delete-replication-instance", "--replication-instance-arn", arn, "--region", region)
+	awscli.AWS("dms", "delete-replication-instance", "--replication-instance-arn", arn, "--region", region)
 
 	for start := time.Now(); time.Since(start) < time.Hour; {
 		if !replicationInstanceExists(arn, region) {
@@ -87,7 +88,7 @@ func replicationInstanceExists(arn, region string) bool {
 	var receiver struct {
 		ARNs []string `jsonry:"ReplicationInstances.ReplicationInstanceArn"`
 	}
-	AWSToJSON(&receiver, "dms", "describe-replication-instances", "--region", region)
+	awscli.AWSToJSON(&receiver, "dms", "describe-replication-instances", "--region", region)
 
 	for _, a := range receiver.ARNs {
 		if a == arn {
