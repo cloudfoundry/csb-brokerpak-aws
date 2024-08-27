@@ -24,7 +24,7 @@ support_url: https://aws.amazon.com/rds/mysql/resources/?nc=sn&loc=5
 tags: [aws, mysql]
 plan_updateable: true
 provision:
-  plan_inputs:
+  user_inputs:
   - field_name: cores
     type: integer
     details: Deprecated - Minimum number of cores for service instance. Suggest setting `instance_class` property instead.
@@ -45,7 +45,6 @@ provision:
     details: Size of storage volume for service instance.
     constraints:
       minimum: 5
-  user_inputs:
   - field_name: storage_type
     type: string
     details: |
