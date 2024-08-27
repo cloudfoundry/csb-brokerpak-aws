@@ -65,3 +65,4 @@ variable "cloudwatch_log_group_retention_in_days" {
   default = 30
 }
 variable "cloudwatch_log_group_kms_key_id" { type = string }
+variable "admin_username" { type = string }
