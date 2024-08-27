@@ -28,7 +28,7 @@ var customMySQLPlan = map[string]any{
 	"name":          mySQLCustomPlanName,
 	"id":            mySQLCustomPlanID,
 	"description":   "Default MySQL plan",
-	"mysql_version": 8,
+	"mysql_version": "8.0",
 	"cores":         4,
 	"storage_gb":    100,
 	"metadata": map[string]any{
@@ -295,6 +295,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
+			Entry("admin_username", "admin_username", "new-username"),
 			Entry("update region", "region", "no-matter-what-region"),
 			Entry("update db_name", "db_name", "no-matter-what-name"),
 			Entry("update kms_key_id", "kms_key_id", "no-matter-what-key"),
