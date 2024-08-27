@@ -16,7 +16,7 @@ func Read() (Credentials, error) {
 	}
 	svs, err := app.Services.WithTag("sqs")
 	if err != nil {
-		return Credentials{}, fmt.Errorf("error reading Redis service details")
+		return Credentials{}, fmt.Errorf("error reading SQS service details")
 	}
 
 	creds := make(Credentials)

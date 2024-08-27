@@ -62,13 +62,20 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 			By("getting the value using the second app")
 			Expect(appTwo.GET(key).String()).To(Equal(value))
 
+			By("deleting bindings created before the upgrade")
+			bindingOne.Unbind()
+
+			By("creating new bindings and testing they still work")
+			serviceInstance.Bind(appOne)
+			apps.Restage(appOne)
+
 			By("updating the instance plan")
-			serviceInstance.Update(services.WithParameters(updatedConfig(tableName)))
+			serviceInstance.Update(services.WithParameters(`{}`))
 
 			By("getting the value using the second app")
 			Expect(appTwo.GET(key).String()).To(Equal(value))
 
-			By("deleting bindings created before the upgrade")
+			By("deleting bindings created before the update")
 			bindingOne.Unbind()
 			bindingTwo.Unbind()
 
@@ -91,38 +98,6 @@ var _ = Describe("UpgradeDynamoDBTableTest", Label("dynamodb-table", "upgrade"),
 
 func config(tableName string) any {
 	return map[string]any{
-		"attributes": []map[string]any{
-			{
-				"name": "id",
-				"type": "S",
-			},
-			{
-				"name": "key",
-				"type": "S",
-			},
-			{
-				"name": "value",
-				"type": "S",
-			},
-		},
-		"hash_key":   "id",
-		"range_key":  "value",
-		"table_name": tableName,
-		"global_secondary_indexes": []map[string]any{
-			{
-				"name":               "KeyIndex",
-				"hash_key":           "key",
-				"range_key":          "value",
-				"projection_type":    "INCLUDE",
-				"non_key_attributes": []string{"id"},
-			},
-		},
-	}
-}
-
-func updatedConfig(tableName string) any {
-	return map[string]any{
-		"server_side_encryption_enabled": true,
 		"attributes": []map[string]any{
 			{
 				"name": "id",

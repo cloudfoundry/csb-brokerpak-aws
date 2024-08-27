@@ -6,10 +6,9 @@ import (
 	"net/http"
 	"regexp"
 
-	_ "github.com/denisenkom/go-mssqldb"
-	"github.com/go-chi/chi/v5"
-
 	"mssqlapp/internal/credentials"
+
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 const (
@@ -21,13 +20,14 @@ const (
 )
 
 func App(connector *credentials.Connector) http.Handler {
-	r := chi.NewRouter()
-	r.Head("/", aliveness)
-	r.Put("/{schema}", handleCreateSchema(connector))
-	r.Post("/{schema}", handleFillDatabase(connector))
-	r.Delete("/{schema}", handleDropSchema(connector))
-	r.Put("/{schema}/{key}", handleSet(connector))
-	r.Get("/{schema}/{key}", handleGet(connector))
+	r := http.NewServeMux()
+
+	r.HandleFunc("GET /", aliveness)
+	r.HandleFunc("PUT /{schema}", handleCreateSchema(connector))
+	r.HandleFunc("POST /{schema}", handleFillDatabase(connector))
+	r.HandleFunc("DELETE /{schema}", handleDropSchema(connector))
+	r.HandleFunc("PUT /{schema}/{key}", handleSet(connector))
+	r.HandleFunc("GET /{schema}/{key}", handleGet(connector))
 
 	return r
 }
@@ -38,7 +38,7 @@ func aliveness(w http.ResponseWriter, r *http.Request) {
 }
 
 func schemaName(r *http.Request) (string, error) {
-	schema := chi.URLParam(r, "schema")
+	schema := r.PathValue("schema")
 
 	switch {
 	case schema == "":

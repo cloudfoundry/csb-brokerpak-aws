@@ -5,8 +5,7 @@ import (
 	"net/http"
 	"redisapp/internal/credentials"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 )
 
 const (
@@ -18,7 +17,7 @@ func handleGet(creds credentials.Credentials, primary bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Handling get (primary=%t).", primary)
 
-		key := chi.URLParam(r, "key")
+		key := r.PathValue("key")
 		if key == "" {
 			fail(w, http.StatusBadRequest, "url parameter 'key' is required")
 			return

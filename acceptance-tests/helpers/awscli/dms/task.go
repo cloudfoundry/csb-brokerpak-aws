@@ -1,6 +1,7 @@
 package dms
 
 import (
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"fmt"
 	"time"
@@ -18,7 +19,7 @@ func RunReplicationTask(replicationInstance *ReplicationInstance, source, target
 		ARN string `jsonry:"ReplicationTask.ReplicationTaskArn"`
 	}
 
-	AWSToJSON(
+	awscli.AWSToJSON(
 		&taskReceiver,
 		"dms",
 		"create-replication-task",
@@ -35,7 +36,7 @@ func RunReplicationTask(replicationInstance *ReplicationInstance, source, target
 
 	waitForReplicationTaskCreation(taskID, region)
 
-	AWS(
+	awscli.AWS(
 		"dms",
 		"start-replication-task",
 		"--replication-task-arn", taskReceiver.ARN,
@@ -53,7 +54,7 @@ func waitForReplicationTaskCompletion(taskID, region string) {
 			Percentages []int    `jsonry:"ReplicationTasks.ReplicationTaskStats.FullLoadProgressPercent"`
 		}
 
-		AWSToJSON(
+		awscli.AWSToJSON(
 			&statusReceiver,
 			"dms",
 			"describe-replication-tasks",
@@ -85,7 +86,7 @@ func waitForReplicationTaskCreation(taskID, region string) {
 			Status []string `jsonry:"ReplicationTasks.Status"`
 		}
 
-		AWSToJSON(
+		awscli.AWSToJSON(
 			&statusReceiver,
 			"dms",
 			"describe-replication-tasks",
@@ -109,7 +110,7 @@ func waitForReplicationTaskCreation(taskID, region string) {
 }
 
 func replicationTaskDeletion(taskARN, region string) {
-	AWS(
+	awscli.AWS(
 		"dms",
 		"delete-replication-task",
 		"--region", region,
@@ -130,7 +131,7 @@ func replicationTaskExists(arn, region string) bool {
 	var receiver struct {
 		ARNs []string `jsonry:"ReplicationTasks.ReplicationTaskArn"`
 	}
-	AWSToJSON(&receiver, "dms", "describe-replication-tasks", "--region", region)
+	awscli.AWSToJSON(&receiver, "dms", "describe-replication-tasks", "--region", region)
 
 	for _, a := range receiver.ARNs {
 		if a == arn {

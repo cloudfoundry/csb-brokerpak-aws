@@ -66,9 +66,9 @@ provision:
       nullable: true
     field_name: engine_version
     details: |
-      The Aurora engine version, e.g. "8.0.mysql_aurora.3.02.0".
+      The Aurora engine version, e.g. "8.0.mysql_aurora.3.04.2".
       If `auto_minor_version_upgrade` is enabled, you must specify a major version 
-      such as 8.0 (for 8.0.mysql_aurora.3.02.0) or not specify anything.
+      such as 8.0 (for 8.0.mysql_aurora.3.04.2) or not specify anything.
       It is recommended setting the version.
       Not all features are supported by all versions. Refer to the AWS documentation for more details.
   - field_name: allow_major_version_upgrade

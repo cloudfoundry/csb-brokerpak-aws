@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/cloudfoundry/cloud-service-broker/v2/utils/freeport"
+	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/dynaclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -25,7 +25,7 @@ var _ = Describe("Resource dynamodbns_instance", func() {
 	BeforeEach(func() {
 		var err error
 
-		port = freeport.Must()
+		port = freePort()
 		localDynamoDBURL = fmt.Sprintf("http://127.0.0.1:%d", port)
 		prefix = fmt.Sprintf("csb-%s-", uuid.New())
 
@@ -43,9 +43,8 @@ var _ = Describe("Resource dynamodbns_instance", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		Eventually(func(g Gomega) {
-			cfg, err := buildClientConfig(localDynamoDBURL)
+			client, err = dynaclient.New(context.TODO(), testRegion, "dummy", "dummy", localDynamoDBURL)
 			g.Expect(err).NotTo(HaveOccurred())
-			client = dynamodb.NewFromConfig(cfg)
 			_, err = client.ListTables(context.TODO(), nil)
 			g.Expect(err).NotTo(HaveOccurred())
 

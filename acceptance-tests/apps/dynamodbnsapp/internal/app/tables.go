@@ -2,13 +2,12 @@ package app
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/go-chi/render"
 )
 
 const tableNameKey = "tableName"
@@ -27,50 +26,40 @@ type TableCreateResponse struct {
 	TableName  string `json:"table_name"`
 	CreatedAt  string `json:"created_at"`
 	TableClass string `json:"table_class"`
-
-	RenderableResponse
 }
 
 type TableDeleteResponse struct {
 	TableName string `json:"table_name"`
-
-	RenderableResponse
 }
 
 type TableGetResponse struct {
 	TableName string `json:"table_name"`
-
-	RenderableResponse
 }
 
 func getTable(w http.ResponseWriter, r *http.Request) {
 	tableName, client := extractTableContextValues(r)
 
-	reply, err := client.DescribeTable(r.Context(), &dynamodb.DescribeTableInput{TableName: &tableName})
+	_, err := client.DescribeTable(r.Context(), &dynamodb.DescribeTableInput{TableName: &tableName})
 	if err != nil {
-		_ = render.Render(w, r, errorResponseFromAWSError(err))
+		writeJSONResponse(w, statusCodeFromAWSError(err), NewErrResponse(err))
 		return
 	}
-	_ = render.Render(w, r, &TableGetResponse{TableName: *reply.Table.TableName})
+
+	writeJSONResponse(w, http.StatusOK, TableGetResponse{TableName: tableName})
 }
 
 func createTable(w http.ResponseWriter, r *http.Request) {
 	client := r.Context().Value(ddbClientKey).(*dynamodb.Client)
-	createTableRequestBytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		_ = render.Render(w, r, &ErrResponse{HTTPStatusCode: http.StatusBadRequest, StatusText: err.Error()})
-		return
-	}
 	var createTableRequest CreateTableRequest
-	if err = json.Unmarshal(createTableRequestBytes, &createTableRequest); err != nil {
-		_ = render.Render(w, r, &ErrResponse{HTTPStatusCode: http.StatusBadRequest, StatusText: err.Error()})
+	if err := json.NewDecoder(r.Body).Decode(&createTableRequest); err != nil {
+		writeJSONResponse(w, http.StatusBadRequest, NewErrResponse(err))
 		return
 	}
 
 	params := tableStructureParams(createTableRequest.TableName)
 	table, err := client.CreateTable(r.Context(), &params)
 	if err != nil {
-		_ = render.Render(w, r, errorResponseFromAWSError(err))
+		writeJSONResponse(w, statusCodeFromAWSError(err), NewErrResponse(err))
 		return
 	}
 	response := TableCreateResponse{
@@ -78,21 +67,20 @@ func createTable(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:  table.TableDescription.CreationDateTime.String(),
 		TableClass: string(table.TableDescription.TableClassSummary.TableClass),
 	}
-	render.Status(r, http.StatusAccepted)
-	_ = render.Render(w, r, &response)
+	writeJSONResponse(w, http.StatusAccepted, response)
 }
 
 func deleteTable(w http.ResponseWriter, r *http.Request) {
 	tableName, client := extractTableContextValues(r)
 
 	params := &dynamodb.DeleteTableInput{TableName: &tableName}
-	table, err := client.DeleteTable(r.Context(), params)
+	_, err := client.DeleteTable(r.Context(), params)
 	if err != nil {
-		_ = render.Render(w, r, errorResponseFromAWSError(err))
+		writeJSONResponse(w, statusCodeFromAWSError(err), NewErrResponse(err))
 		return
 	}
-	response := TableDeleteResponse{TableName: *table.TableDescription.TableName}
-	_ = render.Render(w, r, &response)
+
+	writeJSONResponse(w, http.StatusOK, TableDeleteResponse{TableName: tableName})
 }
 
 func extractTableContextValues(r *http.Request) (string, *dynamodb.Client) {
@@ -101,14 +89,16 @@ func extractTableContextValues(r *http.Request) (string, *dynamodb.Client) {
 	return tableName, client
 }
 
-func errorResponseFromAWSError(err error) *ErrResponse {
-	statusCode := http.StatusFailedDependency
+func statusCodeFromAWSError(err error) int {
 	if strings.Contains(err.Error(), "ResourceNotFoundException") {
-		statusCode = http.StatusNotFound
-	} else if strings.Contains(err.Error(), "AccessDeniedException") {
-		statusCode = http.StatusForbidden
+		return http.StatusNotFound
 	}
-	return &ErrResponse{HTTPStatusCode: statusCode, StatusText: err.Error()}
+
+	if strings.Contains(err.Error(), "AccessDeniedException") {
+		return http.StatusForbidden
+	}
+
+	return http.StatusFailedDependency
 }
 
 func tableStructureParams(tableName string) dynamodb.CreateTableInput {
@@ -135,13 +125,9 @@ func tableStructureParams(tableName string) dynamodb.CreateTableInput {
 		},
 		TableName: &tableName,
 		ProvisionedThroughput: &types.ProvisionedThroughput{
-			ReadCapacityUnits:  int64Ptr(1),
-			WriteCapacityUnits: int64Ptr(1),
+			ReadCapacityUnits:  aws.Int64(1),
+			WriteCapacityUnits: aws.Int64(1),
 		},
 		TableClass: types.TableClassStandardInfrequentAccess,
 	}
-}
-
-func int64Ptr(value int64) *int64 {
-	return &value
 }
