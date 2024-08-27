@@ -63,6 +63,7 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			"performance_insights_retention_period": 7,
 			"enable_audit_logging":                  false,
 			"cloudwatch_log_group_kms_key_id":       "",
+			"admin_username":                        "",
 		}
 	})
 
