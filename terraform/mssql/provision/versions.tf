@@ -2,11 +2,11 @@ terraform {
   required_providers {
     aws = {
       source  = "registry.terraform.io/hashicorp/aws"
-      version = ">= 5.0"
+      version = "~> 5"
     }
     random = {
       source  = "registry.terraform.io/hashicorp/random"
-      version = ">= 3.5.1"
+      version = "~> 3"
     }
     csbmajorengineversion = {
       source  = "cloudfoundry.org/cloud-service-broker/csbmajorengineversion"
