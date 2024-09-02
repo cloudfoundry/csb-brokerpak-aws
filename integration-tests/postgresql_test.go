@@ -214,6 +214,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"enable_export_upgrade_logs":                        true,
 				"cloudwatch_upgrade_log_group_retention_in_days":    1,
 				"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
+				"admin_username":                                    "some-other-username",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -255,6 +256,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("enable_export_upgrade_logs", true),
 					HaveKeyWithValue("cloudwatch_upgrade_log_group_retention_in_days", BeNumerically("==", 1)),
 					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+					HaveKeyWithValue("admin_username", "some-other-username"),
 				),
 			)
 		})
@@ -301,6 +303,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
+			Entry("admin_username", "admin_username", "new-username"),
 			Entry("update region", "region", "no-matter-what-region"),
 			Entry("update kms_key_id", "kms_key_id", "no-matter-what-key"),
 			Entry("update db_name", "db_name", "no-matter-what-name"),
