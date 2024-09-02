@@ -67,12 +67,57 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			"enable_export_upgrade_logs":                        false,
 			"cloudwatch_upgrade_log_group_retention_in_days":    30,
 			"cloudwatch_log_groups_kms_key_id":                  "",
+			"admin_username":                                    "",
 		}
 	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "postgresql/provision")
 		Init(terraformProvisionDir)
+	})
+
+	Context("admin username", func() {
+		When("admin username has been passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"admin_username": "test-name",
+				}))
+			})
+
+			It("should use that admin username", func() {
+				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+					"aws_db_instance",
+					"random_password",
+					"aws_db_parameter_group",
+					"aws_db_subnet_group",
+					"aws_security_group",
+					"aws_security_group_rule",
+				))
+
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"username": Equal("test-name"),
+					}))
+			})
+		})
+
+		When("admin username has not been passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{}))
+			})
+
+			It("should create a new random admin username", func() {
+				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+					"aws_db_instance",
+					"random_password",
+					"random_string",
+					"aws_db_parameter_group",
+					"aws_db_subnet_group",
+					"aws_security_group",
+					"aws_security_group_rule",
+				))
+			})
+		})
 	})
 
 	Context("cloud watch log groups", func() {

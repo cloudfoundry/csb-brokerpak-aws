@@ -64,3 +64,4 @@ variable "enable_export_upgrade_logs" { type = bool }
 variable "cloudwatch_postgresql_log_group_retention_in_days" { type = number }
 variable "cloudwatch_upgrade_log_group_retention_in_days" { type = number }
 variable "cloudwatch_log_groups_kms_key_id" { type = string }
+variable "admin_username" { type = string }
