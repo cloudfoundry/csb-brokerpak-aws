@@ -268,6 +268,16 @@ provision:
     field_name: preferred_maintenance_end_min
     details: The preferred maintenance end minute
     enum: *minute_enum
+  - field_name: admin_username
+    type: string
+    details: The username to use for the admin user of the database. When not specified a random username will be generated. This property should only be used when migrating data.
+    default: ""
+    prohibit_update: true
+  - field_name: legacy_instance
+    type: boolean
+    details: Specifies if the instance is a legacy migrated one. This property should only be used when migrating data.
+    default: false
+    prohibit_update: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

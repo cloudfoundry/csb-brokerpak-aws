@@ -256,6 +256,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					})),
 				))
 			},
+			Entry("admin_username", "admin_username", "new-username"),
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
 			Entry("db_name", "db_name", "someNewName"),
