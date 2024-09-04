@@ -71,8 +71,8 @@ resource "aws_rds_cluster" "cluster" {
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {
-  count                                 = var.legacy_instance ? 1 : var.cluster_instances
-  identifier                            = var.legacy_instance ? "${var.instance_name}" : "${var.instance_name}-${count.index}"
+  count                                 = var.cluster_instances
+  identifier                            = "${var.instance_name}-${count.index}"
   cluster_identifier                    = aws_rds_cluster.cluster.id
   tags                                  = var.labels
   instance_class                        = var.instance_class
