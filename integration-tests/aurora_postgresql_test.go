@@ -186,7 +186,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"preferred_maintenance_start_min":       "45",
 				"preferred_maintenance_end_hour":        "10",
 				"preferred_maintenance_end_min":         "15",
-				"admin_username":                        "some-other-username",
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -217,7 +216,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("preferred_maintenance_start_min", "45"),
 					HaveKeyWithValue("preferred_maintenance_end_hour", "10"),
 					HaveKeyWithValue("preferred_maintenance_end_min", "15"),
-					HaveKeyWithValue("admin_username", "some-other-username"),
 				),
 			)
 		})
@@ -250,7 +248,6 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				const initialProvisionInvocation = 1
 				Expect(mockTerraform.ApplyInvocations()).To(HaveLen(initialProvisionInvocation))
 			},
-			Entry("admin_username", "admin_username", "new-username"),
 			Entry("region", "region", "no-matter-what-region"),
 			Entry("instance_name", "instance_name", "marmaduke"),
 			Entry("db_name", "db_name", "someNewName"),

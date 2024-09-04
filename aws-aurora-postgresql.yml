@@ -196,11 +196,6 @@ provision:
       Review documentation to understand the restrictions associated with the different types of instances accepted by Aurora:
       https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
     required: true
-  - field_name: admin_username
-    type: string
-    details: The username to use for the admin user of the database. When not specified a random username will be generated. This property should only be used when migrating data.
-    default: ""
-    prohibit_update: true
   - <<: &nullable_string
       type: string
       default: null
