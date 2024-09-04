@@ -24,6 +24,7 @@ resource "random_string" "username" {
   length  = 16
   special = false
   numeric = false
+  count   = length(var.admin_username) == 0 ? 1 : 0
 }
 
 resource "random_password" "password" {
@@ -39,7 +40,7 @@ resource "aws_rds_cluster" "cluster" {
   engine_version                  = var.engine_version
   database_name                   = var.db_name
   tags                            = var.labels
-  master_username                 = random_string.username.result
+  master_username                 = length(var.admin_username) == 0 ? random_string.username[0].result : var.admin_username
   master_password                 = random_password.password.result
   port                            = local.port
   db_subnet_group_name            = local.subnet_group

@@ -54,6 +54,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			"preferred_maintenance_end_min":         nil,
 			"preferred_maintenance_start_min":       nil,
 			"preferred_maintenance_day":             nil,
+			"admin_username":                        "",
 		}
 	})
 
@@ -117,6 +118,33 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"engine_version":                     Equal("14"),
 				"apply_immediately":                  BeTrue(),
 			}))
+		})
+	})
+
+	When("admin username has been passed", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"admin_username": "test-name",
+			}))
+		})
+
+		It("should use that admin username", func() {
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+				"aws_rds_cluster_instance",
+				"aws_rds_cluster_instance",
+				"aws_rds_cluster_instance",
+				"aws_rds_cluster",
+				"random_password",
+				"aws_security_group_rule",
+				"aws_db_subnet_group",
+				"aws_security_group",
+				"aws_rds_cluster_parameter_group",
+			))
+
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"master_username": Equal("test-name"),
+				}))
 		})
 	})
 
