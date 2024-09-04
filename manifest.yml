@@ -16,11 +16,11 @@ terraform_state_provider_replacements:
   registry.opentofu.org/cloud-service-broker/csbmysql: "cloudfoundry.org/cloud-service-broker/csbmysql"
   registry.terraform.io/cloud-service-broker/csbmysql: "cloudfoundry.org/cloud-service-broker/csbmysql"
 terraform_upgrade_path:
-- version: 1.8.1
+- version: 1.8.2
 terraform_binaries:
 - name: tofu
-  version: 1.8.1
-  source: https://github.com/opentofu/opentofu/archive/v1.8.1.zip
+  version: 1.8.2
+  source: https://github.com/opentofu/opentofu/archive/v1.8.2.zip
   default: true
 - name: terraform-provider-aws
   version: 5.65.0
