@@ -156,6 +156,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("preferred_maintenance_start_min", BeNil()),
 					HaveKeyWithValue("preferred_maintenance_end_hour", BeNil()),
 					HaveKeyWithValue("preferred_maintenance_end_min", BeNil()),
+					HaveKeyWithValue("legacy_instance", false),
 				))
 		})
 
@@ -187,6 +188,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"preferred_maintenance_end_hour":        "10",
 				"preferred_maintenance_end_min":         "15",
 				"admin_username":                        "some-other-username",
+				"legacy_instance":                       true,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -218,6 +220,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("preferred_maintenance_end_hour", "10"),
 					HaveKeyWithValue("preferred_maintenance_end_min", "15"),
 					HaveKeyWithValue("admin_username", "some-other-username"),
+					HaveKeyWithValue("legacy_instance", true),
 				),
 			)
 		})

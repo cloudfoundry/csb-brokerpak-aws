@@ -201,6 +201,11 @@ provision:
     details: The username to use for the admin user of the database. When not specified a random username will be generated. This property should only be used when migrating data.
     default: ""
     prohibit_update: true
+  - field_name: legacy_instance
+    type: booleanm
+    details: Specifies if the instance is a legacy migrated one. This property should only be used when migrating data.
+    default: false
+    prohibit_update: true
   - <<: &nullable_string
       type: string
       default: null

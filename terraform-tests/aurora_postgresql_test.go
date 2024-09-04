@@ -55,6 +55,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			"preferred_maintenance_start_min":       nil,
 			"preferred_maintenance_day":             nil,
 			"admin_username":                        "",
+			"legacy_instance":                       false,
 		}
 	})
 
@@ -121,31 +122,60 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 		})
 	})
 
-	When("admin username has been passed", func() {
-		BeforeAll(func() {
-			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
-				"admin_username": "test-name",
-			}))
-		})
-
-		It("should use that admin username", func() {
-			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-				"aws_rds_cluster_instance",
-				"aws_rds_cluster_instance",
-				"aws_rds_cluster_instance",
-				"aws_rds_cluster",
-				"random_password",
-				"aws_security_group_rule",
-				"aws_db_subnet_group",
-				"aws_security_group",
-				"aws_rds_cluster_parameter_group",
-			))
-
-			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
-				MatchKeys(IgnoreExtras, Keys{
-					"master_username": Equal("test-name"),
+	Context("legacy migrated cluster", func() {
+		When("admin username has been passed", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"admin_username": "test-name",
 				}))
+			})
+
+			It("should use that admin username", func() {
+				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+					"aws_rds_cluster_instance",
+					"aws_rds_cluster_instance",
+					"aws_rds_cluster_instance",
+					"aws_rds_cluster",
+					"random_password",
+					"aws_security_group_rule",
+					"aws_db_subnet_group",
+					"aws_security_group",
+					"aws_rds_cluster_parameter_group",
+				))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"master_username": Equal("test-name"),
+					}))
+			})
 		})
+
+		When("legacy_instance is set to true", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+					"legacy_instance": true,
+				}))
+			})
+
+			It("should create only one cluster instance", func() {
+				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+					"aws_rds_cluster_instance",
+					"aws_rds_cluster",
+					"random_password",
+					"random_string",
+					"aws_security_group_rule",
+					"aws_db_subnet_group",
+					"aws_security_group",
+					"aws_rds_cluster_parameter_group",
+				))
+
+				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"identifier": Equal("csb-aurorapg-test"),
+					}))
+			})
+		})
+
 	})
 
 	When("cluster_instances is 0", func() {
