@@ -133,15 +133,14 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 			It("should use that admin username", func() {
 				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-					"aws_rds_cluster_instance",
-					"aws_rds_cluster_instance",
-					"aws_rds_cluster_instance",
 					"aws_rds_cluster",
-					"random_password",
-					"aws_security_group_rule",
+					"aws_rds_cluster_instance",
+					"aws_rds_cluster_instance",
+					"aws_rds_cluster_instance",
 					"aws_db_subnet_group",
 					"aws_security_group",
-					"aws_rds_cluster_parameter_group",
+					"aws_security_group_rule",
+					"random_password",
 				))
 
 				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
