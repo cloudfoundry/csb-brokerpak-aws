@@ -159,14 +159,13 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 
 			It("should create only one cluster instance", func() {
 				Expect(ResourceChangesTypes(plan)).To(ConsistOf(
-					"aws_rds_cluster_instance",
+					"aws_db_subnet_group",
 					"aws_rds_cluster",
+					"aws_rds_cluster_instance",
+					"aws_security_group",
+					"aws_security_group_rule",
 					"random_password",
 					"random_string",
-					"aws_security_group_rule",
-					"aws_db_subnet_group",
-					"aws_security_group",
-					"aws_rds_cluster_parameter_group",
 				))
 
 				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
