@@ -5,22 +5,33 @@ updates:
   schedule:
     interval: "daily"
     time: "20:00"
+  ignore:
+  - dependency-name: "github.com/aws/aws-sdk-go-v2"
+  - dependency-name: "github.com/aws/aws-sdk-go-v2/*"
+- package-ecosystem: gomod
+  directory: "/"
+  target-branch: main
+  schedule:
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:
         - "github.com/aws/aws-sdk-go-v2/*"
+  labels:
+    - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
-    interval: "daily"
-    time: "20:30"
+    interval: "weekly"
+    day: "saturday"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/s3app"
   schedule:
-    interval: "daily"
-    time: "21:00"
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -30,29 +41,29 @@ updates:
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
-    interval: "daily"
-    time: "21:30"
+    interval: "weekly"
+    day: "saturday"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mssqlapp"
   schedule:
-    interval: "daily"
-    time: "22:00"
+    interval: "weekly"
+    day: "saturday"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/redisapp"
   schedule:
-    interval: "daily"
-    time: "22:30"
+    interval: "weekly"
+    day: "saturday"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbtableapp"
   schedule:
-    interval: "daily"
-    time: "23:00"
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -62,8 +73,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
-    interval: "daily"
-    time: "23:30"
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -73,8 +84,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/sqsapp"
   schedule:
-    interval: "daily"
-    time: "23:30"
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -84,8 +95,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbdynamodbns"
   schedule:
-    interval: "daily"
-    time: "00:00"
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -95,8 +106,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
-    interval: "daily"
-    time: "00:30"
+    interval: "weekly"
+    day: "saturday"
   groups:
     aws-sdk-go-v2:
       patterns:

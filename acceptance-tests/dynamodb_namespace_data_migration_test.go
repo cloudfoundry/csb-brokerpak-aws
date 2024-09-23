@@ -1,6 +1,7 @@
 package acceptance_tests_test
 
 import (
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"fmt"
 	"net/http"
 	"time"
@@ -9,7 +10,6 @@ import (
 	. "github.com/onsi/gomega"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
-	"csbbrokerpakaws/acceptance-tests/helpers/dms"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
@@ -66,7 +66,7 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 		var backupReceiver struct {
 			ARN string `jsonry:"BackupDetails.BackupArn"`
 		}
-		dms.AWSToJSON(
+		awscli.AWSToJSON(
 			&backupReceiver,
 			"dynamodb", "create-backup",
 			"--table-name", legacyTable,
@@ -78,7 +78,7 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 			var describeReceiver struct {
 				Status string `jsonry:"BackupDescription.BackupDetails.BackupStatus"`
 			}
-			dms.AWSToJSON(&describeReceiver, "dynamodb", "describe-backup", "--backup-arn", backupReceiver.ARN, "--region", metadata.Region)
+			awscli.AWSToJSON(&describeReceiver, "dynamodb", "describe-backup", "--backup-arn", backupReceiver.ARN, "--region", metadata.Region)
 			g.Expect(describeReceiver.Status).To(Equal("AVAILABLE"))
 		}).WithTimeout(time.Hour).WithPolling(time.Second).Should(Succeed())
 
@@ -87,14 +87,14 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 
 		By("restoring the table into the namespace of the CSB service")
 		csbTableName := fmt.Sprintf("csb-%s-%s", csbServiceInstance.GUID(), tableSuffix)
-		dms.AWS("dynamodb", "restore-table-from-backup", "--target-table-name", csbTableName, "--backup-arn", backupReceiver.ARN, "--region", metadata.Region)
+		awscli.AWS("dynamodb", "restore-table-from-backup", "--target-table-name", csbTableName, "--backup-arn", backupReceiver.ARN, "--region", metadata.Region)
 
 		Eventually(func(g Gomega) {
 			var describeReceiver struct {
 				RestoreInProgress bool   `jsonry:"Table.RestoreSummary.RestoreInProgress"`
 				Status            string `jsonry:"Table.TableStatus"`
 			}
-			dms.AWSToJSON(&describeReceiver, "dynamodb", "describe-table", "--table-name", csbTableName, "--region", metadata.Region)
+			awscli.AWSToJSON(&describeReceiver, "dynamodb", "describe-table", "--table-name", csbTableName, "--region", metadata.Region)
 			g.Expect(describeReceiver.Status).To(Equal("ACTIVE"))
 			g.Expect(describeReceiver.RestoreInProgress).To(BeFalse())
 		}).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Succeed())

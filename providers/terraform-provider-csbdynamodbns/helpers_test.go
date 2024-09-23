@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/smithy-go/ptr"
@@ -56,27 +53,6 @@ func populateTables(prefix string, client *dynamodb.Client) {
 			g.Expect(table.Table.TableStatus).To(Equal(types.TableStatusActive))
 		}
 	}).WithTimeout(time.Minute).WithPolling(5 * time.Second).Should(Succeed())
-}
-
-func buildClientConfig(localDynamoDBURL string) (aws.Config, error) {
-	return config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion(testRegion),
-		config.WithEndpointResolverWithOptions(
-			aws.EndpointResolverWithOptionsFunc(
-				func(service, region string, options ...interface{}) (aws.Endpoint, error) {
-					return aws.Endpoint{URL: localDynamoDBURL}, nil
-				},
-			),
-		),
-		config.WithCredentialsProvider(credentials.StaticCredentialsProvider{
-			Value: aws.Credentials{
-				AccessKeyID:     "dummy",
-				SecretAccessKey: "dummy",
-				SessionToken:    "dummy",
-				Source:          "Hard-coded credentials; values are irrelevant",
-			},
-		}),
-	)
 }
 
 func applyHCL(hcl string, checkOnDestroy resource.TestCheckFunc) {
