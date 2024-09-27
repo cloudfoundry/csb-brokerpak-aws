@@ -60,17 +60,6 @@ updates:
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
-  directory: "/acceptance-tests/apps/dynamodbtableapp"
-  schedule:
-    interval: "weekly"
-    day: "saturday"
-  groups:
-    aws-sdk-go-v2:
-      patterns:
-        - "github.com/aws/aws-sdk-go-v2/*"
-  labels:
-    - "test-dependencies"
-- package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
     interval: "weekly"
