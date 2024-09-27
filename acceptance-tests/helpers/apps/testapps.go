@@ -12,7 +12,6 @@ const (
 	Redis                AppCode = "redisapp"
 	S3                   AppCode = "s3app"
 	MSSQL                AppCode = "mssqlapp"
-	DynamoDBTable        AppCode = "dynamodbtableapp"
 	DynamoDBNamespace    AppCode = "dynamodbnsapp"
 	SQS                  AppCode = "sqsapp"
 	JDBCTestAppPostgres  AppCode = "jdbctestapp/jdbctestapp-postgres-1.0.0.jar"
