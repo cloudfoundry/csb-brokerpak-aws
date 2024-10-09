@@ -99,14 +99,14 @@ resource "aws_db_instance" "db_instance" {
 }
 
 resource "aws_secretsmanager_secret_rotation" "secret_manager" {
-  count               = var.use_managed_admin_password ? 1 : 0
-  secret_id           = aws_db_instance.db_instance.master_user_secret[0].secret_arn
+  count     = var.use_managed_admin_password ? 1 : 0
+  secret_id = aws_db_instance.db_instance.master_user_secret[0].secret_arn
 
   rotation_rules {
     automatically_after_days = 365
   }
 
-  depends_on = [ aws_db_instance.db_instance ]
+  depends_on = [aws_db_instance.db_instance]
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {

@@ -63,7 +63,7 @@ provision:
     default: 3000
   - field_name: use_managed_admin_password
     type: boolean
-    default: true
+    default: false
     details: Weather to use AWS managed credentials for admin credentials 
   - field_name: require_ssl
     type: boolean
