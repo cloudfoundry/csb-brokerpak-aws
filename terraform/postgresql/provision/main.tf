@@ -99,6 +99,8 @@ resource "aws_db_instance" "db_instance" {
 }
 
 resource "aws_secretsmanager_secret_rotation" "secret_manager" {
+  # Note that configuring rotation causes the secret to rotate once as soon as you enable rotation. 
+  # This happens even if the configured rotation is the same as the AWS default e.g. 7 days. 
   count     = var.use_managed_admin_password ? 1 : 0
   secret_id = aws_db_instance.db_instance.master_user_secret[0].secret_arn
 
