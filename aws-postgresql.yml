@@ -64,7 +64,11 @@ provision:
   - field_name: use_managed_admin_password
     type: boolean
     default: false
-    details: Weather to use AWS managed credentials for admin credentials 
+    details: Weather to use AWS managed credentials for admin credentials.
+  - field_name: password_rotate_after
+    type: integer
+    default: 7
+    details: Specifies the number of days between automatic scheduled rotations of the admin password.
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL. Note that if "parameter_group_name" is specified then the "require_ssl" parameter will not take effect.
