@@ -36,7 +36,7 @@ var customPostgresPlan = map[string]any{
 	"storage_gb":       100,
 }
 
-var _ = FDescribe("Postgresql", Label("Postgresql"), func() {
+var _ = Describe("Postgresql", Label("Postgresql"), func() {
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
