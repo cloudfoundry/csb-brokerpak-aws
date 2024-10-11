@@ -103,7 +103,7 @@ resource "aws_secretsmanager_secret_rotation" "secret_manager" {
   secret_id = aws_db_instance.db_instance.master_user_secret[0].secret_arn
 
   rotation_rules {
-    automatically_after_days = 365
+    automatically_after_days = var.password_rotate_after
   }
 
   depends_on = [aws_db_instance.db_instance]
