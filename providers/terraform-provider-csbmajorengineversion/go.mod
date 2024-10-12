@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/rds v1.87.2
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.34.0
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.9.0
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.10.0
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
 	golang.org/x/tools v0.26.0
