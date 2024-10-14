@@ -375,7 +375,7 @@ provision:
   - field_name: use_managed_admin_password
     type: boolean
     details: Whether CSB should use AWS managed admin password
-  - field_name: master_secret_arn
+  - field_name: managed_admin_credentials_arn
     type: string
     details: The ARN of the master secret to authenticate to the database instance.
   - field_name: region
@@ -423,9 +423,9 @@ bind:
     type: boolean
     default: ${instance.details["use_managed_admin_password"]}
     overwrite: true
-  - name: master_secret_arn
+  - name: managed_admin_credentials_arn
     type: string
-    default: ${instance.details["master_secret_arn"]}
+    default: ${instance.details["managed_admin_credentials_arn"]}
     overwrite: true
   - name: require_ssl
     type: boolean

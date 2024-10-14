@@ -28,7 +28,7 @@ resource "random_password" "password" {
 
 data "aws_secretsmanager_secret_version" "secret-version" {
   count     = var.use_managed_admin_password ? 1 : 0
-  secret_id = var.master_secret_arn
+  secret_id = var.managed_admin_credentials_arn
 }
 
 locals {

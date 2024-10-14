@@ -19,7 +19,7 @@ output "password" {
   value     = var.use_managed_admin_password ? "" : aws_db_instance.db_instance.password
   sensitive = true
 }
-output "master_secret_arn" {
+output "managed_admin_credentials_arn" {
   # Using join and master_user_secret.*.secret_arn is a woraround to make sure that the value of the secret ARN is evaluated after the apply. 
   # There is currently a bug which results in no value evaluated if using the usual syntax aws_db_instance.db_instance.master_user_secret[0].secret_arn
   # when updating from a password db to a managed secret db. See: https://github.com/hashicorp/terraform-provider-aws/issues/34094
