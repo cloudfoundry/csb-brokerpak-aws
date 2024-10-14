@@ -29,7 +29,7 @@ variable "admin_password" {
   sensitive = true
 }
 variable "use_managed_admin_password" { type = string }
-variable "master_secret_arn" {
+variable "managed_admin_credentials_arn" {
   type      = string
   sensitive = true
 }
