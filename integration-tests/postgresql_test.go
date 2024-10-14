@@ -340,7 +340,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "enable_export_postgresql_logs", true),
 			Entry(nil, "enable_export_upgrade_logs", true),
 			Entry(nil, "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
-			Entry(nil, "manage_master_user_password", true),
+			Entry(nil, "use_managed_admin_password", true),
 			Entry(nil, "password_rotate_after", 365),
 		)
 	})
