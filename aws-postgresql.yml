@@ -65,7 +65,7 @@ provision:
     type: boolean
     default: false
     details: Weather to use AWS managed credentials for admin credentials.
-  - field_name: password_rotate_after
+  - field_name: rotate_admin_password_after
     type: integer
     default: 7
     details: Specifies the number of days between automatic scheduled rotations of the admin password.

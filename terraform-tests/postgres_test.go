@@ -69,7 +69,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			"cloudwatch_log_groups_kms_key_id":                  "",
 			"admin_username":                                    "",
 			"use_managed_admin_password":                        false,
-			"password_rotate_after":                             "7",
+			"rotate_admin_password_after":                       "7",
 		}
 	})
 
@@ -560,8 +560,8 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(
 					defaultVars,
 					map[string]any{
-						"use_managed_admin_password": true,
-						"password_rotate_after":      passwordRotationDays,
+						"use_managed_admin_password":  true,
+						"rotate_admin_password_after": passwordRotationDays,
 					},
 				))
 			})

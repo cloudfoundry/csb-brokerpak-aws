@@ -105,7 +105,7 @@ resource "aws_secretsmanager_secret_rotation" "secret_manager" {
   secret_id = join("", aws_db_instance.db_instance.master_user_secret.*.secret_arn)
 
   rotation_rules {
-    automatically_after_days = var.password_rotate_after
+    automatically_after_days = var.rotate_admin_password_after
   }
 
   depends_on = [aws_db_instance.db_instance]
