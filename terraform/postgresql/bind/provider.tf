@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+provider "aws" {
+  region     = var.region
+  access_key = var.aws_access_key_id
+  secret_key = var.aws_secret_access_key
+}
+
 provider "csbpg" {
   host            = var.hostname
   port            = local.port
   username        = var.admin_username
-  password        = var.admin_password
+  password        = var.use_managed_admin_password ? local.managed_admin_password : var.admin_password
   database        = var.db_name
   data_owner_role = "binding_user_group"
   sslmode         = var.provider_verify_certificate ? "verify-full" : "require"
