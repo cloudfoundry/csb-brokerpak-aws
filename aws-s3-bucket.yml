@@ -244,14 +244,3 @@ bind:
   - field_name: secret_access_key
     type: string
     details: AWS secret access key
-examples:
-- name: s3-default
-  description: Default S3 Bucket
-  plan_id: f64891b4-5021-4742-9871-dfe1a9051302
-  provision_params: {}
-  bind_params: {}
-- name: s3-authenticated-read
-  description: S3 Bucket with ACL authenticated-read
-  plan_id: f64891b4-5021-4742-9871-dfe1a9051302
-  provision_params: {"acl": "authenticated-read", "boc_object_ownership": "BucketOwnerPreferred"}
-  bind_params: {}
