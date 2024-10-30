@@ -424,4 +424,3 @@ bind:
   - field_name: port
     type: integer
     details: The port number of the exposed MSSQL instance.
-examples: []
