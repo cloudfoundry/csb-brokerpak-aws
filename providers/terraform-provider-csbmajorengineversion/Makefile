@@ -20,8 +20,9 @@ build: download checkfmt checkimports vet build_binaries_in_cloudfoundry_namespa
 build_binaries_in_cloudfoundry_namespace:
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/linux_amd64
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/darwin_amd64
-	CGO_ENABLED=0 GOOS=linux $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/linux_amd64/terraform-provider-csbmajorengineversion_v$(VERSION)
-	CGO_ENABLED=0 GOOS=darwin $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/darwin_amd64/terraform-provider-csbmajorengineversion_v$(VERSION)
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/linux_amd64/terraform-provider-csbmajorengineversion_v$(VERSION)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/darwin_amd64/terraform-provider-csbmajorengineversion_v$(VERSION)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/$(VERSION)/darwin_arm64/terraform-provider-csbmajorengineversion_v$(VERSION)
 
 .PHONY: clean
 clean: ## clean up build artifacts
