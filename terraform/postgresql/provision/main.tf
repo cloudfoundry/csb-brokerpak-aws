@@ -95,7 +95,6 @@ resource "aws_db_instance" "db_instance" {
   # so dependencies are always between resource blocks,
   # not between the individual instances of those resource blocks
   depends_on = [aws_cloudwatch_log_group.this]
-
 }
 
 resource "aws_secretsmanager_secret_rotation" "secret_manager" {

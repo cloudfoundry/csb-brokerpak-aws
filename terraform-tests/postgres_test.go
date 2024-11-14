@@ -516,7 +516,8 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					MatchKeys(IgnoreExtras, Keys{
 						"auto_minor_version_upgrade": BeFalse(),
 						"engine_version":             Equal("14"),
-					}))
+					}),
+				)
 			})
 		})
 
@@ -531,7 +532,8 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					MatchKeys(IgnoreExtras, Keys{
 						"auto_minor_version_upgrade": BeFalse(),
 						"engine_version":             Equal("14.7"),
-					}))
+					}),
+				)
 			})
 		})
 	})
@@ -541,21 +543,25 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"use_managed_admin_password": false}))
 			})
+
 			It("should use randomly generatated password", func() {
 				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(0))
 				Expect(UnknownValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"password": Not(BeNil()),
-					}))
+					}),
+				)
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"manage_master_user_password": BeNil(),
-					}))
+					}),
+				)
 			})
 		})
 
 		When("is enabled", func() {
-			passwordRotationDays := 100
+			const passwordRotationDays = 100
+
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(
 					defaultVars,
@@ -565,19 +571,22 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 					},
 				))
 			})
+
 			It("should set admin password to managed aws secret", func() {
 				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"manage_master_user_password": Equal(true),
 						"password":                    BeNil(),
-					}))
+					}),
+				)
 				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(1))
 				Expect(AfterValuesForType(plan, "aws_secretsmanager_secret_rotation")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"rotation_rules": ConsistOf(MatchKeys(IgnoreExtras, Keys{
 							"automatically_after_days": BeNumerically("==", passwordRotationDays),
 						})),
-					}))
+					}),
+				)
 			})
 		})
 	})
