@@ -215,6 +215,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"cloudwatch_upgrade_log_group_retention_in_days":    1,
 				"cloudwatch_log_groups_kms_key_id":                  "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx",
 				"admin_username":                                    "some-other-username",
+				"use_managed_admin_password":                        true,
+				"rotate_admin_password_after":                       365,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -257,6 +259,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("cloudwatch_upgrade_log_group_retention_in_days", BeNumerically("==", 1)),
 					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 					HaveKeyWithValue("admin_username", "some-other-username"),
+					HaveKeyWithValue("use_managed_admin_password", true),
+					HaveKeyWithValue("rotate_admin_password_after", float64(365)),
 				),
 			)
 		})
@@ -336,6 +340,8 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "enable_export_postgresql_logs", true),
 			Entry(nil, "enable_export_upgrade_logs", true),
 			Entry(nil, "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+			Entry(nil, "use_managed_admin_password", true),
+			Entry(nil, "rotate_admin_password_after", 365),
 		)
 	})
 })

@@ -59,7 +59,8 @@ resource "aws_db_instance" "db_instance" {
   identifier                            = var.instance_name
   db_name                               = var.db_name
   username                              = length(var.admin_username) == 0 ? random_string.username[0].result : var.admin_username
-  password                              = random_password.password.result
+  password                              = var.use_managed_admin_password ? null : random_password.password.result
+  manage_master_user_password           = var.use_managed_admin_password ? true : null
   parameter_group_name                  = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
   tags                                  = var.labels
   vpc_security_group_ids                = local.rds_vpc_security_group_ids
@@ -94,7 +95,19 @@ resource "aws_db_instance" "db_instance" {
   # so dependencies are always between resource blocks,
   # not between the individual instances of those resource blocks
   depends_on = [aws_cloudwatch_log_group.this]
+}
 
+resource "aws_secretsmanager_secret_rotation" "secret_manager" {
+  # Note that configuring rotation causes the secret to rotate once as soon as you enable rotation. 
+  # This happens even if the configured rotation is the same as the AWS default e.g. 7 days. 
+  count     = var.use_managed_admin_password ? 1 : 0
+  secret_id = join("", aws_db_instance.db_instance.master_user_secret.*.secret_arn)
+
+  rotation_rules {
+    automatically_after_days = var.rotate_admin_password_after
+  }
+
+  depends_on = [aws_db_instance.db_instance]
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {
