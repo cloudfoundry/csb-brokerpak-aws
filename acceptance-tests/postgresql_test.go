@@ -42,6 +42,14 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		postgresTestMultipleApps(serviceInstance)
 	})
 
+	It("works with postgres 17", Label("Postgres17"), func() {
+		By("creating a service instance")
+		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("pg17"))
+		defer serviceInstance.Delete()
+
+		postgresTestMultipleApps(serviceInstance)
+	})
+
 	// As we introduce the 'use_managed_admin_password' feature, some users may wish to update existing DBs.
 	// This is a tactical test that should exist for this changeover period and is not intended to be a forever test.
 	// Due to limitations in Tofu/AWS provider/AWS the operation to switch fails first time, then succeeds on
