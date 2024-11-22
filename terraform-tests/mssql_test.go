@@ -74,6 +74,9 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 			"enable_export_error_logs":                     false,
 			"cloudwatch_error_log_group_retention_in_days": 30,
 			"cloudwatch_log_groups_kms_key_id":             "",
+
+			"use_managed_admin_password":  false,
+			"rotate_admin_password_after": "7",
 		}
 
 		requiredVars = map[string]any{
@@ -897,6 +900,60 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 					"password",
 					"username",
 				))
+			})
+		})
+	})
+
+	Context("managed admin password", func() {
+		When("disabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"use_managed_admin_password": false}))
+			})
+
+			It("should use randomly generated password", func() {
+				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(0))
+				Expect(UnknownValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"password": Not(BeNil()),
+					}),
+				)
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"manage_master_user_password": BeNil(),
+					}),
+				)
+			})
+		})
+
+		When("enabled", func() {
+			const passwordRotationDays = 100
+
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(
+					defaultVars,
+					requiredVars,
+					map[string]any{
+						"use_managed_admin_password":  true,
+						"rotate_admin_password_after": passwordRotationDays,
+					},
+				))
+			})
+
+			It("should set admin password to managed aws secret", func() {
+				Expect(AfterValuesForType(plan, "aws_db_instance")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"manage_master_user_password": Equal(true),
+						"password":                    BeNil(),
+					}),
+				)
+				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_secretsmanager_secret_rotation")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"rotation_rules": ConsistOf(MatchKeys(IgnoreExtras, Keys{
+							"automatically_after_days": BeNumerically("==", passwordRotationDays),
+						})),
+					}),
+				)
 			})
 		})
 	})

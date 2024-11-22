@@ -49,13 +49,12 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 	var optionalProperties = func() map[string]any {
 		return map[string]any{
-			"rds_vpc_security_group_ids":  "some-security-group-ids",
-			"rds_subnet_group":            "some-rds-subnet-group",
-			"instance_class":              "some-instance-class",
-			"max_allocated_storage":       999,
-			"auto_minor_version_upgrade":  false,
-			"allow_major_version_upgrade": false,
-
+			"rds_vpc_security_group_ids":                   "some-security-group-ids",
+			"rds_subnet_group":                             "some-rds-subnet-group",
+			"instance_class":                               "some-instance-class",
+			"max_allocated_storage":                        999,
+			"auto_minor_version_upgrade":                   false,
+			"allow_major_version_upgrade":                  false,
 			"enable_export_agent_logs":                     true,
 			"cloudwatch_agent_log_group_retention_in_days": 1,
 			"enable_export_error_logs":                     true,
@@ -230,10 +229,26 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("cloudwatch_error_log_group_retention_in_days", BeNumerically("==", 1)),
 					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 					HaveKeyWithValue("multi_az", BeTrue()),
+					HaveKeyWithValue("use_managed_admin_password", false),
+					HaveKeyWithValue("rotate_admin_password_after", float64(7)),
 				),
 			)
 		})
 
+		It("should allow properties to be set on provision", func() {
+			_, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), map[string]any{
+				"use_managed_admin_password":  true,
+				"rotate_admin_password_after": 365,
+			}))
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(mockTerraform.FirstTerraformInvocationVars()).To(
+				SatisfyAll(
+					HaveKeyWithValue("use_managed_admin_password", true),
+					HaveKeyWithValue("rotate_admin_password_after", float64(365)),
+				),
+			)
+		})
 	})
 
 	Describe("updating instance", func() {
