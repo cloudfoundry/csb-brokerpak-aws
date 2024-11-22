@@ -64,7 +64,7 @@ provision:
   - field_name: use_managed_admin_password
     type: boolean
     default: false
-    details: Weather to use AWS managed credentials for admin credentials.
+    details: Whether to use AWS Secrets Manager to generate and manage the admin password for this RDS.
   - field_name: rotate_admin_password_after
     type: integer
     default: 7
@@ -380,7 +380,7 @@ provision:
     details: The ARN of the master secret to authenticate to the database instance.
   - field_name: region
     type: string
-    details: AWS region for the Postgres
+    details: AWS region for the RDS instance
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL
