@@ -165,6 +165,8 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("enable_audit_logging", false),
 					HaveKeyWithValue("cloudwatch_log_group_kms_key_id", ""),
 					HaveKeyWithValue("cloudwatch_log_group_retention_in_days", float64(30)),
+					HaveKeyWithValue("use_managed_admin_password", false),
+					HaveKeyWithValue("rotate_admin_password_after", float64(7)),
 				),
 			)
 		})
@@ -206,6 +208,8 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"enable_audit_logging":                   true,
 				"cloudwatch_log_group_kms_key_id":        "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa",
 				"cloudwatch_log_group_retention_in_days": 33,
+				"use_managed_admin_password":             true,
+				"rotate_admin_password_after":            365,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -250,6 +254,8 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("enable_audit_logging", true),
 					HaveKeyWithValue("cloudwatch_log_group_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 					HaveKeyWithValue("cloudwatch_log_group_retention_in_days", float64(33)),
+					HaveKeyWithValue("use_managed_admin_password", true),
+					HaveKeyWithValue("rotate_admin_password_after", float64(365)),
 				),
 			)
 		})

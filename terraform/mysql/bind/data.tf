@@ -12,16 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "random_string" "username" {
-  length  = 16
-  special = false
-  numeric = false
+data "aws_secretsmanager_secret_version" "secret-version" {
+  count     = var.use_managed_admin_password ? 1 : 0
+  secret_id = var.managed_admin_credentials_arn
 }
 
-resource "random_password" "password" {
-  length           = 64
-  override_special = "~_-."
-  min_upper        = 2
-  min_lower        = 2
-  min_special      = 2
+locals {
+  managed_admin_creds    = var.use_managed_admin_password ? jsondecode(data.aws_secretsmanager_secret_version.secret-version[0].secret_string) : {}
+  managed_admin_password = var.use_managed_admin_password ? local.managed_admin_creds.password : ""
 }

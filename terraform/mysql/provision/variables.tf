@@ -66,3 +66,5 @@ variable "cloudwatch_log_group_retention_in_days" {
 }
 variable "cloudwatch_log_group_kms_key_id" { type = string }
 variable "admin_username" { type = string }
+variable "use_managed_admin_password" { type = bool }
+variable "rotate_admin_password_after" { type = number }
