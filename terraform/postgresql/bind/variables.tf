@@ -29,10 +29,7 @@ variable "admin_password" {
   sensitive = true
 }
 variable "use_managed_admin_password" { type = string }
-variable "managed_admin_credentials_arn" {
-  type      = string
-  sensitive = true
-}
+variable "managed_admin_credentials_arn" { type = string }
 variable "require_ssl" { type = bool }
 variable "provider_verify_certificate" { type = bool }
 

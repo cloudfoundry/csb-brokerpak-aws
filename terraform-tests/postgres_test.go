@@ -539,12 +539,12 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 	})
 
 	Context("managed admin password", func() {
-		When("is not enabled", func() {
+		When("disabled", func() {
 			BeforeAll(func() {
 				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"use_managed_admin_password": false}))
 			})
 
-			It("should use randomly generatated password", func() {
+			It("should use randomly generated password", func() {
 				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(0))
 				Expect(UnknownValuesForType(plan, "aws_db_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
@@ -559,7 +559,7 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			})
 		})
 
-		When("is enabled", func() {
+		When("enabled", func() {
 			const passwordRotationDays = 100
 
 			BeforeAll(func() {

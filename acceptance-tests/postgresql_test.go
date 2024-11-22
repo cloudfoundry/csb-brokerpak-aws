@@ -1,20 +1,19 @@
 package acceptance_tests_test
 
 import (
+	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
+	"csbbrokerpakaws/acceptance-tests/helpers/jdbcapp"
+	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
+	"csbbrokerpakaws/acceptance-tests/helpers/random"
+	"csbbrokerpakaws/acceptance-tests/helpers/services"
 	"fmt"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
-
-	"csbbrokerpakaws/acceptance-tests/helpers/apps"
-	"csbbrokerpakaws/acceptance-tests/helpers/jdbcapp"
-	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
-	"csbbrokerpakaws/acceptance-tests/helpers/random"
-	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
 
 var _ = Describe("PostgreSQL", Label("postgresql"), func() {
@@ -79,7 +78,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		By("updating the service to set 'use_managed_admin_password' a first time which is expected to fail")
 		params := `{"use_managed_admin_password": true}`
 		session := cf.Start("update-service", serviceInstance.Name, "-c", params, "--wait")
-		Eventually(session).WithTimeout(time.Hour).Should(gexec.Exit(), func() string {
+		Eventually(session).WithTimeout(time.Hour).Should(gexec.Exit(1), func() string {
 			out, _ := cf.Run("service", serviceInstance.Name)
 			return out
 		})
@@ -102,6 +101,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		By("rebinding app")
 		binding.Unbind()
 		serviceInstance.Bind(app)
+		app.Restage()
 
 		By("getting the previously stored value")
 		var userOut jdbcapp.AppResponseUser
@@ -114,6 +114,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		By("rebinding app")
 		binding.Unbind()
 		serviceInstance.Bind(app)
+		app.Restage()
 
 		By("getting the previously stored value")
 		app.GET("%d", userIn.ID).ParseInto(&userOut)
