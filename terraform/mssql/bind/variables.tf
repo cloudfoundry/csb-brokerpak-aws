@@ -1,3 +1,12 @@
+variable "aws_access_key_id" {
+  type      = string
+  sensitive = true
+}
+variable "aws_secret_access_key" {
+  type      = string
+  sensitive = true
+}
+variable "region" { type = string }
 variable "db_name" {
   type = string
 }
@@ -14,6 +23,13 @@ variable "admin_password" {
 variable "require_ssl" {
   type = bool
 }
+variable "use_managed_admin_password" {
+  type = string
+}
+variable "managed_admin_credentials_arn" {
+  type = string
+}
+
 
 locals {
   port = 1433

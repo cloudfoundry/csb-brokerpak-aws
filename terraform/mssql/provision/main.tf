@@ -85,31 +85,32 @@ resource "random_password" "password" {
 }
 
 resource "aws_db_instance" "db_instance" {
-  license_model          = "license-included"
-  allocated_storage      = var.storage_gb
-  max_allocated_storage  = var.max_allocated_storage
-  engine                 = var.engine
-  engine_version         = var.mssql_version
-  instance_class         = var.instance_class
-  identifier             = var.instance_name
-  db_name                = null # Otherwise: Error: InvalidParameterValue: DBName must be null for engine: sqlserver-xx
-  username               = random_string.username.result
-  password               = random_password.password.result
-  tags                   = var.labels
-  vpc_security_group_ids = local.security_group_ids
-  db_subnet_group_name   = local.subnet_group_name
-  option_group_name      = var.option_group_name
-  publicly_accessible    = var.publicly_accessible
-  apply_immediately      = true
-  storage_encrypted      = var.storage_encrypted
-  kms_key_id             = var.kms_key_id == "" ? null : var.kms_key_id
-  skip_final_snapshot    = true
-  deletion_protection    = var.deletion_protection
-  storage_type           = var.storage_type
-  iops                   = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
-  monitoring_interval    = var.monitoring_interval
-  monitoring_role_arn    = var.monitoring_role_arn
-  multi_az               = var.multi_az
+  license_model               = "license-included"
+  allocated_storage           = var.storage_gb
+  max_allocated_storage       = var.max_allocated_storage
+  engine                      = var.engine
+  engine_version              = var.mssql_version
+  instance_class              = var.instance_class
+  identifier                  = var.instance_name
+  db_name                     = null # Otherwise: Error: InvalidParameterValue: DBName must be null for engine: sqlserver-xx
+  username                    = random_string.username.result
+  password                    = var.use_managed_admin_password ? null : random_password.password.result
+  manage_master_user_password = var.use_managed_admin_password ? true : null
+  tags                        = var.labels
+  vpc_security_group_ids      = local.security_group_ids
+  db_subnet_group_name        = local.subnet_group_name
+  option_group_name           = var.option_group_name
+  publicly_accessible         = var.publicly_accessible
+  apply_immediately           = true
+  storage_encrypted           = var.storage_encrypted
+  kms_key_id                  = var.kms_key_id == "" ? null : var.kms_key_id
+  skip_final_snapshot         = true
+  deletion_protection         = var.deletion_protection
+  storage_type                = var.storage_type
+  iops                        = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
+  monitoring_interval         = var.monitoring_interval
+  monitoring_role_arn         = var.monitoring_role_arn
+  multi_az                    = var.multi_az
 
   parameter_group_name = length(var.parameter_group_name) == 0 ? aws_db_parameter_group.db_parameter_group[0].name : var.parameter_group_name
 
@@ -136,6 +137,18 @@ resource "aws_db_instance" "db_instance" {
   timeouts {
     create = "60m"
   }
+}
+
+resource "aws_secretsmanager_secret_rotation" "secret_manager" {
+  # Note that configuring rotation causes the secret to rotate once as soon as you enable rotation.
+  # This happens even if the configured rotation is the same as the AWS default e.g. 7 days.
+  count     = var.use_managed_admin_password ? 1 : 0
+  secret_id = join("", aws_db_instance.db_instance.master_user_secret.*.secret_arn)
+  rotation_rules {
+    automatically_after_days = var.rotate_admin_password_after
+  }
+
+  depends_on = [aws_db_instance.db_instance]
 }
 
 resource "aws_db_parameter_group" "db_parameter_group" {
