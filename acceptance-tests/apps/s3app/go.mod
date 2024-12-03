@@ -1,6 +1,6 @@
 module s3app
 
-go 1.23.3
+go 1.23.4
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.32.6
