@@ -14,9 +14,9 @@
 
 dependencies:
     - name: terraform-provider-aws
-      version: 5.79.0
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.79.0.zip
-      source_sha256: 7f1b5ca6aecf76b711b818104c4a859eabe2386d0f4b6bb0edb66a5c251a96e5
+      version: 5.80.0
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.80.0.zip
+      source_sha256: ac9b5caf5b6c66689f799bdded2ed0889f91cdd6402fd9ad4687b111411bdaf0
     - name: terraform-provider-csbmysql
       version: 1.2.47
       source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.47.zip
@@ -34,6 +34,6 @@ dependencies:
       source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.3.zip
       source_sha256: 073025c3b7a2d64d60523da8b5ea29c42ffc0da752377ac5e74c8a9a4c4bb71e
     - name: tofu
-      version: 1.8.6
-      source: https://github.com/opentofu/opentofu/archive/v1.8.6.zip
-      source_sha256: 14d893b26946e0e5bfcf026a43611350301d6f0e7501bb8563d4cb2297f3e57c
+      version: 1.8.7
+      source: https://github.com/opentofu/opentofu/archive/v1.8.7.zip
+      source_sha256: 33fc3b7ae46db8b1cbeead5d198e576caa53243c825197fb3f7fbf3d79bb5032
