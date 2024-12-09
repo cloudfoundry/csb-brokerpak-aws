@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
-	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
+	rdstypes "github.com/aws/aws-sdk-go-v2/service/rds/types"
 	tfjson "github.com/hashicorp/terraform-json"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -967,17 +968,22 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 func createVPCWithMoreThan20Subnets() (string, string, func()) {
 	ec2Client := ec2.NewFromConfig(getAWSConfig())
 	rdsClient := rds.NewFromConfig(getAWSConfig())
+	now := time.Now().Unix()
 
 	// VPC
 	GinkgoWriter.Println("Creating a VPC")
 	createVPCResult, err := ec2Client.CreateVpc(context.Background(), &ec2.CreateVpcInput{
 		CidrBlock: pointer("10.0.0.0/16"),
-		TagSpecifications: []types.TagSpecification{{
-			ResourceType: types.ResourceTypeVpc,
-			Tags: []types.Tag{
+		TagSpecifications: []ec2types.TagSpecification{{
+			ResourceType: ec2types.ResourceTypeVpc,
+			Tags: []ec2types.Tag{
 				{
 					Key:   pointer("Name"),
-					Value: pointer(fmt.Sprintf("vpc-test-%d-%d", GinkgoRandomSeed(), time.Now().Unix())),
+					Value: pointer(fmt.Sprintf("vpc-test-%d-%d", GinkgoRandomSeed(), now)),
+				},
+				{
+					Key:   pointer("CreationTime"),
+					Value: pointer(fmt.Sprintf("%d", now)),
 				},
 			},
 		}},
@@ -997,6 +1003,15 @@ func createVPCWithMoreThan20Subnets() (string, string, func()) {
 			VpcId:              createVPCResult.Vpc.VpcId,
 			CidrBlock:          pointer(fmt.Sprintf("10.0.%d.0/24", i)),
 			AvailabilityZoneId: azs.AvailabilityZones[i%len(azs.AvailabilityZones)].ZoneId, // round-robin AZs
+			TagSpecifications: []ec2types.TagSpecification{{
+				ResourceType: ec2types.ResourceTypeSubnet,
+				Tags: []ec2types.Tag{
+					{
+						Key:   pointer("CreationTime"),
+						Value: pointer(fmt.Sprintf("%d", now)),
+					},
+				},
+			}},
 		})
 
 		Expect(err).NotTo(HaveOccurred())
@@ -1011,6 +1026,12 @@ func createVPCWithMoreThan20Subnets() (string, string, func()) {
 		DBSubnetGroupDescription: pointer(fmt.Sprintf("test subnet created at %s", time.Now().String())),
 		DBSubnetGroupName:        pointer(fmt.Sprintf("rdssubnet-test-%d-%d", GinkgoRandomSeed(), time.Now().Unix())),
 		SubnetIds:                subnetIDs[0:dbSubnetGroupLimit],
+		Tags: []rdstypes.Tag{
+			{
+				Key:   pointer("CreationTime"),
+				Value: pointer(fmt.Sprintf("%d", now)),
+			},
+		},
 	})
 	Expect(err).NotTo(HaveOccurred())
 	GinkgoWriter.Printf("Created DB subnet group %s\n", safe(createResult.DBSubnetGroup.DBSubnetGroupName))
