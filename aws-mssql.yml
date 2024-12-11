@@ -149,6 +149,14 @@ provision:
       See the RDS User Guide for details:
       https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Storage.html#gp3-storage.
     default: 1000
+  - field_name: use_managed_admin_password
+    type: boolean
+    default: false
+    details: Whether to use AWS Secrets Manager to generate and manage the admin password for this RDS.
+  - field_name: rotate_admin_password_after
+    type: integer
+    default: 7
+    details: Specifies the number of days between automatic scheduled rotations of the admin password.
   - field_name: publicly_accessible
     type: boolean
     details: Make instance public if true
@@ -377,9 +385,26 @@ provision:
   - field_name: require_ssl
     type: boolean
     details: Require that connections use SSL
+  - field_name: region
+    type: string
+    details: AWS region for the RDS instance
+  - field_name: use_managed_admin_password
+    type: boolean
+    details: Whether CSB should use AWS managed admin password
+  - field_name: managed_admin_credentials_arn
+    type: string
+    details: The ARN of the master secret to authenticate to the database instance.
 bind:
   plan_inputs: []
-  user_inputs: []
+  user_inputs:
+  - field_name: aws_access_key_id
+    type: string
+    details: AWS access key
+    default: ${config("aws.access_key_id")}
+  - field_name: aws_secret_access_key
+    type: string
+    details: AWS secret key
+    default: ${config("aws.secret_access_key")}
   computed_inputs:
   - name: db_name
     type: string
@@ -400,6 +425,18 @@ bind:
   - name: require_ssl
     type: boolean
     default: ${instance.details["require_ssl"]}
+    overwrite: true
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: use_managed_admin_password
+    type: boolean
+    default: ${instance.details["use_managed_admin_password"]}
+    overwrite: true
+  - name: managed_admin_credentials_arn
+    type: string
+    default: ${instance.details["managed_admin_credentials_arn"]}
     overwrite: true
   template_refs:
     outputs: terraform/mssql/bind/outputs.tf

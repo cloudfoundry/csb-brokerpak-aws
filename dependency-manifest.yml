@@ -14,26 +14,26 @@
 
 dependencies:
     - name: terraform-provider-aws
-      version: 5.75.1
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.75.1.zip
-      source_sha256: e296836bc9ced8ae5e18b2435fe811b5d4a92c2c8042ea45a3752a84815124f5
+      version: 5.80.0
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.80.0.zip
+      source_sha256: ac9b5caf5b6c66689f799bdded2ed0889f91cdd6402fd9ad4687b111411bdaf0
     - name: terraform-provider-csbmysql
-      version: 1.2.44
-      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.44.zip
-      source_sha256: b1cd76b2b69a578fdb1b74c076a8bfaf58582ce8b6eee10b7a197cf14dbb314b
+      version: 1.2.48
+      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.2.48.zip
+      source_sha256: 1da6516e1c65f2e6722d4ed8ae2bfa6693f754ba9615e6a3cb177f5a6eaf09f2
     - name: terraform-provider-csbpg
-      version: 1.2.40
-      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.40.zip
-      source_sha256: 9ad1af682911b1efce2cf94f86fb27ed6b95cbaa8c541c9bc3d8fa5f5d04517a
+      version: 1.2.43
+      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.43.zip
+      source_sha256: a833139e58bd427fd6889f29f5d51512315f2e4ea9c7b0491e7d45cc792f618e
     - name: terraform-provider-csbsqlserver
-      version: 1.0.31
-      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.31.zip
-      source_sha256: e73ad206455d57ecb83982f0ae6da5d71e98ae51f89d31d9dd505191ee9765a4
+      version: 1.0.35
+      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.35.zip
+      source_sha256: 6a3c09c4a32f57ceb51b0ca8e0fbebcd4333d8d64540d42467c4c97e53949d06
     - name: terraform-provider-random
       version: 3.6.3
       source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.6.3.zip
       source_sha256: 073025c3b7a2d64d60523da8b5ea29c42ffc0da752377ac5e74c8a9a4c4bb71e
     - name: tofu
-      version: 1.8.5
-      source: https://github.com/opentofu/opentofu/archive/v1.8.5.zip
-      source_sha256: 5fafd3deec9c1cb4b198f11df376557b82fd790e1b6b3d02409f999474ee3423
+      version: 1.8.7
+      source: https://github.com/opentofu/opentofu/archive/v1.8.7.zip
+      source_sha256: 33fc3b7ae46db8b1cbeead5d198e576caa53243c825197fb3f7fbf3d79bb5032

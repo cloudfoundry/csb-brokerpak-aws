@@ -1,16 +1,19 @@
 package acceptance_tests_test
 
 import (
-	"io"
-	"net/http"
-
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/jdbcapp"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 )
 
 var _ = Describe("MSSQL", Label("mssql"), func() {
@@ -151,5 +154,77 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 			}),
 		)
 		serviceInstance.Delete()
+	})
+
+	// As we introduce the 'use_managed_admin_password' feature, some users may wish to update existing DBs.
+	// This is a tactical test that should exist for this changeover period and is not intended to be a forever test.
+	// Due to limitations in Tofu/AWS provider/AWS the operation to switch fails first time, then succeeds on
+	// a second attempt. That's not an ideal customer experience, and this test exists to ensure that what we
+	// document works, and make us aware if the behavior changes.
+	It("allows 'use_managed_admin_password' to be enabled", Label("managed-password"), func() {
+		By("creating a service instance")
+		serviceInstance := services.CreateInstance("csb-aws-mssql", services.WithPlan("default"))
+		defer serviceInstance.Delete()
+
+		By("pushing an unstarted app")
+		appManifest := jdbcapp.ManifestFor(jdbcapp.SQLServer)
+		app := apps.Push(apps.WithApp(apps.JDBCTestAppSQLServer), apps.WithManifest(appManifest))
+		defer apps.Delete(app)
+
+		By("binding the app to the service instance")
+		binding := serviceInstance.Bind(app)
+
+		By("starting the app")
+		apps.Start(app)
+
+		By("creating an entry using the app")
+		value := random.Hexadecimal()
+		var userIn jdbcapp.AppResponseUser
+		app.POST("", "?name=%s", value).ParseInto(&userIn)
+
+		By("updating the service to set 'use_managed_admin_password' a first time which is expected to fail")
+		params := `{"use_managed_admin_password": true}`
+		session := cf.Start("update-service", serviceInstance.Name, "-c", params, "--wait")
+		Eventually(session).WithTimeout(time.Hour).Should(gexec.Exit(1), func() string {
+			out, _ := cf.Run("service", serviceInstance.Name)
+			return out
+		})
+
+		By("checking that it fails for the expected reason")
+		msg, _ := cf.Run("service", serviceInstance.Name)
+		Expect(msg).To(MatchRegexp(`message:\s+update failed:\s+Error:\s+Provider produced inconsistent final plan When expanding the plan for aws_secretsmanager_secret_rotation`))
+
+		By("updating the service to set 'use_managed_admin_password' a second time")
+		serviceInstance.Update(services.WithParameters(params))
+
+		By("waiting for the password rotation to be applied")
+		identifier := fmt.Sprintf("csb-mssql-%s", serviceInstance.GUID())
+		Eventually(func() string {
+			status := dbInstanceStatus(identifier)
+			Expect(status).To(SatisfyAny(Equal("resetting-master-credentials"), Equal("available")))
+			return status
+		}).WithTimeout(time.Hour).WithPolling(time.Minute).Should(Equal("available"))
+
+		By("rebinding app")
+		binding.Unbind()
+		serviceInstance.Bind(app)
+		app.Restage()
+
+		By("getting the previously stored value")
+		var userOut jdbcapp.AppResponseUser
+		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
+
+		By("updating the service to unset 'use_managed_admin_password'")
+		serviceInstance.Update(services.WithParameters(`{"use_managed_admin_password": false}`))
+
+		By("rebinding app")
+		binding.Unbind()
+		serviceInstance.Bind(app)
+		app.Restage()
+
+		By("getting the previously stored value")
+		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 	})
 })

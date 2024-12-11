@@ -9,5 +9,9 @@ terraform {
       source  = "cloudfoundry.org/cloud-service-broker/csbsqlserver"
       version = ">=1.0.0"
     }
+    aws = {
+      source  = "registry.terraform.io/hashicorp/aws"
+      version = ">= 5.0"
+    }
   }
 }
