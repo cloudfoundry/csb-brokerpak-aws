@@ -6,6 +6,7 @@ import (
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
+	"csbbrokerpakaws/acceptance-tests/helpers/plans"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 )
@@ -64,6 +65,9 @@ var _ = Describe("UpgradeAuroraPostgreSQLTest", Label("aurora-postgresql", "upgr
 
 			By("pushing the development version of the broker")
 			serviceBroker.UpdateBroker(developmentBuildDir)
+
+			By("validating that the instance plan is still active")
+			Expect(plans.ExistsAndAvailable("default", "csb-aws-aurora-postgresql", serviceBroker.Name))
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()

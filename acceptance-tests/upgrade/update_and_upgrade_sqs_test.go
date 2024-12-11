@@ -3,6 +3,7 @@ package upgrade_test
 import (
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/brokers"
+	"csbbrokerpakaws/acceptance-tests/helpers/plans"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"csbbrokerpakaws/acceptance-tests/helpers/services"
 
@@ -51,6 +52,9 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 
 			By("pushing the development version of the broker")
 			serviceBroker.UpdateBroker(developmentBuildDir)
+
+			By("validating that the instance plan is still active")
+			Expect(plans.ExistsAndAvailable("fifo", "csb-aws-sqs", serviceBroker.Name))
 
 			By("upgrading the service instance")
 			serviceInstance.Upgrade()
