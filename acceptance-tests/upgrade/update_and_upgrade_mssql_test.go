@@ -72,7 +72,7 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			serviceBroker.UpdateBroker(developmentBuildDir)
 
 			By("validating that the instance plan is still active")
-			Expect(plans.ExistsAndAvailable("default", "csb-aws-mysql", serviceBroker.Name))
+			Expect(plans.ExistsAndAvailable("default", "csb-aws-mssql", serviceBroker.Name))
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()
