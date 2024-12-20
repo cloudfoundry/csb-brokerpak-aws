@@ -94,7 +94,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"transit_encryption_enabled":  BeTrue(),
 					"automatic_failover_enabled":  BeTrue(),
 					"apply_immediately":           BeTrue(),
-					"at_rest_encryption_enabled":  BeTrue(),
+					"at_rest_encryption_enabled":  Equal("true"),
 					"kms_key_id":                  Equal("fake-encryption-at-rest-key"),
 					"snapshot_retention_limit":    BeNumerically("==", 12),
 					"final_snapshot_identifier":   Equal("tortoise"),
