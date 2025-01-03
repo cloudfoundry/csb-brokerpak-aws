@@ -23,12 +23,20 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			defer serviceBroker.Delete()
 
 			By("creating a service")
+			serviceOffering := "csb-aws-sqs"
+			servicePlan := "fifo"
+			serviceName := random.Name(random.WithPrefix(serviceOffering, servicePlan))
+			// CreateInstance can fail and can leave a service record (albeit a failed one) lying around.
+			// We can't delete service brokers that have serviceInstances, so we need to ensure the service instance
+			// is cleaned up regardless as to whether it wa successful. This is important when we use our own service broker
+			// (which can only have 5 instances at any time) to prevent subsequent test failures.
+			defer services.Delete(serviceName)
 			serviceInstance := services.CreateInstance(
-				"csb-aws-sqs",
-				services.WithPlan("fifo"),
+				serviceOffering,
+				services.WithPlan(servicePlan),
 				services.WithBroker(serviceBroker),
+				services.WithName(serviceName),
 			)
-			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app")
 			app := apps.Push(apps.WithApp(apps.SQS))
@@ -54,7 +62,7 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			serviceBroker.UpdateBroker(developmentBuildDir)
 
 			By("validating that the instance plan is still active")
-			Expect(plans.ExistsAndAvailable("fifo", "csb-aws-sqs", serviceBroker.Name))
+			Expect(plans.ExistsAndAvailable(servicePlan, serviceOffering, serviceBroker.Name))
 
 			By("upgrading the service instance")
 			serviceInstance.Upgrade()

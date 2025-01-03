@@ -34,17 +34,26 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 			// or `aws rds describe-db-engine-versions --engine aurora-mysql --output text --region us-west-2`
 			// There is no open incidence in the provider mentioning anything about it.
 			// We change the test and proceed to document issue.
+
+			serviceOffering := "csb-aws-aurora-mysql"
+			servicePlan := "default"
+			serviceName := random.Name(random.WithPrefix(serviceOffering, servicePlan))
+			// CreateInstance can fail and can leave a service record (albeit a failed one) lying around.
+			// We can't delete service brokers that have serviceInstances, so we need to ensure the service instance
+			// is cleaned up regardless as to whether it wa successful. This is important when we use our own service broker
+			// (which can only have 5 instances at any time) to prevent subsequent test failures.
+			defer services.Delete(serviceName)
 			serviceInstance := services.CreateInstance(
-				"csb-aws-aurora-mysql",
-				services.WithPlan("default"),
+				serviceOffering,
+				services.WithPlan(servicePlan),
 				services.WithParameters(map[string]any{
 					"cluster_instances": 1,
 					"instance_class":    "db.t3.medium",
 					"engine_version":    "5.7",
 				}),
 				services.WithBroker(serviceBroker),
+				services.WithName(serviceName),
 			)
-			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
 			appOne := apps.Push(apps.WithApp(apps.MySQL))
@@ -69,7 +78,7 @@ var _ = Describe("UpgradeAuroraMySQLTest", Label("aurora-mysql", "upgrade"), fun
 			serviceBroker.UpdateBroker(developmentBuildDir)
 
 			By("validating that the instance plan is still active")
-			Expect(plans.ExistsAndAvailable("default", "csb-aws-aurora-mysql", serviceBroker.Name))
+			Expect(plans.ExistsAndAvailable(servicePlan, serviceOffering, serviceBroker.Name))
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()
