@@ -24,6 +24,14 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			defer serviceBroker.Delete()
 
 			By("creating a service")
+			serviceOffering := "csb-aws-mssql"
+			servicePlan := "default"
+			serviceName := random.Name(random.WithPrefix(serviceOffering, servicePlan))
+			// CreateInstance can fail and can leave a service record (albeit a failed one) lying around.
+			// We can't delete service brokers that have serviceInstances, so we need to ensure the service instance
+			// is cleaned up regardless as to whether it wa successful. This is important when we use our own service broker
+			// (which can only have 5 instances at any time) to prevent subsequent test failures.
+			defer services.Delete(serviceName)
 			// without backups and multi az to speed up the process
 			params := map[string]any{
 				"backup_retention_period": 0,
@@ -31,12 +39,12 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			}
 
 			serviceInstance := services.CreateInstance(
-				"csb-aws-mssql",
-				services.WithPlan("default"),
+				serviceOffering,
+				services.WithPlan(servicePlan),
 				services.WithParameters(params),
 				services.WithBroker(serviceBroker),
+				services.WithName(serviceName),
 			)
-			defer serviceInstance.Delete()
 
 			By("pushing the unstarted app twice")
 			appWriter := apps.Push(apps.WithApp(apps.MSSQL))
@@ -72,7 +80,7 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			serviceBroker.UpdateBroker(developmentBuildDir)
 
 			By("validating that the instance plan is still active")
-			Expect(plans.ExistsAndAvailable("default", "csb-aws-mssql", serviceBroker.Name))
+			Expect(plans.ExistsAndAvailable(servicePlan, serviceOffering, serviceBroker.Name))
 
 			By("upgrading service instance")
 			serviceInstance.Upgrade()
