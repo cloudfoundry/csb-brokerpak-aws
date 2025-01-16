@@ -1,6 +1,6 @@
 module sqsapp
 
-go 1.23.4
+go 1.23.5
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.32.8
