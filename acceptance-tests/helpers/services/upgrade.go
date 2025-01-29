@@ -16,22 +16,14 @@ func (s *ServiceInstance) Upgrade() {
 		return
 	}
 
-	var command []string
-	switch cf.Version() {
-	case cf.VersionV8:
-		command = []string{"upgrade-service", s.Name, "--force"}
-	default:
-		command = []string{"update-service", s.Name, "--upgrade", "--force"}
-	}
-
-	session := cf.Start(command...)
-	Eventually(session).WithTimeout(asyncCommandTimeout).Should(Exit(0))
-
-	Eventually(func() string {
+	session := cf.Start("upgrade-service", s.Name, "--force", "--wait")
+	Eventually(session).WithTimeout(operationTimeout).Should(Exit(0), func() string {
 		out, _ := cf.Run("service", s.Name)
-		Expect(out).NotTo(MatchRegexp(`status:\s+update failed`))
 		return out
-	}).WithTimeout(operationTimeout).WithPolling(pollingInterval).Should(MatchRegexp(`status:\s+update succeeded`))
+	})
+
+	out, _ := cf.Run("service", s.Name)
+	Expect(out).To(MatchRegexp(`status:\s+update succeeded`))
 
 	Expect(s.UpgradeAvailable()).To(BeFalse(), "service instance has an upgrade available after upgrade")
 }

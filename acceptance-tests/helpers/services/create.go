@@ -32,6 +32,7 @@ func CreateInstance(offering string, opts ...Option) *ServiceInstance {
 	Expect(cfg.plan).ToNot(BeEmpty())
 	args := []string{
 		"create-service",
+		"--wait",
 		offering,
 		cfg.plan,
 		cfg.name,
@@ -43,34 +44,13 @@ func CreateInstance(offering string, opts ...Option) *ServiceInstance {
 		args = append(args, "-c", cfg.parameters)
 	}
 
-	switch cf.Version() {
-	case cf.VersionV8:
-		createInstanceWithWait(cfg.name, args)
-	default:
-		createInstanceWithPoll(cfg.name, args)
-	}
-
-	return &ServiceInstance{Name: cfg.name}
-}
-
-func createInstanceWithWait(name string, args []string) {
-	args = append(args, "--wait")
 	session := cf.Start(args...)
 	Eventually(session, time.Hour).Should(Exit(0), func() string {
-		out, _ := cf.Run("service", name)
+		out, _ := cf.Run("service", cfg.name)
 		return out
 	})
-}
 
-func createInstanceWithPoll(name string, args []string) {
-	session := cf.Start(args...)
-	Eventually(session, 5*time.Minute).Should(Exit(0))
-
-	Eventually(func() string {
-		out, _ := cf.Run("service", name)
-		Expect(out).NotTo(MatchRegexp(`status:\s+create failed`))
-		return out
-	}, time.Hour, 30*time.Second).Should(MatchRegexp(`status:\s+create succeeded`))
+	return &ServiceInstance{Name: cfg.name}
 }
 
 func WithDefaultBroker() Option {
