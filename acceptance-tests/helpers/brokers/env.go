@@ -17,7 +17,7 @@ const (
 	gsbBrokerpakConfig   = "GSB_BROKERPAK_CONFIG"
 )
 
-func (b Broker) env() []apps.EnvVar {
+func (b *Broker) env() []apps.EnvVar {
 	env := make(map[string]any)
 
 	// Read these values from the environment
@@ -73,7 +73,7 @@ func (b Broker) env() []apps.EnvVar {
 	return result
 }
 
-func (b Broker) latestEnv() []apps.EnvVar {
+func (b *Broker) latestEnv() []apps.EnvVar {
 	return readEnvrcServices(testpath.BrokerpakFile(".envrc"))
 }
 
