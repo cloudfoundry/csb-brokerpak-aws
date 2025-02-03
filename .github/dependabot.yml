@@ -12,8 +12,8 @@ updates:
   directory: "/"
   target-branch: main
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "01:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -23,15 +23,15 @@ updates:
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/postgresqlapp"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "02:00"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/s3app"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "03:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -41,29 +41,29 @@ updates:
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mysqlapp"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "04:00"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/mssqlapp"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "05:00"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/redisapp"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "06:00"
   labels:
     - "test-dependencies"
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/dynamodbnsapp"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "07:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -73,8 +73,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/acceptance-tests/apps/sqsapp"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "08:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -84,8 +84,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbdynamodbns"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "09:00"
   groups:
     aws-sdk-go-v2:
       patterns:
@@ -95,8 +95,8 @@ updates:
 - package-ecosystem: gomod
   directory: "/providers/terraform-provider-csbmajorengineversion/"
   schedule:
-    interval: "weekly"
     day: "saturday"
+    time: "10:00"
   groups:
     aws-sdk-go-v2:
       patterns:
