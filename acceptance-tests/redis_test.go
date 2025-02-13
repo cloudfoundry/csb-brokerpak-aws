@@ -33,14 +33,14 @@ var _ = Describe("Redis", Label("redis"), func() {
 		By("setting a key-value using the first app")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		appOne.PUT(value, "/primary/%s", key)
+		appOne.PUTf(value, "/primary/%s", key)
 
 		By("getting the value using the second app")
-		got := appTwo.GET("/primary/%s", key).String()
+		got := appTwo.GETf("/primary/%s", key).String()
 		Expect(got).To(Equal(value))
 
 		By("getting the value using the reader endpoint")
-		got2 := appTwo.GET("/replica/%s", key).String()
+		got2 := appTwo.GETf("/replica/%s", key).String()
 		Expect(got2).To(Equal(value))
 	})
 })

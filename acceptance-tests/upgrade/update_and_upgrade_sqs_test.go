@@ -51,7 +51,7 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			send := func(message string) {
 				messageGroupID := random.Hexadecimal()
 				messageDeduplicationID := random.Hexadecimal()
-				app.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", bindingName, messageGroupID, messageDeduplicationID)
+				app.POSTf(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", bindingName, messageGroupID, messageDeduplicationID)
 			}
 			messageOne := random.Hexadecimal()
 			messageTwo := random.Hexadecimal()
@@ -68,7 +68,7 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			serviceInstance.Upgrade()
 
 			By("receiving the previously written first message")
-			got := app.GET("/retrieve_and_delete/%s", bindingName).String()
+			got := app.GETf("/retrieve_and_delete/%s", bindingName).String()
 			Expect(got).To(Equal(messageOne))
 
 			By("deleting bindings created before the upgrade")
@@ -82,7 +82,7 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			serviceInstance.Update(services.WithParameters(`{}`))
 
 			By("receiving the previously written second message")
-			got = app.GET("/retrieve_and_delete/%s", bindingName).String()
+			got = app.GETf("/retrieve_and_delete/%s", bindingName).String()
 			Expect(got).To(Equal(messageTwo))
 
 			By("deleting bindings created before the upgrade")
@@ -96,7 +96,7 @@ var _ = Describe("UpgradeSQSTest", Label("upgrade", "sqs"), func() {
 			messageThree := random.Hexadecimal()
 			send(messageThree)
 
-			got = app.GET("/retrieve_and_delete/%s", bindingName).String()
+			got = app.GETf("/retrieve_and_delete/%s", bindingName).String()
 			Expect(got).To(Equal(messageThree))
 		})
 	})

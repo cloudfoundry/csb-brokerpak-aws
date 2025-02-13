@@ -34,7 +34,7 @@ var _ = Describe("Aurora MySQL data migration", Label("aurora-mysql-migration"),
 		By("adding some data in the source legacy database")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		app.PUT(value, "%s?tls=true", key)
+		app.PUTf(value, "%s?tls=true", key)
 
 		By("creating a target service instance using the CSB")
 		params := map[string]any{

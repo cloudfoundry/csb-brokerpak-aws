@@ -56,7 +56,7 @@ var _ = Describe("DynamoDB Namespace", Label("dynamodb-namespace"), func() {
 		// however, trying to create a value in it immediately results in a 404 error
 		var postBody dynamoDBValueResponseType
 		Eventually(func(g Gomega) {
-			postResponse := appOne.POSTResponse(valuePayload, "/tables/%s/values/%s", tableName, valueSortKey)
+			postResponse := appOne.POSTResponsef(valuePayload, "/tables/%s/values/%s", tableName, valueSortKey)
 			g.Expect(postResponse).To(HaveHTTPStatus(http.StatusCreated))
 			defer postResponse.Body.Close()
 			apps.NewPayload(postResponse).ParseInto(&postBody)
@@ -67,19 +67,19 @@ var _ = Describe("DynamoDB Namespace", Label("dynamodb-namespace"), func() {
 		Expect(postBody.PK).To(BeNumerically(">", 0))
 
 		By("checking the table presence using the second app")
-		appTwo.GET("/tables/%s", tableName)
+		appTwo.GETf("/tables/%s", tableName)
 
 		By("reading the value using the second app")
 		var getBody dynamoDBValueResponseType
-		appTwo.GET("/tables/%s/values/%s/%d", tableName, valueSortKey, postBody.PK).ParseInto(&getBody)
+		appTwo.GETf("/tables/%s/values/%s/%d", tableName, valueSortKey, postBody.PK).ParseInto(&getBody)
 		Expect(getBody).To(Equal(postBody))
 
 		By("destroying the table using the second app")
-		appTwo.DELETE("/tables/%s", tableName)
+		appTwo.DELETEf("/tables/%s", tableName)
 
 		By("ensuring the table is gone eventually")
 		Eventually(func(g Gomega) {
-			getResponse := appTwo.GETResponse("/tables/%s", tableName)
+			getResponse := appTwo.GETResponsef("/tables/%s", tableName)
 			g.Expect(getResponse).To(HaveHTTPStatus(http.StatusNotFound))
 		}).WithTimeout(5 * time.Minute).WithPolling(time.Second).Should(Succeed())
 	})

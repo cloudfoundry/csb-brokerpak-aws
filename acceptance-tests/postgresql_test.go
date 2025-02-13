@@ -73,7 +73,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		By("creating an entry using the app")
 		value := random.Hexadecimal()
 		var userIn jdbcapp.AppResponseUser
-		app.POST("", "?name=%s", value).ParseInto(&userIn)
+		app.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("updating the service to set 'use_managed_admin_password' a first time which is expected to fail")
 		params := `{"use_managed_admin_password": true}`
@@ -105,7 +105,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 
 		By("getting the previously stored value")
 		var userOut jdbcapp.AppResponseUser
-		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 
 		By("updating the service to unset 'use_managed_admin_password'")
@@ -117,7 +117,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		app.Restage()
 
 		By("getting the previously stored value")
-		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 	})
 })
@@ -145,14 +145,14 @@ func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
 
 	By("creating an entry using the first app")
 	value := random.Hexadecimal()
-	appOne.POST("", "?name=%s", value).ParseInto(&userIn)
+	appOne.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 	By("binding and starting the second app")
 	serviceInstance.Bind(appTwo)
 	apps.Start(appTwo)
 
 	By("getting the entry using the second app")
-	appTwo.GET("%d", userIn.ID).ParseInto(&userOut)
+	appTwo.GETf("%d", userIn.ID).ParseInto(&userOut)
 	Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 	By("verifying the DB connection utilises TLS")
@@ -162,7 +162,7 @@ func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
 	Expect(sslInfo.Bits).To(BeNumerically(">=", 256))
 
 	By("deleting the entry using the first app")
-	appOne.DELETE("%d", userIn.ID)
+	appOne.DELETEf("%d", userIn.ID)
 }
 
 func dbInstanceStatus(instanceName string) string {

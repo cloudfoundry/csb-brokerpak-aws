@@ -61,15 +61,15 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 		apps.Start(golangAppOne)
 		By("creating a schema using the app")
 		schema := random.Name(random.WithMaxLength(10))
-		golangAppOne.PUT("", "%s?dbo=false&tls=disable", schema)
+		golangAppOne.PUTf("", "%s?dbo=false&tls=disable", schema)
 
 		By("setting a key-value using the app")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		golangAppOne.PUT(value, "%s/%s?tls=disable", schema, key)
+		golangAppOne.PUTf(value, "%s/%s?tls=disable", schema, key)
 
 		By("reading value from legacy service instance")
-		got := golangAppOne.GET("%s/%s?tls=disable", schema, key).String()
+		got := golangAppOne.GETf("%s/%s?tls=disable", schema, key).String()
 		Expect(got).To(Equal(value))
 
 		By("waiting for the replication instance to be ready")
@@ -157,7 +157,7 @@ var _ = Describe("MSSQL data migration", Label("mssql-migration"), func() {
 
 		By("checking that the data is available in the target CSB created database")
 
-		Expect(golangAppOne.GET("%s/%s?tls=disable", schema, key).String()).To(Equal(value))
+		Expect(golangAppOne.GETf("%s/%s?tls=disable", schema, key).String()).To(Equal(value))
 	})
 })
 

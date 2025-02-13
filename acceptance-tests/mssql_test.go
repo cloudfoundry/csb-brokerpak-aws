@@ -41,7 +41,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 
 		By("creating an entry using the writer app")
 		value := random.Hexadecimal()
-		appWriter.POST("", "?name=%s", value).ParseInto(&userIn)
+		appWriter.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("binding the reader app")
 		serviceInstance.Bind(appReader)
@@ -50,7 +50,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		apps.Start(appReader)
 
 		By("getting the entry using the reader app")
-		appReader.GET("%d", userIn.ID).ParseInto(&userOut)
+		appReader.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 		// This step is not necessary, added for the purpose of serving as documentation
@@ -72,15 +72,15 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		apps.Start(golangAppOne, golangAppTwo)
 		By("creating a schema using the first app")
 		schema := random.Name(random.WithMaxLength(10))
-		golangAppOne.PUT("", "%s?dbo=false", schema)
+		golangAppOne.PUTf("", "%s?dbo=false", schema)
 
 		By("setting a key-value using the first app")
 		key := random.Hexadecimal()
 		value = random.Hexadecimal()
-		golangAppOne.PUT(value, "%s/%s", schema, key)
+		golangAppOne.PUTf(value, "%s/%s", schema, key)
 
 		By("verifying that non-TLS connections should fail")
-		response := golangAppTwo.GETResponse("%s/%s?tls=disable", schema, key)
+		response := golangAppTwo.GETResponsef("%s/%s?tls=disable", schema, key)
 		defer response.Body.Close()
 		Expect(response).To(HaveHTTPStatus(http.StatusInternalServerError), "force TLS is enabled by default")
 		b, err := io.ReadAll(response.Body)
@@ -89,7 +89,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 
 		By("deleting binding one the binding two keeps reading the value - object reassignment works")
 		binding.Unbind()
-		got := golangAppTwo.GET("%s/%s", schema, key).String()
+		got := golangAppTwo.GETf("%s/%s", schema, key).String()
 		Expect(got).To(Equal(value))
 
 		By("dropping the schema using the second app")
@@ -129,10 +129,10 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 
 		By("creating an entry using the writer app")
 		value := random.Hexadecimal()
-		appWriter.POST("", "?name=%s", value).ParseInto(&userIn)
+		appWriter.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("getting the entry using the reader app")
-		appWriter.GET("%d", userIn.ID).ParseInto(&userOut)
+		appWriter.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value))
 	})
 
@@ -180,7 +180,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		By("creating an entry using the app")
 		value := random.Hexadecimal()
 		var userIn jdbcapp.AppResponseUser
-		app.POST("", "?name=%s", value).ParseInto(&userIn)
+		app.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("updating the service to set 'use_managed_admin_password' a first time which is expected to fail")
 		params := `{"use_managed_admin_password": true}`
@@ -212,7 +212,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 
 		By("getting the previously stored value")
 		var userOut jdbcapp.AppResponseUser
-		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 
 		By("updating the service to unset 'use_managed_admin_password'")
@@ -224,7 +224,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		app.Restage()
 
 		By("getting the previously stored value")
-		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 	})
 })
