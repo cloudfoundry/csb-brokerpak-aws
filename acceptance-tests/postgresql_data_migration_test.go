@@ -46,7 +46,7 @@ var _ = Describe("PostgreSQL data migration", Label("postgresql-migration"), fun
 
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		sourceApp.PUT(value, "%s/%s", schema, key)
+		sourceApp.PUTf(value, "%s/%s", schema, key)
 
 		By("waiting for the replication instance to be ready")
 		replicationInstance.Wait()
@@ -109,7 +109,7 @@ var _ = Describe("PostgreSQL data migration", Label("postgresql-migration"), fun
 		defer targetApp.Delete()
 		targetServiceInstance.Bind(targetApp)
 		targetApp.Start()
-		got := targetApp.GET("%s/%s", schema, key).String()
+		got := targetApp.GETf("%s/%s", schema, key).String()
 		Expect(got).To(Equal(value))
 	})
 })

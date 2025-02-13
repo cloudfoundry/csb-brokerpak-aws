@@ -39,7 +39,7 @@ var _ = Describe("MySQL data migration", Label("mysql-migration"), func() {
 		By("adding some data in the source legacy database")
 		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		app.PUT(value, "%s?tls=true", key)
+		app.PUTf(value, "%s?tls=true", key)
 
 		By("waiting for the replication instance to be ready")
 		replicationInstance.Wait()

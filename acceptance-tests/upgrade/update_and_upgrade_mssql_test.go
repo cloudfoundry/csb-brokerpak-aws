@@ -59,12 +59,12 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 
 			By("creating a schema using the first app")
 			schema := random.Name(random.WithMaxLength(10))
-			appWriter.PUT("", "%s?dbo=false", schema)
+			appWriter.PUTf("", "%s?dbo=false", schema)
 
 			By("setting a key-value using the first app")
 			key := random.Hexadecimal()
 			value := random.Hexadecimal()
-			appWriter.PUT(value, "%s/%s", schema, key)
+			appWriter.PUTf(value, "%s/%s", schema, key)
 
 			By("binding the reader app")
 			bindingReader := serviceInstance.Bind(appReader)
@@ -73,7 +73,7 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			apps.Start(appReader)
 
 			By("getting the entry using the reader app")
-			got := appReader.GET("%s/%s", schema, key).String()
+			got := appReader.GETf("%s/%s", schema, key).String()
 			Expect(got).To(Equal(value))
 
 			By("pushing the development version of the broker")
@@ -86,7 +86,7 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			serviceInstance.Upgrade()
 
 			By("getting the entry using the reader app after upgrading")
-			got = appReader.GET("%s/%s", schema, key).String()
+			got = appReader.GETf("%s/%s", schema, key).String()
 			Expect(got).To(Equal(value))
 
 			By("deleting bindings created before the upgrade")
@@ -111,8 +111,8 @@ var _ = Describe("UpgradeMSSQLTest", Label("mssql", "upgrade"), func() {
 			By("checking data can still be written and read")
 			key = random.Hexadecimal()
 			value = random.Hexadecimal()
-			appWriter.PUT(value, "%s/%s", schema, key)
-			got = appReader.GET("%s/%s", schema, key).String()
+			appWriter.PUTf(value, "%s/%s", schema, key)
+			got = appReader.GETf("%s/%s", schema, key).String()
 			Expect(got).To(Equal(value))
 		})
 	})
