@@ -74,18 +74,18 @@ var _ = Describe("S3", Label("s3"), func() {
 		By("uploading a file using the app")
 		filename := random.Hexadecimal()
 		fileContent := fmt.Sprintf("This is a dummy file that will be uploaded the S3 at %s.", time.Now().String())
-		app.PUT(fileContent, "/upload-with-public-read-acl/%s", filename)
+		app.PUTf(fileContent, "/upload-with-public-read-acl/%s", filename)
 
 		By("downloading the file using the app and the AWS Go library")
 		got := app.GET(filename).String()
 		Expect(got).To(Equal(fileContent))
 
 		By("downloading the file using the app and HTTPS request")
-		got = app.GET("/check-https/%s", filename).String()
+		got = app.GETf("/check-https/%s", filename).String()
 		Expect(got).To(Equal(fileContent))
 
 		By("receiving a failure when using the app and HTTP request")
-		resp := app.GETResponse("/check-http/%s", filename)
+		resp := app.GETResponsef("/check-http/%s", filename)
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(BeNumerically("==", http.StatusForbidden))
 
@@ -93,7 +93,7 @@ var _ = Describe("S3", Label("s3"), func() {
 		serviceInstance.Update(services.WithParameters(map[string]any{"require_tls": false}))
 
 		By("receiving a successful response when using the app and HTTP request")
-		resp = app.GETResponse("/check-http/%s", filename)
+		resp = app.GETResponsef("/check-http/%s", filename)
 		defer resp.Body.Close()
 		Expect(resp.StatusCode).To(BeNumerically("==", http.StatusOK))
 

@@ -51,7 +51,7 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 		// however, trying to create a value in it immediately results in a 404 error
 		var postBody dynamoDBValueResponseType
 		Eventually(func(g Gomega) {
-			postResponse := app.POSTResponse(valuePayload, "/tables/%s/values/%s", legacyTable, valueSortKey)
+			postResponse := app.POSTResponsef(valuePayload, "/tables/%s/values/%s", legacyTable, valueSortKey)
 			g.Expect(postResponse).To(HaveHTTPStatus(http.StatusCreated))
 			defer postResponse.Body.Close()
 			apps.NewPayload(postResponse).ParseInto(&postBody)
@@ -83,7 +83,7 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 		}).WithTimeout(time.Hour).WithPolling(time.Second).Should(Succeed())
 
 		By("destroying the table")
-		app.DELETE("/tables/%s", legacyTable)
+		app.DELETEf("/tables/%s", legacyTable)
 
 		By("restoring the table into the namespace of the CSB service")
 		csbTableName := fmt.Sprintf("csb-%s-%s", csbServiceInstance.GUID(), tableSuffix)
@@ -105,19 +105,19 @@ var _ = Describe("DynamoDB Namespace Data Migration", Label("dynamodb-namespace-
 		app.Restage()
 
 		By("checking the table presence using the app")
-		app.GET("/tables/%s", csbTableName)
+		app.GETf("/tables/%s", csbTableName)
 
 		By("reading the value using the app")
 		var getBody dynamoDBValueResponseType
-		app.GET("/tables/%s/values/%s/%d", csbTableName, valueSortKey, postBody.PK).ParseInto(&getBody)
+		app.GETf("/tables/%s/values/%s/%d", csbTableName, valueSortKey, postBody.PK).ParseInto(&getBody)
 		Expect(getBody).To(Equal(postBody))
 
 		By("destroying the table using the app")
-		app.DELETE("/tables/%s", csbTableName)
+		app.DELETEf("/tables/%s", csbTableName)
 
 		By("ensuring the table is gone eventually")
 		Eventually(func(g Gomega) {
-			getResponse := app.GETResponse("/tables/%s", csbTableName)
+			getResponse := app.GETResponsef("/tables/%s", csbTableName)
 			g.Expect(getResponse).To(HaveHTTPStatus(http.StatusNotFound))
 		}).WithTimeout(5 * time.Minute).WithPolling(time.Second).Should(Succeed())
 	})

@@ -50,14 +50,14 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 
 		By("creating an entry using the first app")
 		value := random.Hexadecimal()
-		appOne.POST("", "?name=%s", value).ParseInto(&userIn)
+		appOne.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("binding and starting the second app")
 		serviceInstance.Bind(appTwo)
 		apps.Start(appTwo)
 
 		By("getting the entry using the second app")
-		appTwo.GET("%d", userIn.ID).ParseInto(&userOut)
+		appTwo.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 		By("verifying the DB connection utilises TLS")
@@ -66,7 +66,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		Expect(sslInfo.Value).NotTo(BeEmpty())
 
 		By("deleting the entry using the first app")
-		appOne.DELETE("%d", userIn.ID)
+		appOne.DELETEf("%d", userIn.ID)
 
 		By("pushing and binding an app for verifying non-TLS connection attempts")
 		golangApp := apps.Push(apps.WithApp(apps.MySQL))
@@ -81,7 +81,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		Expect(got).To(Equal(value))
 
 		By("verifying that non-TLS connections should fail")
-		response := golangApp.GETResponse("%s?tls=false", key)
+		response := golangApp.GETResponsef("%s?tls=false", key)
 		defer response.Body.Close()
 		Expect(response).To(HaveHTTPStatus(http.StatusInternalServerError), "force TLS is enabled by default")
 		b, err := io.ReadAll(response.Body)
@@ -114,7 +114,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		By("creating an entry using the app")
 		value := random.Hexadecimal()
 		var userIn jdbcapp.AppResponseUser
-		app.POST("", "?name=%s", value).ParseInto(&userIn)
+		app.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("updating the service to set 'use_managed_admin_password' a first time which is expected to fail")
 		params := `{"use_managed_admin_password": true}`
@@ -146,7 +146,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 
 		By("getting the previously stored value")
 		var userOut jdbcapp.AppResponseUser
-		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 
 		By("updating the service to unset 'use_managed_admin_password'")
@@ -158,7 +158,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		app.Restage()
 
 		By("getting the previously stored value")
-		app.GET("%d", userIn.ID).ParseInto(&userOut)
+		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 	})
 })

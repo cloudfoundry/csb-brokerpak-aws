@@ -38,10 +38,10 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		message := random.Hexadecimal()
 		messageGroupID := random.Hexadecimal()
 		messageDeduplicationID := random.Hexadecimal()
-		producerApp.POST(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", producerBindingName, messageGroupID, messageDeduplicationID)
+		producerApp.POSTf(message, "/send/%s?messageGroupId=%s&messageDeduplicationId=%s", producerBindingName, messageGroupID, messageDeduplicationID)
 
 		By("receiving the message using the consumer app")
-		got := consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
+		got := consumerApp.GETf("/retrieve_and_delete/%s", consumerBindingName).String()
 		Expect(got).To(Equal(message))
 	})
 
@@ -97,49 +97,49 @@ var _ = Describe("SQS", Label("sqs"), func() {
 		By("checking message is send and received between two apps", func() {
 			By("sending a message using producer app")
 			message := random.Hexadecimal()
-			producerApp.POST(message, "/send/%s", producerBindingName)
+			producerApp.POSTf(message, "/send/%s", producerBindingName)
 
 			By("reading message using consumer app")
-			got := consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
+			got := consumerApp.GETf("/retrieve_and_delete/%s", consumerBindingName).String()
 			Expect(got).To(Equal(message))
 		})
 
 		By("checking consumer app can read from DLQ", func() {
 			By("sending a message using producer app")
 			message := random.Hexadecimal()
-			producerApp.POST(message, "/send/%s", producerBindingName)
+			producerApp.POSTf(message, "/send/%s", producerBindingName)
 
 			By("read the message without deleting it using consumer app")
-			got := consumerApp.GET("/retrieve/%s", consumerBindingName).String()
+			got := consumerApp.GETf("/retrieve/%s", consumerBindingName).String()
 			Expect(got).To(Equal(message))
 
 			By("triggering move to DLQ by attempting to retrieve from the queue again using consumer app")
-			response := consumerApp.GETResponse("/retrieve/%s", consumerBindingName)
+			response := consumerApp.GETResponsef("/retrieve/%s", consumerBindingName)
 			Expect(response).To(HaveHTTPStatus(http.StatusTooEarly))
 
 			By("reading message in the DLQ using consumer app")
-			got = consumerApp.GET("/retrieve_and_delete/%s", bindingDLQName).String()
+			got = consumerApp.GETf("/retrieve_and_delete/%s", bindingDLQName).String()
 			Expect(got).To(Equal(message))
 		})
 
 		By("checking consumer app can trigger a redrive from DLQ to original queue", func() {
 			By("sending another message using producer app")
 			message := random.Hexadecimal()
-			producerApp.POST(message, "/send/%s", producerBindingName)
+			producerApp.POSTf(message, "/send/%s", producerBindingName)
 
 			By("read a message without delete it using consumer app")
-			got := consumerApp.GET("/retrieve/%s", consumerBindingName).String()
+			got := consumerApp.GETf("/retrieve/%s", consumerBindingName).String()
 			Expect(got).To(Equal(message))
 
 			By("triggering move to DLQ by attempting to retrieve from the queue again using consumer app")
-			response := consumerApp.GETResponse("/retrieve/%s", consumerBindingName)
+			response := consumerApp.GETResponsef("/retrieve/%s", consumerBindingName)
 			Expect(response).To(HaveHTTPStatus(http.StatusTooEarly))
 
 			By("triggering redrive from DLQ to original queue using consumer app")
-			consumerApp.POST("", "/redrive/%s?dlq_arn=%s", consumerBindingName, dlqARN)
+			consumerApp.POSTf("", "/redrive/%s?dlq_arn=%s", consumerBindingName, dlqARN)
 
 			By("reading message in the original queue using consumer app")
-			got = consumerApp.GET("/retrieve_and_delete/%s", consumerBindingName).String()
+			got = consumerApp.GETf("/retrieve_and_delete/%s", consumerBindingName).String()
 			Expect(got).To(Equal(message))
 		})
 	})

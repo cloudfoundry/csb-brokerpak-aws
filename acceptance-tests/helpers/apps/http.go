@@ -12,10 +12,14 @@ import (
 )
 
 // GET does an HTTP get, returning the body as a payload
-func (a *App) GET(format string, s ...any) Payload {
+func (a *App) GET(path string) Payload {
+	return a.GETf("%s", path)
+}
+
+func (a *App) GETf(format string, s ...any) Payload {
 	GinkgoHelper()
 
-	response := a.GETResponse(format, s...)
+	response := a.GETResponsef(format, s...)
 	Expect(response).To(HaveHTTPStatus(http.StatusOK))
 
 	defer func(Body io.ReadCloser) {
@@ -28,7 +32,11 @@ func (a *App) GET(format string, s ...any) Payload {
 }
 
 // GETResponse does an HTTP get, returning the *http.Response
-func (a *App) GETResponse(format string, s ...any) *http.Response {
+func (a *App) GETResponse(path string) *http.Response {
+	return a.GETResponsef("%s", path)
+}
+
+func (a *App) GETResponsef(format string, s ...any) *http.Response {
 	GinkgoHelper()
 
 	url := a.urlf(format, s...)
@@ -38,7 +46,11 @@ func (a *App) GETResponse(format string, s ...any) *http.Response {
 	return response
 }
 
-func (a *App) PUT(input any, format string, s ...any) {
+func (a *App) PUT(input any, path string) {
+	a.PUTf(input, "%s", path)
+}
+
+func (a *App) PUTf(input any, format string, s ...any) {
 	GinkgoHelper()
 
 	url := a.urlf(format, s...)
@@ -53,7 +65,11 @@ func (a *App) PUT(input any, format string, s ...any) {
 	Expect(response).To(HaveHTTPStatus(http.StatusCreated, http.StatusOK))
 }
 
-func (a *App) POSTResponse(data, format string, s ...any) *http.Response {
+func (a *App) POSTResponse(data, path string) *http.Response {
+	return a.POSTResponsef(data, "%s", path)
+}
+
+func (a *App) POSTResponsef(data, format string, s ...any) *http.Response {
 	GinkgoHelper()
 
 	url := a.urlf(format, s...)
@@ -67,7 +83,11 @@ func (a *App) POSTResponse(data, format string, s ...any) *http.Response {
 	return response
 }
 
-func (a *App) POST(input any, format string, s ...any) Payload {
+func (a *App) POST(input any, path string) Payload {
+	return a.POSTf(input, "%s", path)
+}
+
+func (a *App) POSTf(input any, format string, s ...any) Payload {
 	GinkgoHelper()
 
 	url := a.urlf(format, s...)
@@ -85,7 +105,11 @@ func (a *App) POST(input any, format string, s ...any) Payload {
 	return NewPayload(response)
 }
 
-func (a *App) DELETEResponse(format string, s ...any) (*http.Response, error) {
+func (a *App) DELETEResponse(path string) (*http.Response, error) {
+	return a.DELETEResponsef("%s", path)
+}
+
+func (a *App) DELETEResponsef(format string, s ...any) (*http.Response, error) {
 	GinkgoHelper()
 
 	url := a.urlf(format, s...)
@@ -95,7 +119,11 @@ func (a *App) DELETEResponse(format string, s ...any) (*http.Response, error) {
 	return http.DefaultClient.Do(request)
 }
 
-func (a *App) DELETE(format string, s ...any) {
+func (a *App) DELETE(path string) {
+	a.DELETEf("%s", path)
+}
+
+func (a *App) DELETEf(format string, s ...any) {
 	GinkgoHelper()
 
 	url := a.urlf(format, s...)

@@ -51,7 +51,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		By("creating an entry using the writer app")
 		value := random.Hexadecimal()
-		appWriter.POST("", "?name=%s", value).ParseInto(&userIn)
+		appWriter.POSTf("", "?name=%s", value).ParseInto(&userIn)
 
 		By("binding the reader app to the reader endpoint")
 		serviceInstance.Bind(appReader, services.WithBindParameters(map[string]any{"reader_endpoint": true}))
@@ -60,7 +60,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		apps.Start(appReader)
 
 		By("getting the entry using the reader app")
-		appReader.GET("%d", userIn.ID).ParseInto(&userOut)
+		appReader.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "The first app stored [%s] as the value, the second app retrieved [%s]", value, userOut.Name)
 
 		By("verifying the DB connection utilises TLS")
@@ -70,7 +70,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		Expect(sslInfo.Cipher).NotTo(BeEmpty())
 
 		By("deleting the entry using the writer app")
-		appWriter.DELETE("%d", userIn.ID)
+		appWriter.DELETEf("%d", userIn.ID)
 
 		By("pushing and binding an app for verifying non-TLS connection attempts")
 		golangApp := apps.Push(apps.WithApp(apps.PostgreSQL))
@@ -80,12 +80,12 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		By("verifying interactions with TLS enabled")
 		schema, key, value := "newschema", "key", "value"
 		golangApp.PUT("", schema)
-		golangApp.PUT(value, "%s/%s", schema, key)
-		got := golangApp.GET("%s/%s", schema, key).String()
+		golangApp.PUTf(value, "%s/%s", schema, key)
+		got := golangApp.GETf("%s/%s", schema, key).String()
 		Expect(got).To(Equal(value))
 
 		By("verifying that non-TLS connections should fail")
-		response := golangApp.GETResponse("%s/%s?tls=disable", schema, key)
+		response := golangApp.GETResponsef("%s/%s?tls=disable", schema, key)
 		defer response.Body.Close()
 		Expect(response).To(HaveHTTPStatus(http.StatusInternalServerError), "force TLS is enabled by default")
 		b, err := io.ReadAll(response.Body)
