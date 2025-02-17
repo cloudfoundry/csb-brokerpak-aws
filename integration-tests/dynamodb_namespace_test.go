@@ -46,6 +46,10 @@ var _ = Describe("DynamoDB Namespace", Label("DynamoDB Namespace"), func() {
 					Name: Equal("default"),
 					ID:   Equal("73b55e9a-4cdd-4d6f-81bd-c34d5c27a086"),
 				}),
+				MatchFields(IgnoreExtras, Fields{
+					Name: Equal("second-plan"),
+					ID:   Equal("9dfa9514-c311-42d3-a6a2-cf3a44253690"),
+				}),
 			),
 		)
 	})
