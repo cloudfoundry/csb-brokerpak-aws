@@ -17,15 +17,15 @@ const (
 	dynamoDBNamespaceServiceSupportURL          = "https://aws.amazon.com/dynamodb/"
 	dynamoDBNamespaceServiceProviderDisplayName = "VMware"
 	dynamoDBNamespaceDefaultPlanName            = "default"
-	dynamoDBNamespaceDefaultPlanId              = "73b55e9a-4cdd-4d6f-81bd-c34d5c27a086"
+	dynamoDBNamespaceDefaultPlanID              = "73b55e9a-4cdd-4d6f-81bd-c34d5c27a086"
 	dynamoDBNamespaceSecondPlanName             = "second-plan"
-	dynamoDBNamespaceSecondPlanId               = "9dfa9514-c311-42d3-a6a2-cf3a44253690"
+	dynamoDBNamespaceSecondPlanID               = "9dfa9514-c311-42d3-a6a2-cf3a44253690"
 )
 
 var customDynamoDBNamespacePlans = []map[string]any{
 	{
 		"name":        dynamoDBNamespaceDefaultPlanName,
-		"id":          dynamoDBNamespaceDefaultPlanId,
+		"id":          dynamoDBNamespaceDefaultPlanID,
 		"description": "Default DynamoDB namespace plan",
 		"metadata": map[string]any{
 			"displayName": "default",
@@ -33,7 +33,7 @@ var customDynamoDBNamespacePlans = []map[string]any{
 	},
 	{
 		"name":        dynamoDBNamespaceSecondPlanName,
-		"id":          dynamoDBNamespaceSecondPlanId,
+		"id":          dynamoDBNamespaceSecondPlanID,
 		"description": "Second DynamoDB namespace plan",
 		"metadata": map[string]any{
 			"displayName": "second",
@@ -67,11 +67,11 @@ var _ = Describe("DynamoDB Namespace", Label("DynamoDB Namespace"), func() {
 			ConsistOf(
 				MatchFields(IgnoreExtras, Fields{
 					Name: Equal(dynamoDBNamespaceDefaultPlanName),
-					ID:   Equal(dynamoDBNamespaceDefaultPlanId),
+					ID:   Equal(dynamoDBNamespaceDefaultPlanID),
 				}),
 				MatchFields(IgnoreExtras, Fields{
 					Name: Equal(dynamoDBNamespaceSecondPlanName),
-					ID:   Equal(dynamoDBNamespaceSecondPlanId),
+					ID:   Equal(dynamoDBNamespaceSecondPlanID),
 				}),
 			),
 		)
