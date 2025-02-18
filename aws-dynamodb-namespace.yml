@@ -23,11 +23,6 @@ provider_display_name: VMware
 support_url: https://aws.amazon.com/dynamodb/
 tags: [aws, dynamodb, namespace]
 plan_updateable: true
-plans:
-- name: default
-  id: 73b55e9a-4cdd-4d6f-81bd-c34d5c27a086
-  description: "A DynamoDB Namespace"
-  display_name: "dynamodb namespace"
 provision:
   plan_inputs: []
   user_inputs: []

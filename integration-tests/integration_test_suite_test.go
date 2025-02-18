@@ -49,6 +49,7 @@ var _ = BeforeSuite(func() {
 		"GSB_SERVICE_CSB_AWS_REDIS_PLANS=" + marshall(customRedisPlans),
 		"GSB_SERVICE_CSB_AWS_MSSQL_PLANS=" + marshall(customMSSQLPlans),
 		"GSB_SERVICE_CSB_AWS_SQS_PLANS=" + marshall(customSQSPlans),
+		"GSB_SERVICE_CSB_AWS_DYNAMODB_NAMESPACE_PLANS=" + marshall(customDynamoDBNamespacePlans),
 		"AWS_ACCESS_KEY_ID=" + awsAccessKeyID,
 		"AWS_SECRET_ACCESS_KEY=" + awsSecretAccessKey,
 		"CSB_LISTENER_HOST=localhost",
