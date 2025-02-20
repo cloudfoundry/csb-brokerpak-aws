@@ -24,7 +24,7 @@ func (s *ServiceInstance) Update(opts ...Option) {
 
 	session := cf.Start(args...)
 	Eventually(session, time.Hour).Should(Exit(0), func() string {
-		out, _ := cf.Run("service", cfg.name)
+		out, _ := cf.Run("service", s.Name)
 		return out
 	})
 }
