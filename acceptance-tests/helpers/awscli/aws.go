@@ -4,6 +4,7 @@ package awscli
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"code.cloudfoundry.org/jsonry"
@@ -16,6 +17,14 @@ func AWS(args ...string) []byte {
 	session := AWSSession(args...)
 	gomega.Eventually(session).WithTimeout(time.Minute).Should(gexec.Exit(0))
 	return session.Out.Contents()
+}
+
+// AWSQuery runs the AWS command with a JMESPath query, which extracts just the information
+// that we need and results in much shorter logs when used to poll for a property value change
+func AWSQuery(query string, args ...string) string {
+	args = append(args, "--query", query)
+	output := AWS(args...)
+	return strings.Trim(strings.TrimSpace(string(output)), `"`)
 }
 
 func AWSToJSON[R any, pR *R](receiver pR, args ...string) {

@@ -234,8 +234,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		defer serviceInstance.Delete()
 
 		By("pushing an unstarted app")
-		appManifest := jdbcapp.ManifestFor(jdbcapp.SQLServer)
-		app := apps.Push(apps.WithApp(apps.JDBCTestAppSQLServer), apps.WithManifest(appManifest))
+		app := apps.Push(apps.WithApp(apps.MSSQL))
 		defer apps.Delete(app)
 
 		By("waiting for the DB to be available")
@@ -246,12 +245,20 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		binding := serviceInstance.Bind(app)
 
 		By("starting the app")
-		apps.Start(app)
+		app.Start()
+
+		By("creating a schema using the app")
+		schema := random.Name(random.WithMaxLength(10))
+		app.PUTf("", "%s?dbo=false", schema)
 
 		By("creating an entry using the app")
+		key := random.Hexadecimal()
 		value := random.Hexadecimal()
-		var userIn jdbcapp.AppResponseUser
-		app.POSTf("", "?name=%s", value).ParseInto(&userIn)
+		app.PUTf(value, "%s/%s", schema, key)
+
+		By("checking that the value can be read")
+		got1 := app.GETf("%s/%s", schema, key).String()
+		Expect(got1).To(Equal(value))
 
 		By("taking a snapshot of the DB")
 		snapshotIdentifier := random.Name(random.WithPrefix("snapshot-restore-test"))
@@ -265,24 +272,34 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		By("deleting the DB")
 		awscli.AWS("rds", "delete-db-instance", "--db-instance-identifier", dbInstanceIdentifier, "--skip-final-snapshot")
 		Eventually(func() *gbytes.Buffer {
-			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier)
+			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier, "--query", "DBInstances[0].DBInstanceStatus")
 			session.Wait(5 * time.Minute) // Should be quick, but it's occasionally slow, and we don't want to bail out when that happens
 			return session.Err
 		}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
+
+		By("waiting a bit to avoid a 'DBInstanceAlreadyExists' error if we restore too soon")
+		time.Sleep(time.Minute)
 
 		// At the time of writing, there's no flag in the AWS CLI (or in the console) to enable AWS secrets manager when
 		// restoring from a snapshot. Ideally we could restore with the "--manage-master-user-password" and there would
 		// be no need to mess around with the settings after the restore, but that flag hasn't been added yet.
 		By("restoring the DB from the snapshot")
-		awscli.AWS(
+		args := []string{
 			"rds", "restore-db-instance-from-db-snapshot",
 			"--db-snapshot-identifier", snapshotIdentifier,
 			"--db-instance-identifier", dbInstanceIdentifier,
 			"--db-instance-class", "db.r5.large",
-		)
+			"--db-subnet-group-name", dbSubnetGroupName(metadata.VPC),
+			"--vpc-security-group-ids",
+		}
+		awscli.AWS(append(args, vpcSecurityGroupIDs(metadata.VPC)...)...)
 
 		By("waiting for the DB to be available")
 		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("checking that existing bindings still work")
+		got2 := app.GETf("%s/%s", schema, key).String()
+		Expect(got2).To(Equal(value))
 
 		By("disabling 'use_managed_admin_password' to match the restored snapshot")
 		serviceInstance.Update(services.WithParameters(`{"use_managed_admin_password": false}`))
@@ -305,18 +322,57 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
 
 		By("checking that bindings created before the restore still work")
-		var userOut1 jdbcapp.AppResponseUser
-		app.GETf("%d", userIn.ID).ParseInto(&userOut1)
-		Expect(userOut1.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut1.Name)
+		got3 := app.GETf("%s/%s", schema, key).String()
+		Expect(got3).To(Equal(value))
 
 		By("rebinding app")
 		binding.Unbind()
 		serviceInstance.Bind(app)
 		app.Restage()
 
-		By("checking that new bindings can be created")
-		var userOut2 jdbcapp.AppResponseUser
-		app.GETf("%d", userIn.ID).ParseInto(&userOut2)
-		Expect(userOut2.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut2.Name)
+		By("checking that new binding works")
+		got4 := app.GETf("%s/%s", schema, key).String()
+		Expect(got4).To(Equal(value))
 	})
 })
+
+func vpcSecurityGroupIDs(vpcID string) []string {
+	var receiver struct {
+		SecurityGroups []struct {
+			GroupName string `json:"GroupName"`
+			GroupID   string `json:"GroupId"`
+		} `json:"SecurityGroupForVpcs"`
+	}
+
+	awscli.AWSToJSON(&receiver, "ec2", "get-security-groups-for-vpc", "--vpc-id", vpcID)
+
+	var ids []string
+	for _, sg := range receiver.SecurityGroups {
+		if sg.GroupName != "default" {
+			ids = append(ids, sg.GroupID)
+		}
+	}
+
+	Expect(ids).NotTo(BeEmpty())
+	return ids
+}
+
+func dbSubnetGroupName(vpcID string) string {
+	var receiver struct {
+		SubnetGroups []struct {
+			VPCID string `json:"VpcId"`
+			Name  string `json:"DBSubnetGroupName"`
+		} `json:"DBSubnetGroups"`
+	}
+
+	awscli.AWSToJSON(&receiver, "rds", "describe-db-subnet-groups")
+
+	for _, sg := range receiver.SubnetGroups {
+		if sg.VPCID == vpcID {
+			return sg.Name
+		}
+	}
+
+	Fail("no DB subnet group found for vpc " + vpcID)
+	return "" // unreachable
+}
