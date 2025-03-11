@@ -199,7 +199,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		By("deleting the DB")
 		awscli.AWS("rds", "delete-db-instance", "--db-instance-identifier", dbInstanceIdentifier, "--skip-final-snapshot")
 		Eventually(func() *gbytes.Buffer {
-			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier)
+			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier, "--query", "DBInstances[0].DBInstanceStatus")
 			session.Wait(5 * time.Minute) // Should be quick, but it's occasionally slow, and we don't want to bail out when that happens
 			return session.Err
 		}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
@@ -257,12 +257,8 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 
 func dbSnapshotStatus(id string) func() string {
 	return func() string {
-		var receiver struct {
-			Status []string `jsonry:"DBSnapshots.Status"`
-		}
-		awscli.AWSToJSON(&receiver, "rds", "describe-db-snapshots", "--db-snapshot-identifier", id)
-		Expect(receiver.Status).To(HaveLen(1))
-		Expect(receiver.Status[0]).To(SatisfyAny(Equal("available"), Equal("creating")))
-		return receiver.Status[0]
+		status := awscli.AWSQuery("DBSnapshots[0].Status", "rds", "describe-db-snapshots", "--db-snapshot-identifier", id)
+		Expect(status).To(SatisfyAny(Equal("available"), Equal("creating")))
+		return status
 	}
 }

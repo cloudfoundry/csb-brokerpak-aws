@@ -157,7 +157,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		By("deleting the DB")
 		awscli.AWS("rds", "delete-db-instance", "--db-instance-identifier", dbInstanceIdentifier, "--skip-final-snapshot")
 		Eventually(func() *gbytes.Buffer {
-			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier)
+			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier, "--query", "DBInstances[0].DBInstanceStatus")
 			session.Wait(5 * time.Minute) // Should be quick, but it's occasionally slow, and we don't want to bail out when that happens
 			return session.Err
 		}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
@@ -258,11 +258,6 @@ func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
 
 func dbInstanceStatus(instanceName string) func() string {
 	return func() string {
-		var receiver struct {
-			Status []string `jsonry:"DBInstances.DBInstanceStatus"`
-		}
-		awscli.AWSToJSON(&receiver, "rds", "describe-db-instances", "--db-instance-identifier", instanceName)
-		Expect(receiver.Status).To(HaveLen(1))
-		return receiver.Status[0]
+		return awscli.AWSQuery("DBInstances[0].DBInstanceStatus", "rds", "describe-db-instances", "--db-instance-identifier", instanceName)
 	}
 }
