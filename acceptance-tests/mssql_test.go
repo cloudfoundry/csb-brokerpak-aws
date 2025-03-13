@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -348,7 +349,7 @@ func vpcSecurityGroupIDs(vpcID string) []string {
 
 	var ids []string
 	for _, sg := range receiver.SecurityGroups {
-		if sg.GroupName != "default" {
+		if strings.HasPrefix(sg.GroupName, "csb-mssql-") {
 			ids = append(ids, sg.GroupID)
 		}
 	}
