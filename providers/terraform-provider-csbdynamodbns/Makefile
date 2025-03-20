@@ -1,8 +1,4 @@
 .DEFAULT_GOAL = help
-
-  GO = go
-  GOFMT = gofmt
-
 VERSION = 1.0.0
 
 SRC = $(shell find . -name "*.go" | grep -v "_test\." )
@@ -20,9 +16,9 @@ build: download checkfmt checkimports vet ../build/cloudfoundry.org ## build the
 ../build/cloudfoundry.org: *.go */*.go
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64
 	mkdir -p ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
-	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 $(GO) build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_arm64/terraform-provider-csbdynamodbns_v$(VERSION)
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/linux_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_amd64/terraform-provider-csbdynamodbns_v$(VERSION)
+	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o ../build/cloudfoundry.org/cloud-service-broker/csbdynamodbns/$(VERSION)/darwin_arm64/terraform-provider-csbdynamodbns_v$(VERSION)
 
 .PHONY: clean
 clean: ## clean up build artifacts
@@ -32,31 +28,31 @@ clean: ## clean up build artifacts
 	- rm -rf /tmp/tpdynamodbns-coverage.out
 
 download: ## download dependencies
-	$(GO) mod download
+	go mod download
 
 vet: ## run static code analysis
-	$(GO) vet ./...
-	$(GO) run honnef.co/go/tools/cmd/staticcheck ./...
+	go vet ./...
+	go tool staticcheck ./...
 
 checkfmt: ## check that the code is formatted correctly
-	@@if [ -n "$$(${GOFMT} -s -e -l -d .)" ]; then \
+	@@if [ -n "$$(gofmt -s -e -l -d .)" ]; then \
 		echo "gofmt check failed: run 'make fmt'"; \
 		exit 1; \
 	fi
 
 checkimports: ## check that imports are formatted correctly
-	@@if [ -n "$$(${GO} run golang.org/x/tools/cmd/goimports -l -d .)" ]; then \
+	@@if [ -n "$$(go tool goimports -l -d .)" ]; then \
 		echo "goimports check failed: run 'make fmt'";  \
 		exit 1; \
 	fi
 
 fmt: ## format the code
-	$(GOFMT) -s -e -l -w .
-	$(GO) run golang.org/x/tools/cmd/goimports -l -w .
+	gofmt -s -e -l -w .
+	go tool goimports -l -w .
 
 .PHONY: ginkgo
 ginkgo: generate ## run the tests with Ginkgo
-	$(GO) run github.com/onsi/ginkgo/v2/ginkgo -r
+	go tool ginkgo -r
 
 .PHONY: ginkgo-coverage
 ginkgo-coverage: ## ginkgo tests coverage score
@@ -67,5 +63,5 @@ ginkgo-coverage: ## ginkgo tests coverage score
 
 .PHONY: generate
 generate: ## generate test fakes
-	cd csbdynamodbns; $(GO) generate; cd ..
+	cd csbdynamodbns; go generate; cd ..
 
