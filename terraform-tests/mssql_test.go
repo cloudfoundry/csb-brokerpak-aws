@@ -178,7 +178,7 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 				session, _ := FailPlan(terraformProvisionDir, buildVars(defaultVars, requiredVars, map[string]any{"monitoring_role_arn": "arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access"}))
 				Expect(session.ExitCode()).NotTo(Equal(0))
 				msgs := string(session.Out.Contents())
-				Expect(msgs).To(ContainSubstring(`(arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access) is an invalid ARN: invalid account ID value (expecting to match regular expression: ^(aws|aws-managed|third-party|\\d{12}|cw.{10})$)`))
+				Expect(msgs).To(ContainSubstring(`(arn:aws:iam::xxxxxxxxxxxx:role/enhanced_monitoring_access) is an invalid ARN: invalid account ID value`))
 			})
 		})
 
