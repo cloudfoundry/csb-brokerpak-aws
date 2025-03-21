@@ -15,7 +15,7 @@ const (
 	AwsSecretAccessKeyKey = "secret_access_key"
 )
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+//go:generate go tool counterfeiter -generate
 
 //counterfeiter:generate -header csbdynamodbnsfakes/header.txt . DynamoDBClient
 type DynamoDBClient interface {
