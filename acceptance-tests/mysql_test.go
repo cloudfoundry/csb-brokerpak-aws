@@ -204,6 +204,9 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 			return session.Err
 		}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
 
+		By("waiting a bit to avoid a 'DBInstanceAlreadyExists' error if we restore too soon")
+		time.Sleep(time.Minute)
+
 		// At the time of writing, there's no flag in the AWS CLI (or in the console) to enable AWS secrets manager when
 		// restoring from a snapshot. Ideally we could restore with the "--manage-master-user-password" and there would
 		// be no need to mess around with the settings after the restore, but that flag hasn't been added yet.
