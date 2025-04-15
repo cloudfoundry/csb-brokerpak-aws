@@ -19,6 +19,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		testWithMultipleApps("13")
 	})
 
+	It("works with the latest supported version of Postgres", Label("JDBC-p", "PostgresLatestAGC"), func() {
+		testWithMultipleApps("16")
+	})
+
 	It("works with the latest supported version of Postgres", Label("JDBC-p", "PostgresLatest"), func() {
 		testWithMultipleApps("17")
 	})
