@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.211.3
 	github.com/aws/aws-sdk-go-v2/service/rds v1.94.4
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cloudfoundry/cloud-service-broker/v2 v2.5.8
+	github.com/cloudfoundry/cloud-service-broker/v2 v2.5.9
 	github.com/hashicorp/terraform-json v0.24.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.23.4
@@ -30,9 +30,9 @@ require (
 	cloud.google.com/go/iam v1.4.0 // indirect
 	cloud.google.com/go/monitoring v1.24.0 // indirect
 	cloud.google.com/go/storage v1.50.0 // indirect
-	code.cloudfoundry.org/brokerapi/v13 v13.0.2 // indirect
+	code.cloudfoundry.org/brokerapi/v13 v13.0.3 // indirect
 	code.cloudfoundry.org/credhub-cli v0.0.0-20250310131029-ea50fd1cfd0a // indirect
-	code.cloudfoundry.org/lager/v3 v3.32.0 // indirect
+	code.cloudfoundry.org/lager/v3 v3.34.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.4.1-0.20240526193622-a339e1f7089c // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.26.0 // indirect
@@ -63,7 +63,7 @@ require (
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-sql-driver/mysql v1.9.1 // indirect
+	github.com/go-sql-driver/mysql v1.9.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -125,16 +125,16 @@ require (
 	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/oauth2 v0.26.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/time v0.10.0 // indirect
-	golang.org/x/tools v0.31.0 // indirect
+	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/api v0.222.0 // indirect
 	google.golang.org/genproto v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250219182151-9fdb1cabc7b2 // indirect
