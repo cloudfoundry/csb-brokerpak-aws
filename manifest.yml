@@ -26,8 +26,8 @@ terraform_binaries:
   version: 5.95.0
   source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.95.0.zip
 - name: terraform-provider-random
-  version: 3.7.1
-  source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.7.1.zip
+  version: 3.7.2
+  source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.7.2.zip
 - name: terraform-provider-csbpg
   version: 1.2.54
   source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.54.zip
