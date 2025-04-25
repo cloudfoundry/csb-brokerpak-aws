@@ -9,7 +9,7 @@ The service broker is deployed to CloudFoundry as a `cf push`ed application.
 
 ## Cloud Service Broker General
 * Consuming Services are documented in Cloud Service Broker for VMware Tanzu for AWS official 
-[docs](https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html).
+[docs](https://techdocs.broadcom.com/tnz-aws-broker-cf).
 
 ## Brokerpak Specifications
 * [Brokerpak Intro](https://github.com/cloudfoundry/cloud-service-broker/tree/main/docs/brokerpak-intro.md)

@@ -24,7 +24,7 @@ const (
 	Name               = "Name"
 	ID                 = "ID"
 	fakeRegion         = "fake-region"
-	documentationURL   = "https://docs.vmware.com/en/Cloud-Service-Broker-for-VMware-Tanzu/index.html"
+	documentationURL   = "https://techdocs.broadcom.com/tnz-aws-broker-cf"
 )
 
 var (
