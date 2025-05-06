@@ -278,6 +278,10 @@ provision:
     details: Specifies if the instance is a legacy migrated one. This property should only be used when migrating data.
     default: false
     prohibit_update: true
+  - field_name: delete_automated_backups
+    type: boolean
+    details: Specifies whether to remove automated backups immediately after the DB cluster is deleted.
+    default: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}

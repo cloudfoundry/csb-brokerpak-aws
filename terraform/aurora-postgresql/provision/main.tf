@@ -55,6 +55,7 @@ resource "aws_rds_cluster" "cluster" {
   kms_key_id                      = var.kms_key_id
   preferred_maintenance_window    = local.preferred_maintenance_window
   apply_immediately               = true
+  delete_automated_backups        = var.delete_automated_backups
 
   dynamic "serverlessv2_scaling_configuration" {
     for_each = local.serverless ? [null] : []
