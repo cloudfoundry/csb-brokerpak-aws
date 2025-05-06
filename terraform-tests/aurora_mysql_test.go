@@ -58,6 +58,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			"preferred_maintenance_day":              nil,
 			"admin_username":                         "",
 			"legacy_instance":                        false,
+			"delete_automated_backups":               true,
 		}
 	})
 
@@ -119,6 +120,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"enabled_cloudwatch_logs_exports":    BeNil(),
 				"storage_encrypted":                  BeTrue(),
 				"apply_immediately":                  BeTrue(),
+				"delete_automated_backups":           BeTrue(),
 			}))
 		})
 	})
@@ -244,6 +246,21 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				}))
 
 			Expect(ResourceCreationForType(plan, "rds_subnet_group")).To(BeEmpty())
+		})
+	})
+
+	When("delete_automated_backups is disabled", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"delete_automated_backups": false,
+			}))
+		})
+
+		It("should disabled deleting automated backups", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"delete_automated_backups": BeFalse(),
+				}))
 		})
 	})
 

@@ -43,3 +43,4 @@ variable "preferred_maintenance_end_hour" { type = string }
 variable "preferred_maintenance_end_min" { type = string }
 variable "admin_username" { type = string }
 variable "legacy_instance" { type = bool }
+variable "delete_automated_backups" { type = bool }

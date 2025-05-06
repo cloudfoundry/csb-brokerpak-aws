@@ -54,6 +54,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			"preferred_maintenance_end_min":         nil,
 			"preferred_maintenance_start_min":       nil,
 			"preferred_maintenance_day":             nil,
+			"delete_automated_backups":              true,
 		}
 	})
 
@@ -150,6 +151,21 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"db_subnet_group_name": Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
 			}))
+		})
+	})
+
+	When("delete_automated_backups is disabled", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{
+				"delete_automated_backups": false,
+			}))
+		})
+
+		It("should disabled deleting automated backups", func() {
+			Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+				MatchKeys(IgnoreExtras, Keys{
+					"delete_automated_backups": BeFalse(),
+				}))
 		})
 	})
 

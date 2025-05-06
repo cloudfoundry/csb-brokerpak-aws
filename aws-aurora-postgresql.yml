@@ -255,6 +255,10 @@ provision:
     field_name: preferred_maintenance_end_min
     details: The preferred maintenance end minute
     enum: *minute_enum
+  - field_name: delete_automated_backups
+    type: boolean
+    details: Specifies whether to remove automated backups immediately after the DB cluster is deleted.
+    default: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
