@@ -155,6 +155,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				HaveKeyWithValue("preferred_maintenance_start_min", BeNil()),
 				HaveKeyWithValue("preferred_maintenance_end_hour", BeNil()),
 				HaveKeyWithValue("preferred_maintenance_end_min", BeNil()),
+				HaveKeyWithValue("delete_automated_backups", BeTrue()),
 			))
 		})
 
@@ -187,6 +188,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 				"preferred_maintenance_start_min":       "45",
 				"preferred_maintenance_end_hour":        "10",
 				"preferred_maintenance_end_min":         "15",
+				"delete_automated_backups":              false,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -219,6 +221,7 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 					HaveKeyWithValue("preferred_maintenance_start_min", "45"),
 					HaveKeyWithValue("preferred_maintenance_end_hour", "10"),
 					HaveKeyWithValue("preferred_maintenance_end_min", "15"),
+					HaveKeyWithValue("delete_automated_backups", false),
 				),
 			)
 		})
