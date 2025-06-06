@@ -18,13 +18,13 @@ dependencies:
       source: https://github.com/terraform-providers/terraform-provider-aws/archive/v5.99.1.zip
       source_sha256: ecc3144b1eaf71789c117298892a9a1257888eec924dc6e0cc1d29ab11d5f232
     - name: terraform-provider-csbmysql
-      version: 1.3.2
-      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.3.2.zip
-      source_sha256: 644d0774941313911828c21307dfe3d4279338e29f3b5084ee9036c8e9a02bde
+      version: 1.3.3
+      source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.3.3.zip
+      source_sha256: c7d76c93daa8964a24c3e08ba0eb3ff662d3ab79eda1adc73da99c9be57cb574
     - name: terraform-provider-csbpg
-      version: 1.2.56
-      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.56.zip
-      source_sha256: 560f681578a7be8b12599009b09c36eb4e24047a8ac4436999adf9c4ca892b02
+      version: 1.2.57
+      source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.57.zip
+      source_sha256: d293c89d0a3bd9894c006478a6f653e235930baffdf241ba2a8eacb7810ad861
     - name: terraform-provider-csbsqlserver
       version: 1.0.49
       source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.49.zip
