@@ -26,14 +26,14 @@ dependencies:
       source: https://github.com/cloudfoundry/terraform-provider-csbpg/archive/v1.2.58.zip
       source_sha256: dfca3bad25038903b086016780b875634953236fce5cc3001e03ead0aa441dfe
     - name: terraform-provider-csbsqlserver
-      version: 1.0.51
-      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.51.zip
-      source_sha256: 60a835307b80c2f2724ebfe09d255033f2ee098852817c5381eaa48f952ca44d
+      version: 1.0.52
+      source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.52.zip
+      source_sha256: 80af43260cbc1f54655da896720044027d8ad76a101d1ea99f2d517f18fd1994
     - name: terraform-provider-random
       version: 3.7.2
       source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.7.2.zip
       source_sha256: b365d10350d75cdb9801d0f338f5adce1df3a7c455b90c07121e05b7e67e83a8
     - name: tofu
-      version: 1.10.1
-      source: https://github.com/opentofu/opentofu/archive/v1.10.1.zip
-      source_sha256: 2afda3795684d9be66140c1c3f436307337a0086139ba0a32dfa7af356d153b8
+      version: 1.10.2
+      source: https://github.com/opentofu/opentofu/archive/v1.10.2.zip
+      source_sha256: 30a2d2ce2600c18b18aed4dff69d97ea3ae9ebdcbf4e90acb3a1ee1e079dd5ad
