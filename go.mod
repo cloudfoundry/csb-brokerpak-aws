@@ -5,11 +5,11 @@ go 1.24.5
 require (
 	code.cloudfoundry.org/jsonry v1.1.4
 	github.com/Pallinder/go-randomdata v1.2.0
-	github.com/aws/aws-sdk-go-v2 v1.37.0
-	github.com/aws/aws-sdk-go-v2/config v1.30.1
-	github.com/aws/aws-sdk-go-v2/credentials v1.18.1
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.237.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.100.0
+	github.com/aws/aws-sdk-go-v2 v1.37.1
+	github.com/aws/aws-sdk-go-v2/config v1.30.2
+	github.com/aws/aws-sdk-go-v2/credentials v1.18.2
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.239.0
+	github.com/aws/aws-sdk-go-v2/service/rds v1.100.1
 	github.com/blang/semver/v4 v4.0.0
 	github.com/cloudfoundry/cloud-service-broker/v2 v2.5.17
 	github.com/hashicorp/terraform-json v0.25.0
@@ -40,15 +40,15 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.55.6 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.26.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.31.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.35.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.26.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.31.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.35.1 // indirect
 	github.com/aws/smithy-go v1.22.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
