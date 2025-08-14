@@ -102,6 +102,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"auto_minor_version_upgrade":  Equal("false"), // yes, a string. Provider quirk.
 					"parameter_group_name":        Equal("fake-param-group-name"),
 					"preferred_cache_cluster_azs": BeNil(),
+					"region":                      Equal(awsRegion),
 
 					// By specifying these (apparently less useful) keys in the test we'll
 					// get very valuable feedback when bumping the provider (test may break).
