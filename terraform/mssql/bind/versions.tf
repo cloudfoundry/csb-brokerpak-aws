@@ -11,7 +11,7 @@ terraform {
     }
     aws = {
       source  = "registry.terraform.io/hashicorp/aws"
-      version = ">= 5.0"
+      version = ">= 6"
     }
   }
 }
