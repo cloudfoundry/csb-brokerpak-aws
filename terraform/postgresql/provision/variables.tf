@@ -24,6 +24,7 @@ variable "region" { type = string }
 variable "cores" { type = number }
 variable "instance_name" { type = string }
 variable "db_name" { type = string }
+variable "port" { type = number }
 variable "labels" { type = map(any) }
 variable "storage_gb" { type = number }
 variable "storage_type" { type = string }

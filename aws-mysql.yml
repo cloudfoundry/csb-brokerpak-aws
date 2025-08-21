@@ -121,6 +121,13 @@ provision:
     type: boolean
     details: Make instance public if true
     default: false
+  - field_name: port
+    type: integer
+    default: 3306
+    constraints:
+      minimum: 1
+      maximum: 65535
+    details: The port number of the database instance.
   - field_name: region
     type: string
     details: The region of AWS.
@@ -364,6 +371,9 @@ provision:
   - field_name: managed_admin_credentials_arn
     type: string
     details: The ARN of the master secret to authenticate to the database instance.
+  - field_name: port
+    type: integer
+    details: The port number of the exposed database instance.
 bind:
   plan_inputs: []
   user_inputs:
@@ -396,9 +406,13 @@ bind:
     default: ${instance.details["region"]}
     overwrite: true
     type: string
+  - name: port
+    type: integer
+    default: ${instance.details["port"]}
+    overwrite: true
   - name: use_managed_admin_password
-    type: boolean
     default: ${instance.details["use_managed_admin_password"]}
+    type: boolean
     overwrite: true
   - name: managed_admin_credentials_arn
     type: string

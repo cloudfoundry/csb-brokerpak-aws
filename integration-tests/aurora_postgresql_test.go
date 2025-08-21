@@ -117,6 +117,21 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				map[string]any{"performance_insights_retention_period": 1},
 				"performance_insights_retention_period: Must be greater than or equal to 7",
 			),
+			Entry(
+				"port too low",
+				map[string]any{"port": 0},
+				"port: Must be greater than or equal to 1",
+			),
+			Entry(
+				"port too high",
+				map[string]any{"port": 65536},
+				"port: Must be less than or equal to 65535",
+			),
+			Entry(
+				"port not integer",
+				map[string]any{"port": 3.14},
+				"port: Invalid type. Expected: integer, given: number",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -157,6 +172,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("preferred_maintenance_end_hour", BeNil()),
 					HaveKeyWithValue("preferred_maintenance_end_min", BeNil()),
 					HaveKeyWithValue("delete_automated_backups", BeTrue()),
+					HaveKeyWithValue("port", BeNumerically("==", 5432)),
 				))
 		})
 
@@ -188,6 +204,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 				"preferred_maintenance_end_hour":        "10",
 				"preferred_maintenance_end_min":         "15",
 				"delete_automated_backups":              false,
+				"port":                                  1234,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -219,6 +236,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 					HaveKeyWithValue("preferred_maintenance_end_hour", "10"),
 					HaveKeyWithValue("preferred_maintenance_end_min", "15"),
 					HaveKeyWithValue("delete_automated_backups", false),
+					HaveKeyWithValue("port", BeNumerically("==", 1234)),
 				),
 			)
 		})
@@ -278,6 +296,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
 			Entry("update instance_class", "instance_class", "db.r5.large"),
+			Entry("port", "port", 2345),
 		)
 	})
 })

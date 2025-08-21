@@ -115,6 +115,21 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				map[string]any{"performance_insights_retention_period": 1},
 				"performance_insights_retention_period: Must be greater than or equal to 7",
 			),
+			Entry(
+				"port too low",
+				map[string]any{"port": 0},
+				"port: Must be greater than or equal to 1",
+			),
+			Entry(
+				"port too high",
+				map[string]any{"port": 65536},
+				"port: Must be less than or equal to 65535",
+			),
+			Entry(
+				"port not integer",
+				map[string]any{"port": 3.14},
+				"port: Invalid type. Expected: integer, given: number",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -167,6 +182,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("cloudwatch_log_group_retention_in_days", float64(30)),
 					HaveKeyWithValue("use_managed_admin_password", false),
 					HaveKeyWithValue("rotate_admin_password_after", float64(7)),
+					HaveKeyWithValue("port", BeNumerically("==", 3306)),
 				),
 			)
 		})
@@ -210,6 +226,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 				"cloudwatch_log_group_retention_in_days": 33,
 				"use_managed_admin_password":             true,
 				"rotate_admin_password_after":            365,
+				"port":                                   1234,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -256,6 +273,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 					HaveKeyWithValue("cloudwatch_log_group_retention_in_days", float64(33)),
 					HaveKeyWithValue("use_managed_admin_password", true),
 					HaveKeyWithValue("rotate_admin_password_after", float64(365)),
+					HaveKeyWithValue("port", BeNumerically("==", 1234)),
 				),
 			)
 		})
@@ -311,9 +329,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 
 		DescribeTable("should allow updating properties",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, mySQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
-
-				Expect(err).NotTo(HaveOccurred())
+				Expect(broker.Update(instanceID, mySQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})).To(Succeed())
 			},
 			Entry("update storage_type", "storage_type", "gp2"),
 			Entry("update iops", "iops", 1500),
@@ -330,6 +346,7 @@ var _ = Describe("MySQL", Label("MySQL"), func() {
 			Entry("update performance_insights_enabled", "performance_insights_enabled", true),
 			Entry("update performance_insights_kms_key_id", "performance_insights_kms_key_id", "arn:aws:kms:us-west-2:649758297924:key/ebbb4ecc-ddfb-4e2f-8e93-c96d7bc43daa"),
 			Entry("update performance_insights_retention_period", "performance_insights_retention_period", 31),
+			Entry("port", "port", 2345),
 		)
 	})
 })

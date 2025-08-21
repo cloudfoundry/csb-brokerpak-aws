@@ -120,6 +120,21 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				map[string]any{"cloudwatch_upgrade_log_group_retention_in_days": 3654},
 				"cloudwatch_upgrade_log_group_retention_in_days: Must be less than or equal to 3653",
 			),
+			Entry(
+				"port too low",
+				map[string]any{"port": 0},
+				"port: Must be greater than or equal to 1",
+			),
+			Entry(
+				"port too high",
+				map[string]any{"port": 65536},
+				"port: Must be less than or equal to 65535",
+			),
+			Entry(
+				"port not integer",
+				map[string]any{"port": 3.14},
+				"port: Invalid type. Expected: integer, given: number",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -172,6 +187,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("enable_export_upgrade_logs", false),
 					HaveKeyWithValue("cloudwatch_upgrade_log_group_retention_in_days", BeNumerically("==", 30)),
 					HaveKeyWithValue("cloudwatch_log_groups_kms_key_id", ""),
+					HaveKeyWithValue("port", BeNumerically("==", 5432)),
 				),
 			)
 		})
@@ -217,6 +233,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 				"admin_username":                                    "some-other-username",
 				"use_managed_admin_password":                        true,
 				"rotate_admin_password_after":                       365,
+				"port":                                              1234,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -261,6 +278,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 					HaveKeyWithValue("admin_username", "some-other-username"),
 					HaveKeyWithValue("use_managed_admin_password", true),
 					HaveKeyWithValue("rotate_admin_password_after", float64(365)),
+					HaveKeyWithValue("port", BeNumerically("==", 1234)),
 				),
 			)
 		})
@@ -318,9 +336,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 		DescribeTable(
 			"some allowed updates",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, postgreSQLServiceName, "custom-sample", map[string]any{prop: value})
-
-				Expect(err).NotTo(HaveOccurred())
+				Expect(broker.Update(instanceID, postgreSQLServiceName, "custom-sample", map[string]any{prop: value})).To(Succeed())
 			},
 			Entry(nil, "require_ssl", true),
 			Entry(nil, "storage_type", "gp2"),
@@ -342,6 +358,7 @@ var _ = Describe("Postgresql", Label("Postgresql"), func() {
 			Entry(nil, "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
 			Entry(nil, "use_managed_admin_password", true),
 			Entry(nil, "rotate_admin_password_after", 365),
+			Entry("port", "port", 2345),
 		)
 	})
 })

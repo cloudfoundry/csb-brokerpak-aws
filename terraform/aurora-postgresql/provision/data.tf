@@ -12,7 +12,6 @@ data "aws_subnets" "all" {
 
 locals {
   engine        = "aurora-postgresql"
-  port          = 5432
   serverless    = var.serverless_max_capacity != null || var.serverless_min_capacity != null
   major_version = split(".", var.engine_version)[0]
 
