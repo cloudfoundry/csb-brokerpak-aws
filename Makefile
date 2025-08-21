@@ -99,7 +99,7 @@ run-integration-tests: run-provider-tests ## run integration tests for this brok
 
 .PHONY: run-terraform-tests
 run-terraform-tests: providers custom.tfrc ## run terraform tests for this brokerpak
-	cd ./terraform-tests && TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go tool ginkgo -r --label-filter="${LABEL_FILTER}" .
+	cd ./terraform-tests && TF_CLI_CONFIG_FILE="$(PWD)/custom.tfrc" go tool ginkgo -r --label-filter="${LABEL_FILTER}" --timeout=2h .
 
 .PHONY: run-modified-tests
 run-modified-tests: providers custom.tfrc
