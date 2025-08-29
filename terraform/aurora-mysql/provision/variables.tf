@@ -10,6 +10,7 @@ variable "aws_secret_access_key" {
 variable "region" { type = string }
 variable "instance_name" { type = string }
 variable "db_name" { type = string }
+variable "port" { type = number }
 variable "labels" { type = map(any) }
 variable "cluster_instances" { type = number }
 variable "aws_vpc_id" { type = string }
