@@ -5,13 +5,13 @@ output "password" {
   sensitive = true
 }
 
-output "port" { value = local.port }
+output "port" { value = var.port }
 
 output "jdbcUrl" {
   value = format(
     "jdbc:sqlserver://%s:%d;database=%s;user=%s;password=%s;loginTimeout=30;%s",
     var.hostname,
-    local.port,
+    var.port,
     var.db_name,
     random_string.username.result,
     random_password.password.result,
@@ -24,7 +24,7 @@ output "uri" {
   value = format(
     "mssql://%s:%d/%s?%s",
     var.hostname,
-    local.port,
+    var.port,
     var.db_name,
     local.uri_tls_string
   )
