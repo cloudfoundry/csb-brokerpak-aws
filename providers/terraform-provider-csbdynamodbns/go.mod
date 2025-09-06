@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.50.1
 	github.com/aws/smithy-go v1.23.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.37.0
-	github.com/onsi/ginkgo/v2 v2.25.2
+	github.com/onsi/ginkgo/v2 v2.25.3
 	github.com/onsi/gomega v1.38.2
 	github.com/pborman/uuid v1.2.1
 )
