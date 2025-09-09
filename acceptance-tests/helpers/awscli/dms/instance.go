@@ -4,6 +4,7 @@ import (
 	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/onsi/ginkgo/v2"
@@ -90,10 +91,5 @@ func replicationInstanceExists(arn, region string) bool {
 	}
 	awscli.AWSToJSON(&receiver, "dms", "describe-replication-instances", "--region", region)
 
-	for _, a := range receiver.ARNs {
-		if a == arn {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(receiver.ARNs, arn)
 }
