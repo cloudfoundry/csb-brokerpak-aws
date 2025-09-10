@@ -16,11 +16,15 @@ import (
 )
 
 var _ = Describe("Resource dynamodbns_instance", func() {
-	var session *gexec.Session
-	var port int
-	var localDynamoDBURL string
-	var client *dynamodb.Client
-	var prefix string
+	const dockerPullTimeout = 10 * time.Minute
+
+	var (
+		session          *gexec.Session
+		port             int
+		localDynamoDBURL string
+		client           *dynamodb.Client
+		prefix           string
+	)
 
 	BeforeEach(func() {
 		var err error
@@ -32,7 +36,7 @@ var _ = Describe("Resource dynamodbns_instance", func() {
 		pullCMD := exec.Command("docker", "pull", "amazon/dynamodb-local")
 		sessionDockerPull, err := gexec.Start(pullCMD, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
-		Eventually(sessionDockerPull).WithTimeout(time.Minute).WithPolling(time.Second).Should(gexec.Exit(0))
+		Eventually(sessionDockerPull).WithTimeout(dockerPullTimeout).WithPolling(time.Second).Should(gexec.Exit(0))
 
 		cmd := exec.Command("docker", "run",
 			"-p", fmt.Sprintf("%d:8000", port),
