@@ -23,17 +23,17 @@ output "uri" {
     csbmysql_binding_user.new_user.username,
     csbmysql_binding_user.new_user.password,
     var.hostname,
-    local.port,
+    var.port,
     var.db_name,
   )
   sensitive = true
 }
-output "port" { value = local.port }
+output "port" { value = var.port }
 output "jdbcUrl" {
   value = format(
     "jdbc:mysql://%s:%d/%s?user=%s\u0026password=%s\u0026useSsl=true",
     var.hostname,
-    local.port,
+    var.port,
     var.db_name,
     csbmysql_binding_user.new_user.username,
     csbmysql_binding_user.new_user.password,
