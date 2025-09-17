@@ -14,8 +14,8 @@ resource "aws_security_group_rule" "rds_inbound_access" {
   count             = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
   protocol          = "tcp"
   security_group_id = aws_security_group.rds_sg[0].id
-  from_port         = local.port
-  to_port           = local.port
+  from_port         = var.port
+  to_port           = var.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
@@ -42,7 +42,7 @@ resource "aws_rds_cluster" "cluster" {
   tags                            = var.labels
   master_username                 = length(var.admin_username) == 0 ? random_string.username[0].result : var.admin_username
   master_password                 = random_password.password.result
-  port                            = local.port
+  port                            = var.port
   db_subnet_group_name            = local.subnet_group
   vpc_security_group_ids          = local.rds_vpc_security_group_ids
   skip_final_snapshot             = true
