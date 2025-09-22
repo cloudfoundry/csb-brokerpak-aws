@@ -14,9 +14,9 @@
 
 dependencies:
     - name: terraform-provider-aws
-      version: 6.14.0
-      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v6.14.0.zip
-      source_sha256: 1d90a3f964165ca27e60682f27dbb8d6ba4ebfc291fd63e1b7e48fcad3ff453b
+      version: 6.14.1
+      source: https://github.com/terraform-providers/terraform-provider-aws/archive/v6.14.1.zip
+      source_sha256: eb5ddb554a0147de10f174c099cc01b67e47b676a6e55fce5ac67c439fa1093f
     - name: terraform-provider-csbmysql
       version: 1.3.9
       source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.3.9.zip
