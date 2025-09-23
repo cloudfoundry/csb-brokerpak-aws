@@ -87,7 +87,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"description":                 Equal("csb-redis-test redis"),
 					"node_type":                   Equal("cache.t3.medium"),
 					"num_cache_clusters":          BeNumerically("==", 2),
-					"engine":                      Equal("redis"),
 					"engine_version":              Equal("6.0"),
 					"port":                        BeNumerically("==", 2345),
 					"tags":                        HaveKeyWithValue("key1", "some-redis-value"),

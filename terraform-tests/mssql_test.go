@@ -1000,7 +1000,7 @@ func createVPCWithMoreThan20Subnets() (string, string, func()) {
 	Expect(err).NotTo(HaveOccurred())
 
 	var subnetIDs []string
-	for i := 0; i < numSubnets; i++ {
+	for i := range numSubnets {
 		createSubnetResult, err := ec2Client.CreateSubnet(context.Background(), &ec2.CreateSubnetInput{
 			VpcId:              createVPCResult.Vpc.VpcId,
 			CidrBlock:          pointer(fmt.Sprintf("10.0.%d.0/24", i)),
