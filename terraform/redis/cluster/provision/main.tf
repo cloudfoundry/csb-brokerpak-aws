@@ -26,10 +26,10 @@ resource "aws_elasticache_subnet_group" "subnet_group" {
 
 resource "aws_security_group_rule" "inbound_access" {
   count             = length(var.elasticache_vpc_security_group_ids) == 0 ? 1 : 0
-  from_port         = local.port
+  from_port         = var.port
   protocol          = "tcp"
   security_group_id = aws_security_group.sg[0].id
-  to_port           = local.port
+  to_port           = var.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
@@ -51,7 +51,7 @@ resource "aws_elasticache_replication_group" "redis" {
   node_type                   = local.node_type
   num_cache_clusters          = var.node_count
   engine_version              = var.redis_version
-  port                        = local.port
+  port                        = var.port
   tags                        = var.labels
   security_group_ids          = local.elasticache_vpc_security_group_ids
   subnet_group_name           = local.subnet_group

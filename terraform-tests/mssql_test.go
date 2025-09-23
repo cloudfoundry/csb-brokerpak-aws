@@ -78,6 +78,8 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 			"use_managed_admin_password":  false,
 			"rotate_admin_password_after": "7",
+
+			"port": 2345,
 		}
 
 		requiredVars = map[string]any{
@@ -122,20 +124,20 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 		It("should create a db instance with the right values", func() {
 			Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
-				"engine":               Equal("sqlserver-ee"),
-				"engine_version":       Equal("15.00"),
-				"identifier":           Equal("csb-mssql-test"),
-				"storage_encrypted":    BeTrue(),
-				"instance_class":       Equal("some-instance-class"),
-				"tags":                 HaveKeyWithValue("label1", "value1"),
-				"db_subnet_group_name": Equal("csb-mssql-test-p-sn"),
-				"apply_immediately":    BeTrue(),
-				"skip_final_snapshot":  BeTrue(),
-				"license_model":        Equal("license-included"),
-				"publicly_accessible":  BeFalse(),
-				"monitoring_interval":  BeNumerically("==", 0),
-
+				"engine":                       Equal("sqlserver-ee"),
+				"engine_version":               Equal("15.00"),
+				"identifier":                   Equal("csb-mssql-test"),
+				"storage_encrypted":            BeTrue(),
+				"instance_class":               Equal("some-instance-class"),
+				"tags":                         HaveKeyWithValue("label1", "value1"),
+				"db_subnet_group_name":         Equal("csb-mssql-test-p-sn"),
+				"apply_immediately":            BeTrue(),
+				"skip_final_snapshot":          BeTrue(),
+				"license_model":                Equal("license-included"),
+				"publicly_accessible":          BeFalse(),
+				"monitoring_interval":          BeNumerically("==", 0),
 				"performance_insights_enabled": BeFalse(),
+				"port":                         BeNumerically("==", 2345),
 			}))
 		})
 	})

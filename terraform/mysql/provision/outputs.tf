@@ -14,6 +14,7 @@
 
 output "name" { value = aws_db_instance.db_instance.db_name }
 output "hostname" { value = aws_db_instance.db_instance.address }
+output "port" { value = var.port }
 output "username" { value = aws_db_instance.db_instance.username }
 output "password" {
   value     = var.use_managed_admin_password ? "" : aws_db_instance.db_instance.password

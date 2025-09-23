@@ -32,7 +32,6 @@ locals {
   }
 
   node_type = length(var.node_type) == 0 ? try(local.instance_types[var.cache_size], "") : var.node_type
-  port      = 6379
 
   subnet_group = length(var.elasticache_subnet_group) > 0 ? var.elasticache_subnet_group : aws_elasticache_subnet_group.subnet_group[0].name
 

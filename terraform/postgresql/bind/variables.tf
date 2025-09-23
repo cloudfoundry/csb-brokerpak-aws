@@ -32,7 +32,4 @@ variable "use_managed_admin_password" { type = string }
 variable "managed_admin_credentials_arn" { type = string }
 variable "require_ssl" { type = bool }
 variable "provider_verify_certificate" { type = bool }
-
-locals {
-  port = 5432
-}
+variable "port" { type = number }

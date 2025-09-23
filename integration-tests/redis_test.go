@@ -173,6 +173,21 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				map[string]any{"backup_end_min": "12"},
 				`backup_end_min must be one of the following: \"00\", \"15\", \"30\", \"45\", null`,
 			),
+			Entry(
+				"port too low",
+				map[string]any{"port": 0},
+				"port: Must be greater than or equal to 1",
+			),
+			Entry(
+				"port too high",
+				map[string]any{"port": 65536},
+				"port: Must be less than or equal to 65535",
+			),
+			Entry(
+				"port not integer",
+				map[string]any{"port": 3.14},
+				"port: Invalid type. Expected: integer, given: number",
+			),
 		)
 
 		It("should prevent modifying `plan defined properties`", func() {
@@ -277,6 +292,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("logs_engine_log_loggroup_retention_in_days", BeNumerically("==", 0)),
 					HaveKeyWithValue("logs_engine_log_loggroup_kms_key_id", BeEmpty()),
 					HaveKeyWithValue("auto_minor_version_upgrade", BeFalse()),
+					HaveKeyWithValue("port", BeNumerically("==", 6379)),
 				))
 		})
 
@@ -315,6 +331,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 				"logs_engine_log_loggroup_retention_in_days": 2,
 				"logs_engine_log_loggroup_kms_key_id":        "engine-log-key",
 				"auto_minor_version_upgrade":                 true,
+				"port":                                       1234,
 			})
 			Expect(err).NotTo(HaveOccurred())
 
@@ -354,6 +371,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 					HaveKeyWithValue("logs_engine_log_loggroup_retention_in_days", BeNumerically("==", 2)),
 					HaveKeyWithValue("logs_engine_log_loggroup_kms_key_id", "engine-log-key"),
 					HaveKeyWithValue("auto_minor_version_upgrade", BeTrue()),
+					HaveKeyWithValue("port", BeNumerically("==", 1234)),
 				),
 			)
 		})
@@ -426,8 +444,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 		DescribeTable(
 			"allowed updates",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, redisServiceName, redisCustomPlanName, map[string]any{prop: value})
-				Expect(err).ToNot(HaveOccurred())
+				Expect(broker.Update(instanceID, redisServiceName, redisCustomPlanName, map[string]any{prop: value})).To(Succeed())
 			},
 			Entry("aws_access_key_id", "aws_access_key_id", "any-valid-aws-access-key-id"),
 			Entry("aws_secret_access_key", "aws_secret_access_key", "any-valid-aws-secret-access-key"),
@@ -452,6 +469,7 @@ var _ = Describe("Redis", Label("Redis"), func() {
 			Entry("logs_engine_log_loggroup_retention_in_days", "logs_engine_log_loggroup_retention_in_days", 5),
 			Entry("logs_engine_log_loggroup_kms_key_id", "logs_engine_log_loggroup_kms_key_id", "engine-log-key-2"),
 			Entry("auto_minor_version_upgrade", "auto_minor_version_upgrade", true),
+			Entry("port", "port", 2345),
 		)
 	})
 

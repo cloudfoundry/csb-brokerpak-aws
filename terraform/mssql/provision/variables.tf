@@ -11,6 +11,7 @@ variable "instance_name" { type = string }
 variable "storage_encrypted" { type = bool }
 variable "kms_key_id" { type = string }
 variable "db_name" { type = string }
+variable "port" { type = number }
 variable "labels" { type = map(any) }
 variable "instance_class" { type = string }
 variable "aws_vpc_id" { type = string }

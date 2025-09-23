@@ -29,8 +29,6 @@ variable "use_managed_admin_password" {
 variable "managed_admin_credentials_arn" {
   type = string
 }
-
-
-locals {
-  port = 1433
+variable "port" {
+  type = number
 }

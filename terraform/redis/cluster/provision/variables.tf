@@ -24,6 +24,7 @@ variable "region" { type = string }
 variable "cache_size" { type = number }
 variable "redis_version" { type = string }
 variable "instance_name" { type = string }
+variable "port" { type = number }
 variable "labels" { type = map(any) }
 variable "aws_vpc_id" { type = string }
 variable "node_type" { type = string }

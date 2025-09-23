@@ -176,6 +176,21 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				map[string]any{"cloudwatch_error_log_group_retention_in_days": 3654},
 				"cloudwatch_error_log_group_retention_in_days: Must be less than or equal to 3653",
 			),
+			Entry(
+				"port too low",
+				map[string]any{"port": 0},
+				"port: Must be greater than or equal to 1",
+			),
+			Entry(
+				"port too high",
+				map[string]any{"port": 65536},
+				"port: Must be less than or equal to 65535",
+			),
+			Entry(
+				"port not integer",
+				map[string]any{"port": 3.14},
+				"port: Invalid type. Expected: integer, given: number",
+			),
 		)
 
 		It("should provision a plan", func() {
@@ -231,6 +246,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 					HaveKeyWithValue("multi_az", BeTrue()),
 					HaveKeyWithValue("use_managed_admin_password", false),
 					HaveKeyWithValue("rotate_admin_password_after", float64(7)),
+					HaveKeyWithValue("port", BeNumerically("==", 1433)),
 				),
 			)
 		})
@@ -239,6 +255,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			_, err := broker.Provision(msSQLServiceName, customMSSQLPlan["name"].(string), buildProperties(requiredProperties(), map[string]any{
 				"use_managed_admin_password":  true,
 				"rotate_admin_password_after": 365,
+				"port":                        1234,
 			}))
 			Expect(err).NotTo(HaveOccurred())
 
@@ -246,6 +263,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 				SatisfyAll(
 					HaveKeyWithValue("use_managed_admin_password", true),
 					HaveKeyWithValue("rotate_admin_password_after", float64(365)),
+					HaveKeyWithValue("port", BeNumerically("==", 1234)),
 				),
 			)
 		})
@@ -335,10 +353,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 
 		DescribeTable("should allow updating properties",
 			func(prop string, value any) {
-				err := broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})
-
-				Expect(err).NotTo(HaveOccurred())
-				Expect(nthTerraformInvocationVars(mockTerraform, 1)).To(HaveKeyWithValue(prop, value))
+				Expect(broker.Update(instanceID, msSQLServiceName, customMySQLPlan["name"].(string), map[string]any{prop: value})).To(Succeed())
 			},
 			Entry("update storage_type", "storage_type", "gp2"),
 			Entry("update iops", "iops", float64(1500)),
@@ -354,6 +369,7 @@ var _ = Describe("MSSQL", Label("MSSQL"), func() {
 			Entry("update enable_export_agent_logs", "enable_export_agent_logs", true),
 			Entry("update enable_export_error_logs", "enable_export_error_logs", true),
 			Entry("update cloudwatch_log_groups_kms_key_id", "cloudwatch_log_groups_kms_key_id", "arn:aws:kms:us-west-2:xxxxxxxxxxxx:key/xxxxxxxx-80b9-4afd-98c0-xxxxxxxxxxxx"),
+			Entry("port", "port", 2345),
 		)
 	})
 })

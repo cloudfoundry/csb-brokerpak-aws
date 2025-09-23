@@ -31,8 +31,6 @@ locals {
 
   valid_storage_types_for_iops = ["io1", "gp3"]
 
-  port = 3306
-
   instance_class = length(var.instance_class) == 0 ? local.instance_types[var.cores] : var.instance_class
 
   subnet_group = length(var.rds_subnet_group) > 0 ? var.rds_subnet_group : aws_db_subnet_group.rds-private-subnet[0].name

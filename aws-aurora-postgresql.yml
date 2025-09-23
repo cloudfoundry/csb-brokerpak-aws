@@ -50,6 +50,13 @@ provision:
       - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
+  - field_name: port
+    type: integer
+    default: 5432
+    constraints:
+      minimum: 1
+      maximum: 65535
+    details: The port number of the database instance.
   - <<: &nullable_number
       type: number
       default: null

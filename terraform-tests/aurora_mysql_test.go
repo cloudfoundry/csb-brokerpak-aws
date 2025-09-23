@@ -59,6 +59,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			"admin_username":                         "",
 			"legacy_instance":                        false,
 			"delete_automated_backups":               true,
+			"port":                                   2345,
 		}
 	})
 
@@ -107,7 +108,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"cluster_identifier":                 Equal("csb-auroramysql-test"),
 				"engine":                             Equal("aurora-mysql"),
 				"database_name":                      Equal("csbdb"),
-				"port":                               Equal(float64(3306)),
+				"port":                               Equal(float64(2345)),
 				"db_subnet_group_name":               Equal("csb-auroramysql-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
@@ -176,7 +177,6 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 					}))
 			})
 		})
-
 	})
 
 	When("cluster_instances is 0", func() {
@@ -204,7 +204,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				"cluster_identifier":   Equal("csb-auroramysql-test"),
 				"engine":               Equal("aurora-mysql"),
 				"database_name":        Equal("csbdb"),
-				"port":                 Equal(float64(3306)),
+				"port":                 Equal(float64(2345)),
 				"db_subnet_group_name": Equal("csb-auroramysql-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
 			}))
@@ -320,7 +320,6 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 					"kms_key_id": Equal("arn:aws:kms:us-west-9:123456789012:key/900dd091-2b79-47d2-aee8-c92e17cc7cce"),
 				}))
 		})
-
 	})
 
 	Context("serverless", func() {

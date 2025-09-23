@@ -12,10 +12,10 @@ resource "aws_db_subnet_group" "rds-private-subnet" {
 
 resource "aws_security_group_rule" "rds_inbound_access" {
   count             = length(var.rds_vpc_security_group_ids) == 0 ? 1 : 0
-  from_port         = local.port
+  from_port         = var.port
   protocol          = "tcp"
   security_group_id = aws_security_group.rds-sg[0].id
-  to_port           = local.port
+  to_port           = var.port
   type              = "ingress"
   cidr_blocks       = ["0.0.0.0/0"]
 }
@@ -93,6 +93,7 @@ resource "aws_db_instance" "db_instance" {
   instance_class              = var.instance_class
   identifier                  = var.instance_name
   db_name                     = null # Otherwise: Error: InvalidParameterValue: DBName must be null for engine: sqlserver-xx
+  port                        = var.port
   username                    = random_string.username.result
   password                    = var.use_managed_admin_password ? null : random_password.password.result
   manage_master_user_password = var.use_managed_admin_password ? true : null

@@ -56,6 +56,13 @@ provision:
       - asia-northeast1
       pattern: ^[a-z][a-z0-9-]+$
     prohibit_update: true
+  - field_name: port
+    type: integer
+    default: 6379
+    constraints:
+      minimum: 1
+      maximum: 65535
+    details: The port number of the instance.
   - field_name: node_count
     type: integer
     details: Number of nodes (primary and replicas) in cluster

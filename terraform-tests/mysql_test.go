@@ -66,12 +66,38 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			"admin_username":                        "",
 			"use_managed_admin_password":            false,
 			"rotate_admin_password_after":           "7",
+			"port":                                  2345,
 		}
 	})
 
 	BeforeAll(func() {
 		terraformProvisionDir = path.Join(workingDir, "mysql/provision")
 		Init(terraformProvisionDir)
+	})
+
+	Context("with Default values", func() {
+		BeforeAll(func() {
+			plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars))
+		})
+
+		It("should create the right resources", func() {
+			Expect(plan.ResourceChanges).To(HaveLen(6), "incorrect number of resources")
+
+			Expect(ResourceChangesTypes(plan)).To(ConsistOf(
+				"aws_db_instance",
+				"aws_db_subnet_group",
+				"aws_security_group",
+				"aws_security_group_rule",
+				"random_password",
+				"random_string",
+			))
+		})
+
+		It("should create a db instance with the right values", func() {
+			Expect(AfterValuesForType(plan, "aws_db_instance")).To(MatchKeys(IgnoreExtras, Keys{
+				"port": BeNumerically("==", 2345),
+			}))
+		})
 	})
 
 	Context("mysql parameter groups", func() {
@@ -88,7 +114,6 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 						"parameter_group_name": Equal("default.mysql5.7"),
 					}))
 			})
-
 		})
 
 		Context("Parameter group passed", func() {

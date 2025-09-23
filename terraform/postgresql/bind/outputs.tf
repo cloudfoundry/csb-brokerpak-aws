@@ -23,17 +23,17 @@ output "uri" {
     csbpg_binding_user.new_user.username,
     csbpg_binding_user.new_user.password,
     var.hostname,
-    local.port,
+    var.port,
     var.db_name,
   )
   sensitive = true
 }
-output "port" { value = local.port }
+output "port" { value = var.port }
 output "jdbcUrl" {
   value = format(
     "jdbc:postgresql://%s:%d/%s?user=%s\u0026password=%s\u0026ssl=true\u0026sslfactory=org.postgresql.ssl.DefaultJavaSSLFactory",
     var.hostname,
-    local.port,
+    var.port,
     var.db_name,
     csbpg_binding_user.new_user.username,
     csbpg_binding_user.new_user.password,
