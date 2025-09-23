@@ -55,6 +55,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			"preferred_maintenance_start_min":       nil,
 			"preferred_maintenance_day":             nil,
 			"delete_automated_backups":              true,
+			"port":                                  2345,
 		}
 	})
 
@@ -104,7 +105,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"cluster_identifier":                 Equal("csb-aurorapg-test"),
 				"engine":                             Equal("aurora-postgresql"),
 				"database_name":                      Equal("csbdb"),
-				"port":                               BeNumerically("==", 5432),
+				"port":                               BeNumerically("==", 2345),
 				"db_subnet_group_name":               Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":                BeTrue(),
 				"serverlessv2_scaling_configuration": BeEmpty(),
@@ -147,7 +148,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				"cluster_identifier":   Equal("csb-aurorapg-test"),
 				"engine":               Equal("aurora-postgresql"),
 				"database_name":        Equal("csbdb"),
-				"port":                 BeNumerically("==", 5432),
+				"port":                 BeNumerically("==", 2345),
 				"db_subnet_group_name": Equal("csb-aurorapg-test-p-sn"),
 				"skip_final_snapshot":  BeTrue(),
 			}))

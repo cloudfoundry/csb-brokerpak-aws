@@ -62,6 +62,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			"logs_engine_log_loggroup_retention_in_days": 0,
 			"logs_engine_log_enabled":                    false,
 			"auto_minor_version_upgrade":                 false,
+			"port":                                       2345,
 		}
 	})
 
@@ -87,7 +88,7 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"node_type":                   Equal("cache.t3.medium"),
 					"num_cache_clusters":          BeNumerically("==", 2),
 					"engine_version":              Equal("6.0"),
-					"port":                        BeNumerically("==", 6379),
+					"port":                        BeNumerically("==", 2345),
 					"tags":                        HaveKeyWithValue("key1", "some-redis-value"),
 					"subnet_group_name":           Equal("csb-redis-test-p-sn"),
 					"transit_encryption_enabled":  BeTrue(),
@@ -116,7 +117,8 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 					"user_group_ids":             BeNil(),
 					"data_tiering_enabled":       BeFalse(),
 					"auth_token_update_strategy": BeNil(),
-				}))
+				}),
+			)
 		})
 	})
 
