@@ -266,6 +266,14 @@ provision:
     type: boolean
     details: Specifies whether to remove automated backups immediately after the DB cluster is deleted.
     default: true
+  - field_name: use_managed_admin_password
+    type: boolean
+    default: false
+    details: Whether to use AWS Secrets Manager to generate and manage the admin password for this RDS cluster.
+  - field_name: rotate_admin_password_after
+    type: integer
+    default: 7
+    details: Specifies the number of days between automatic scheduled rotations of the admin password.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -297,6 +305,12 @@ provision:
   - field_name: port
     type: integer
     details: The port number of the exposed database instance.
+  - field_name: use_managed_admin_password
+    type: boolean
+    details: Whether CSB should use AWS managed admin password
+  - field_name: managed_admin_credentials_arn
+    type: string
+    details: The ARN of the master secret to authenticate to the database instance.
 bind:
   plan_inputs: []
   user_inputs:
@@ -328,6 +342,14 @@ bind:
   - name: port
     type: integer
     default: ${instance.details["port"]}
+    overwrite: true
+  - name: use_managed_admin_password
+    default: ${instance.details["use_managed_admin_password"]}
+    type: boolean
+    overwrite: true
+  - name: managed_admin_credentials_arn
+    type: string
+    default: ${instance.details["managed_admin_credentials_arn"]}
     overwrite: true
   template_refs:
     outputs: ./terraform/aurora-postgresql/bind/outputs.tf

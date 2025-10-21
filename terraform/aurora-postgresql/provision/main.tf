@@ -40,7 +40,8 @@ resource "aws_rds_cluster" "cluster" {
   database_name                   = var.db_name
   tags                            = var.labels
   master_username                 = random_string.username.result
-  master_password                 = random_password.password.result
+  master_password                 = var.use_managed_admin_password ? null : random_password.password.result
+  manage_master_user_password     = var.use_managed_admin_password ? true : null
   port                            = var.port
   db_subnet_group_name            = local.subnet_group
   vpc_security_group_ids          = local.rds_vpc_security_group_ids
@@ -68,6 +69,18 @@ resource "aws_rds_cluster" "cluster" {
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_secretsmanager_secret_rotation" "secret_manager" {
+  # Note that configuring rotation causes the secret to rotate once as soon as you enable rotation.
+  # This happens even if the configured rotation is the same as the AWS default e.g. 7 days.
+  count     = var.use_managed_admin_password ? 1 : 0
+  secret_id = join("", aws_rds_cluster.cluster.master_user_secret.*.secret_arn)
+  rotation_rules {
+    automatically_after_days = var.rotate_admin_password_after
+  }
+
+  depends_on = [aws_rds_cluster.cluster]
 }
 
 resource "aws_rds_cluster_instance" "cluster_instances" {

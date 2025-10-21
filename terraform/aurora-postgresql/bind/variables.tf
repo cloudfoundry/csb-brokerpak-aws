@@ -8,3 +8,5 @@ variable "admin_password" {
   sensitive = true
 }
 variable "port" { type = number }
+variable "use_managed_admin_password" { type = bool }
+variable "managed_admin_credentials_arn" { type = string }

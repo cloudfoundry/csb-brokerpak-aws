@@ -59,6 +59,8 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			"admin_username":                         "",
 			"legacy_instance":                        false,
 			"delete_automated_backups":               true,
+			"use_managed_admin_password":             false,
+			"rotate_admin_password_after":            "7",
 			"port":                                   2345,
 		}
 	})
@@ -488,6 +490,59 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				Expect(AfterValuesForType(plan, "aws_rds_cluster_instance")).To(
 					MatchKeys(IgnoreExtras, Keys{
 						"auto_minor_version_upgrade": BeTrue(),
+					}),
+				)
+			})
+		})
+	})
+
+	Context("managed admin password", func() {
+		When("disabled", func() {
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(defaultVars, map[string]any{"use_managed_admin_password": false}))
+			})
+
+			It("should use randomly generated password", func() {
+				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(0))
+				Expect(UnknownValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"master_password": Not(BeNil()),
+					}),
+				)
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"manage_master_user_password": BeNil(),
+					}),
+				)
+			})
+		})
+
+		When("enabled", func() {
+			const passwordRotationDays = 100
+
+			BeforeAll(func() {
+				plan = ShowPlan(terraformProvisionDir, buildVars(
+					defaultVars,
+					map[string]any{
+						"use_managed_admin_password":  true,
+						"rotate_admin_password_after": passwordRotationDays,
+					},
+				))
+			})
+
+			It("should set admin password to managed aws secret", func() {
+				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"manage_master_user_password": Equal(true),
+						"master_password":             BeNil(),
+					}),
+				)
+				Expect(ResourceCreationForType(plan, "aws_secretsmanager_secret_rotation")).To(HaveLen(1))
+				Expect(AfterValuesForType(plan, "aws_secretsmanager_secret_rotation")).To(
+					MatchKeys(IgnoreExtras, Keys{
+						"rotation_rules": ConsistOf(MatchKeys(IgnoreExtras, Keys{
+							"automatically_after_days": BeNumerically("==", passwordRotationDays),
+						})),
 					}),
 				)
 			})
