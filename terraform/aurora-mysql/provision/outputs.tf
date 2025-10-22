@@ -18,6 +18,9 @@ output "managed_admin_credentials_arn" {
 output "use_managed_admin_password" {
   value = var.use_managed_admin_password
 }
+output "region" {
+  value = var.region
+}
 output "status" {
   value = format(
     "created db %s (id: %s) on server %s",

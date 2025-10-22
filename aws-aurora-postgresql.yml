@@ -305,6 +305,9 @@ provision:
   - field_name: port
     type: integer
     details: The port number of the exposed database instance.
+  - field_name: region
+    type: string
+    details: AWS region for the Aurora cluster
   - field_name: use_managed_admin_password
     type: boolean
     details: Whether CSB should use AWS managed admin password
@@ -318,6 +321,14 @@ bind:
     type: boolean
     details: Expose the Aurora reader endpoint, which is balanced across Reader and Writer instances
     default: false
+  - field_name: aws_access_key_id
+    type: string
+    details: AWS access key
+    default: ${config("aws.access_key_id")}
+  - field_name: aws_secret_access_key
+    type: string
+    details: AWS secret key
+    default: ${config("aws.secret_access_key")}
   computed_inputs:
   - name: name
     type: string
@@ -342,6 +353,10 @@ bind:
   - name: port
     type: integer
     default: ${instance.details["port"]}
+    overwrite: true
+  - name: region
+    type: string
+    default: ${instance.details["region"]}
     overwrite: true
   - name: use_managed_admin_password
     default: ${instance.details["use_managed_admin_password"]}
