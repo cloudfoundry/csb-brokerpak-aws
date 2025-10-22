@@ -1,6 +1,7 @@
 package acceptance_tests_test
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -75,6 +76,10 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 
 		By("updating the service to set 'use_managed_admin_password' a second time")
 		serviceInstance.Update(services.WithParameters(updateParams))
+
+		By("waiting for the password rotation to be applied")
+		identifier := fmt.Sprintf("csb-aurorapg-%s", serviceInstance.GUID())
+		Eventually(dbClusterStatus(identifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
 
 		By("rebinding app")
 		binding.Unbind()

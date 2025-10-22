@@ -1,12 +1,14 @@
 package acceptance_tests_test
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
 	"time"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
+	"csbbrokerpakaws/acceptance-tests/helpers/awscli"
 	"csbbrokerpakaws/acceptance-tests/helpers/cf"
 	"csbbrokerpakaws/acceptance-tests/helpers/jdbcapp"
 	"csbbrokerpakaws/acceptance-tests/helpers/matchers"
@@ -145,6 +147,10 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		By("updating the service to set 'use_managed_admin_password' a second time")
 		serviceInstance.Update(services.WithParameters(updateParams))
 
+		By("waiting for the password rotation to be applied")
+		identifier := fmt.Sprintf("csb-auroramysql-%s", serviceInstance.GUID())
+		Eventually(dbClusterStatus(identifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
 		By("rebinding app")
 		binding.Unbind()
 		serviceInstance.Bind(app)
@@ -168,3 +174,9 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 	})
 })
+
+func dbClusterStatus(clusterIdentifier string) func() string {
+	return func() string {
+		return awscli.AWSQuery("DBClusters[0].Status", "rds", "describe-db-clusters", "--db-cluster-identifier", clusterIdentifier)
+	}
+}
