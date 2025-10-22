@@ -380,6 +380,7 @@ bind:
     versions: ./terraform/aurora-mysql/bind/versions.tf
     variables: ./terraform/aurora-mysql/bind/variables.tf
     main: ./terraform/aurora-mysql/bind/main.tf
+    data: ./terraform/aurora-mysql/bind/data.tf
   outputs:
   - field_name: hostname
     type: string

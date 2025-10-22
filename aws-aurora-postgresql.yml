@@ -357,6 +357,7 @@ bind:
     versions: ./terraform/aurora-postgresql/bind/versions.tf
     variables: ./terraform/aurora-postgresql/bind/variables.tf
     main: ./terraform/aurora-postgresql/bind/main.tf
+    data: ./terraform/aurora-postgresql/bind/data.tf
   outputs:
   - field_name: username
     type: string
