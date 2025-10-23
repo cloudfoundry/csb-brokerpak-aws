@@ -289,6 +289,14 @@ provision:
     type: boolean
     details: Specifies whether to remove automated backups immediately after the DB cluster is deleted.
     default: true
+  - field_name: use_managed_admin_password
+    type: boolean
+    default: false
+    details: Whether to use AWS Secrets Manager to generate and manage the admin password for this RDS cluster.
+  - field_name: rotate_admin_password_after
+    type: integer
+    default: 7
+    details: Specifies the number of days between automatic scheduled rotations of the admin password.
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -320,6 +328,15 @@ provision:
   - field_name: port
     type: integer
     details: The port number of the exposed database instance.
+  - field_name: region
+    type: string
+    details: AWS region for the Aurora cluster
+  - field_name: use_managed_admin_password
+    type: boolean
+    details: Whether CSB should use AWS managed admin password
+  - field_name: managed_admin_credentials_arn
+    type: string
+    details: The ARN of the master secret to authenticate to the database instance.
 bind:
   plan_inputs: []
   user_inputs:
@@ -327,6 +344,14 @@ bind:
     type: boolean
     details: Expose the Aurora reader endpoint, which is balanced across Reader and Writer instances
     default: false
+  - field_name: aws_access_key_id
+    type: string
+    details: AWS access key
+    default: ${config("aws.access_key_id")}
+  - field_name: aws_secret_access_key
+    type: string
+    details: AWS secret key
+    default: ${config("aws.secret_access_key")}
   computed_inputs:
   - name: name
     type: string
@@ -352,12 +377,25 @@ bind:
     type: integer
     default: ${instance.details["port"]}
     overwrite: true
+  - name: region
+    type: string
+    default: ${instance.details["region"]}
+    overwrite: true
+  - name: use_managed_admin_password
+    default: ${instance.details["use_managed_admin_password"]}
+    type: boolean
+    overwrite: true
+  - name: managed_admin_credentials_arn
+    type: string
+    default: ${instance.details["managed_admin_credentials_arn"]}
+    overwrite: true
   template_refs:
     outputs: ./terraform/aurora-mysql/bind/outputs.tf
     provider: ./terraform/aurora-mysql/bind/provider.tf
     versions: ./terraform/aurora-mysql/bind/versions.tf
     variables: ./terraform/aurora-mysql/bind/variables.tf
     main: ./terraform/aurora-mysql/bind/main.tf
+    data: ./terraform/aurora-mysql/bind/data.tf
   outputs:
   - field_name: hostname
     type: string

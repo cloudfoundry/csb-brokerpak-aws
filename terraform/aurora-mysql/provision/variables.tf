@@ -45,3 +45,5 @@ variable "preferred_maintenance_end_min" { type = string }
 variable "admin_username" { type = string }
 variable "legacy_instance" { type = bool }
 variable "delete_automated_backups" { type = bool }
+variable "use_managed_admin_password" { type = bool }
+variable "rotate_admin_password_after" { type = number }
