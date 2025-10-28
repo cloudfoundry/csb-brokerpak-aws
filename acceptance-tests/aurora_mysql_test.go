@@ -17,6 +17,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 )
 
@@ -173,10 +174,161 @@ var _ = Describe("Aurora MySQL", Label("aurora-mysql"), func() {
 		app.GETf("%d", userIn.ID).ParseInto(&userOut)
 		Expect(userOut.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut.Name)
 	})
+
+	// While snapshot restore is an AWS feature rather than a CSB feature, its valuable to check that it works
+	It("allows a snapshot to be restored when 'use_managed_admin_password' is enabled", Label("managed-password-snapshot-restore"), func() {
+		By("creating a service instance")
+		const engineVersion = "8.0.mysql_aurora.3.04.2"
+		params := map[string]any{
+			"use_managed_admin_password":  true,
+			"rotate_admin_password_after": 4,
+			"cluster_instances":           1,
+			"instance_class":              "db.t3.medium",
+			"engine_version":              engineVersion,
+			"auto_minor_version_upgrade":  false,
+		}
+		serviceInstance := services.CreateInstance("csb-aws-aurora-mysql", services.WithPlan("default"), services.WithParameters(params))
+		defer serviceInstance.Delete()
+
+		By("pushing an unstarted app")
+		appManifest := jdbcapp.ManifestFor(jdbcapp.MySQL)
+		app := apps.Push(apps.WithApp(apps.JDBCTestAppMysql), apps.WithManifest(appManifest))
+		defer apps.Delete(app)
+
+		By("waiting for the DB cluster to be available")
+		dbClusterIdentifier := fmt.Sprintf("csb-auroramysql-%s", serviceInstance.GUID())
+		Eventually(dbClusterStatus(dbClusterIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("binding the app to the service instance")
+		binding := serviceInstance.Bind(app)
+
+		By("starting the app")
+		apps.Start(app)
+
+		By("creating an entry using the app")
+		value := random.Hexadecimal()
+		var userIn jdbcapp.AppResponseUser
+		app.POSTf("", "?name=%s", value).ParseInto(&userIn)
+
+		// The cluster manages the storage, so we need to take a snapshot of the cluster, not the instance.
+		By("taking a snapshot of the DB cluster")
+		snapshotIdentifier := random.Name(random.WithPrefix("snapshot-restore-test"))
+		awscli.AWS(
+			"rds", "create-db-cluster-snapshot",
+			"--db-cluster-snapshot-identifier", snapshotIdentifier,
+			"--db-cluster-identifier", dbClusterIdentifier,
+		)
+		Eventually(dbClusterSnapshotStatus(snapshotIdentifier)).WithPolling(time.Minute).WithTimeout(time.Hour).Should(Equal("available"))
+
+		deleteDBCluster(dbClusterIdentifier)
+
+		By("waiting a bit to avoid a 'DBClusterAlreadyExists' error if we restore too soon")
+		time.Sleep(time.Minute)
+
+		// At the time of writing, there's no flag in the AWS CLI (or in the console) to enable AWS secrets manager when
+		// restoring from a snapshot. Ideally we could restore with the "--manage-master-user-password" and there would
+		// be no need to mess around with the settings after the restore, but that flag hasn't been added yet.
+		By("restoring the DB cluster from the snapshot")
+		awscli.AWS(
+			"rds", "restore-db-cluster-from-snapshot",
+			"--snapshot-identifier", snapshotIdentifier,
+			"--db-cluster-identifier", dbClusterIdentifier,
+			"--engine", "aurora-mysql",
+			"--engine-version", engineVersion,
+			"--db-subnet-group-name", dbSubnetGroupName(metadata.VPC, serviceInstance.GUID()),
+		)
+
+		By("waiting for the DB cluster to be available")
+		Eventually(dbClusterStatus(dbClusterIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("creating a DB instance in the restored cluster")
+		dbInstanceIdentifier := fmt.Sprintf("%s-0", dbClusterIdentifier)
+		awscli.AWS(
+			"rds", "create-db-instance",
+			"--db-instance-identifier", dbInstanceIdentifier,
+			"--db-instance-class", "db.t3.medium",
+			"--engine", "aurora-mysql",
+			"--db-cluster-identifier", dbClusterIdentifier,
+		)
+
+		By("waiting for the DB instance to be available")
+		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("disabling 'use_managed_admin_password' to match the restored snapshot")
+		serviceInstance.Update(services.WithParameters(`{"use_managed_admin_password": false}`))
+
+		By("updating the service to set 'use_managed_admin_password' a first time which is expected to fail")
+		const paramsJSON = `{"use_managed_admin_password": true, "rotate_admin_password_after": 4}`
+		session := cf.Start("update-service", serviceInstance.Name, "-c", paramsJSON, "--wait")
+		Eventually(session).WithTimeout(time.Hour).Should(gexec.Exit(1), func() string {
+			out, _ := cf.Run("service", serviceInstance.Name)
+			return out
+		})
+
+		By("checking that it failed for the expected reason")
+		msg, _ := cf.Run("service", serviceInstance.Name)
+		Expect(msg).To(MatchRegexp(`message:\s+update failed:\s+Error:\s+Provider produced inconsistent final plan When expanding the plan for aws_secretsmanager_secret_rotation`))
+
+		By("updating the service to set 'use_managed_admin_password' a second time")
+		serviceInstance.Update(services.WithParameters(paramsJSON))
+
+		By("waiting for the password rotation to be applied")
+		Eventually(dbClusterStatus(dbClusterIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("checking that bindings created before the restore still work")
+		var userOut1 jdbcapp.AppResponseUser
+		app.GETf("%d", userIn.ID).ParseInto(&userOut1)
+		Expect(userOut1.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut1.Name)
+
+		By("rebinding app")
+		binding.Unbind()
+		serviceInstance.Bind(app)
+		app.Restage()
+
+		By("checking that new bindings can be created")
+		var userOut2 jdbcapp.AppResponseUser
+		app.GETf("%d", userIn.ID).ParseInto(&userOut2)
+		Expect(userOut2.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut2.Name)
+	})
 })
 
 func dbClusterStatus(clusterIdentifier string) func() string {
 	return func() string {
 		return awscli.AWSQuery("DBClusters[0].Status", "rds", "describe-db-clusters", "--db-cluster-identifier", clusterIdentifier)
 	}
+}
+
+func dbClusterSnapshotStatus(id string) func() string {
+	return func() string {
+		status := awscli.AWSQuery("DBClusterSnapshots[0].Status", "rds", "describe-db-cluster-snapshots", "--db-cluster-snapshot-identifier", id)
+		Expect(status).To(SatisfyAny(Equal("available"), Equal("creating")))
+		return status
+	}
+}
+
+func deleteDBCluster(dbClusterIdentifier string) {
+	By("deleting the DB instances in the cluster")
+	output := awscli.AWS("rds", "describe-db-clusters", "--db-cluster-identifier", dbClusterIdentifier, "--query", "DBClusters[0].DBClusterMembers[*].DBInstanceIdentifier", "--output", "text")
+	dbInstanceIdentifiers := strings.Fields(string(output))
+
+	for _, instanceID := range dbInstanceIdentifiers {
+		awscli.AWS("rds", "delete-db-instance", "--db-instance-identifier", instanceID, "--skip-final-snapshot")
+	}
+
+	By("waiting for DB instances to be deleted")
+	for _, instanceID := range dbInstanceIdentifiers {
+		Eventually(func() *gbytes.Buffer {
+			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", instanceID, "--query", "DBInstances[0].DBInstanceStatus")
+			session.Wait(5 * time.Minute)
+			return session.Err
+		}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
+	}
+
+	By("deleting the DB cluster")
+	awscli.AWS("rds", "delete-db-cluster", "--db-cluster-identifier", dbClusterIdentifier, "--skip-final-snapshot")
+	Eventually(func() *gbytes.Buffer {
+		session := awscli.AWSSession("rds", "describe-db-clusters", "--db-cluster-identifier", dbClusterIdentifier, "--query", "DBClusters[0].Status")
+		session.Wait(5 * time.Minute) // Should be quick, but it's occasionally slow, and we don't want to bail out when that happens
+		return session.Err
+	}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
 }
