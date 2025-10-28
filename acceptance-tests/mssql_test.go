@@ -290,7 +290,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 			"--db-snapshot-identifier", snapshotIdentifier,
 			"--db-instance-identifier", dbInstanceIdentifier,
 			"--db-instance-class", "db.r5.large",
-			"--db-subnet-group-name", dbSubnetGroupName(metadata.VPC),
+			"--db-subnet-group-name", dbSubnetGroupName(metadata.VPC, serviceInstance.GUID()),
 			"--vpc-security-group-ids",
 		}
 		awscli.AWS(append(args, vpcSecurityGroupIDs(metadata.VPC)...)...)
@@ -358,7 +358,7 @@ func vpcSecurityGroupIDs(vpcID string) []string {
 	return ids
 }
 
-func dbSubnetGroupName(vpcID string) string {
+func dbSubnetGroupName(vpcID, guid string) string {
 	var receiver struct {
 		SubnetGroups []struct {
 			VPCID string `json:"VpcId"`
@@ -369,11 +369,11 @@ func dbSubnetGroupName(vpcID string) string {
 	awscli.AWSToJSON(&receiver, "rds", "describe-db-subnet-groups")
 
 	for _, sg := range receiver.SubnetGroups {
-		if sg.VPCID == vpcID {
+		if sg.VPCID == vpcID && strings.Contains(sg.Name, guid) {
 			return sg.Name
 		}
 	}
 
-	Fail("no DB subnet group found for vpc " + vpcID)
+	Fail("no DB subnet group found for vpc " + vpcID + " and service instance guid " + guid)
 	return "" // unreachable
 }
