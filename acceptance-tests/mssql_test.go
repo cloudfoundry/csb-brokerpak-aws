@@ -293,7 +293,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 			"--db-subnet-group-name", dbSubnetGroupName(metadata.VPC, serviceInstance.GUID()),
 			"--vpc-security-group-ids",
 		}
-		awscli.AWS(append(args, vpcSecurityGroupIDs(metadata.VPC)...)...)
+		awscli.AWS(append(args, vpcSecurityGroupIDs(metadata.VPC, "csb-mssql-")...)...)
 
 		By("waiting for the DB to be available")
 		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
@@ -337,7 +337,7 @@ var _ = Describe("MSSQL", Label("mssql"), func() {
 	})
 })
 
-func vpcSecurityGroupIDs(vpcID string) []string {
+func vpcSecurityGroupIDs(vpcID, prefix string) []string {
 	var receiver struct {
 		SecurityGroups []struct {
 			GroupName string `json:"GroupName"`
@@ -349,7 +349,7 @@ func vpcSecurityGroupIDs(vpcID string) []string {
 
 	var ids []string
 	for _, sg := range receiver.SecurityGroups {
-		if strings.HasPrefix(sg.GroupName, "csb-mssql-") {
+		if strings.HasPrefix(sg.GroupName, prefix) {
 			ids = append(ids, sg.GroupID)
 		}
 	}
