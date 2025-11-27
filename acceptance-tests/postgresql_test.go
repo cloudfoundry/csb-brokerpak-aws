@@ -119,7 +119,8 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 	})
 
 	// While snapshot restore is an AWS feature rather than a CSB feature, its valuable to check that it works
-	It("allows a snapshot to be restored when 'use_managed_admin_password' is enabled", Label("managed-password-snapshot-restore"), func() {
+	// This test uses the CSB to toggle the managed admin password after restore
+	It("allows a snapshot to be restored when 'use_managed_admin_password' is enabled by using CF commands", Label("managed-password-snapshot-restore-cf"), func() {
 		By("creating a service instance")
 		const params = `{"use_managed_admin_password":true, "rotate_admin_password_after":4}`
 		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("default"), services.WithParameters(params))
@@ -214,6 +215,101 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		app.GETf("%d", userIn.ID).ParseInto(&userOut2)
 		Expect(userOut2.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut2.Name)
 	})
+
+	// This version of the test above uses AWS commands to re-enable the managed admin password after restore. This is an alternative way,
+	// and has an advantage if 'use_managed_admin_password' is a plan property that cannot be changed
+	It("allows a snapshot to be restored when 'use_managed_admin_password' is enabled using AWS commands", Label("managed-password-snapshot-restore-aws"), func() {
+		By("creating a service instance")
+		const params = `{"use_managed_admin_password":true, "rotate_admin_password_after":4}`
+		serviceInstance := services.CreateInstance("csb-aws-postgresql", services.WithPlan("default"), services.WithParameters(params))
+		defer serviceInstance.Delete()
+
+		By("pushing an unstarted app")
+		appManifest := jdbcapp.ManifestFor(jdbcapp.PostgreSQL)
+		app := apps.Push(apps.WithApp(apps.JDBCTestAppPostgres), apps.WithManifest(appManifest))
+		defer apps.Delete(app)
+
+		By("waiting for the DB to be available")
+		dbInstanceIdentifier := fmt.Sprintf("csb-postgresql-%s", serviceInstance.GUID())
+		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("binding the app to the service instance")
+		binding := serviceInstance.Bind(app)
+
+		By("starting the app")
+		apps.Start(app)
+
+		By("creating an entry using the app")
+		value := random.Hexadecimal()
+		var userIn jdbcapp.AppResponseUser
+		app.POSTf("", "?name=%s", value).ParseInto(&userIn)
+
+		By("taking a snapshot of the DB")
+		snapshotIdentifier := random.Name(random.WithPrefix("snapshot-restore-test"))
+		awscli.AWS(
+			"rds", "create-db-snapshot",
+			"--db-snapshot-identifier", snapshotIdentifier,
+			"--db-instance-identifier", dbInstanceIdentifier,
+		)
+		Eventually(dbSnapshotStatus(snapshotIdentifier)).WithPolling(time.Minute).WithTimeout(time.Hour).Should(Equal("available"))
+
+		By("deleting the DB")
+		awscli.AWS("rds", "delete-db-instance", "--db-instance-identifier", dbInstanceIdentifier, "--skip-final-snapshot")
+		Eventually(func() *gbytes.Buffer {
+			session := awscli.AWSSession("rds", "describe-db-instances", "--db-instance-identifier", dbInstanceIdentifier, "--query", "DBInstances[0].DBInstanceStatus")
+			session.Wait(5 * time.Minute) // Should be quick, but it's occasionally slow, and we don't want to bail out when that happens
+			return session.Err
+		}).WithPolling(time.Minute).WithTimeout(time.Hour).Should(gbytes.Say("not found"))
+
+		By("waiting a bit to avoid a 'DBInstanceAlreadyExists' error if we restore too soon")
+		time.Sleep(time.Minute)
+
+		// There is a --manage-master-user-password flag on this command, and at the time of writing it only works for Oracle
+		By("restoring the DB from the snapshot")
+		args := []string{
+			"rds", "restore-db-instance-from-db-snapshot",
+			"--db-snapshot-identifier", snapshotIdentifier,
+			"--db-instance-identifier", dbInstanceIdentifier,
+			"--db-instance-class", "db.t3.micro",
+			"--db-subnet-group-name", dbSubnetGroupName(metadata.VPC, serviceInstance.GUID()),
+			"--no-publicly-accessible",
+			"--vpc-security-group-ids",
+		}
+		awscli.AWS(append(args, vpcSecurityGroupIDs(metadata.VPC, dbInstanceIdentifier)...)...)
+
+		By("waiting for the DB to be available")
+		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		// Ideally this would be done at restore time, but at the time of writing, the AWS CLI makes you do it in two steps
+		By("re-enabling managed admin password")
+		awscli.AWS("rds", "modify-db-instance", "--db-instance-identifier", dbInstanceIdentifier, "--manage-master-user-password")
+
+		By("waiting for the password rotation to be applied")
+		Eventually(dbSecretStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("active"))
+		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("performing a no-op update to sync TF state")
+		serviceInstance.Update(services.WithParameters(`{}`))
+
+		By("waiting for everything to be ready")
+		Eventually(dbSecretStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("active"))
+		Eventually(dbInstanceStatus(dbInstanceIdentifier)).WithTimeout(time.Hour).WithPolling(10 * time.Second).Should(Equal("available"))
+
+		By("checking that bindings created before the restore still work")
+		var userOut1 jdbcapp.AppResponseUser
+		app.GETf("%d", userIn.ID).ParseInto(&userOut1)
+		Expect(userOut1.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut1.Name)
+
+		By("rebinding app")
+		binding.Unbind()
+		serviceInstance.Bind(app)
+		app.Restage()
+
+		By("checking that new bindings can be created")
+		var userOut2 jdbcapp.AppResponseUser
+		app.GETf("%d", userIn.ID).ParseInto(&userOut2)
+		Expect(userOut2.Name).To(Equal(value), "App stored [%s] as the value, App retrieved [%s]", value, userOut2.Name)
+	})
 })
 
 func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
@@ -262,5 +358,11 @@ func postgresTestMultipleApps(serviceInstance *services.ServiceInstance) {
 func dbInstanceStatus(instanceName string) func() string {
 	return func() string {
 		return awscli.AWSQuery("DBInstances[0].DBInstanceStatus", "rds", "describe-db-instances", "--db-instance-identifier", instanceName)
+	}
+}
+
+func dbSecretStatus(instanceName string) func() string {
+	return func() string {
+		return awscli.AWSQuery("DBInstances[0].MasterUserSecret.SecretStatus", "rds", "describe-db-instances", "--db-instance-identifier", instanceName)
 	}
 }
