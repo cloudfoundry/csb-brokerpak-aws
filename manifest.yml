@@ -34,8 +34,8 @@ terraform_binaries:
   provider: cloudfoundry.org/cloud-service-broker/csbpg
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbmysql
-  version: 1.3.15
-  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.3.15.zip
+  version: 1.3.16
+  source: https://github.com/cloudfoundry/terraform-provider-csbmysql/archive/v1.3.16.zip
   provider: cloudfoundry.org/cloud-service-broker/csbmysql
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-csbdynamodbns
@@ -47,8 +47,8 @@ terraform_binaries:
   provider: cloudfoundry.org/cloud-service-broker/csbmajorengineversion
   url_template: ./providers/build/cloudfoundry.org/cloud-service-broker/csbmajorengineversion/${version}/${os}_${arch}/${name}_v${version}
 - name: terraform-provider-csbsqlserver
-  version: 1.0.63
-  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.63.zip
+  version: 1.0.64
+  source: https://github.com/cloudfoundry/terraform-provider-csbsqlserver/archive/v1.0.64.zip
   provider: cloudfoundry.org/cloud-service-broker/csbsqlserver
   url_template: https://github.com/cloudfoundry/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 env_config_mapping:
