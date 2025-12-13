@@ -10,7 +10,7 @@ require (
 	github.com/aws/smithy-go v1.24.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.38.1
 	github.com/onsi/ginkgo/v2 v2.27.2
-	github.com/onsi/gomega v1.38.2
+	github.com/onsi/gomega v1.38.3
 	github.com/pborman/uuid v1.2.1
 )
 
