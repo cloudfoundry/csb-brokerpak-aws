@@ -44,8 +44,10 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			defer apps.Delete(appOne, appTwo)
 
 			By("binding the apps to the s3 service instance")
-			bindingOne := serviceInstance.Bind(appOne)
-			bindingTwo := serviceInstance.Bind(appTwo)
+			// Using WithBindParameters to ensure bind request details are stored in the database,
+			// which exercises the upgrade path for the bind_resource migration (PR #1341)
+			bindingOne := serviceInstance.Bind(appOne, services.WithBindParameters(`{}`))
+			bindingTwo := serviceInstance.Bind(appTwo, services.WithBindParameters(`{}`))
 			apps.Start(appOne, appTwo)
 
 			By("uploading a blob using the first app")
