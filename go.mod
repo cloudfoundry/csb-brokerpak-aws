@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.193.0
 	github.com/aws/aws-sdk-go-v2/service/rds v1.91.0
 	github.com/blang/semver/v4 v4.0.0
-	github.com/cloudfoundry/cloud-service-broker/v2 v2.4.7
+	github.com/cloudfoundry/cloud-service-broker/v2 v2.4.8-0.20260114151514-57c7313a37b2
 	github.com/hashicorp/terraform-json v0.23.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/onsi/ginkgo/v2 v2.22.0
