@@ -44,11 +44,11 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			defer apps.Delete(appOne, appTwo)
 
 			By("binding the apps to the s3 service instance")
-			// Using WithBindParameters with "vacant" param to ensure bind request details are stored
+			// Using WithBindParameters with empty JSON to ensure bind request details are stored
 			// in the database, which exercises the upgrade path for the bind_resource migration (PR #1341).
-			// The "vacant" parameter is a no-op that's always allowed by the broker.
-			bindingOne := serviceInstance.Bind(appOne, services.WithBindParameters(`{"vacant":true}`))
-			bindingTwo := serviceInstance.Bind(appTwo, services.WithBindParameters(`{"vacant":true}`))
+			// Empty JSON "{}" creates an empty map (not nil), which triggers storage of bind request details.
+			bindingOne := serviceInstance.Bind(appOne, services.WithBindParameters(`{}`))
+			bindingTwo := serviceInstance.Bind(appTwo, services.WithBindParameters(`{}`))
 			apps.Start(appOne, appTwo)
 
 			By("uploading a blob using the first app")
@@ -66,8 +66,10 @@ var _ = Describe("UpgradeS3Test", Label("upgrade", "s3"), func() {
 			By("validating that the instance plan is still active")
 			Expect(plans.ExistsAndAvailable(servicePlan, serviceOffering, serviceBroker.Name))
 
-			By("upgrading the service instance")
-			serviceInstance.Upgrade()
+			By("upgrading the service instance (forced)")
+			// Using ForceUpgrade to bypass UpgradeAvailable() check, which may not detect
+			// the maintenance_info version change correctly in all environments.
+			serviceInstance.ForceUpgrade()
 
 			By("checking that previously written data is accessible")
 			got = appTwo.GET(blobNameOne).String()

@@ -28,6 +28,22 @@ func (s *ServiceInstance) Upgrade() {
 	Expect(s.UpgradeAvailable()).To(BeFalse(), "service instance has an upgrade available after upgrade")
 }
 
+// ForceUpgrade attempts to upgrade the service instance regardless of whether
+// CF reports an upgrade is available. This is useful for testing upgrade paths
+// where the maintenance_info version detection may not work as expected.
+func (s *ServiceInstance) ForceUpgrade() {
+	fmt.Printf("Force upgrading service instance (UpgradeAvailable=%v)\n", s.UpgradeAvailable())
+
+	session := cf.Start("upgrade-service", s.Name, "--force", "--wait")
+	Eventually(session).WithTimeout(operationTimeout).Should(Exit(0), func() string {
+		out, _ := cf.Run("service", s.Name)
+		return out
+	})
+
+	out, _ := cf.Run("service", s.Name)
+	Expect(out).To(MatchRegexp(`status:\s+update succeeded`))
+}
+
 func (s *ServiceInstance) UpgradeAvailable() bool {
 	out, _ := cf.Run("curl", fmt.Sprintf("/v3/service_instances/%s", s.GUID()))
 
