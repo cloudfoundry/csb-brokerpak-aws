@@ -60,8 +60,6 @@ var _ = Describe("postgres", Label("postgres-terraform"), Ordered, func() {
 			"require_ssl":                           false,
 			"storage_type":                          "io1",
 			"backup_retention_period":               7,
-			"aws_access_key_id":                     awsAccessKeyID,
-			"aws_secret_access_key":                 awsSecretAccessKey,
 			"enable_export_postgresql_logs":         false,
 			"cloudwatch_postgresql_log_group_retention_in_days": 30,
 			"enable_export_upgrade_logs":                        false,

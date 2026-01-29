@@ -3,7 +3,6 @@ package csbmajorengineversion_test
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -15,9 +14,7 @@ import (
 )
 
 const (
-	accessKeyID     = "AWS_ACCESS_KEY_ID"
-	secretAccessKey = "AWS_SECRET_ACCESS_KEY"
-	providerName    = "csbmajorengineversion"
+	providerName = "csbmajorengineversion"
 )
 
 var (
@@ -31,14 +28,8 @@ var _ = Describe("Provider", func() {
 		resource.Test(GinkgoT(), resource.TestCase{
 			IsUnitTest:        true,
 			ProviderFactories: getTestProviderFactories(provider),
-			PreCheck: func() {
-				failIfEnvEmpty(accessKeyID)
-				failIfEnvEmpty(secretAccessKey)
-			},
 			Steps: []resource.TestStep{{
 				Config: testGetConfiguration(
-					os.Getenv(accessKeyID),
-					os.Getenv(secretAccessKey),
 					region,
 					engine,
 					engineVersion,
@@ -115,22 +106,15 @@ func getTestProviderFactories(provider *schema.Provider) map[string]func() (*sch
 	}
 }
 
-func testGetConfiguration(accessKeyID, secretAccessKey, region, engine, engineVersion string) string {
+func testGetConfiguration(region, engine, engineVersion string) string {
 	return fmt.Sprintf(`
 provider "csbmajorengineversion" {
   engine 			= %[1]q
-  access_key_id     = %[2]q
-  secret_access_key = %[3]q
-  region            = %[4]q
+  region      = %[2]q
 }
 
 data "csbmajorengineversion" "major_version" {
-  engine_version     = %[5]q
+  engine_version     = %[3]q
 }
-`, engine, accessKeyID, secretAccessKey, region, engineVersion)
-}
-
-func failIfEnvEmpty(name string) {
-	value := os.Getenv(name)
-	Expect(value).NotTo(BeEmpty(), "environment variable %s must be set.", name)
+`, engine, region, engineVersion)
 }

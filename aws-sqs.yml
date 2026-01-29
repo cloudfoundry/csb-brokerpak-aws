@@ -54,14 +54,6 @@ provision:
         The time for which a ReceiveMessage call will wait for a message to arrive (long polling) before returning. 
         An integer from 0 to 20 (seconds). The default for this attribute is 0, meaning that the call will return immediately.
       default: 0
-    - field_name: aws_access_key_id
-      type: string
-      details: AWS access key
-      default: ${config("aws.access_key_id")}
-    - field_name: aws_secret_access_key
-      type: string
-      details: AWS secret key
-      default: ${config("aws.secret_access_key")}
     - field_name: dlq_arn
       type: string
       details: ARN of the Dead Letter Queue. If provided, configures redrive_policy for the queue.
@@ -157,12 +149,6 @@ bind:
   plan_inputs: []
   user_inputs: []
   computed_inputs:
-    - name: aws_access_key_id
-      type: string
-      default: ${config("aws.access_key_id")}
-    - name: aws_secret_access_key
-      type: string
-      default: ${config("aws.secret_access_key")}
     - name: arn
       default: ${instance.details["arn"]}
       overwrite: true
