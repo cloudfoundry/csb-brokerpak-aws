@@ -33,8 +33,6 @@ var _ = Describe("Redis", Label("redis-terraform"), Ordered, func() {
 			"elasticache_subnet_group":                   "",
 			"elasticache_vpc_security_group_ids":         "",
 			"region":                                     awsRegion,
-			"aws_access_key_id":                          awsAccessKeyID,
-			"aws_secret_access_key":                      awsSecretAccessKey,
 			"aws_vpc_id":                                 awsVPCID,
 			"at_rest_encryption_enabled":                 true,
 			"kms_key_id":                                 "fake-encryption-at-rest-key",

@@ -13,12 +13,11 @@ This allows `cf push`ed applications access, while denying any public access.
 ### AWS Service Credentials
 
 The services need to be provisioned in the same AWS account that the foundation is running in.
-To do this, the broker needs the following service principal credentials to manage resources within that account:
-- access key id
-- secret access key
+To do this, the broker needs to authenticate to the AWS account. This can be performed by any of the options
+described by default aws credential provider chain ([Credential Chain](https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html#credentialProviderChain)).
 
 #### Required IAM Policies
-The AWS account represented by the access key needs the following permission policies:
+The cloud service broker requires the following permission policies:
 ```json
 {
     "Version": "2012-10-17",
@@ -293,20 +292,6 @@ cf create-service <MySQL_SERVICE_OFFERING_NAME> <PLAN_NAME> csb-sql [-b <SERVICE
 ```
 
 ### Build Config File
-To avoid putting any sensitive information in environment variables, a config file can be used.
-
-Create a file named `config.yml` in the same directory the broker and brokerpak have been downloaded to. Its contents should be:
-
-```yaml
-aws:
-  access_key_id: your access key id
-  secret_access_key: your secret access key
-
-api:
-  user: someusername
-  password: somepassword
-```
-
 Add your custom plans to the `config.yml` file, for example, plans for MySQL
 
 ```yaml
@@ -366,10 +351,6 @@ To avoid putting any sensitive information in environment variables, a config fi
 Create a file named `config.yml` in the same directory the broker and brokerpak have been downloaded to. Its contents should be:
 
 ```yaml
-aws:
-  access_key_id: your access key id
-  secret_access_key: your secret access key
-
 db:
   host: your mysql host
   password: your mysql password
