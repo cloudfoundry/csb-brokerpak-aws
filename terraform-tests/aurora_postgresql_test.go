@@ -24,8 +24,6 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 			"db_name":                               "csbdb",
 			"labels":                                map[string]any{"key1": "some-postgres-value"},
 			"region":                                awsRegion,
-			"aws_access_key_id":                     awsAccessKeyID,
-			"aws_secret_access_key":                 awsSecretAccessKey,
 			"aws_vpc_id":                            awsVPCID,
 			"cluster_instances":                     3,
 			"serverless_min_capacity":               nil,

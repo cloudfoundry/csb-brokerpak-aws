@@ -9,10 +9,9 @@ A brokerpak for the [Cloud Service Broker](https://github.com/pivotal/cloud-serv
 
 ## AWS account information
 
-To provision services, the brokerpak currently requires AWS access key id and secret. The brokerpak expects them in environment variables:
+To provision services, the brokerpak currently requires access to the AWS account.
+You can provide access by using any of the methods defined by the default AWS credential provider chain ([Credential Chain](https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html#credentialProviderChain)).
 
-* AWS_ACCESS_KEY_ID
-* AWS_SECRET_ACCESS_KEY
 
 ## Development Tools
 

@@ -73,19 +73,11 @@ Brokerpak configuration values:
 
 ## AWS Configuration
 
-The AWS brokerpak supports default values for access key id and secret access key credentials.
-
-| Environment Variable  | Config File Value     | Type   | Description       |
-|-----------------------|-----------------------|--------|-------------------|
-| AWS_ACCESS_KEY_ID     | aws.access_key_id     | string | access key id     |
-| AWS_SECRET_ACCESS_KEY | aws.secret_access_key | string | secret access key |
+The AWS brokerpak supports default provider chain for authentication with AWS. ([Credential Chain](https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html#credentialProviderChain))
 
 ### Config Example
 
 ```yml
-aws:
-  access_key_id: access key id
-  secret_access_key: secret access key
 db:
   host: your mysql host
   password: your mysql password

@@ -38,8 +38,6 @@ var _ = Describe("SQS", Label("SQS-terraform"), Ordered, func() {
 			"delay_seconds":                     0,
 			"receive_wait_time_seconds":         0,
 			"labels":                            map[string]string{"label1": "value1"},
-			"aws_access_key_id":                 awsAccessKeyID,
-			"aws_secret_access_key":             awsSecretAccessKey,
 			"region":                            awsRegion,
 			"dlq_arn":                           "",
 			"max_receive_count":                 5,
