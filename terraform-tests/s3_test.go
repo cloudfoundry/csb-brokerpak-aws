@@ -22,8 +22,6 @@ var _ = Describe("S3", Label("S3-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"aws_access_key_id":                          awsAccessKeyID,
-			"aws_secret_access_key":                      awsSecretAccessKey,
 			"bucket_name":                                bucketName,
 			"region":                                     awsRegion,
 			"acl":                                        "public-read",

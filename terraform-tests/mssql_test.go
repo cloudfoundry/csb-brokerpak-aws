@@ -29,8 +29,6 @@ var _ = Describe("mssql", Label("mssql-terraform"), Ordered, func() {
 
 	BeforeEach(func() {
 		defaultVars = map[string]any{
-			"aws_access_key_id":     awsAccessKeyID,
-			"aws_secret_access_key": awsSecretAccessKey,
 			"region":                awsRegion,
 			"instance_name":         "csb-mssql-test",
 			"storage_encrypted":     true,

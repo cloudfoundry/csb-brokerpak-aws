@@ -67,14 +67,6 @@ provision:
     type: integer
     details: Number of nodes (primary and replicas) in cluster
     default: 2
-  - field_name: aws_access_key_id
-    type: string
-    details: AWS access key
-    default: ${config("aws.access_key_id")}
-  - field_name: aws_secret_access_key
-    type: string
-    details: AWS secret key
-    default: ${config("aws.secret_access_key")}
   - field_name: aws_vpc_id
     details: VPC ID for instance
     type: string

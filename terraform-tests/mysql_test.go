@@ -52,8 +52,6 @@ var _ = Describe("mysql", Label("mysql-terraform"), Ordered, func() {
 			"backup_window":                         nil,
 			"copy_tags_to_snapshot":                 true,
 			"delete_automated_backups":              true,
-			"aws_access_key_id":                     awsAccessKeyID,
-			"aws_secret_access_key":                 awsSecretAccessKey,
 			"region":                                awsRegion,
 			"option_group_name":                     "",
 			"monitoring_interval":                   0,

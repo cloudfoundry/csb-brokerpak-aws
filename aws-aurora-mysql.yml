@@ -102,14 +102,6 @@ provision:
     type: boolean
     details: Whether deletion protection is enabled. The database cannot be deleted when this value is set.
     default: false
-  - field_name: aws_access_key_id
-    type: string
-    details: AWS access key
-    default: ${config("aws.access_key_id")}
-  - field_name: aws_secret_access_key
-    type: string
-    details: AWS secret key
-    default: ${config("aws.secret_access_key")}
   - field_name: aws_vpc_id
     type: string
     details: VPC ID for instance
@@ -344,14 +336,6 @@ bind:
     type: boolean
     details: Expose the Aurora reader endpoint, which is balanced across Reader and Writer instances
     default: false
-  - field_name: aws_access_key_id
-    type: string
-    details: AWS access key
-    default: ${config("aws.access_key_id")}
-  - field_name: aws_secret_access_key
-    type: string
-    details: AWS secret key
-    default: ${config("aws.secret_access_key")}
   computed_inputs:
   - name: name
     type: string

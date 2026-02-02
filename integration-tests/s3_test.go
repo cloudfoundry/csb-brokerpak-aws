@@ -111,8 +111,6 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("sse_default_kms_key_id", BeNil()),
 					HaveKeyWithValue("sse_default_algorithm", BeNil()),
 					HaveKeyWithValue("sse_bucket_key_enabled", false),
-					HaveKeyWithValue("aws_access_key_id", awsAccessKeyID),
-					HaveKeyWithValue("aws_secret_access_key", awsSecretAccessKey),
 					HaveKeyWithValue("require_tls", false),
 				),
 			)
@@ -132,8 +130,6 @@ var _ = Describe("S3", Label("s3"), func() {
 				"sse_default_kms_key_id":                  "key-arn",
 				"sse_bucket_key_enabled":                  true,
 				"sse_default_algorithm":                   "aws:kms",
-				"aws_access_key_id":                       "fake-aws-access-key-id",
-				"aws_secret_access_key":                   "fake-aws-secret-access-key",
 				"require_tls":                             true,
 			})
 
@@ -160,8 +156,6 @@ var _ = Describe("S3", Label("s3"), func() {
 					HaveKeyWithValue("sse_default_kms_key_id", "key-arn"),
 					HaveKeyWithValue("sse_default_algorithm", "aws:kms"),
 					HaveKeyWithValue("sse_bucket_key_enabled", true),
-					HaveKeyWithValue("aws_access_key_id", "fake-aws-access-key-id"),
-					HaveKeyWithValue("aws_secret_access_key", "fake-aws-secret-access-key"),
 					HaveKeyWithValue("require_tls", true),
 				),
 			)
@@ -213,8 +207,6 @@ var _ = Describe("S3", Label("s3"), func() {
 
 				Expect(err).NotTo(HaveOccurred())
 			},
-			Entry("update aws_access_key_id", map[string]any{"aws_access_key_id": "another-aws_access_key_id"}),
-			Entry("update aws_secret_access_key", map[string]any{"aws_secret_access_key": "another-aws_secret_access_key"}),
 			Entry("update pab_block_public_acls", map[string]any{"pab_block_public_acls": true}),
 			Entry("update pab_block_public_policy", map[string]any{"pab_block_public_policy": true}),
 			Entry("update pab_ignore_public_acls", map[string]any{"pab_ignore_public_acls": true}),

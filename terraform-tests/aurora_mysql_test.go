@@ -24,8 +24,6 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 			"db_name":                                "csbdb",
 			"labels":                                 map[string]any{"key1": "some-mysql-value"},
 			"region":                                 awsRegion,
-			"aws_access_key_id":                      awsAccessKeyID,
-			"aws_secret_access_key":                  awsSecretAccessKey,
 			"aws_vpc_id":                             awsVPCID,
 			"cluster_instances":                      3,
 			"serverless_min_capacity":                nil,
