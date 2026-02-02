@@ -292,6 +292,20 @@ cf create-service <MySQL_SERVICE_OFFERING_NAME> <PLAN_NAME> csb-sql [-b <SERVICE
 ```
 
 ### Build Config File
+To avoid putting any sensitive information in environment variables, a config file can be used.
+
+Create a file named `config.yml` in the same directory the broker and brokerpak have been downloaded to. Its contents should be:
+
+```yaml
+aws:
+  access_key_id: your access key id
+  secret_access_key: your secret access key
+
+api:
+  user: someusername
+  password: somepassword
+```
+
 Add your custom plans to the `config.yml` file, for example, plans for MySQL
 
 ```yaml
@@ -351,6 +365,10 @@ To avoid putting any sensitive information in environment variables, a config fi
 Create a file named `config.yml` in the same directory the broker and brokerpak have been downloaded to. Its contents should be:
 
 ```yaml
+aws:
+  access_key_id: your access key id
+  secret_access_key: your secret access key
+
 db:
   host: your mysql host
   password: your mysql password
