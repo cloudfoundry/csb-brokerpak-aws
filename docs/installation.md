@@ -13,12 +13,11 @@ This allows `cf push`ed applications access, while denying any public access.
 ### AWS Service Credentials
 
 The services need to be provisioned in the same AWS account that the foundation is running in.
-To do this, the broker needs the following service principal credentials to manage resources within that account:
-- access key id
-- secret access key
+To do this, the broker needs to authenticate to the AWS account. This can be performed by any of the options
+described by default aws credential provider chain ([Credential Chain](https://docs.aws.amazon.com/sdkref/latest/guide/standardized-credentials.html#credentialProviderChain)).
 
 #### Required IAM Policies
-The AWS account represented by the access key needs the following permission policies:
+The cloud service broker requires the following permission policies:
 ```json
 {
     "Version": "2012-10-17",
