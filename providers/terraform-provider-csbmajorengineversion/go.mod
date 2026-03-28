@@ -3,7 +3,7 @@ module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-majorenginev
 go 1.26.1
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.41.4
+	github.com/aws/aws-sdk-go-v2 v1.41.5
 	github.com/aws/aws-sdk-go-v2/config v1.32.12
 	github.com/aws/aws-sdk-go-v2/service/rds v1.116.3
 	github.com/hashicorp/terraform-plugin-log v0.10.0
