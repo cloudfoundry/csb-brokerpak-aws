@@ -2,6 +2,7 @@ package acceptance_tests_test
 
 import (
 	"net/http"
+	"time"
 
 	"csbbrokerpakaws/acceptance-tests/helpers/apps"
 	"csbbrokerpakaws/acceptance-tests/helpers/random"
@@ -139,8 +140,14 @@ var _ = Describe("SQS", Label("sqs"), func() {
 			consumerApp.POSTf("", "/redrive/%s?dlq_arn=%s", consumerBindingName, dlqARN)
 
 			By("reading message in the original queue using consumer app")
-			got = consumerApp.GETf("/retrieve_and_delete/%s", consumerBindingName).String()
-			Expect(got).To(Equal(message))
+			Eventually(func() string {
+				resp := consumerApp.GETResponsef("/retrieve_and_delete/%s", consumerBindingName)
+				defer resp.Body.Close()
+				if resp.StatusCode != http.StatusOK {
+					return ""
+				}
+				return apps.NewPayload(resp).String()
+			}).WithTimeout(time.Minute).WithPolling(5 * time.Second).Should(Equal(message))
 		})
 	})
 })
