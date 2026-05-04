@@ -18,7 +18,7 @@ plans:
 - name: sandbox-8h
   id: d4e5f6a7-b8c9-0123-defa-123456789100
   description: |
-    Sandbox plan — 8-hour TTL, locked to Haiku/lite/embed models only.
+    Sandbox plan — 8-hour TTL with configurable model selection.
     Auto-deprovisioned by TTL controller after ttl_hours. Optional operator
     budget alert email can be configured broker-side.
   display_name: Sandbox 8-hour
