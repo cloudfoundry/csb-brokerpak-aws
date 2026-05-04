@@ -64,7 +64,4 @@ service_definitions:
 - aws-aurora-mysql.yml
 - aws-mssql.yml
 - aws-sqs.yml
-
-
-
-
+- aws-bedrock.yml
