@@ -19,7 +19,7 @@ description: CSB Amazon DynamoDB Namespace
 display_name: CSB Amazon DynamoDB Namespace
 image_url: file://service-images/csb.png
 documentation_url: https://techdocs.broadcom.com/tnz-aws-broker-cf
-provider_display_name: VMware
+provider_display_name: GSA TTS
 support_url: https://aws.amazon.com/dynamodb/
 tags: [aws, dynamodb, namespace]
 plan_updateable: true

@@ -4,6 +4,7 @@ data "aws_partition" "current" {}
 locals {
   model_ids      = jsondecode(var.models)
   ttl_expires_at = timeadd(timestamp(), "${var.ttl_hours}h")
+  budget_enforcement_mode = trimspace(var.budget_alert_email) == "" ? "alert-email-optional-unset" : "alert-email-configured"
 
   # Build ARNs for each model ID so the IAM policy can reference them directly.
   model_arns = [

@@ -19,7 +19,8 @@ plans:
   id: d4e5f6a7-b8c9-0123-defa-123456789100
   description: |
     Sandbox plan — 8-hour TTL, locked to Haiku/lite/embed models only.
-    Auto-deprovisioned by TTL controller after ttl_hours.
+    Auto-deprovisioned by TTL controller after ttl_hours. Optional operator
+    budget alert email can be configured broker-side.
   display_name: Sandbox 8-hour
   properties:
     ttl_hours: 8
@@ -27,7 +28,9 @@ plans:
     models: '["anthropic.claude-3-haiku-20240307-v1:0","amazon.titan-embed-text-v1","amazon.titan-text-lite-v1"]'
 - name: standard
   id: e5f6a7b8-c9d0-1234-efab-234567890100
-  description: Standard plan — configurable TTL up to 8 hours and model selection.
+  description: |
+    Standard plan — configurable TTL up to 8 hours and model selection.
+    Optional operator budget alert email can be configured broker-side.
   display_name: Standard
   properties: {}
 provision:
@@ -43,6 +46,10 @@ provision:
       enabled in the AWS console. Example:
       '["anthropic.claude-3-haiku-20240307-v1:0","amazon.titan-embed-text-v1"]'
     default: '["anthropic.claude-3-haiku-20240307-v1:0","amazon.titan-embed-text-v1","amazon.titan-text-lite-v1"]'
+  - field_name: budget_amount
+    type: number
+    details: Monthly USD budget threshold metadata for this instance. Alerting is operator-email based when configured broker-side.
+    default: 100
   user_inputs:
   - field_name: instance_name
     type: string
@@ -64,6 +71,10 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
+  - name: budget_alert_email
+    default: ${config("aws.budget_alert_email")}
+    overwrite: true
+    type: string
   template_refs:
     data: terraform/bedrock/provision/data.tf
     main: terraform/bedrock/provision/main.tf
@@ -90,6 +101,12 @@ provision:
   - field_name: guardrail_arn
     type: string
     details: Bedrock guardrail ARN.
+  - field_name: budget_amount
+    type: number
+    details: Monthly USD budget threshold metadata for this instance.
+  - field_name: budget_enforcement_mode
+    type: string
+    details: Whether an optional operator budget alert email is configured broker-side.
   - field_name: ttl_expires_at
     type: string
     details: RFC3339 timestamp when this instance expires.
@@ -119,6 +136,14 @@ bind:
     type: string
   - name: bedrock_endpoint
     default: ${instance.details["bedrock_endpoint"]}
+    overwrite: true
+    type: string
+  - name: budget_amount
+    default: ${instance.details["budget_amount"]}
+    overwrite: true
+    type: number
+  - name: budget_enforcement_mode
+    default: ${instance.details["budget_enforcement_mode"]}
     overwrite: true
     type: string
   - name: ttl_expires_at
@@ -154,6 +179,12 @@ bind:
   - field_name: guardrail_id
     type: string
     details: Bedrock guardrail ID for content filtering.
+  - field_name: budget_amount
+    type: number
+    details: Monthly USD budget threshold metadata for this instance.
+  - field_name: budget_enforcement_mode
+    type: string
+    details: Whether an optional operator budget alert email is configured broker-side.
   - field_name: ttl_expires_at
     type: string
     details: RFC3339 timestamp when this instance expires.

@@ -5,4 +5,6 @@ variable "guardrail_id" { type = string }
 variable "guardrail_arn" { type = string }
 variable "available_models" { type = string }
 variable "bedrock_endpoint" { type = string }
+variable "budget_amount" { type = number }
+variable "budget_enforcement_mode" { type = string }
 variable "ttl_expires_at" { type = string }
