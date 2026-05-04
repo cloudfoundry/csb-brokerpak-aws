@@ -2,8 +2,20 @@ output "region" {
   value = var.region
 }
 
+output "instance_name" {
+  value = var.instance_name
+}
+
+output "cf_provenance_json" {
+  value = jsonencode(local.cf_provenance)
+}
+
 output "available_models" {
   value = var.models
+}
+
+output "resource_tags_json" {
+  value = jsonencode(local.common_tags)
 }
 
 output "bedrock_endpoint" {

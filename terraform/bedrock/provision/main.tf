@@ -3,7 +3,6 @@
 resource "aws_iam_policy" "bedrock_access" {
   name        = "${var.instance_name}-bedrock-access"
   description = "CSB sandbox Bedrock access policy — expires ${local.ttl_expires_at}"
-  tags        = local.common_tags
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -44,7 +43,6 @@ resource "aws_bedrock_guardrail" "content_filter" {
   description               = "Content filtering guardrail for CSB sandbox — expires ${local.ttl_expires_at}"
   blocked_input_messaging   = "This request was blocked by the content policy."
   blocked_outputs_messaging = "This response was blocked by the content policy."
-  tags                      = local.common_tags
 
   content_policy_config {
     filters_config {

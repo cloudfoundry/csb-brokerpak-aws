@@ -8,3 +8,5 @@ variable "budget_alert_email" {
 	default = ""
 }
 variable "labels" { type = map(any) }
+variable "cf_context_json" { type = string }
+variable "cf_originating_identity_json" { type = string }

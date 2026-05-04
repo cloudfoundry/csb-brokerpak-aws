@@ -19,20 +19,84 @@ plans:
   id: d4e5f6a7-b8c9-0123-defa-123456789100
   description: |
     Sandbox plan — 8-hour TTL with configurable model selection.
+    Supports the same `models` override surface as the standard plan; only the
+    TTL envelope is sandbox-constrained.
     Auto-deprovisioned by TTL controller after ttl_hours. Optional operator
     budget alert email can be configured broker-side.
   display_name: Sandbox 8-hour
   properties:
     ttl_hours: 8
     region: us-east-1
-    models: '["anthropic.claude-3-haiku-20240307-v1:0","amazon.titan-embed-text-v1","amazon.titan-text-lite-v1"]'
+    models: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","us.meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-12b-it"]'
+- name: claude-opus-4-6
+  id: f6a7b8c9-d0e1-2345-abcd-345678901101
+  description: Standard Bedrock access pinned to Claude Opus 4.6.
+  display_name: Claude Opus 4.6
+  properties:
+    models: '["us.anthropic.claude-opus-4-6-v1"]'
+- name: claude-opus-4-5
+  id: a7b8c9d0-e1f2-3456-bcde-456789011102
+  description: Standard Bedrock access pinned to Claude Opus 4.5.
+  display_name: Claude Opus 4.5
+  properties:
+    models: '["us.anthropic.claude-opus-4-5-20251101-v1:0"]'
+- name: claude-sonnet-4-6
+  id: b8c9d0e1-f2a3-4567-cdef-567890111203
+  description: Standard Bedrock access pinned to Claude Sonnet 4.6.
+  display_name: Claude Sonnet 4.6
+  properties:
+    models: '["us.anthropic.claude-sonnet-4-6"]'
+- name: claude-sonnet-4-5
+  id: c9d0e1f2-a3b4-5678-def0-678901112304
+  description: Standard Bedrock access pinned to Claude Sonnet 4.5.
+  display_name: Claude Sonnet 4.5
+  properties:
+    models: '["us.anthropic.claude-sonnet-4-5-20250929-v1:0"]'
+- name: claude-haiku-4-5
+  id: d0e1f2a3-b4c5-6789-ef01-789011123405
+  description: Standard Bedrock access pinned to Claude Haiku 4.5.
+  display_name: Claude Haiku 4.5
+  properties:
+    models: '["anthropic.claude-haiku-4-5-20251001-v1:0"]'
+- name: llama-4-maverick-17b-instruct
+  id: e1f2a3b4-c5d6-7890-f012-890111234506
+  description: Standard Bedrock access pinned to Llama 4 Maverick 17B Instruct.
+  display_name: Llama 4 Maverick 17B Instruct
+  properties:
+    models: '["us.meta.llama4-maverick-17b-instruct-v1:0"]'
+- name: llama-4-scout-17b-instruct
+  id: f2a3b4c5-d6e7-8901-0123-901112345607
+  description: Standard Bedrock access pinned to Llama 4 Scout 17B Instruct.
+  display_name: Llama 4 Scout 17B Instruct
+  properties:
+    models: '["us.meta.llama4-scout-17b-instruct-v1:0"]'
+- name: llama-3-3-70b-instruct
+  id: a3b4c5d6-e7f8-9012-1234-011123456708
+  description: Standard Bedrock access pinned to Llama 3.3 70B Instruct.
+  display_name: Llama 3.3 70B Instruct
+  properties:
+    models: '["us.meta.llama3-3-70b-instruct-v1:0"]'
+- name: gpt-oss-120b
+  id: b4c5d6e7-f809-0123-2345-111234567809
+  description: Standard Bedrock access pinned to gpt-oss-120b.
+  display_name: gpt-oss-120b
+  properties:
+    models: '["openai.gpt-oss-120b-1:0"]'
+- name: gemma-3-12b-it
+  id: c5d6e7f8-091a-1234-3456-21234567890a
+  description: Standard Bedrock access pinned to Gemma 3 12B IT.
+  display_name: Gemma 3 12B IT
+  properties:
+    models: '["google.gemma-3-12b-it"]'
 - name: standard
   id: e5f6a7b8-c9d0-1234-efab-234567890100
   description: |
-    Standard plan — configurable TTL up to 8 hours and model selection.
+    Standard plan — configurable TTL up to 8 hours with the requested Bedrock
+    model set enabled by default.
     Optional operator budget alert email can be configured broker-side.
   display_name: Standard
-  properties: {}
+  properties:
+    models: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","us.meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-12b-it"]'
 provision:
   plan_inputs:
   - field_name: ttl_hours
@@ -43,9 +107,10 @@ provision:
     type: string
     details: |
       JSON array of Bedrock foundation model IDs to allow. Model access must be
-      enabled in the AWS console. Example:
-      '["anthropic.claude-3-haiku-20240307-v1:0","amazon.titan-embed-text-v1"]'
-    default: '["anthropic.claude-3-haiku-20240307-v1:0","amazon.titan-embed-text-v1","amazon.titan-text-lite-v1"]'
+      enabled in the AWS console. Supported on both sandbox-8h and standard.
+      Example:
+      '["us.anthropic.claude-opus-4-6-v1","us.meta.llama4-maverick-17b-instruct-v1:0"]'
+    default: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","us.meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-12b-it"]'
   - field_name: budget_amount
     type: number
     details: Monthly USD budget threshold metadata for this instance. Alerting is operator-email based when configured broker-side.
@@ -71,6 +136,14 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
+  - name: cf_context_json
+    default: ${json.marshal(request.context)}
+    overwrite: true
+    type: string
+  - name: cf_originating_identity_json
+    default: ${json.marshal(request.x_broker_api_originating_identity)}
+    overwrite: true
+    type: string
   - name: budget_alert_email
     default: ${config("aws.budget_alert_email")}
     overwrite: true
@@ -83,6 +156,15 @@ provision:
     versions: terraform/bedrock/provision/versions.tf
     variables: terraform/bedrock/provision/variables.tf
   outputs:
+  - field_name: instance_name
+    type: string
+    details: Requested instance name used as the resource naming prefix.
+  - field_name: cf_provenance_json
+    type: string
+    details: JSON object of the Cloud Foundry org, space, and user provenance applied to resource tags.
+  - field_name: resource_tags_json
+    type: string
+    details: JSON object of the effective AWS tags applied to the provisioned resources.
   - field_name: region
     type: string
     details: AWS region for Bedrock.
@@ -118,6 +200,26 @@ bind:
     default: ${instance.details["region"]}
     overwrite: true
     type: string
+  - name: instance_name
+    default: ${instance.details["instance_name"]}
+    overwrite: true
+    type: string
+  - name: resource_tags_json
+    default: ${instance.details["resource_tags_json"]}
+    overwrite: true
+    type: string
+  - name: cf_context_json
+    default: ${json.marshal(request.context)}
+    overwrite: true
+    type: string
+  - name: cf_originating_identity_json
+    default: ${json.marshal(request.x_broker_api_originating_identity)}
+    overwrite: true
+    type: string
+  - name: cf_app_guid
+    default: ${request.app_guid}
+    overwrite: true
+    type: string
   - name: policy_arn
     default: ${instance.details["policy_arn"]}
     overwrite: true
@@ -138,14 +240,6 @@ bind:
     default: ${instance.details["bedrock_endpoint"]}
     overwrite: true
     type: string
-  - name: budget_amount
-    default: ${instance.details["budget_amount"]}
-    overwrite: true
-    type: number
-  - name: budget_enforcement_mode
-    default: ${instance.details["budget_enforcement_mode"]}
-    overwrite: true
-    type: string
   - name: ttl_expires_at
     default: ${instance.details["ttl_expires_at"]}
     overwrite: true
@@ -164,6 +258,15 @@ bind:
   - field_name: access_key_id
     type: string
     details: AWS access key ID for Bedrock invocation.
+  - field_name: instance_name
+    type: string
+    details: Requested instance name used as the resource naming prefix.
+  - field_name: binding_provenance_json
+    type: string
+    details: JSON object of the Cloud Foundry org, space, user, and bound app provenance for this binding.
+  - field_name: resource_tags_json
+    type: string
+    details: JSON object of the effective AWS tags applied to the provisioned resources and per-binding IAM user.
   - field_name: secret_access_key
     type: string
     details: AWS secret access key for Bedrock invocation.
@@ -179,12 +282,6 @@ bind:
   - field_name: guardrail_id
     type: string
     details: Bedrock guardrail ID for content filtering.
-  - field_name: budget_amount
-    type: number
-    details: Monthly USD budget threshold metadata for this instance.
-  - field_name: budget_enforcement_mode
-    type: string
-    details: Whether an optional operator budget alert email is configured broker-side.
   - field_name: ttl_expires_at
     type: string
     details: RFC3339 timestamp when this instance expires.
