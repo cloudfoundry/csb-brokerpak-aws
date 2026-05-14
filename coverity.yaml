@@ -1,0 +1,4 @@
+Service: csb-brokerpak-aws
+Language: go
+Default_branch: main
+Commit: main
