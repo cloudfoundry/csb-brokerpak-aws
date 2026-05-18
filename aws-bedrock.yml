@@ -285,3 +285,6 @@ bind:
   - field_name: ttl_expires_at
     type: string
     details: RFC3339 timestamp when this instance expires.
+  - field_name: normalized_binding_json
+    type: string
+    details: Normalized v1 runtime binding payload for cross-provider consumers.

@@ -49,3 +49,35 @@ output "guardrail_id" {
 output "ttl_expires_at" {
   value = var.ttl_expires_at
 }
+
+output "normalized_binding_json" {
+  value = jsonencode({
+    version            = "v1"
+    provider           = "aws"
+    provisioner_family = "aws_bedrock_identity"
+    connection_type    = "runtime"
+    endpoint = {
+      base_url    = var.bedrock_endpoint
+      region      = var.region
+      api_version = null
+    }
+    access = {
+      mode       = "aws_sigv4"
+      expires_at = null
+    }
+    grant = {
+      kind                 = "scoped_key"
+      least_privilege_unit = "model"
+      allowed_models       = try(jsondecode(var.available_models), [])
+    }
+    credential = {
+      format = "aws_temp_creds"
+      inline = {
+        access_key_id     = aws_iam_access_key.bedrock_key.id
+        secret_access_key = aws_iam_access_key.bedrock_key.secret
+      }
+      secret_ref = null
+    }
+  })
+  sensitive = true
+}
