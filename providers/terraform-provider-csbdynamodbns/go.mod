@@ -1,4 +1,4 @@
-module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns
+module github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns
 
 go 1.26.3
 

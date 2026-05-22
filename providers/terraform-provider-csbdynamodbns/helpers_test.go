@@ -13,7 +13,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
 )
 
 const testRegion = "us-west-2"

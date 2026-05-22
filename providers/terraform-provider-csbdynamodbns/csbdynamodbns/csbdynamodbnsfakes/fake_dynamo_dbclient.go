@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
 )
 
 type FakeDynamoDBClient struct {

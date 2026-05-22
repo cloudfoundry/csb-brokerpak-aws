@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
 )
 
 func main() {

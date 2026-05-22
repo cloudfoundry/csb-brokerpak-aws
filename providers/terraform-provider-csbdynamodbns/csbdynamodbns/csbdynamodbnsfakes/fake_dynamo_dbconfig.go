@@ -7,7 +7,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
 )
 
 type FakeDynamoDBConfig struct {

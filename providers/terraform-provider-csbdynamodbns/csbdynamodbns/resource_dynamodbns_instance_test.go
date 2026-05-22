@@ -11,8 +11,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/pborman/uuid"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns/csbdynamodbnsfakes"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/csbdynamodbns/csbdynamodbnsfakes"
 )
 
 var _ = Describe("ResourceDynamoDBNSInstance", func() {

@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-majorengineversion/csbmajorengineversion"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-majorengineversion/csbmajorengineversion"
 )
 
 const (

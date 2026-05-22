@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-majorengineversion/csbmajorengineversion"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-majorengineversion/csbmajorengineversion"
 )
 
 func main() {

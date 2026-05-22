@@ -7,12 +7,12 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/dynaclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 	"github.com/pborman/uuid"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/dynaclient"
 )
 
 var _ = Describe("Resource dynamodbns_instance", func() {

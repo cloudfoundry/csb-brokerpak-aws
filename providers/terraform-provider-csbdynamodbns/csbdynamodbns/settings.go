@@ -3,7 +3,7 @@ package csbdynamodbns
 import (
 	"context"
 
-	"github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns/dynaclient"
+	"github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns/dynaclient"
 )
 
 //counterfeiter:generate -header csbdynamodbnsfakes/header.txt . DynamoDBConfig
