@@ -55,6 +55,15 @@ jobs:
           GOPRIVATE: github.gwd.broadcom.net
           GONOSUMDB: github.gwd.broadcom.net
           GOMODCACHE: /tmp/gomodcache-${{ github.run_id }}
+      - name: DynamoDB NS provider unit tests
+        run: |
+          cd providers/terraform-provider-csbdynamodbns
+          go vet ./...
+          go tool ginkgo -r
+        env:
+          GOPRIVATE: github.gwd.broadcom.net
+          GONOSUMDB: github.gwd.broadcom.net
+          GOMODCACHE: /tmp/gomodcache-provider-${{ github.run_id }}
       - name: Integration tests
         run: cd integration-tests && go tool ginkgo -r .
         env:
