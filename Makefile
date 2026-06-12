@@ -7,7 +7,7 @@ help: ## list Makefile targets
 
 ###### Setup ##################################################################
 IAAS=aws
-CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.com/cloudfoundry/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
+CSB_VERSION := $(or $(CSB_VERSION), $(shell grep 'github.gwd.broadcom.net/TNZ/cloud-service-broker' go.mod | grep -v replace | awk '{print $$NF}' | sed -e 's/v//'))
 CSB_RELEASE_VERSION := $(CSB_VERSION) # this doesnt work well if we did make latest-csb.
 
 ####### broker environment variables
@@ -36,9 +36,9 @@ BROKER_GO_OPTS=PORT=8080 \
 				GSB_COMPATIBILITY_ENABLE_BETA_SERVICES='$(GSB_COMPATIBILITY_ENABLE_BETA_SERVICES)'
 
 PAK_PATH=$(PWD)
-RUN_CSB=$(BROKER_GO_OPTS) go run github.com/cloudfoundry/cloud-service-broker/v2
-LDFLAGS="-X github.com/cloudfoundry/cloud-service-broker/v2/utils.Version=$(CSB_VERSION)"
-GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.com/cloudfoundry/cloud-service-broker/v2"
+RUN_CSB=$(BROKER_GO_OPTS) go run github.gwd.broadcom.net/TNZ/cloud-service-broker/v2
+LDFLAGS="-X github.gwd.broadcom.net/TNZ/cloud-service-broker/v2/utils.Version=$(CSB_VERSION)"
+GET_CSB="env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags $(LDFLAGS) github.gwd.broadcom.net/TNZ/cloud-service-broker/v2"
 
 ###### Targets ################################################################
 
@@ -171,12 +171,12 @@ $(PAK_BUILD_CACHE_PATH):
 
 .PHONY: latest-csb
 latest-csb: ## point to the very latest CSB on GitHub
-	go get -d github.com/cloudfoundry/cloud-service-broker@main
+	go get -d github.gwd.broadcom.net/TNZ/cloud-service-broker@main
 	go mod tidy
 
 .PHONY: local-csb
 local-csb: ## point to a local CSB repo
-	echo "replace \"github.com/cloudfoundry/cloud-service-broker/v2\" => \"$$PWD/../cloud-service-broker\"" >>go.mod
+	echo "replace \"github.gwd.broadcom.net/TNZ/cloud-service-broker/v2\" => \"$$PWD/../cloud-service-broker\"" >>go.mod
 	go mod tidy
 
 ###### lint ###################################################################
