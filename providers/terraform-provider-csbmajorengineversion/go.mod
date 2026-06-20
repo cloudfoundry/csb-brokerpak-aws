@@ -5,7 +5,7 @@ go 1.26.4
 require (
 	github.com/aws/aws-sdk-go-v2 v1.42.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.25
-	github.com/aws/aws-sdk-go-v2/service/rds v1.119.2
+	github.com/aws/aws-sdk-go-v2/service/rds v1.119.3
 	github.com/hashicorp/terraform-plugin-log v0.10.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.1
 	github.com/onsi/ginkgo/v2 v2.31.0
