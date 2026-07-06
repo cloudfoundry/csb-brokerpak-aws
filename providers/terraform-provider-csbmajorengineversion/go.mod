@@ -1,6 +1,6 @@
 module github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-majorengineversion
 
-go 1.26.3
+go 1.26.4
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.42.1
