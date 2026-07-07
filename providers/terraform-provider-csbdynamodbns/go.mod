@@ -1,6 +1,6 @@
 module github.gwd.broadcom.net/TNZ/csb-brokerpak-aws/terraform-provider-dynamodbns
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.42.1
