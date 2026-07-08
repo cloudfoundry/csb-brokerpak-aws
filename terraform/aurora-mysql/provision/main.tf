@@ -42,7 +42,7 @@ resource "aws_rds_cluster" "cluster" {
   tags                            = var.labels
   master_username                 = length(var.admin_username) == 0 ? random_string.username[0].result : var.admin_username
   master_password                 = var.use_managed_admin_password ? null : random_password.password.result
-  manage_master_user_password     = var.use_managed_admin_password ? true : null
+  manage_master_user_password     = var.use_managed_admin_password ? true : false
   port                            = var.port
   db_subnet_group_name            = local.subnet_group
   vpc_security_group_ids          = local.rds_vpc_security_group_ids

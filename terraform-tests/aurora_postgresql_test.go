@@ -434,7 +434,7 @@ var _ = Describe("Aurora postgresql", Label("aurora-postgresql-terraform"), Orde
 				)
 				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"manage_master_user_password": BeNil(),
+						"manage_master_user_password": Equal(false),
 					}),
 				)
 			})
