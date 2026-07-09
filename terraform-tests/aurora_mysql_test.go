@@ -509,7 +509,7 @@ var _ = Describe("Aurora mysql", Label("aurora-mysql-terraform"), Ordered, func(
 				)
 				Expect(AfterValuesForType(plan, "aws_rds_cluster")).To(
 					MatchKeys(IgnoreExtras, Keys{
-						"manage_master_user_password": Equal(false),
+						"manage_master_user_password": BeNil(),
 					}),
 				)
 			})
