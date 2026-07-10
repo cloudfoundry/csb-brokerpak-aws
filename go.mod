@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.29
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.28
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.315.0
-	github.com/aws/aws-sdk-go-v2/service/rds v1.119.4
+	github.com/aws/aws-sdk-go-v2/service/rds v1.120.0
 	github.com/blang/semver/v4 v4.0.0
 	github.com/hashicorp/terraform-json v0.27.2
 	github.com/mitchellh/mapstructure v1.5.0
