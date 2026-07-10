@@ -1,22 +1,30 @@
 {
   "branchPrefix": "renovate/",
-  "enabledManagers": ["gomod", "github-actions", "terraform"],
+  "enabledManagers": [
+    "gomod",
+    "github-actions",
+    "terraform"
+  ],
   "automerge": true,
-  "endpoint": "https://github.gwd.broadcom.net/api/v3/",
   "forkProcessing": "enabled",
   "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
-  "onboarding": false,
   "packageRules": [
     {
       "dependencyDashboardApproval": false,
-      "matchUpdateTypes": ["pin", "digest", "patch", "minor", "major", "lockFileMaintenance"],
+      "matchUpdateTypes": [
+        "pin",
+        "digest",
+        "patch",
+        "minor",
+        "major",
+        "lockFileMaintenance"
+      ],
       "minimumReleaseAge": "0"
     }
   ],
-  "platform": "github",
   "rebaseWhen": "behind-base-branch",
-  "postUpdateOptions": ["gomodTidy"],
-  "prHourlyLimit": 0,
-  "repositories": ["TNZ/csb-brokerpak-aws"],
-  "username": "svc-tas-enablement"
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "prHourlyLimit": 0
 }
