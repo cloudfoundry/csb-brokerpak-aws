@@ -23,8 +23,13 @@ terraform_binaries:
   source: https://github.com/opentofu/opentofu/archive/v1.11.8.zip
   default: true
 - name: terraform-provider-aws
-  version: 6.46.0
-  source: https://github.com/terraform-providers/terraform-provider-aws/archive/v6.46.0.zip
+  # Pinned to a Broadcom-patched fork that fixes InvalidParameterCombination when
+  # disabling manage_master_user_password on an Aurora cluster whose Secrets Manager
+  # integration was never active (e.g. after a snapshot restore). Upstream PR:
+  # https://github.com/hashicorp/terraform-provider-aws/pull/48901
+  # Revert to an official hashicorp release once the fix is merged and published.
+  version: 6.55.0-broadcom-patch-1
+  source: https://github.com/georgidimdimitrov/terraform-provider-aws/archive/6e28fb02dca48c141ca18e05196217a0b0573371.zip
 - name: terraform-provider-random
   version: 3.9.0
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.9.0.zip
