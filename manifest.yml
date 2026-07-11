@@ -29,8 +29,8 @@ terraform_binaries:
   # https://github.com/hashicorp/terraform-provider-aws/pull/48901
   # Revert to an official hashicorp release once the fix is merged and published.
   version: 6.55.0-broadcom-patch-1
-  source: https://github.com/georgidimdimitrov/terraform-provider-aws/archive/6e28fb02dca48c141ca18e05196217a0b0573371.zip
-  url_template: https://github.com/georgidimdimitrov/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
+  source: https://github.gwd.broadcom.net/TNZ/terraform-provider-aws/archive/v6.55.0-broadcom-patch-1.zip
+  url_template: https://github.gwd.broadcom.net/TNZ/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-random
   version: 3.9.0
   source: https://github.com/terraform-providers/terraform-provider-random/archive/v3.9.0.zip
