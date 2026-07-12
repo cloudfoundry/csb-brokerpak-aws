@@ -28,10 +28,12 @@ terraform_binaries:
   # integration was never active (e.g. after a snapshot restore). The fix queries
   # the live AWS DescribeDBClusters state rather than the potentially stale Terraform
   # SDK state, and returns an explicit error if the describe call itself fails.
-  # Upstream PR: https://github.com/hashicorp/terraform-provider-aws/pull/48901
+  # A plain semver version (6.55.0, no pre-release suffix) is required so that
+  # OpenTofu's ~> 6 constraint matches the bundled provider without falling back
+  # to the public registry. Upstream PR: https://github.com/hashicorp/terraform-provider-aws/pull/48901
   # Revert to an official hashicorp release once the fix is merged and published.
-  version: 6.55.0-broadcom-patch-2
-  source: https://github.gwd.broadcom.net/TNZ/terraform-provider-aws/archive/v6.55.0-broadcom-patch-2.zip
+  version: 6.55.0
+  source: https://github.gwd.broadcom.net/TNZ/terraform-provider-aws/archive/v6.55.0.zip
   url_template: https://github.gwd.broadcom.net/TNZ/${name}/releases/download/v${version}/${name}_${version}_${os}_${arch}.zip
 - name: terraform-provider-random
   version: 3.9.0
