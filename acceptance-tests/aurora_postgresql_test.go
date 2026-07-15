@@ -25,11 +25,11 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	})
 
 	It("works with the latest supported version of Postgres", Label("JDBC-p", "PostgresLatestAGC"), func() {
-		testWithMultipleApps("17")
+		testWithMultipleApps("18")
 	})
 
 	It("works with the latest supported version of Postgres", Label("JDBC-p", "PostgresLatest"), func() {
-		testWithMultipleApps("17")
+		testWithMultipleApps("18")
 	})
 
 	// As we introduce the 'use_managed_admin_password' feature, some users may wish to update existing DBs.
@@ -42,7 +42,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 		params := map[string]any{
 			"cluster_instances": 1,
 			"instance_class":    "db.t3.medium",
-			"engine_version":    "17",
+			"engine_version":    "18",
 		}
 		serviceInstance := services.CreateInstance("csb-aws-aurora-postgresql", services.WithPlan("default"), services.WithParameters(params))
 		defer serviceInstance.Delete()
@@ -108,7 +108,7 @@ var _ = Describe("Aurora PostgreSQL", Label("aurora-postgresql"), func() {
 	// While snapshot restore is an AWS feature rather than a CSB feature, its valuable to check that it works
 	It("allows a snapshot to be restored when 'use_managed_admin_password' is enabled", Label("managed-password-snapshot-restore"), func() {
 		By("creating a service instance")
-		const engineVersion = "17"
+		const engineVersion = "18"
 		params := map[string]any{
 			"use_managed_admin_password":  true,
 			"rotate_admin_password_after": 4,
