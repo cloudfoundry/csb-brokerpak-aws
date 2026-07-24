@@ -49,7 +49,7 @@ provision:
     details: |
       Type of storage to be used.
       One of "standard" (magnetic), "gp2" (general purpose SSD), "gp3" (general purpose SSD),
-      or "io1" (provisioned IOPS SSD).
+      or "io1" (provisioned IOPS SSD). Note: "standard" is deprecated by AWS and will be automatically mapped to "gp3".
     default: "io1"
   - field_name: iops
     type: integer

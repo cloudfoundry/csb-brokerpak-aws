@@ -107,8 +107,8 @@ resource "aws_db_instance" "db_instance" {
   kms_key_id                  = var.kms_key_id == "" ? null : var.kms_key_id
   skip_final_snapshot         = true
   deletion_protection         = var.deletion_protection
-  storage_type                = var.storage_type
-  iops                        = contains(local.valid_storage_types_for_iops, var.storage_type) ? var.iops : null
+  storage_type                = var.storage_type == "standard" ? "gp3" : var.storage_type
+  iops                        = contains(local.valid_storage_types_for_iops, var.storage_type == "standard" ? "gp3" : var.storage_type) ? var.iops : null
   monitoring_interval         = var.monitoring_interval
   monitoring_role_arn         = var.monitoring_role_arn
   multi_az                    = var.multi_az
