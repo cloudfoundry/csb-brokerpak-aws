@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.32
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.31
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.46.1
-	github.com/cloudfoundry-community/go-cfenv v1.18.0
+	github.com/cloudfoundry-community/go-cfenv v1.22.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
@@ -23,5 +23,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.38.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.45.1 // indirect
 	github.com/aws/smithy-go v1.27.5 // indirect
-	github.com/onsi/gomega v1.18.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 )
