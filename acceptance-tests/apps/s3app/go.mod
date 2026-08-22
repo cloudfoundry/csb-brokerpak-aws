@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.37
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.36
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.2
-	github.com/cloudfoundry-community/go-cfenv v1.24.1
+	github.com/cloudfoundry-community/go-cfenv v1.24.2
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
