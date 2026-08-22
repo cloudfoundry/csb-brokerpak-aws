@@ -3,7 +3,7 @@ module postgresqlapp
 go 1.26.4
 
 require (
-	github.com/cloudfoundry-community/go-cfenv v1.24.1
+	github.com/cloudfoundry-community/go-cfenv v1.24.2
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
