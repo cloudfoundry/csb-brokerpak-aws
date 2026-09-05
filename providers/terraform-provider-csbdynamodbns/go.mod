@@ -3,11 +3,11 @@ module github.com/cloudfoundry/csb-brokerpak-aws/terraform-provider-dynamodbns
 go 1.26.4
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.43.8
-	github.com/aws/aws-sdk-go-v2/config v1.32.39
-	github.com/aws/aws-sdk-go-v2/credentials v1.19.38
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.63.5
-	github.com/aws/smithy-go v1.28.0
+	github.com/aws/aws-sdk-go-v2 v1.45.1
+	github.com/aws/aws-sdk-go-v2/config v1.33.2
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.2
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.66.0
+	github.com/aws/smithy-go v1.28.1
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.1
 	github.com/onsi/ginkgo/v2 v2.32.1
 	github.com/onsi/gomega v1.42.1
@@ -20,17 +20,17 @@ require (
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
 	github.com/agext/levenshtein v1.2.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.39 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.39 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.39 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.40 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.18 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.16 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.39 // indirect
-	github.com/aws/aws-sdk-go-v2/service/signin v1.5.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.33.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.38.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.45.8 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.19.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.1 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.19 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.13.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/signin v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.36.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.41.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.48.0 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
