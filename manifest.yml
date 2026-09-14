@@ -54,6 +54,7 @@ terraform_binaries:
 env_config_mapping:
   AWS_ACCESS_KEY_ID: aws.access_key_id
   AWS_SECRET_ACCESS_KEY: aws.secret_access_key
+  AWS_BUDGET_ALERT_EMAIL: aws.budget_alert_email
 service_definitions:
 - aws-mysql.yml
 - aws-redis.yml
@@ -64,7 +65,4 @@ service_definitions:
 - aws-aurora-mysql.yml
 - aws-mssql.yml
 - aws-sqs.yml
-
-
-
-
+- aws-bedrock.yml
