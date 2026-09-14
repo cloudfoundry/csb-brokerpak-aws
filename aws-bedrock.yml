@@ -27,7 +27,7 @@ plans:
   properties:
     ttl_hours: 8
     region: us-east-1
-    models: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","us.meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-12b-it"]'
+    models: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","us.anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-27b-it"]'
 - name: claude-opus-4-6
   id: f6a7b8c9-d0e1-2345-abcd-345678901101
   description: Standard Bedrock access pinned to Claude Opus 4.6.
@@ -57,7 +57,7 @@ plans:
   description: Standard Bedrock access pinned to Claude Haiku 4.5.
   display_name: Claude Haiku 4.5
   properties:
-    models: '["anthropic.claude-haiku-4-5-20251001-v1:0"]'
+    models: '["us.anthropic.claude-haiku-4-5-20251001-v1:0"]'
 - name: llama-4-maverick-17b-instruct
   id: e1f2a3b4-c5d6-7890-f012-890111234506
   description: Standard Bedrock access pinned to Llama 4 Maverick 17B Instruct.
@@ -75,19 +75,19 @@ plans:
   description: Standard Bedrock access pinned to Llama 3.3 70B Instruct.
   display_name: Llama 3.3 70B Instruct
   properties:
-    models: '["us.meta.llama3-3-70b-instruct-v1:0"]'
+    models: '["meta.llama3-3-70b-instruct-v1:0"]'
 - name: gpt-oss-120b
   id: b4c5d6e7-f809-0123-2345-111234567809
   description: Standard Bedrock access pinned to gpt-oss-120b.
   display_name: gpt-oss-120b
   properties:
     models: '["openai.gpt-oss-120b-1:0"]'
-- name: gemma-3-12b-it
+- name: gemma-3-27b-it
   id: c5d6e7f8-091a-1234-3456-21234567890a
-  description: Standard Bedrock access pinned to Gemma 3 12B IT.
-  display_name: Gemma 3 12B IT
+  description: Standard Bedrock access pinned to Gemma 3 27B IT.
+  display_name: Gemma 3 27B IT
   properties:
-    models: '["google.gemma-3-12b-it"]'
+    models: '["google.gemma-3-27b-it"]'
 - name: standard
   id: e5f6a7b8-c9d0-1234-efab-234567890100
   description: |
@@ -96,7 +96,7 @@ plans:
     Optional operator budget alert email can be configured broker-side.
   display_name: Standard
   properties:
-    models: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","us.meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-12b-it"]'
+    models: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","us.anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-27b-it"]'
 provision:
   plan_inputs:
   - field_name: ttl_hours
@@ -110,7 +110,7 @@ provision:
       enabled in the AWS console. Supported on both sandbox-8h and standard.
       Example:
       '["us.anthropic.claude-opus-4-6-v1","us.meta.llama4-maverick-17b-instruct-v1:0"]'
-    default: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","us.meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-12b-it"]'
+    default: '["us.anthropic.claude-opus-4-6-v1","us.anthropic.claude-opus-4-5-20251101-v1:0","us.anthropic.claude-sonnet-4-6","us.anthropic.claude-sonnet-4-5-20250929-v1:0","us.anthropic.claude-haiku-4-5-20251001-v1:0","us.meta.llama4-maverick-17b-instruct-v1:0","us.meta.llama4-scout-17b-instruct-v1:0","meta.llama3-3-70b-instruct-v1:0","openai.gpt-oss-120b-1:0","google.gemma-3-27b-it"]'
   - field_name: budget_amount
     type: number
     details: Monthly USD budget threshold metadata for this instance. Alerting is operator-email based when configured broker-side.

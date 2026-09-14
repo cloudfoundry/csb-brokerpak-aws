@@ -3,7 +3,8 @@ data "aws_partition" "current" {}
 
 locals {
   model_ids      = jsondecode(var.models)
-  ttl_expires_at = timeadd(timestamp(), "${var.ttl_hours}h")
+  ttl_hours      = coalesce(var.ttl_hours, 8)
+  ttl_expires_at = timeadd(timestamp(), "${local.ttl_hours}h")
   budget_enforcement_mode = trimspace(var.budget_alert_email) == "" ? "alert-email-optional-unset" : "alert-email-configured"
   cf_context               = try(jsondecode(var.cf_context_json), {})
   cf_originating_identity = try(jsondecode(var.cf_originating_identity_json), {})
