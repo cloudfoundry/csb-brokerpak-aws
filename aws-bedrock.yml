@@ -10,7 +10,7 @@ description: |
 display_name: CSB AWS Bedrock AI
 image_url: file://service-images/csb.png
 documentation_url: https://docs.aws.amazon.com/bedrock/latest/userguide/
-provider_display_name: GSA TTS
+provider_display_name: AWS
 support_url: https://aws.amazon.com/bedrock/
 tags: [aws, bedrock, ai, llm, generative-ai]
 plan_updateable: true
