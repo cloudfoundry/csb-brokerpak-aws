@@ -66,3 +66,4 @@ service_definitions:
 - aws-mssql.yml
 - aws-sqs.yml
 - aws-bedrock.yml
+- aws-eks.yml
