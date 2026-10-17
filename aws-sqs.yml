@@ -5,7 +5,7 @@ description: CSB AWS SQS
 display_name: CSB AWS SQS
 image_url: file://service-images/csb.png
 documentation_url: https://techdocs.broadcom.com/tnz-aws-broker-cf
-provider_display_name: VMware
+provider_display_name: GSA TTS
 support_url: https://aws.amazon.com/sqs/
 tags: [aws, sqs]
 plan_updateable: true

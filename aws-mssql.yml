@@ -6,7 +6,7 @@ description: CSB Amazon RDS for MSSQL
 display_name: CSB Amazon RDS for MSSQL
 image_url: file://service-images/csb.png
 documentation_url: https://techdocs.broadcom.com/tnz-aws-broker-cf
-provider_display_name: VMware
+provider_display_name: GSA TTS
 support_url: https://aws.amazon.com/sql/
 tags: [aws, mssql]
 plan_updateable: true

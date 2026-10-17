@@ -19,7 +19,7 @@ description: CSB Amazon ElastiCache for Redis
 display_name: CSB Amazon ElastiCache for Redis
 image_url: file://service-images/csb.png
 documentation_url: https://techdocs.broadcom.com/tnz-aws-broker-cf
-provider_display_name: VMware
+provider_display_name: GSA TTS
 support_url: https://aws.amazon.com/redis/
 tags: [aws, redis]
 plan_updateable: true

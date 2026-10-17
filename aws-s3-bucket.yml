@@ -19,7 +19,7 @@ description: CSB AWS S3 Bucket
 display_name: CSB AWS S3 Bucket
 image_url: file://service-images/csb.png
 documentation_url: https://techdocs.broadcom.com/tnz-aws-broker-cf
-provider_display_name: VMware
+provider_display_name: GSA TTS
 support_url: https://aws.amazon.com/s3/
 tags: [aws, s3]
 plan_updateable: true
