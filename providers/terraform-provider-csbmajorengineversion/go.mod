@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/rds v1.130.3
 	github.com/hashicorp/terraform-plugin-log v0.11.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.1
-	github.com/onsi/ginkgo/v2 v2.33.0
+	github.com/onsi/ginkgo/v2 v2.33.1
 	github.com/onsi/gomega v1.44.0
 )
 
