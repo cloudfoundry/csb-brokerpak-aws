@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.33.12
 	github.com/aws/aws-sdk-go-v2/credentials v1.20.12
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.72.2
-	github.com/cloudfoundry-community/go-cfenv v1.24.4
+	github.com/cloudfoundry-community/go-cfenv v1.25.0
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
